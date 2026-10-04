@@ -4,9 +4,11 @@ An Elixir implementation of [ONCE Campfire](https://github.com/basecamp/once-cam
 It keeps the existing SQLite database, storage layout, signed/encrypted cookies and
 Action Cable protocol, so existing installs can retain their data and sessions.
 
-The application runs on Elixir 1.19.5 / OTP 28 with Bandit and Plug. Redis and a
-native Resque-compatible worker handle jobs and broadcasts; the same Thruster
-binary as Rails handles TLS, HTTP/2 and proxy caching. libvips and FFmpeg process
+The application runs on Elixir 1.19.5 / OTP 28 with Bandit and Plug. Broadcasts,
+fragment caching and the Resque-compatible job queue run in-process; setting
+`REDIS_URL` keeps the Rails-compatible Resque queues and cross-runtime Action Cable
+broadcasts for mixed deployments. The same Thruster binary as Rails handles TLS,
+HTTP/2 and proxy caching. libvips and FFmpeg process
 media. The Rails frontend is preserved, including Turbo and the composer.
 
 ## Running it
@@ -43,9 +45,12 @@ docker run -d --name campfire -p 80:80 -p 443:443 \
   installations must retain their storage and secrets.
 - Web Push requires a valid P-256 VAPID key pair in URL-safe Base64. Use your own
   production secrets; `parity/reference.env` contains public test keys.
-- Redis starts inside the container by default. `REDIS_URL` selects an external
-  Redis. The native job worker starts automatically; `bin/jobs` can also run it
-  against the same database, Redis and storage environment.
+- Redis is optional. Without `REDIS_URL`, broadcasts, fragment caching, rate limits
+  and jobs run inside the app and the container starts no Redis. `REDIS_URL` selects
+  a Redis shared with a Rails deployment. The native job worker starts automatically;
+  `bin/jobs` can also run it against the same database, Redis and storage environment.
+- `CAMPFIRE_GZIP_LEVEL` (default 6, Rack's) sets the zlib level; cached responses are
+  compressed once, so lower levels only speed up cache misses.
 - The app listener binds loopback behind Thruster. Forwarded URL headers are
   trusted from the local proxy. The current Dockerfile packages the amd64
   Thruster binary.
@@ -128,6 +133,59 @@ message posting over the initial Elixir build, using an older Rust image. Both t
 empty job queues and no failed jobs. Rust remains substantially faster on dynamic
 HTTP and fanout.
 
+## Performance work on this branch
+
+The numbers above are the unmodified port in its production container. This branch
+removes the per-request work that the Rust and Go ports avoid, one commit per step,
+and measures each step with the same load generator, seed room, routes and
+validation as `bench/run`, run natively on the development machine
+(`bench/local-run`, Apple M5, 10 cores, macOS, no Thruster, no cpuset; two reps,
+medians). Absolute numbers are therefore not comparable with the container table
+above; the baseline column is the unmodified port on the same machine. The full
+step-by-step tables, including a baseline rerun to show drift, are in
+[`bench/results/local/report.md`](bench/results/local/report.md) and the method
+and findings in [`plans/performance-fork.md`](plans/performance-fork.md).
+
+| 16 concurrent clients | Baseline | Final | Change |
+|---|---:|---:|---:|
+| Room page | 1,226 req/s | 12,130 req/s | 9.9× |
+| Messages page | 1,619 req/s | 3,901 req/s | 2.4× |
+| Sidebar | 1,600 req/s | 13,352 req/s | 8.3× |
+| Search | 1,673 req/s | 13,697 req/s | 8.2× |
+| Post a message | 888 req/s | 1,269 req/s | 1.4× |
+| Avatar | 2,438 req/s | 6,630 req/s | 2.7× |
+| Static CSS | 10,252 req/s | 27,226 req/s | 2.7× |
+| `/up` | 33,858 req/s | 34,676 req/s | 1.0× |
+| Room page p99 | 16.4 ms | 2.0 ms | 8.0× |
+| Deliveries/s, 1,000 clients in one room | 94,300 | 140,000 | 1.5× |
+| Peak RSS under load | 1,472 MiB | 369 MiB | 4.0× |
+
+The steps, cumulative:
+
+1. **gzip level** (`step1-gzip`): zlib level 1 instead of 6 gave 14–22% on dynamic
+   pages. Once responses were cached the level made no measurable difference, so the
+   default is back at 6 and the wire bytes match Rails again; `CAMPFIRE_GZIP_LEVEL`
+   keeps the option.
+2. **Response cache** (`step2-cache`): complete compressed room, messages, search and
+   sidebar responses with their ETags, keyed on the user, CSRF session, route inputs,
+   base URL, User-Agent, Turbo-Frame header and a database write generation; static
+   files served from memory with a precompressed body. 3–3.6× on pages, 2.5× on CSS.
+3. **No Redis** (`step3-noredis`): Registry broadcasts with one encoded frame per
+   subscription identifier, ETS fragments, an in-process Resque-compatible queue.
+   1,000-client fan-out +37%, paced delivery latency −30%, peak memory 1.3 GiB → 356 MiB.
+4. **SQLite reader pool** (`step4-dbpool`): reads on pooled reader processes with
+   cached prepared statements; the single writer keeps transactions serialized.
+   2.4–2.9× on cached pages, avatars 2.6×, room page p99 at 64 clients 32 → 11.5 ms.
+5. **Pipeline cleanups** (`step5-pipeline`): decrypt the session cookie once per
+   request, single-pass cookie escaping, Accept-Encoding and authority fast paths.
+   5–15% on the cached pages.
+
+What is left: the messages page still runs its query and renders through the
+fragment cache on every request (2.4×); posting a message is bounded by the write
+transaction plus fan-out and push jobs (1.4×); `/up` shows the fixed cost of Bandit
+plus the Plug pipeline on this machine (34k req/s); and 1,000-client fan-out is
+140 complete broadcasts/s, where each post still sends two frames to every client.
+
 ## Development
 
 The project follows [rails-to-rust](https://github.com/basecamp/rails-to-rust): an
@@ -138,6 +196,11 @@ The Rails reference is pinned to
 [`90b3300`](https://github.com/basecamp/once-campfire/commit/90b330024dec3e757c79b6a7e6568f93da8e3148).
 
 Use the Docker toolchain above, then run:
+
+Without Docker, `bin/export-assets-local` reproduces the Rails asset precompile from
+the `reference` submodule plus unpacked gem assets (`GEM_ASSETS`, default
+`var/gem-assets`), `mise.toml` pins the same Erlang/Elixir as the image, and
+`bench/local-run --label NAME` benchmarks a native release of the working tree.
 
 ```sh
 bin/mix format --check-formatted
@@ -200,10 +263,17 @@ Gumbo sources from Rails' Nokogiri 1.19.4. Expected oracle output is retained;
 raw differences and the comparison rules are documented in
 [`plans/richtext-comparison.md`](plans/richtext-comparison.md).
 
-Elixir retains Redis and Resque-compatible jobs, while Rust uses integrated
-queues and a different frontend/server implementation. Their actual process
-models, response sizes and compression ratios are recorded with the benchmarks.
-No production cutover has been performed.
+On this branch Redis is optional; without it the Resque-compatible queue, Action
+Cable broadcasts, fragment cache and rate limits run in-process, so a Rails and an
+Elixir process cannot share queues or broadcasts unless `REDIS_URL` is set.
+Rails never cached whole pages: room, messages, search and sidebar responses are
+now remembered per user and session until the next database write (messages pages
+until their messages change), so repeated requests also get stable ETags and 304
+responses. Message fragments keep Rails' staleness: a creator's renamed profile
+shows in old messages only once the message itself changes. Rust uses integrated
+queues and a different frontend/server implementation. Actual process models,
+response sizes and compression ratios are recorded with the benchmarks. No
+production cutover has been performed.
 
 ## License
 

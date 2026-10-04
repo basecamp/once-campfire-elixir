@@ -113,7 +113,7 @@ start_app() {
   local t0; t0=$(python3 -c 'import time; print(time.time())')
   env PORT="$PORT" DATABASE_PATH="$WORK/db/production.sqlite3" STORAGE_PATH="$WORK/files" \
     CAMPFIRE_WORKER=1 CAMPFIRE_BIND=loopback APP_URL="$BASE" RAILS_ENV=production \
-    CAMPFIRE_GZIP_LEVEL="${CAMPFIRE_GZIP_LEVEL:-1}" \
+    CAMPFIRE_GZIP_LEVEL="${CAMPFIRE_GZIP_LEVEL:-6}" \
     "$REL" start >"$WORK/app.log" 2>&1 &
   echo $! > "$WORK/app.pid"
   for _ in $(seq 1 3000); do
@@ -225,7 +225,7 @@ PY
 {
   echo "date: $(date -Iseconds)"
   echo "host: $(uname -sr), $(sysctl -n machdep.cpu.brand_string 2>/dev/null || grep -m1 'model name' /proc/cpuinfo | cut -d: -f2), $(sysctl -n hw.ncpu 2>/dev/null || nproc) threads"
-  echo "mode: native release, no Thruster, no Redis container; REDIS=$REDIS CAMPFIRE_GZIP_LEVEL=${CAMPFIRE_GZIP_LEVEL:-1}"
+  echo "mode: native release, no Thruster, no Redis container; REDIS=$REDIS CAMPFIRE_GZIP_LEVEL=${CAMPFIRE_GZIP_LEVEL:-6}"
   echo "git: $(git -C "$ROOT" rev-parse --short HEAD) (dirty: $(git -C "$ROOT" status --porcelain -- lib priv/templates mix.exs mix.lock | wc -l | tr -d ' ') files)"
   echo "elixir: $(cd "$ROOT" && elixir --version 2>/dev/null | tail -1)"
   echo "workload: suites=$SUITES HTTP_SECS=$HTTP_SECS HTTP_CONCS=$HTTP_CONCS CABLE_CLIENTS=$CABLE_CLIENTS CABLE_TPUT_SECS=$CABLE_TPUT_SECS CABLE_POSTERS=$CABLE_POSTERS REPS=$REPS"

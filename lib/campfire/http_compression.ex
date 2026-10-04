@@ -1,16 +1,18 @@
 defmodule Campfire.HttpCompression do
   @moduledoc "Rack-compatible gzip selection and response framing."
   import Plug.Conn
-  # Rack::Deflater uses zlib's default level (6). Level 1 compresses this app's
-  # HTML about 2.5x faster for roughly 1.5x the wire bytes; CAMPFIRE_GZIP_LEVEL
-  # selects another level (1-9) at startup.
-  def level, do: :persistent_term.get({__MODULE__, :level}, 1)
+  # Rack::Deflater uses zlib's default level (6), which keeps gzip wire bytes
+  # identical to the Rails reference. Cached responses are compressed once, so
+  # the level only costs CPU on cache misses; CAMPFIRE_GZIP_LEVEL selects
+  # another level (1-9) at startup. Level 1 compresses this app's HTML about
+  # 2.5x faster for roughly 1.5x the bytes.
+  def level, do: :persistent_term.get({__MODULE__, :level}, 6)
 
   def configure_level do
     level =
-      case Integer.parse(System.get_env("CAMPFIRE_GZIP_LEVEL", "1")) do
+      case Integer.parse(System.get_env("CAMPFIRE_GZIP_LEVEL", "6")) do
         {n, ""} when n in 1..9 -> n
-        _ -> 1
+        _ -> 6
       end
 
     :persistent_term.put({__MODULE__, :level}, level)

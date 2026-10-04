@@ -12,3 +12,6 @@ __pycache__/
 /bench/.work/
 
 /bench/loadgen/target/
+
+# Local benchmark raw output; the report and env records are kept
+/bench/results/local/*/*.json
