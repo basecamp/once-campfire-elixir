@@ -63,6 +63,15 @@ defmodule Campfire.DB do
   def restore_fixture(fixture),
     do: GenServer.call(__MODULE__, {:restore_fixture, fixture}, 30_000)
 
+  @reads ["select", "with", "pragma", "explai"]
+  @doc "Whether `sql` can change data; such statements advance the response cache generation."
+  def write?(sql) do
+    head =
+      sql |> String.trim_leading() |> binary_part(0, min(6, byte_size(sql))) |> String.downcase()
+
+    not Enum.any?(@reads, &String.starts_with?(head, &1))
+  end
+
   def handle_call({:restore_fixture, fixture}, _, db) do
     :ok = SQL.execute(db, "PRAGMA foreign_keys=OFF")
 
@@ -93,6 +102,8 @@ defmodule Campfire.DB do
     end
 
     :ok = SQL.execute(db, "COMMIT; PRAGMA foreign_keys=ON")
+    Campfire.ResponseCache.bump()
+    Campfire.ResponseCache.clear()
     {:reply, :ok, db}
   end
 
@@ -104,6 +115,7 @@ defmodule Campfire.DB do
         e -> {:error, e}
       end
 
+    if write?(sql), do: Campfire.ResponseCache.bump()
     {:reply, result, db}
   end
 
@@ -113,6 +125,7 @@ defmodule Campfire.DB do
     try do
       result = fun.(fn sql, params -> run(db, sql, params) end)
       :ok = SQL.execute(db, "COMMIT")
+      Campfire.ResponseCache.bump()
       {:reply, result, db}
     rescue
       e ->

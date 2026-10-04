@@ -24,9 +24,24 @@ defmodule Campfire.HttpCompression do
 
         "gzip" ->
           compressed =
-            if conn.state == :set_file,
-              do: nil,
-              else: gzip(IO.iodata_to_binary(body), conn.assigns[:gzip_chunks])
+            cond do
+              conn.state == :set_file ->
+                nil
+
+              is_binary(conn.assigns[:precompressed_gzip]) ->
+                timestamp_header(conn.assigns[:precompressed_gzip])
+
+              match?(%{gzip: g} when is_binary(g), conn.assigns[:response_cache_hit]) ->
+                timestamp_header(conn.assigns[:response_cache_hit].gzip)
+
+              true ->
+                compressed = gzip(IO.iodata_to_binary(body), conn.assigns[:gzip_chunks])
+
+                if hit = conn.assigns[:response_cache_hit],
+                  do: Campfire.ResponseCache.put_gzip(hit, compressed)
+
+                compressed
+            end
 
           %{conn | resp_body: compressed}
           |> put_resp_header("content-encoding", "gzip")
@@ -116,6 +131,9 @@ defmodule Campfire.HttpCompression do
     do:
       <<prefix::binary, DateTime.to_unix(Campfire.Clock.now())::little-unsigned-size(32),
         rest::binary>>
+
+  @doc "Rack::Deflater's chunked gzip framing of `body` (or of the given chunks)."
+  def compress(body, chunks \\ nil), do: gzip(body, chunks)
 
   defp gzip(body, chunks) do
     z = :zlib.open()

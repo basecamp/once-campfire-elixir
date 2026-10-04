@@ -8,6 +8,7 @@ defmodule Campfire.Application do
       Campfire.RateLimiter,
       Campfire.FragmentCache,
       Campfire.CableFrames,
+      Campfire.ResponseCache,
       {Campfire.DB, path: System.get_env("DATABASE_PATH", "var/production.sqlite3")}
     ]
 
