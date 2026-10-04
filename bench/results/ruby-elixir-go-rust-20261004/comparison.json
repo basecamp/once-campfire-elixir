@@ -1,0 +1,18 @@
+{
+  "date": "2026-10-04",
+  "methodology": "Two runs per app. Elixir comes from the earlier alternating Elixir/older-Rust session; Ruby, Go and current Rust were each measured separately afterward. Same date, seed, host, CPU sets, encoding, HTTP/Cable/upload settings and validation; each production image ID is retained.",
+  "source_directories": {
+    "reference": "../ruby-20261004",
+    "go": "../go-20261004",
+    "elixir": "../tuned-fifo-20261004",
+    "rust": "../rust-current-20261004"
+  },
+  "samples_per_app": 2,
+  "passed": true,
+  "measured_revisions": {
+    "reference": "90b330024dec3e757c79b6a7e6568f93da8e3148",
+    "elixir": "3498c18f3705de2bcaff778132cd5699199e1cbc",
+    "go": "504428addff333549f1fc88b003c7331779a3c2a",
+    "rust": "1ea6d6f6b24fd21e7d01e69b7c92df5c380bcbde"
+  }
+}

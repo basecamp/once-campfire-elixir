@@ -42,6 +42,8 @@ ENV_FILE=$ROOT/parity/reference.env
 REFERENCE_IMAGE=${REFERENCE_IMAGE:-campfire-reference:app}
 RUST_IMAGE=${RUST_IMAGE:-campfire-rust:app}
 ELIXIR_IMAGE=${ELIXIR_IMAGE:-campfire-elixir:release}
+GO_IMAGE=${GO_IMAGE:-once-campfire-go:optimized}
+GO_ROOT=${GO_ROOT:-$(dirname "$ROOT")/once-campfire-go}
 SERVER_CPUS=${SERVER_CPUS:-8-11}
 LOADGEN_CPUS=${LOADGEN_CPUS:-12-15}
 HTTP_SECS=${HTTP_SECS:-8}
@@ -110,7 +112,7 @@ AVATAR=$(label avatar_tokens.jason)    # image avatar
 EMAIL=$(label emails.david)
 PASSWORD=$(label passwords.all)
 
-image_for() { case "$1" in reference) echo "$REFERENCE_IMAGE" ;; elixir) echo "$ELIXIR_IMAGE" ;; rust|rust-identity) echo "$RUST_IMAGE" ;; esac; }
+image_for() { case "$1" in reference) echo "$REFERENCE_IMAGE" ;; elixir) echo "$ELIXIR_IMAGE" ;; go) echo "$GO_IMAGE" ;; rust|rust-identity) echo "$RUST_IMAGE" ;; esac; }
 
 # Environment: parity/.env.reference, but with the reference's *default* process model for
 # SERVER_CPUS (config/puma.rb: workers = ceil(nproc * 0.666), JOB_CONCURRENCY the same, 5 threads;
@@ -294,6 +296,7 @@ PY
   echo "quiet wait: LOAD_MAX=$LOAD_MAX LOAD_WAIT_SECS=$LOAD_WAIT_SECS"
   echo "user agent: ${USER_AGENT_ARGS[1]:-(none)}"
   for app in ${APPS//,/ }; do echo "$app image: $(image_for "$app") $(docker image inspect -f '{{.Id}} {{.Created}} unpacked_bytes={{.Size}}' "$(image_for "$app")")"; done
+  if [[ ",$APPS," = *,go,* ]]; then echo "go HEAD: $(git -C "$GO_ROOT" rev-parse HEAD) (dirty: $(git -C "$GO_ROOT" status --porcelain -- cmd internal assets go.mod go.sum third_party Dockerfile | wc -l) files)"; fi
   echo "rust HEAD: $(git -C "$RUST_ROOT" rev-parse --short HEAD) (dirty: $(git -C "$RUST_ROOT" status --porcelain -- crates Cargo.toml Cargo.lock | wc -l) files)"
 } > "$OUT/env.txt"
 cat "$OUT/env.txt" >&2

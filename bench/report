@@ -4,7 +4,8 @@
   bench/report bench/results/<stamp>
 
 "Rust adv." is the Rust advantage: >1 means Rust is better (higher throughput, or lower
-latency/memory/time), computed from the medians. When the results include `rust-identity` runs
+latency/memory/time), computed from the medians. With Elixir included, the ratio compares Rust to Elixir;
+otherwise it compares Rust to Rails. When the results include `rust-identity` runs
 (the Rust image serving `Accept-Encoding: identity`), the HTTP table adds a "Rust, no gzip" column
 and its advantage over Rust with gzip.
 """
@@ -23,7 +24,7 @@ for f in sorted(glob.glob(os.path.join(out, "*-*.json"))):
             assert c["ready"] == c["clients"] and c["failed"] == 0 and c["latency"]["complete"] == c["latency"]["messages"] and c["throughput"]["complete"] == c["throughput"]["posted"], f
         runs.setdefault(r["app"], []).append(r)
 identity = runs.pop("rust-identity", None)
-apps = [a for a in ("reference", "elixir", "rust") if a in runs]
+apps = [a for a in ("reference", "elixir", "go", "rust") if a in runs]
 
 
 def cell(vals):
@@ -74,7 +75,8 @@ def header(title, with_identity=False, note=""):
     if note:
         print(note + "\n")
     more = " Rust, no gzip | vs Rust gzip |" if with_identity else ""
-    print("| Metric | " + " | ".join({"reference":"Rails", "elixir":"Elixir", "rust":"Rust"}[a] for a in apps) + " | Rust adv. |" + more)
+    advantage = "Rust advantage over Elixir" if "elixir" in apps else "Rust advantage over Rails"
+    print("| Metric | " + " | ".join({"reference":"Rails", "elixir":"Elixir", "go":"Go", "rust":"Rust"}[a] for a in apps) + " | " + advantage + " |" + more)
     print("|---|" + "---|" * len(apps) + "---|" + ("---|---|" if with_identity else ""))
 
 
@@ -86,10 +88,10 @@ print(f"\nReps: " + ", ".join(f"{a} {len(runs[a])}" for a in apps) + (f", rust-i
 
 header("Startup and memory")
 row("cold start: docker run → /up 200 (ms)", lambda r: r["cold_start_ms"], False)
-row("idle memory.current (MB)", lambda r: r["memory"]["idle_current_mb"], False)
-row("idle anon (MB)", lambda r: r["memory"]["idle_anon_mb"], False)
-row("peak memory.current under load (MB)", lambda r: r["memory"]["peak_current_mb"], False)
-row("peak anon under load (MB)", lambda r: r["memory"]["peak_anon_mb"], False)
+row("idle memory.current (MiB)", lambda r: r["memory"]["idle_current_mb"], False)
+row("idle anon (MiB)", lambda r: r["memory"]["idle_anon_mb"], False)
+row("peak memory.current under load (MiB)", lambda r: r["memory"]["peak_current_mb"], False)
+row("peak anon under load (MiB)", lambda r: r["memory"]["peak_anon_mb"], False)
 
 first = runs[apps[0]][0]
 routes = []
@@ -148,25 +150,25 @@ def procmem(n, phase, what):
         p = c["process_memory"][phase]
         roles = p["roles"]
         if what == "app":
-            return roles[{"rust":"campfire","elixir":"beam","reference":"puma"}[r["app"]]]["peak_pss_mb"]
+            return roles[{"rust":"campfire","go":"campfire","elixir":"beam","reference":"puma"}[r["app"]]]["peak_pss_mb"]
         if what == "app_anon":
-            return roles[{"rust":"campfire","elixir":"beam","reference":"puma"}[r["app"]]]["peak_anon_mb"]
+            return roles[{"rust":"campfire","go":"campfire","elixir":"beam","reference":"puma"}[r["app"]]]["peak_anon_mb"]
         if what == "serving":  # everything that takes part in a cable delivery
-            keys = ["campfire"] if r["app"] == "rust" else ["beam", "redis", "helpers", "thrust"] if r["app"] == "elixir" else ["puma", "redis", "thrust"]
+            keys = ["campfire"] if r["app"] in ["rust", "go"] else ["beam", "redis", "helpers", "thrust"] if r["app"] == "elixir" else ["puma", "redis", "thrust"]
             return sum(roles[k]["peak_pss_mb"] for k in keys if k in roles)
         return p["peak_total_pss_mb"]
     return get
 
 
 if all("process_memory" in c for a in apps for r in runs[a] for c in r["cable"]):
-    header("Memory during cable fan-out, by process (MB, peak within the phase)", note=(
+    header("Memory during cable fan-out, by process (MiB, peak within the phase)", note=(
         "App process: Elixir BEAM; Rails Puma master/workers when included;\n"
-        "Rust's integrated campfire process. Serving totals include native helpers, Redis and Thruster.\n"
+        "Go/Rust's integrated campfire processes. Serving totals include native helpers, Redis and Thruster.\n"
         "PSS apportions shared pages; RssAnon counts them in each process."))
     for c in first["cable"]:
         n = c["clients"]
         for phase, label in (("connected", "all subscribed, idle"), ("saturated", "saturated fan-out")):
             row(f"{n} clients, {label}: app process Pss", procmem(n, phase, "app"), False)
             row(f"{n} clients, {label}: app process RssAnon", procmem(n, phase, "app_anon"), False)
-            row(f"{n} clients, {label}: app + Redis + Thruster Pss", procmem(n, phase, "serving"), False)
+            row(f"{n} clients, {label}: serving processes Pss", procmem(n, phase, "serving"), False)
             row(f"{n} clients, {label}: whole container Pss", procmem(n, phase, "total"), False)

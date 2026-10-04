@@ -1,0 +1,13 @@
+date: 2026-10-04T15:29:44+02:00
+host: 7.2.5-4-omarchy, AMD RYZEN AI MAX+ 395 w/ Radeon 8060S, 32 threads, 30GB
+server cpus: 8-11 (nproc 4); loadgen cpus: 12-15; network: host
+env: WEB_CONCURRENCY=3 JOB_CONCURRENCY=3 RAILS_MAX_THREADS=5 
+seed sha256: 433ccdce78759eef0524b2840a512077e52cc8e867f6c095430a8871d47a2e38  /home/dhh/Work/basecamp/once-campfire-rust/parity/.seed/default/db/production.sqlite3
+elixir source digest: ad793a949fb8bc0f03f370a2b562b9226f3e86d9304fc4be6110ea72b0179056
+rust extra env: 
+workload: suites=http cable upload HTTP_SECS=4 HTTP_CONCS=1 16 64 CABLE_CLIENTS=100 500 1000 CABLE_TPUT_SECS=15 CABLE_POSTERS=4 UPLOAD_REPS=5 REPS=2
+quiet wait: LOAD_MAX=1.5 LOAD_WAIT_SECS=30
+user agent: (none)
+go image: once-campfire-go:readme-504428 sha256:929c0116613a3696ff2ad276b7e11ef00554f5469003775361e136e760617c45 2026-10-04T15:28:42.439061071+02:00 unpacked_bytes=241608271
+go HEAD: 504428addff333549f1fc88b003c7331779a3c2a (dirty: 0 files)
+rust HEAD: 195457b (dirty: 0 files)

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Record external Resque backlog; single-process Rust owns its queue internally."""
+"""Record external Resque backlog; Go and Rust own their queues internally."""
 import json,socket
 try:
  s=socket.create_connection(('127.0.0.1',6379),timeout=1);f=s.makefile('rb');out={}

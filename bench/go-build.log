@@ -1,0 +1,151 @@
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 9.50kB done
+#1 DONE 0.0s
+
+#2 resolve image config for docker-image://docker.io/docker/dockerfile:1
+#2 DONE 0.7s
+
+#3 docker-image://docker.io/docker/dockerfile:1@sha256:4edf897a3ffa55b89f906fc8cc78afdb3f1834cc9c7083565e611a8a7d5fe99e
+#3 resolve docker.io/docker/dockerfile:1@sha256:4edf897a3ffa55b89f906fc8cc78afdb3f1834cc9c7083565e611a8a7d5fe99e 0.0s done
+#3 CACHED
+
+#4 [internal] load metadata for docker.io/library/debian:trixie-slim
+#4 DONE 0.7s
+
+#5 [internal] load metadata for docker.io/library/golang:1.27.1-trixie
+#5 DONE 0.7s
+
+#6 [internal] load .dockerignore
+#6 transferring context: 513B done
+#6 DONE 0.0s
+
+#7 [internal] preparing inline document
+#7 DONE 0.0s
+
+#8 [internal] preparing inline document
+#8 DONE 0.0s
+
+#9 [stage-6  1/11] FROM docker.io/library/debian:trixie-slim@sha256:a99cfc517144bc59b1978475ec53b46ecabec7e43635402ee5b77cc54cd1b20a
+#9 resolve docker.io/library/debian:trixie-slim@sha256:a99cfc517144bc59b1978475ec53b46ecabec7e43635402ee5b77cc54cd1b20a 0.0s done
+#9 DONE 0.0s
+
+#10 [media-base 1/3] FROM docker.io/library/golang:1.27.1-trixie@sha256:3b77fc618ec235a1ab412de7737f120dd507c57e8d87de4cbb7994fb94275ed5
+#10 resolve docker.io/library/golang:1.27.1-trixie@sha256:3b77fc618ec235a1ab412de7737f120dd507c57e8d87de4cbb7994fb94275ed5 0.0s done
+#10 DONE 0.0s
+
+#11 [internal] load build context
+#11 transferring context: 16.56MB 0.1s done
+#11 DONE 0.1s
+
+#12 [media-base 2/3] RUN sed -i 's/^Types: deb$/Types: deb deb-src/' /etc/apt/sources.list.d/debian.sources &&     apt-get update -qq &&     apt-get install --no-install-recommends -y       dpkg-dev meson ninja-build nasm python3 pkg-config libzstd-dev zstd       libglib2.0-dev libexpat1-dev zlib1g-dev libjpeg62-turbo-dev libspng-dev libpng-dev       libwebp-dev libtiff-dev libheif-dev libexif-dev liblcms2-dev libcgif-dev libimagequant-dev       libhwy-dev libdav1d-dev libbz2-dev liblzma-dev
+#12 CACHED
+
+#13 [vips 1/1] RUN apt-get source -qq vips=8.16.1-1+deb13u1 &&     echo "60205e00d061b9d8072938e04899f2ca2fdac0513068e561d33f7c87fae1ae2e  vips_8.16.1-1+deb13u1.dsc" | sha256sum -c - &&     cd vips-8.16.1 &&     eval "$(DEB_BUILD_MAINT_OPTIONS=hardening=+all dpkg-buildflags --export=sh)" &&     meson setup build --buildtype=plain --wrap-mode=nodownload --prefix=/opt/vips --libdir=lib       --auto-features=disabled -Dmodules=disabled -Dintrospection=disabled -Dcplusplus=false       -Ddeprecated=false -Dexamples=false       -Djpeg=enabled -Dspng=enabled -Dpng=enabled -Dwebp=enabled -Dtiff=enabled -Dheif=enabled       -Dexif=enabled -Dlcms=enabled -Dcgif=enabled -Dimagequant=enabled -Dhighway=enabled       -Dzlib=enabled &&     meson install -C build --strip
+#13 CACHED
+
+#14 [ffmpeg 1/1] RUN apt-get source -qq ffmpeg=7:7.1.5-0+deb13u1 &&     upstream=7.1.5-0+deb13u1 && upstream=${upstream%-*} && revision=0+deb13u1 &&     echo "9ed2ed34cbe7f056eeebbe9045c5e2d15e41b5b053fe7c8ba6979a0b6fb081ce  ffmpeg_7.1.5-0+deb13u1.dsc" | sha256sum -c - &&     cd ffmpeg-${upstream} &&     ./configure --prefix=/opt/ffmpeg --extra-version="${revision}" --toolchain=hardened       --enable-shared --disable-static --disable-doc --disable-ffplay --disable-avdevice       --disable-autodetect --disable-network --disable-hwaccels --disable-devices       --enable-libdav1d --enable-zlib --enable-bzlib --enable-lzma       --disable-encoders --enable-encoder=mjpeg       --disable-muxers --enable-muxer=image2       --disable-protocols --enable-protocol=file,pipe       --disable-filters       --enable-filter=buffer,buffersink,abuffer,abuffersink,format,aformat,null,anull,scale,aresample       --enable-filter=select,loop,trim,transpose,hflip,vflip,rotate,crop &&     make -j"$(nproc)" &&     make install &&     strip --strip-unneeded /opt/ffmpeg/lib/*.so.* /opt/ffmpeg/bin/*
+#14 CACHED
+
+#15 [toolchain 2/2] COPY --from=ffmpeg /opt/ffmpeg /opt/ffmpeg
+#15 CACHED
+
+#16 [toolchain 1/2] COPY --from=vips /opt/vips /opt/vips
+#16 CACHED
+
+#17 [build  1/12] WORKDIR /src
+#17 CACHED
+
+#18 [media-base 3/3] WORKDIR /usr/src
+#18 CACHED
+
+#19 [build  2/12] COPY go.mod go.sum ./
+#19 CACHED
+
+#20 [build  3/12] COPY third_party third_party
+#20 CACHED
+
+#21 [build  4/12] RUN --mount=type=cache,target=/go/pkg/mod go mod download
+#21 CACHED
+
+#22 [build  5/12] COPY cmd cmd
+#22 CACHED
+
+#23 [build  6/12] COPY internal internal
+#23 DONE 0.4s
+
+#24 [build  7/12] COPY assets assets
+#24 DONE 0.2s
+
+#25 [build  8/12] COPY bin/build-assets bin/build-assets
+#25 DONE 0.0s
+
+#26 [build  9/12] COPY reference/crates/assets reference/crates/assets
+#26 DONE 0.1s
+
+#27 [build 10/12] COPY reference/reference reference/reference
+#27 DONE 0.1s
+
+#28 [build 11/12] RUN python3 bin/build-assets
+#28 0.193 Compiled 315 assets and 89 imports
+#28 DONE 0.2s
+
+#29 [build 12/12] RUN --mount=type=cache,target=/go/pkg/mod     --mount=type=cache,target=/root/.cache/go-build     go build -tags sqlite_fts5 -trimpath -ldflags='-s -w' -o /out/campfire ./cmd/campfire
+#29 DONE 1.7s
+
+#30 [stage-6  5/11] RUN groupadd --system --gid 1000 rails &&     useradd rails --uid 1000 --gid 1000 --create-home --shell /bin/bash
+#30 CACHED
+
+#31 [media 3/3] COPY --from=ffmpeg /opt/ffmpeg/bin/ffmpeg /opt/ffmpeg/bin/ffprobe /usr/local/bin/
+#31 CACHED
+
+#32 [stage-6  2/11] RUN apt-get update -qq &&     apt-get install --no-install-recommends -y       ca-certificates libzstd1 libglib2.0-0t64 libexpat1 libjpeg62-turbo libspng0 libpng16-16t64       libwebp7 libwebpmux3 libwebpdemux2 libtiff6 libheif1 libheif-plugin-libde265       libheif-plugin-dav1d libexif12 liblcms2-2 libcgif0 libimagequant0 libhwy1t64 libdav1d7 &&     rm -rf /var/lib/apt/lists /var/cache/apt/archives
+#32 CACHED
+
+#33 [media 1/3] COPY --from=vips /opt/vips/lib/libvips.so.42 /usr/local/lib/
+#33 CACHED
+
+#34 [stage-6  3/11] COPY --from=media / /
+#34 CACHED
+
+#35 [stage-6  4/11] RUN ldconfig
+#35 CACHED
+
+#36 [media 2/3] COPY --from=ffmpeg /opt/ffmpeg/lib/libavcodec.so.61 /opt/ffmpeg/lib/libavfilter.so.10      /opt/ffmpeg/lib/libavformat.so.61 /opt/ffmpeg/lib/libavutil.so.59      /opt/ffmpeg/lib/libswresample.so.5 /opt/ffmpeg/lib/libswscale.so.8 /usr/local/lib/
+#36 CACHED
+
+#37 [stage-6  6/11] WORKDIR /rails
+#37 CACHED
+
+#8 [internal] preparing inline document
+#8 CACHED
+
+#7 [internal] preparing inline document
+#7 CACHED
+
+#38 [stage-6  7/11] COPY --from=build /out/campfire /usr/local/bin/campfire
+#38 DONE 0.0s
+
+#39 [stage-6  8/11] COPY --chmod=755 <<EOF /rails/bin/boot
+#39 DONE 0.0s
+
+#40 [stage-6  9/11] RUN mkdir -p /rails/storage/db /rails/storage/files /rails/storage/backups &&     chown -R 1000:1000 /rails
+#40 DONE 0.1s
+
+#41 [stage-6 10/11] COPY --chmod=755 <<EOF /hooks/pre-backup
+#41 DONE 0.0s
+
+#42 [stage-6 11/11] COPY --chmod=755 reference/reference/hooks/post-restore /hooks/post-restore
+#42 DONE 0.0s
+
+#43 exporting to image
+#43 exporting layers
+#43 exporting layers 0.3s done
+#43 exporting manifest sha256:fb72e0748b6dbfd0165fd27eb22bfa50ac39ae29390ae5c16aa06cea9f64a107 done
+#43 exporting config sha256:26d34dbdbd36f6b1afbc986d04c4e9ceae1f83f2f95d7006ee9fd2004bef73c0 done
+#43 exporting attestation manifest sha256:154ec641f47fd6d23d29a5a35274f7cb3eeccffdcd56e0343004044490e0def7 done
+#43 exporting manifest list sha256:929c0116613a3696ff2ad276b7e11ef00554f5469003775361e136e760617c45 done
+#43 naming to docker.io/library/once-campfire-go:readme-504428 done
+#43 unpacking to docker.io/library/once-campfire-go:readme-504428 0.1s done
+#43 DONE 0.5s
