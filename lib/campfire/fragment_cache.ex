@@ -2,10 +2,14 @@ defmodule Campfire.FragmentCache do
   @moduledoc "Bounded application fragments shared by request and broadcast rendering."
   use Agent
 
+  @fragments Campfire.Fragments
+  @capacity 8192
+
   def start_link(_) do
     Agent.start_link(
       fn ->
         :ets.new(Campfire.DecodedFragments, [:named_table, :set, :public, read_concurrency: true])
+        :ets.new(@fragments, [:named_table, :set, :public, read_concurrency: true])
         %{}
       end,
       name: __MODULE__
@@ -30,7 +34,7 @@ defmodule Campfire.FragmentCache do
           render.()
       end
     else
-      fetch({kind, record}, render)
+      fetch(identity(kind, record), render)
     end
   end
 
@@ -106,23 +110,17 @@ defmodule Campfire.FragmentCache do
     html
   end
 
+  @doc "Rendered fragment for a versioned key, shared across requests without Redis."
   def fetch(key, render) do
-    case Agent.get(__MODULE__, &Map.fetch(&1, key)) do
-      {:ok, html} ->
+    case :ets.lookup(@fragments, key) do
+      [{^key, html}] ->
         html
 
-      :error ->
+      [] ->
         html = render.()
-
-        Agent.get_and_update(__MODULE__, fn cache ->
-          case Map.fetch(cache, key) do
-            {:ok, existing} ->
-              {existing, cache}
-
-            :error ->
-              {html, Map.put(if(map_size(cache) >= 4096, do: %{}, else: cache), key, html)}
-          end
-        end)
+        if :ets.info(@fragments, :size) >= @capacity, do: :ets.delete_all_objects(@fragments)
+        :ets.insert(@fragments, {key, html})
+        html
     end
   end
 end

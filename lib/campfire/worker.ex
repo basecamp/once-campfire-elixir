@@ -7,11 +7,21 @@ defmodule Campfire.Worker do
   def child_spec(options),
     do: %{id: __MODULE__, start: {__MODULE__, :start_link, [options]}, shutdown: 30_000}
 
+  defp redis?, do: Process.whereis(Campfire.Redis) != nil
+
   def init(state) do
     Process.flag(:trap_exit, true)
     {:ok, hostname} = :inet.gethostname()
     worker = "#{hostname}:#{System.pid()}:default"
 
+    if redis?(),
+      do: register(worker)
+
+    send(self(), :poll)
+    {:ok, Map.put(state, :worker, worker)}
+  end
+
+  defp register(worker) do
     {:ok, _} =
       Redix.transaction_pipeline(Campfire.Redis, [
         ["SADD", "resque:workers", worker],
@@ -21,12 +31,14 @@ defmodule Campfire.Worker do
           Calendar.strftime(Campfire.Clock.now(), "%Y-%m-%d %H:%M:%S %z")
         ]
       ])
-
-    send(self(), :poll)
-    {:ok, Map.put(state, :worker, worker)}
   end
 
   def terminate(_, %{worker: worker}) do
+    if redis?(), do: unregister(worker)
+    :ok
+  end
+
+  defp unregister(worker) do
     Redix.transaction_pipeline(Campfire.Redis, [
       ["SREM", "resque:workers", worker],
       [
@@ -42,7 +54,12 @@ defmodule Campfire.Worker do
   end
 
   def handle_info(:poll, state) do
-    claimed = Redix.command(Campfire.Redis, ["LPOP", "resque:queue:default"])
+    redis? = redis?()
+
+    claimed =
+      if redis?,
+        do: Redix.command(Campfire.Redis, ["LPOP", "resque:queue:default"]),
+        else: Campfire.LocalQueue.claim()
 
     case claimed do
       {:ok, nil} ->
@@ -61,11 +78,13 @@ defmodule Campfire.Worker do
           "payload" => decoded
         }
 
-        Redix.command(Campfire.Redis, [
-          "SET",
-          "resque:worker:#{state.worker}",
-          Jason.encode!(current)
-        ])
+        if redis?,
+          do:
+            Redix.command(Campfire.Redis, [
+              "SET",
+              "resque:worker:#{state.worker}",
+              Jason.encode!(current)
+            ])
 
         try do
           %{"class" => "ActiveJob::QueueAdapters::ResqueAdapter::JobWrapper", "args" => [job]} =
@@ -89,17 +108,25 @@ defmodule Campfire.Worker do
               "queue" => "default"
             }
 
-            Redix.transaction_pipeline(Campfire.Redis, [
-              ["INCR", "resque:stat:failed"],
-              ["INCR", "resque:stat:failed:#{state.worker}"],
-              ["RPUSH", "resque:failed", Jason.encode!(failure)]
-            ])
+            if redis? do
+              Redix.transaction_pipeline(Campfire.Redis, [
+                ["INCR", "resque:stat:failed"],
+                ["INCR", "resque:stat:failed:#{state.worker}"],
+                ["RPUSH", "resque:failed", Jason.encode!(failure)]
+              ])
+            else
+              Campfire.LocalQueue.failed()
+            end
         after
-          Redix.transaction_pipeline(Campfire.Redis, [
-            ["INCR", "resque:stat:processed"],
-            ["INCR", "resque:stat:processed:#{state.worker}"],
-            ["DEL", "resque:worker:#{state.worker}"]
-          ])
+          if redis? do
+            Redix.transaction_pipeline(Campfire.Redis, [
+              ["INCR", "resque:stat:processed"],
+              ["INCR", "resque:stat:processed:#{state.worker}"],
+              ["DEL", "resque:worker:#{state.worker}"]
+            ])
+          else
+            Campfire.LocalQueue.processed()
+          end
         end
 
       {:error, error} ->

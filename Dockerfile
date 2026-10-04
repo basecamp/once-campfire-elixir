@@ -10,7 +10,6 @@ COPY vectors/message-etags.json vectors/mime-types.json vectors/route-actions.js
 RUN mix deps.compile && mix compile --warnings-as-errors && mix release
 
 FROM campfire-elixir:toolchain
-RUN apt-get update && apt-get install -y --no-install-recommends redis-server && rm -rf /var/lib/apt/lists/*
 WORKDIR /campfire
 COPY --from=build /app/_build/prod/rel/campfire ./
 COPY --from=frontend /usr/local/bundle/ruby/3.4.0/gems/thruster-0.1.23-x86_64-linux/exe/x86_64-linux/thrust /usr/local/bin/thrust

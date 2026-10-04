@@ -208,8 +208,14 @@ defmodule Campfire.Cable do
     if Process.whereis(Campfire.Redis) do
       Redix.command(Campfire.Redis, ["PUBLISH", @prefix <> stream, Rails.json(data)])
     else
+      # One encoded frame per subscription identifier, shared by every connection.
       Registry.dispatch(Campfire.Streams, stream, fn entries ->
-        for {pid, id} <- entries, do: send(pid, {:delivery, id, data})
+        entries
+        |> Enum.group_by(fn {_, id} -> id end, fn {pid, _} -> pid end)
+        |> Enum.each(fn {id, pids} ->
+          frame = Rails.json(%{"identifier" => id, "message" => data})
+          for pid <- pids, do: send(pid, {:frame, frame})
+        end)
       end)
     end
 
@@ -242,8 +248,7 @@ defmodule Campfire.Cable do
      state}
   end
 
-  def handle_info({:delivery, id, data}, state),
-    do: {:push, {:text, Rails.json(%{"identifier" => id, "message" => data})}, state}
+  def handle_info({:frame, frame}, state), do: {:push, {:text, frame}, state}
 
   def handle_info(
         {:redix_pubsub, _, _, :message, %{channel: @prefix <> stream, payload: payload}},

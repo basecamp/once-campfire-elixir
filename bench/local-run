@@ -146,7 +146,7 @@ for name, cmd, key in [("queued", "LLEN", "resque:queue:default"), ("processed",
 print(json.dumps(out))
 PY
   else
-    curl -fsS "$BASE/up?jobs=1" -H "X-Campfire-Jobs: 1" 2>/dev/null | python3 -c 'import json,sys; d=sys.stdin.read(); print(d if d.startswith("{") else json.dumps({"runtime_queue":"internal"}))' || echo '{"runtime_queue":"internal"}'
+    "$REL" rpc 'IO.puts(Jason.encode!(Campfire.LocalQueue.stats()))' 2>/dev/null || echo '{"runtime_queue":"internal"}'
   fi
 }
 

@@ -9,6 +9,7 @@ defmodule Campfire.Application do
       Campfire.FragmentCache,
       Campfire.CableFrames,
       Campfire.ResponseCache,
+      Campfire.LocalQueue,
       {Campfire.DB, path: System.get_env("DATABASE_PATH", "var/production.sqlite3")}
     ]
 

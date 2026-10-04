@@ -35,11 +35,17 @@ defmodule Campfire.Jobs do
         "args" => [job]
       }
 
-      {:ok, _} =
-        Redix.transaction_pipeline(Campfire.Redis, [
-          ["SADD", "resque:queues", "default"],
-          ["RPUSH", "resque:queue:default", Campfire.Rails.json(wrapper)]
-        ])
+      payload = Campfire.Rails.json(wrapper)
+
+      if Process.whereis(Campfire.Redis) do
+        {:ok, _} =
+          Redix.transaction_pipeline(Campfire.Redis, [
+            ["SADD", "resque:queues", "default"],
+            ["RPUSH", "resque:queue:default", payload]
+          ])
+      else
+        Campfire.LocalQueue.push(payload)
+      end
 
       :ok
     end
