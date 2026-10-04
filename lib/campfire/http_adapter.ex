@@ -28,7 +28,7 @@ defmodule Campfire.HttpAdapter do
         z = :zlib.open()
 
         try do
-          :ok = :zlib.deflateInit(z, :default, :deflated, 31, 8, :default)
+          :ok = :zlib.deflateInit(z, Campfire.HttpCompression.level(), :deflated, 31, 8, :default)
 
           File.open!(path, [:read, :binary], fn file ->
             {:ok, _} = :file.position(file, offset)
