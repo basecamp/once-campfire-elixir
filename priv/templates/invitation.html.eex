@@ -1,0 +1,46 @@
+      <div id="system_welcome" class="message message--formatted txt-align-center center">
+    <div class="message__body center">
+      <div class="message__body-content position-relative">
+        <figure class="account-logo avatar center margin-block-end txt-large"><img alt="Account logo" src="/account/logo?v=<%= @account_version %>" width="300" height="300" /></figure>
+        <div class="flex align-center gap">
+          <div class="system-welcome--translation">
+            <details class="position-relative" data-controller="popup" data-action="keydown.esc-&gt;popup#close toggle-&gt;popup#toggle click@document-&gt;popup#closeOnClickOutside" data-popup-orientation-top-class="popup-orientation-top"><summary class="btn" tabindex="-1"><img aria-hidden="true" class="color-icon" src="<%= Campfire.Assets.path("globe.svg") %>" width="20" height="20" /><span class="for-screen-reader">Translate</span></summary><div class="language-list-menu shadow" data-popup-target="menu"><dl class="language-list"><dt>🇺🇸</dt><dd class="margin-none">Welcome to Campfire. To invite some people to chat with you, share the join link below.</dd><dt>🇪🇸</dt><dd class="margin-none">Bienvenido a Campfire. Para invitar a algunas personas a chatear contigo, comparte el enlace de unión que se encuentra a continuación.</dd><dt>🇫🇷</dt><dd class="margin-none">Bienvenue sur Campfire. Pour inviter des personnes à discuter avec vous, partagez le lien pour rejoindre ci-dessous.</dd><dt>🇮🇳</dt><dd class="margin-none">Campfire में आपका स्वागत है। अधिक लोगों को चैट के लिए आमंत्रित करने के लिए, नीचे जुड़ने का लिंक साझा करें।</dd><dt>🇩🇪</dt><dd class="margin-none">Willkommen bei Campfire. Um einige Personen zum Chatten einzuladen, teilen Sie den unten stehenden Beitrittslink.</dd><dt>🇧🇷</dt><dd class="margin-none">Boas vindas ao Campfire. Para convidar pessoas para conversarem com você, compartilhe o link de convite abaixo.</dd><dt>🇯🇵</dt><dd class="margin-none">Campfireへようこそ。他の人をチャットに招待するには、下記の参加リンクを共有してください。</dd></dl></div></details>
+          </div>
+          <p>
+            <strong>Welcome to Campfire</strong><br>
+            To invite people to chat, share the join link below.
+          </p>
+        </div>
+        <div class="flex flex-column align-center gap">
+
+  <label class="flex flex-column gap full-width" style="--row-gap: 0.5em">
+    <strong id="invite_label" class="invite-label">Share to invite more people</strong>
+    <span class="flex align-center gap input input--actor fill-white">
+      <img aria-hidden="true" class="colorize--black" src="<%= Campfire.Assets.path("person-add.svg") %>" width="20" height="20" />
+      <input type="text" class="input" id="invite_url" value="<%= @join_url %>" aria-labelledby="invite_label" readonly>
+    </span>
+  </label>
+
+  <div class="flex align-center gap">
+    <a class="btn" data-lightbox-target="image" data-action="lightbox#open" data-lightbox-url-value="/qr_code/<%= @qr %>" href="/qr_code/<%= @qr %>">
+      <span class="for-screen-reader">Show join link QR code</span>
+      <img aria-hidden="true" class="colorize--black" src="<%= Campfire.Assets.path("qr-code.svg") %>" width="20" height="20" />
+</a>
+    <button class="btn" data-controller="copy-to-clipboard" data-action="copy-to-clipboard#copy" data-copy-to-clipboard-success-class="btn--success" data-copy-to-clipboard-content-value="<%= @join_url %>">
+      <span class="for-screen-reader">Copy join link</span>
+      <img aria-hidden="true" class="colorize--black" src="<%= Campfire.Assets.path("copy-paste.svg") %>" width="20" height="20" />
+</button>
+    <button class="btn" hidden="hidden" data-controller="web-share" data-action="web-share#share" data-web-share-url-value="<%= @join_url %>" data-web-share-text-value="Hit this link to join me in Campfire and start chatting." data-web-share-title-value="Link to join Campfire">
+      <span class="for-screen-reader">Share join link</span>
+      <img aria-hidden="true" class="colorize--black" src="<%= Campfire.Assets.path("share.svg") %>" width="20" height="20" />
+</button>
+<%= if @admin do %>      <form class="button_to" method="post" action="/account/join_code"><button class="btn btn--regenerate" type="submit">
+        <img aria-hidden="true" class="colorize--black" src="<%= Campfire.Assets.path("refresh.svg") %>" width="20" height="20" />
+        <span class="for-screen-reader">Regenerate join link</span>
+</button><input type="hidden" name="authenticity_token" value="<%= @join_token %>" /></form><% end %>  </div>
+</div>
+
+      </div>
+    </div>
+  </div>
+

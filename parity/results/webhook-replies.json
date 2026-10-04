@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "scope": [
+    "html",
+    "plain",
+    "png",
+    "failed_text_attachment",
+    "unknown",
+    "no_type",
+    "gzip_text",
+    "deflate_text",
+    "bodyless_204",
+    "bodyless_304",
+    "read_timeout",
+    "all persisted tables",
+    "attachment and variant bytes",
+    "real queue drained"
+  ]
+}

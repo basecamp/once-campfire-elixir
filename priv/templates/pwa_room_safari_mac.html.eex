@@ -1,0 +1,54 @@
+              <details class="notifications-help" data-notifications-target="details">
+    <summary class="btn">
+      <img aria-hidden="true" src="<%= Assets.path("external/web.svg") %>" width="20" height="20" />
+      <strong>Check your <%= @browser %> settings</strong>
+      <img aria-hidden="true" class="disclosure" src="<%= Assets.path("disclosure.svg") %>" width="10" height="10" />
+    </summary>
+
+        <ol>
+          <li>Click <em><%= @browser %></em> in the top left.</li>
+          <li>Click <em>Settings…</em>.</li>
+          <li>Click the <em>Websites</em> tab.</li>
+          <li>Click <em>Notifications</em> in the sidebar.</li>
+          <li>Click <em><%= @base %>/</em> in the list.</li>
+          <li>Select <em>Allow</em>.</li>
+        </ol>
+  </details>
+
+            <details class="notifications-help hide-in-browser" data-notifications-target="details">
+  <summary class="btn">
+    <img aria-hidden="true" src="<%= Assets.path("external/gear.svg") %>" width="20" height="20" />
+    <strong>Check your <%= @os %> settings</strong>
+    <img aria-hidden="true" class="disclosure" src="<%= Assets.path("disclosure.svg") %>" width="10" height="10" />
+  </summary>
+
+      <ol>
+        <li>Click <em aria-label="the Apple menu"></em> in the top left.</li>
+        <li>Click <em>System Settings…</em>.</li>
+        <li>Click <em>Notifications</em>.</li>
+        <li>Click <em>Campfire</em>.</li>
+        <li>Click <em><img alt="the allow notifications switch" src="<%= Assets.path("external/switch.svg") %>" width="22" height="22" /></em> to <em>Allow notifications</em>.</li>
+      </ol>
+</details>
+
+              <details class="notifications-help pwa__instructions hide-in-pwa" data-controller="pwa-install" data-pwa-install-prompting-class="pwa--can-install" data-notifications-target="details">
+    <summary class="btn">
+      <img aria-hidden="true" src="<%= Assets.path("external/install.svg") %>" width="20" height="20" />
+      <strong>Install Campfire as a web app.</strong>
+      <img aria-hidden="true" class="disclosure" src="<%= Assets.path("disclosure.svg") %>" width="10" height="10" />
+    </summary>
+
+        <ol>
+          <li>Click <em>File</em> in the top left.</li>
+          <li>Click <em>Add to Dock…</em>.</li>
+        </ol>
+
+    <div class="margin-block-start txt-align-center pwa__installer">
+      <hr class="separator margin-block">
+      <button class="btn btn--reversed center" data-action="pwa-install#promptInstall">
+        <img aria-hidden="true" src="<%= Assets.path("external/install.svg") %>" />
+        Install now
+      </button>
+    </div>
+  </details>
+

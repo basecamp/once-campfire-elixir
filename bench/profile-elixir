@@ -1,0 +1,41 @@
+#!/usr/bin/env python3
+"""Profile a warmed populated room on an isolated release; timings are diagnostic only."""
+import argparse,json,os,pathlib,shutil,socket,sqlite3,subprocess,time,urllib.request
+parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--suite',choices=['http','cable'],default='http');options=parser.parse_args()
+ROOT=pathlib.Path(__file__).resolve().parents[1];SEED=pathlib.Path(os.environ.get('RUST_ROOT','/home/dhh/Work/basecamp/once-campfire-rust'))/'parity/.seed/default'
+PORT=47140;NAME='campfire-elixir-profile';WORK=ROOT/'bench/.work/profile';OUT=ROOT/('bench/results/profile-'+options.suite);OUT.mkdir(parents=True,exist_ok=True)
+def run(argv,**kw):
+ r=subprocess.run(list(map(str,argv)),capture_output=True,text=True,**kw)
+ if r.returncode:raise RuntimeError(r.stdout+r.stderr)
+ return r.stdout
+def rpc(code):return run(['docker','exec',NAME,'bin/campfire','rpc',code])
+run(['python3',ROOT/'bench/validate.py','ledger'])
+for port in [PORT,6379]:
+ with socket.socket() as sock:
+  sock.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1);sock.bind(('127.0.0.1',port))
+if WORK.exists():shutil.rmtree(WORK)
+shutil.copytree(SEED,WORK)
+with sqlite3.connect(WORK/'db/production.sqlite3') as db:
+ db.execute("UPDATE push_subscriptions SET endpoint='https://127.0.0.1:9/push/'||id");db.execute("UPDATE webhooks SET url='http://127.0.0.1:9/hook/'||id")
+labels=json.loads((SEED/'labels.json').read_text());base=f'http://127.0.0.1:{PORT}';room=labels['rooms.watercooler'];lg=ROOT/'target/bench/release/loadgen'
+def load(*args):return run(['taskset','-c','12-15',lg,*args])
+try:
+ run(['docker','run','-d','--name',NAME,'--network','host','--cpuset-cpus','8-11','--user',f'{os.getuid()}:{os.getgid()}','--env-file',ROOT/'parity/reference.env','-e',f'PORT={PORT}','-v',f'{WORK}/db:/rails/storage/db','-v',f'{WORK}/storage:/rails/storage/files','campfire-elixir:release'])
+ for _ in range(600):
+  try:
+   if urllib.request.urlopen(base+'/up').status==200:break
+  except OSError:pass
+  time.sleep(.1)
+ cookie=json.loads(load('login','--base',base,'--email',labels['emails.david'],'--password',labels['passwords.all']))['cookie']
+ args=['http','--base',base,'--cookie',cookie,'--path',f'/rooms/{room}','--conc','16']
+ load(*args,'--duration','3')
+ rpc('Path.wildcard("/usr/local/lib/erlang/lib/tools-*/ebin") |> Enum.each(fn p -> :code.add_patha(String.to_charlist(p)); :code.load_abs(String.to_charlist(Path.join(p, "eprof"))) end); :eprof.start(); :eprof.start_profiling(:erlang.processes())')
+ if options.suite=='http':sample=load(*args,'--duration','15')
+ else:
+  scrape=json.loads(load('scrape','--base',base,'--cookie',cookie,'--room',room))
+  sample=load('cable','--base',base,'--cookie',cookie,'--room',room,'--csrf',scrape['csrf'],'--streams',','.join(scrape['streams']),'--clients','500','--latency-msgs','3','--tput-secs','10','--posters','4')
+ (OUT/'load.json').write_text(sample)
+ (OUT/'functions.txt').write_text(rpc(':eprof.stop_profiling(); :erlang.group_leader(Process.group_leader(), Process.whereis(:eprof)); :eprof.analyze(:total, sort: :time); :eprof.stop()'))
+ (OUT/'image.txt').write_text(run(['docker','image','inspect','-f','{{.Id}}','campfire-elixir:release']))
+ print(OUT)
+finally:subprocess.run(['docker','rm','-f',NAME],capture_output=True)

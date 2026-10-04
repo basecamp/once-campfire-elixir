@@ -1,0 +1,87 @@
+{
+  "plain": {
+    "status": 200,
+    "body": "PHA+UHJvdG9jb2wgJmFtcDsgcmVwbHkgzqk8L3A+",
+    "headers": {
+      "content-length": "30",
+      "content-type": "text/html"
+    }
+  },
+  "gzip": {
+    "status": 200,
+    "body": "PHA+UHJvdG9jb2wgJmFtcDsgcmVwbHkgzqk8L3A+",
+    "headers": {
+      "content-length": "30",
+      "content-type": "text/html"
+    }
+  },
+  "deflate": {
+    "status": 200,
+    "body": "PHA+UHJvdG9jb2wgJmFtcDsgcmVwbHkgzqk8L3A+",
+    "headers": {
+      "content-length": "30",
+      "content-type": "text/html"
+    }
+  },
+  "chunked": {
+    "status": 200,
+    "body": "PHA+UHJvdG9jb2wgJmFtcDsgcmVwbHkgzqk8L3A+",
+    "headers": {
+      "content-type": "text/html",
+      "transfer-encoding": "chunked"
+    }
+  },
+  "informational": {
+    "status": 200,
+    "body": "PHA+UHJvdG9jb2wgJmFtcDsgcmVwbHkgzqk8L3A+",
+    "headers": {
+      "content-type": "text/html"
+    }
+  },
+  "repeated_headers": {
+    "status": 200,
+    "body": "PHA+UHJvdG9jb2wgJmFtcDsgcmVwbHkgzqk8L3A+",
+    "headers": {
+      "content-type": "text/html",
+      "x-fixture": "one, two"
+    }
+  },
+  "folded_headers": {
+    "status": 200,
+    "body": "PHA+UHJvdG9jb2wgJmFtcDsgcmVwbHkgzqk8L3A+",
+    "headers": {
+      "content-type": "text/html",
+      "x-fixture": "one two"
+    }
+  },
+  "bodyless_204": {
+    "status": 204,
+    "body": null,
+    "headers": {
+      "content-length": "12345",
+      "content-type": "text/plain"
+    }
+  },
+  "bodyless_304": {
+    "status": 304,
+    "body": null,
+    "headers": {
+      "content-length": "12345",
+      "content-type": "text/plain"
+    }
+  },
+  "truncated_length": {
+    "status": 200,
+    "body": "PHA+UHJvdG9jb2wgJmFtcDsgcmVwbHkgzqk8L3A+",
+    "headers": {
+      "content-length": "12345",
+      "content-type": "text/html"
+    }
+  },
+  "invalid_chunk": {
+    "error": ":error"
+  },
+  "timeout": {
+    "error": "{:error, :timeout}"
+  }
+}

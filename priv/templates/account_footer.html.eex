@@ -1,0 +1,2 @@
+          <div class="txt-align-center center margin-block-double txt-subtle">Campfire&trade; version <span class="version-badge"><%= @version %></span></div>
+

@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "scope": [
+    "text append",
+    "unread",
+    "presentation replace",
+    "boost append/remove",
+    "message remove",
+    "HTTP mutations"
+  ]
+}

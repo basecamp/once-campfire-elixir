@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "scope": [
+    "JSON null/boolean/number string attribute casts",
+    "unchanged updates retain timestamps",
+    "failed bot update rolls back webhook mutation",
+    "account/room/bot/profile response and complete domain tables"
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "scope": [
+    "bot new/edit forms",
+    "bot dynamic name/webhook/avatar",
+    "custom CSS edit and layout injection",
+    "flash display and consumption",
+    "administrator/member/unauthenticated access"
+  ]
+}

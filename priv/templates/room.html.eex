@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= @room_name %></title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, interactive-widget=resizes-content">
+    <meta name="view-transition" content="same-origin">
+    <meta name="color-scheme" content="light dark">
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="csrf-param" content="authenticity_token" />
+<meta name="csrf-token" content="<%= @meta_token %>" />
+    
+    <meta name="current-user-id" content="<%= @user_id %>" /><meta name="current-user-name" content="<%= @user_name %>" />
+    <meta name="action-cable-url" content="/cable">
+
+    <meta name="vapid-public-key" content="<%= @vapid %>">
+    <meta name="turbo-prefetch" content="true">
+
+    <link rel="manifest" href="/webmanifest.json">
+    <link rel="icon" href="/account/logo?v=<%= @account_version %>" type="image/png">
+    <link rel="apple-touch-icon" href="/account/logo?v=<%= @account_version %>">
+
+    <link rel="stylesheet" href="<%= Campfire.Assets.path("_reset.css") %>" data-turbo-track="reload" />
+<link rel="stylesheet" href="<%= Campfire.Assets.path("actiontext.css") %>" data-turbo-track="reload" />
+<link rel="stylesheet" href="<%= Campfire.Assets.path("animation.css") %>" data-turbo-track="reload" />
+<link rel="stylesheet" href="<%= Campfire.Assets.path("autocomplete.css") %>" data-turbo-track="reload" />
+<link rel="stylesheet" href="<%= Campfire.Assets.path("avatars.css") %>" data-turbo-track="reload" />
+<link rel="stylesheet" href="<%= Campfire.Assets.path("base.css") %>" data-turbo-track="reload" />
+<link rel="stylesheet" href="<%= Campfire.Assets.path("boosts.css") %>" data-turbo-track="reload" />
+<link rel="stylesheet" href="<%= Campfire.Assets.path("buttons.css") %>" data-turbo-track="reload" />
+<link rel="stylesheet" href="<%= Campfire.Assets.path("code.css") %>" data-turbo-track="reload" />
+<link rel="stylesheet" href="<%= Campfire.Assets.path("colorize.css") %>" data-turbo-track="reload" />
+<link rel="stylesheet" href="<%= Campfire.Assets.path("colors.css") %>" data-turbo-track="reload" />
+<link rel="stylesheet" href="<%= Campfire.Assets.path("composer.css") %>" data-turbo-track="reload" />
+<link rel="stylesheet" href="<%= Campfire.Assets.path("embeds.css") %>" data-turbo-track="reload" />
+<link rel="stylesheet" href="<%= Campfire.Assets.path("filters.css") %>" data-turbo-track="reload" />
+<link rel="stylesheet" href="<%= Campfire.Assets.path("flash.css") %>" data-turbo-track="reload" />
+<link rel="stylesheet" href="<%= Campfire.Assets.path("inputs.css") %>" data-turbo-track="reload" />
+<link rel="stylesheet" href="<%= Campfire.Assets.path("layout.css") %>" data-turbo-track="reload" />
+<link rel="stylesheet" href="<%= Campfire.Assets.path("lexxy-content.css") %>" data-turbo-track="reload" />
+<link rel="stylesheet" href="<%= Campfire.Assets.path("lexxy-editor.css") %>" data-turbo-track="reload" />
+<link rel="stylesheet" href="<%= Campfire.Assets.path("lexxy-variables.css") %>" data-turbo-track="reload" />
+<link rel="stylesheet" href="<%= Campfire.Assets.path("lexxy.css") %>" data-turbo-track="reload" />
+<link rel="stylesheet" href="<%= Campfire.Assets.path("lightbox.css") %>" data-turbo-track="reload" />
+<link rel="stylesheet" href="<%= Campfire.Assets.path("messages.css") %>" data-turbo-track="reload" />
+<link rel="stylesheet" href="<%= Campfire.Assets.path("nav.css") %>" data-turbo-track="reload" />
+<link rel="stylesheet" href="<%= Campfire.Assets.path("panels.css") %>" data-turbo-track="reload" />
+<link rel="stylesheet" href="<%= Campfire.Assets.path("separators.css") %>" data-turbo-track="reload" />
+<link rel="stylesheet" href="<%= Campfire.Assets.path("sidebar.css") %>" data-turbo-track="reload" />
+<link rel="stylesheet" href="<%= Campfire.Assets.path("signup.css") %>" data-turbo-track="reload" />
+<link rel="stylesheet" href="<%= Campfire.Assets.path("spinner.css") %>" data-turbo-track="reload" />
+<link rel="stylesheet" href="<%= Campfire.Assets.path("trix.css") %>" data-turbo-track="reload" />
+<link rel="stylesheet" href="<%= Campfire.Assets.path("utilities.css") %>" data-turbo-track="reload" />
+    
+
+    <script type="importmap" data-turbo-track="reload">{
+  "imports": {
+    "application": "<%= Campfire.Assets.path("application.js") %>",
+    "@hotwired/stimulus": "<%= Campfire.Assets.path("stimulus.min.js") %>",
+    "@hotwired/stimulus-loading": "<%= Campfire.Assets.path("stimulus-loading.js") %>",
+    "@hotwired/turbo-rails": "<%= Campfire.Assets.path("turbo.js") %>",
+    "@rails/actioncable": "<%= Campfire.Assets.path("actioncable.esm.js") %>",
+    "@rails/request.js": "<%= Campfire.Assets.path("@rails--request.js") %>",
+    "lexxy": "<%= Campfire.Assets.path("lexxy.js") %>",
+    "highlight.js": "<%= Campfire.Assets.path("highlight.js/core.js") %>",
+    "initializers/autocomplete": "<%= Campfire.Assets.path("initializers/autocomplete.js") %>",
+    "initializers/current": "<%= Campfire.Assets.path("initializers/current.js") %>",
+    "initializers/highlight": "<%= Campfire.Assets.path("initializers/highlight.js") %>",
+    "initializers": "<%= Campfire.Assets.path("initializers/index.js") %>",
+    "initializers/rich_text": "<%= Campfire.Assets.path("initializers/rich_text.js") %>",
+    "lib/autocomplete/autocomplete_handler": "<%= Campfire.Assets.path("lib/autocomplete/autocomplete_handler.js") %>",
+    "lib/autocomplete/base_autocomplete_handler": "<%= Campfire.Assets.path("lib/autocomplete/base_autocomplete_handler.js") %>",
+    "lib/autocomplete/collection": "<%= Campfire.Assets.path("lib/autocomplete/collection.js") %>",
+    "lib/autocomplete/constants": "<%= Campfire.Assets.path("lib/autocomplete/constants.js") %>",
+    "lib/autocomplete/custom_elements/suggestion_option": "<%= Campfire.Assets.path("lib/autocomplete/custom_elements/suggestion_option.js") %>",
+    "lib/autocomplete/custom_elements/suggestion_select": "<%= Campfire.Assets.path("lib/autocomplete/custom_elements/suggestion_select.js") %>",
+    "lib/autocomplete/helpers": "<%= Campfire.Assets.path("lib/autocomplete/helpers.js") %>",
+    "lib/autocomplete/renderer": "<%= Campfire.Assets.path("lib/autocomplete/renderer.js") %>",
+    "lib/autocomplete/selection": "<%= Campfire.Assets.path("lib/autocomplete/selection.js") %>",
+    "lib/autocomplete/suggestion_context": "<%= Campfire.Assets.path("lib/autocomplete/suggestion_context.js") %>",
+    "lib/autocomplete/suggestion_controller": "<%= Campfire.Assets.path("lib/autocomplete/suggestion_controller.js") %>",
+    "lib/autocomplete/suggestion_results_controller": "<%= Campfire.Assets.path("lib/autocomplete/suggestion_results_controller.js") %>",
+    "lib/autocomplete/utils": "<%= Campfire.Assets.path("lib/autocomplete/utils.js") %>",
+    "lib/cookie": "<%= Campfire.Assets.path("lib/cookie.js") %>",
+    "lib/rich_text/campfire_extension": "<%= Campfire.Assets.path("lib/rich_text/campfire_extension.js") %>",
+    "lib/rich_text/cite_node": "<%= Campfire.Assets.path("lib/rich_text/cite_node.js") %>",
+    "controllers/application": "<%= Campfire.Assets.path("controllers/application.js") %>",
+    "controllers/auto_submit_controller": "<%= Campfire.Assets.path("controllers/auto_submit_controller.js") %>",
+    "controllers/autocomplete_controller": "<%= Campfire.Assets.path("controllers/autocomplete_controller.js") %>",
+    "controllers/badge_dot_controller": "<%= Campfire.Assets.path("controllers/badge_dot_controller.js") %>",
+    "controllers/boost_delete_controller": "<%= Campfire.Assets.path("controllers/boost_delete_controller.js") %>",
+    "controllers/composer_controller": "<%= Campfire.Assets.path("controllers/composer_controller.js") %>",
+    "controllers/copy_to_clipboard_controller": "<%= Campfire.Assets.path("controllers/copy_to_clipboard_controller.js") %>",
+    "controllers/drop_target_controller": "<%= Campfire.Assets.path("controllers/drop_target_controller.js") %>",
+    "controllers/element_removal_controller": "<%= Campfire.Assets.path("controllers/element_removal_controller.js") %>",
+    "controllers/filter_controller": "<%= Campfire.Assets.path("controllers/filter_controller.js") %>",
+    "controllers/form_controller": "<%= Campfire.Assets.path("controllers/form_controller.js") %>",
+    "controllers": "<%= Campfire.Assets.path("controllers/index.js") %>",
+    "controllers/lightbox_controller": "<%= Campfire.Assets.path("controllers/lightbox_controller.js") %>",
+    "controllers/local_time_controller": "<%= Campfire.Assets.path("controllers/local_time_controller.js") %>",
+    "controllers/maintain_scroll_controller": "<%= Campfire.Assets.path("controllers/maintain_scroll_controller.js") %>",
+    "controllers/messages_controller": "<%= Campfire.Assets.path("controllers/messages_controller.js") %>",
+    "controllers/notifications_controller": "<%= Campfire.Assets.path("controllers/notifications_controller.js") %>",
+    "controllers/popup_controller": "<%= Campfire.Assets.path("controllers/popup_controller.js") %>",
+    "controllers/presence_controller": "<%= Campfire.Assets.path("controllers/presence_controller.js") %>",
+    "controllers/pwa_install_controller": "<%= Campfire.Assets.path("controllers/pwa_install_controller.js") %>",
+    "controllers/read_rooms_controller": "<%= Campfire.Assets.path("controllers/read_rooms_controller.js") %>",
+    "controllers/refresh_room_controller": "<%= Campfire.Assets.path("controllers/refresh_room_controller.js") %>",
+    "controllers/reply_controller": "<%= Campfire.Assets.path("controllers/reply_controller.js") %>",
+    "controllers/rooms_list_controller": "<%= Campfire.Assets.path("controllers/rooms_list_controller.js") %>",
+    "controllers/scroll_into_view_controller": "<%= Campfire.Assets.path("controllers/scroll_into_view_controller.js") %>",
+    "controllers/search_results_controller": "<%= Campfire.Assets.path("controllers/search_results_controller.js") %>",
+    "controllers/sessions_controller": "<%= Campfire.Assets.path("controllers/sessions_controller.js") %>",
+    "controllers/soft_keyboard_controller": "<%= Campfire.Assets.path("controllers/soft_keyboard_controller.js") %>",
+    "controllers/sorted_list_controller": "<%= Campfire.Assets.path("controllers/sorted_list_controller.js") %>",
+    "controllers/sound_controller": "<%= Campfire.Assets.path("controllers/sound_controller.js") %>",
+    "controllers/toggle_class_controller": "<%= Campfire.Assets.path("controllers/toggle_class_controller.js") %>",
+    "controllers/turbo_frame_controller": "<%= Campfire.Assets.path("controllers/turbo_frame_controller.js") %>",
+    "controllers/turbo_streaming_controller": "<%= Campfire.Assets.path("controllers/turbo_streaming_controller.js") %>",
+    "controllers/typing_notifications_controller": "<%= Campfire.Assets.path("controllers/typing_notifications_controller.js") %>",
+    "controllers/unfurl_controller": "<%= Campfire.Assets.path("controllers/unfurl_controller.js") %>",
+    "controllers/upload_preview_controller": "<%= Campfire.Assets.path("controllers/upload_preview_controller.js") %>",
+    "controllers/web_share_controller": "<%= Campfire.Assets.path("controllers/web_share_controller.js") %>",
+    "helpers/dom_helpers": "<%= Campfire.Assets.path("helpers/dom_helpers.js") %>",
+    "helpers/navigator_helpers": "<%= Campfire.Assets.path("helpers/navigator_helpers.js") %>",
+    "helpers/string_helpers": "<%= Campfire.Assets.path("helpers/string_helpers.js") %>",
+    "helpers/timing_helpers": "<%= Campfire.Assets.path("helpers/timing_helpers.js") %>",
+    "helpers/turbo_helpers": "<%= Campfire.Assets.path("helpers/turbo_helpers.js") %>",
+    "models/client_message": "<%= Campfire.Assets.path("models/client_message.js") %>",
+    "models/file_uploader": "<%= Campfire.Assets.path("models/file_uploader.js") %>",
+    "models/message_formatter": "<%= Campfire.Assets.path("models/message_formatter.js") %>",
+    "models/message_paginator": "<%= Campfire.Assets.path("models/message_paginator.js") %>",
+    "models/scroll_manager": "<%= Campfire.Assets.path("models/scroll_manager.js") %>",
+    "models/typing_tracker": "<%= Campfire.Assets.path("models/typing_tracker.js") %>",
+    "languages/bash": "<%= Campfire.Assets.path("languages/bash.js") %>",
+    "languages/css": "<%= Campfire.Assets.path("languages/css.js") %>",
+    "languages/diff": "<%= Campfire.Assets.path("languages/diff.js") %>",
+    "languages/go": "<%= Campfire.Assets.path("languages/go.js") %>",
+    "languages/java": "<%= Campfire.Assets.path("languages/java.js") %>",
+    "languages/javascript": "<%= Campfire.Assets.path("languages/javascript.js") %>",
+    "languages/json": "<%= Campfire.Assets.path("languages/json.js") %>",
+    "languages/python": "<%= Campfire.Assets.path("languages/python.js") %>",
+    "languages/ruby": "<%= Campfire.Assets.path("languages/ruby.js") %>",
+    "languages/rust": "<%= Campfire.Assets.path("languages/rust.js") %>",
+    "languages/sql": "<%= Campfire.Assets.path("languages/sql.js") %>",
+    "languages/xml": "<%= Campfire.Assets.path("languages/xml.js") %>"
+  }
+}</script>
+<link rel="modulepreload" href="<%= Campfire.Assets.path("application.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("stimulus.min.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("stimulus-loading.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("turbo.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("actioncable.esm.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("@rails--request.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("lexxy.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("highlight.js/core.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("initializers/autocomplete.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("initializers/current.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("initializers/highlight.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("initializers/index.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("initializers/rich_text.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("lib/autocomplete/autocomplete_handler.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("lib/autocomplete/base_autocomplete_handler.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("lib/autocomplete/collection.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("lib/autocomplete/constants.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("lib/autocomplete/custom_elements/suggestion_option.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("lib/autocomplete/custom_elements/suggestion_select.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("lib/autocomplete/helpers.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("lib/autocomplete/renderer.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("lib/autocomplete/selection.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("lib/autocomplete/suggestion_context.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("lib/autocomplete/suggestion_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("lib/autocomplete/suggestion_results_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("lib/autocomplete/utils.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("lib/cookie.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("lib/rich_text/campfire_extension.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("lib/rich_text/cite_node.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/application.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/auto_submit_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/autocomplete_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/badge_dot_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/boost_delete_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/composer_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/copy_to_clipboard_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/drop_target_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/element_removal_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/filter_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/form_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/index.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/lightbox_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/local_time_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/maintain_scroll_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/messages_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/notifications_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/popup_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/presence_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/pwa_install_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/read_rooms_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/refresh_room_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/reply_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/rooms_list_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/scroll_into_view_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/search_results_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/sessions_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/soft_keyboard_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/sorted_list_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/sound_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/toggle_class_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/turbo_frame_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/turbo_streaming_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/typing_notifications_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/unfurl_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/upload_preview_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/web_share_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("helpers/dom_helpers.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("helpers/navigator_helpers.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("helpers/string_helpers.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("helpers/timing_helpers.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("helpers/turbo_helpers.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("models/client_message.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("models/file_uploader.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("models/message_formatter.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("models/message_paginator.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("models/scroll_manager.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("models/typing_tracker.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("languages/bash.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("languages/css.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("languages/diff.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("languages/go.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("languages/java.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("languages/javascript.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("languages/json.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("languages/python.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("languages/ruby.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("languages/rust.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("languages/sql.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("languages/xml.js") %>">
+<script type="module">import "application"</script>
+
+    <meta name="turbo-cache-control" content="no-preview">  
+  <meta name="current-room-id" content="<%= @room_id %>">
+
+  </head>
+
+  <body class="sidebar<%= if @admin, do: " admin", else: "" %>" data-controller="local-time lightbox">
+    <a href="#main-content" class="skip-navigation btn">Skip to main content</a>
+
+    <nav id="nav">
+        
+
+  <span class="btn btn--reversed btn--faux room--current">
+    <h1 class="room__contents txt-medium overflow-ellipsis">
+
+      <%= @room_name %>
+    </h1>
+</span>
+  <a class="btn" style="view-transition-name: edit-room-<%= @room_id %>" data-room-id="<%= @room_id %>" href="/rooms/<%= @namespace %>/<%= @room_id %>/edit">
+    <img aria-hidden="true" src="<%= Campfire.Assets.path("menu-dots-horizontal.svg") %>" width="20" height="20" />
+    <span class="for-screen-reader">Settings for this room</span>
+</a>
+  <span>
+  <span class="button_to_change_notifying"
+      data-controller="notifications" data-notifications-subscriptions-url-value="/users/me/push_subscriptions" data-notifications-attention-class="btn--pulsing">
+    <turbo-frame data-controller="turbo-frame" data-action="notifications:ready@window-&gt;turbo-frame#load" data-turbo-frame-url-param="/rooms/<%= @room_id %>/involvement" id="involvement_<%= @room_key %>">
+      <button class="btn" data-action="click->notifications#attemptToSubscribe" data-notifications-target="bell">
+        <img aria-hidden="true" src="<%= Campfire.Assets.path("notification-bell-loading.svg") %>" width="20" height="20" />
+        <img aria-hidden="true" hidden="hidden" src="<%= Campfire.Assets.path("notification-bell-alert.svg") %>" width="20" height="20" />
+        <span class="for-screen-reader">Notification settings for this room</span>
+      </button>
+</turbo-frame>
+    <dialog data-notifications-target="notAllowedNotice" class="dialog pad center center-block border-radius border shadow" style="--inline-space: var(--block-space)">
+      <div class="flex flex-column txt-align-center">
+        <span class="btn btn--faux center txt-x-large">
+          <img aria-hidden="true" src="<%= Campfire.Assets.path("notification-bell-alert.svg") %>" width="48" height="48" />
+          <span class="for-screen-reader">Notifications alert</span>
+        </span>
+
+        <section>
+          <h1 class="txt-large margin-none">Notifications aren’t allowed</h1>
+          <div class="txt-align-start margin-block-start">
+              <details class="notifications-help" data-notifications-target="details">
+    <summary class="btn">
+      <img aria-hidden="true" src="<%= Campfire.Assets.path("external/web.svg") %>" width="20" height="20" />
+      <strong>Check your Chrome settings</strong>
+      <img aria-hidden="true" class="disclosure" src="<%= Campfire.Assets.path("disclosure.svg") %>" width="10" height="10" />
+    </summary>
+
+        <h2 class="txt-normal txt-medium margin-block-start">Turn on notifications for this website.</h2>
+        <ol>
+          <li>Click the <em><img alt="View site information" src="<%= Campfire.Assets.path("external/sliders.svg") %>" width="20" height="20" /></em> icon in the address bar.</li>
+          <li>Click <em>Site Settings</em>.</li>
+          <li>Ensure notifications are <em>Allowed</em>.</li>
+        </ol>
+
+        <h2 class="txt-normal txt-medium margin-block-start">Turn on notifications for Chrome.</h2>
+        <ol>
+            <li>Click <em aria-label="the Apple menu"></em> in the top left.</li>
+            <li>Click <em>System Settings…</em>.</li>
+            <li>Click <em>Notifications</em>.</li>
+            <li>Click <em>Chrome</em>.</li>
+            <li>Click <em><img alt="the switch" src="<%= Campfire.Assets.path("external/switch.svg") %>" width="22" height="22" /></em> to <em>Allow notifications</em>.</li>
+        </ol>
+  </details>
+
+            <details class="notifications-help hide-in-browser" data-notifications-target="details">
+  <summary class="btn">
+    <img aria-hidden="true" src="<%= Campfire.Assets.path("external/gear.svg") %>" width="20" height="20" />
+    <strong>Check your  settings</strong>
+    <img aria-hidden="true" class="disclosure" src="<%= Campfire.Assets.path("disclosure.svg") %>" width="10" height="10" />
+  </summary>
+
+      <ol>
+          <li>Click <em aria-label="the Apple menu"></em> in the top left.</li>
+          <li>Click <em>System Settings…</em>.</li>
+          <li>Click <em>Notifications</em>.</li>
+          <li>Click <em>Campfire</em>.</li>
+          <li>Click <em><img alt="the allow notifications switch" src="<%= Campfire.Assets.path("external/switch.svg") %>" width="22" height="22" /></em> to <em>Allow notifications</em>.</li>
+      </ol>
+</details>
+
+            
+          </div>
+        </section>
+
+        <form method="dialog" class="flex align-center gap center">
+          <button class="btn dialog__close" autofocus="true">
+            <span class="for-screen-reader">Close</span>
+            <img aria-hidden="true" src="<%= Campfire.Assets.path("remove.svg") %>" width="20" height="20" />
+          </button>
+        </form>
+      </div>
+    </dialog>
+  </span>
+</span>
+
+
+    </nav>
+
+
+    <main id="main-content">
+      
+
+
+
+<div id="message-area" class="message-area" contents="true" data-controller="messages presence drop-target" data-action="turbo:before-stream-render@document-&gt;messages#beforeStreamRender keydown.up@document-&gt;messages#editMyLastMessage dragenter-&gt;drop-target#dragenter dragover-&gt;drop-target#dragover drop-&gt;drop-target#drop visibilitychange@document-&gt;presence#visibilityChanged" data-messages-first-of-day-class="message--first-of-day" data-messages-formatted-class="message--formatted" data-messages-me-class="message--me" data-messages-mentioned-class="message--mentioned" data-messages-threaded-class="message--threaded" data-messages-page-url-value="<%= @base %>/rooms/<%= @room_id %>/messages">
+  <script type="text/template" data-messages-target="template">
+  <div class="message message--me $messageClasses$"
+      id="message_$clientMessageId$"
+      data-format-message-target="message"
+      data-user-id="<%= @user_id %>"
+      data-message-timestamp="$messageTimestamp$"
+      data-messages-target="message">
+    <div class="message__day-separator"><time class="message__timestamp" datetime="$messageDatetime$" data-local-time-target="date"></time></div>
+
+    <figure class="avatar message__avatar">
+      <%= @user_avatar %>
+    </figure>
+
+    <div class="message__body">
+      <div class="message__body-content">
+        <div class="message__meta">
+          <h3 class="message__heading">
+            <span class="message__author"><strong><%= @user_name %></strong></span>
+            <span class="message__permalink"><time class="message__timestamp" datetime="$messageDatetime$" data-local-time-target="time"></time></span>
+          </h3>
+          <div class="message__actions">
+            <div class="position-relative">
+              <span class="btn message__action-btn message__options-btn">
+                <img class="colorize--black" aria-hidden="true" src="<%= Campfire.Assets.path("menu-dots-horizontal.svg") %>" />
+                <span class="for-screen-reader">Message options</span>
+              </span>
+            </div class="position-relative">
+          </div>
+        </div>
+        $body$
+      </div>
+    </div>
+  </div>
+</script>
+
+
+  <div id="messages_<%= @room_key %>" class="messages" data-controller="maintain-scroll refresh-room" data-action="turbo:before-stream-render@document-&gt;maintain-scroll#beforeStreamRender visibilitychange@document-&gt;refresh-room#visibilityChanged online@window-&gt;refresh-room#online" data-messages-target="messages" data-refresh-room-loaded-at-value="<%= @room_updated %>" data-refresh-room-url-value="<%= @base %>/rooms/<%= @room_id %>/refresh">
+    
+    
+<%= @messages %></div>
+  <turbo-cable-stream-source channel="RoomMessagesChannel" signed-stream-name="<%= @stream %>"></turbo-cable-stream-source>
+  <button class="message-area__return-to-latest btn" data-action="messages#returnToLatest" data-messages-target="latest" hidden="hidden"><img aria-hidden="true" src="<%= Campfire.Assets.path("arrow-down.svg") %>" width="20" height="20" /><span class="for-screen-reader">Jump to newest message</span></button>
+</div>
+
+
+
+      <footer id="footer">
+          <div class="composer flex align-end gap position-relative"
+      data-controller="typing-notifications" data-typing-notifications-active-class="typing-indicator--active">
+    <a class="btn flex-item-no-shrink margin-block-end composer__context-btn" style="view-transition-name: input-switcher" href="/searches">
+      <img aria-hidden="true" src="<%= Campfire.Assets.path("search.svg") %>" width="20" height="20" />
+      <span class="for-screen-reader">Search</span>
+</a>
+    <turbo-frame id="composer-frame">
+      <form id="composer" class="margin-block flex-item-grow contain" data-controller="composer drop-target" data-action="dragenter-&gt;drop-target#dragenter dragover-&gt;drop-target#dragover drop-&gt;drop-target#drop drop-target:drop@window-&gt;composer#dropFiles lexxy:file-accept-&gt;composer#preventAttachment refresh-room:online@window-&gt;composer#online typing-notifications#stop paste-&gt;composer#pasteFiles turbo:submit-end-&gt;composer#submitEnd refresh-room:offline@window-&gt;composer#offline" data-composer-messages-outlet="#message-area" data-composer-toolbar-class="composer--rich-text" data-composer-room-id-value="<%= @room_id %>" action="/rooms/<%= @room_id %>/messages" accept-charset="UTF-8" method="post"><input type="hidden" name="authenticity_token" value="<%= @form_token %>" />
+        <fieldset data-composer-target="fields" contents>
+          <div class="flex flex-column">
+            <div class="composer__filelist flex flex--align-center gap flex-wrap" data-composer-target="fileList"></div>
+
+            <div class="flex composer__input input input--actor fill-white min-width" style="--input-border-radius: 1.3rem">
+              <div class="flex align-end gap full-width">
+                <img aria-hidden="true" class="composer__input-hint colorize--black" style="view-transition-name: input-btn;" src="<%= Campfire.Assets.path("messages-outlined.svg") %>" width="22" height="22" />
+
+                <div class="flex flex-column flex-item-grow min-width gap">
+                  <lexxy-editor rows="1" class="input lexxy-content" style="order: -1" aria-multiline="true" aria-label="Write a message" permitted-attachment-types="application/vnd.campfire.mention application/vnd.actiontext.opengraph-embed" data-controller="unfurl" data-action="lexxy:change-&gt;typing-notifications#start keydown-&gt;composer#submitByKeyboard:capture lexxy:change-&gt;composer#saveDraft lexxy:insert-link-&gt;unfurl#unfurl" data-composer-target="text" data-direct-upload-url="<%= @base %>/rails/active_storage/direct_uploads" data-blob-url-template="<%= @base %>/rails/active_storage/blobs/redirect/:signed_id/:filename" id="message_body" input="message_body_trix_input_message" name="message[body]">
+                    <lexxy-prompt trigger="@" name="mention" src="/autocompletable/users?room_id=<%= @room_id %>" remote-filtering="true" empty-results="No matches"></lexxy-prompt>
+</lexxy-editor>                </div>
+
+                <label class="btn btn--borderless txt-small flex-item-no-shrink composer__attachment-btn input--file">
+                  <img class="colorize--black" aria-hidden="true" src="<%= Campfire.Assets.path("attachment.svg") %>" width="22" height="22" />
+                  <input type="file" data-action="composer#filePicked" multiple />
+                  <span class="for-screen-reader">Attach a file</span>
+                </label>
+
+                <button class="btn btn--borderless txt-small flex-item-no-shrink composer__rich-text-btn" type="button" data-action="composer#toggleToolbar">
+                  <img class="colorize--black" aria-hidden="true" src="<%= Campfire.Assets.path("text-options.svg") %>" width="20" height="20" />
+                  <span class="for-screen-reader">Rich text</span>
+                </button>
+
+                <button name="send" type="submit" data-action="composer#submit" class="btn btn--reversed flex-item-no-shrink txt-small">
+                  <img aria-hidden="true" src="<%= Campfire.Assets.path("arrow-up.svg") %>" width="20" height="20" />
+                  <span class="for-screen-reader">Send Message</span>
+</button>              </div>
+            </div>
+          </div>
+        </fieldset>
+
+        <div class="typing-indicator gap txt-small align-center flex-inline" data-typing-notifications-target="indicator">
+          <div class="typing-indicator__author spinner" data-typing-notifications-target="author"></div>
+        </div>
+
+        <input data-composer-target="clientid" type="hidden" name="message[client_message_id]" id="message_client_message_id" />
+</form>    </turbo-frame>
+  </div>
+
+      </footer>
+    </main>
+
+    <aside id="sidebar" data-controller="toggle-class" data-toggle-class-toggle-class="open">
+      <turbo-frame data-turbo-permanent="true" data-controller="rooms-list read-rooms turbo-frame" data-rooms-list-unread-class="unread" data-action="presence:present@window->rooms-list#read read-rooms:read->rooms-list#read turbo:frame-load->rooms-list#loaded refresh-room:visible@window->turbo-frame#reload" id="user_sidebar" src="/users/me/sidebar" target="_top"></turbo-frame>
+    </aside>
+
+    <dialog class="lightbox" aria-label="Image Viewer (Press escape to close)" data-lightbox-target="dialog" data-action="close->lightbox#reset">
+  <img src="" class="lightbox__image" data-lightbox-target="zoomedImage" />
+
+  <form method="dialog" class="lightbox__btn">
+    <button class="btn">
+      <img aria-hidden="true" src="<%= Campfire.Assets.path("remove.svg") %>" />
+      <span class="for-screen-reader">Close image viewer</span>
+    </button>
+  </form>
+
+  <a href="" class="lightbox__btn--download btn hide-in-ios-pwa" data-lightbox-target="download">
+    <img aria-hidden="true" src="<%= Campfire.Assets.path("download.svg") %>" />
+    <span class="for-screen-reader">Download file</span>
+  </a>
+
+  <button class="lightbox__btn--share btn"
+      data-controller="web-share"
+      data-action="web-share#share"
+      data-web-share-files-value=""
+      data-lightbox-target="share">
+    <img aria-hidden="true" src="<%= Campfire.Assets.path("share.svg") %>" />
+    <span class="for-screen-reader">Share file</span>
+  </button>
+</dialog>
+
+
+    <a href="https://once.com" id="app-logo" target="_blank" aria-label="Once software from 37signals home page">
+      <img alt="Campfire logo" width="256" height="216" src="<%= Campfire.Assets.path("campfire-icon.png") %>" />
+    </a>
+  </body>
+</html>

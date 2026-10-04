@@ -1,0 +1,8 @@
+{
+  "passed": true,
+  "scope": [
+    "boolean/number/null message body and boost content",
+    "arrays/objects filtered by strong parameters",
+    "actual create/update responses and persisted mutation tables"
+  ]
+}

@@ -1,0 +1,132 @@
+{
+  "deliveries": {
+    "gone": {
+      "headers": {
+        "content-encoding": "aes128gcm",
+        "content-type": "application/octet-stream",
+        "host": "parity.fcm.googleapis.com",
+        "ttl": "2419200",
+        "urgency": "high"
+      },
+      "payload": {
+        "options": {
+          "body": "Body\nline",
+          "data": {
+            "badge": 3,
+            "path": "/rooms/486777696"
+          },
+          "icon": "/account/logo"
+        },
+        "title": "Push <& Ω"
+      },
+      "vapid": {
+        "aud": "https://parity.fcm.googleapis.com",
+        "sub": "mailto:support@37signals.com"
+      }
+    },
+    "manual_gone": {
+      "headers": {
+        "content-encoding": "aes128gcm",
+        "content-type": "application/octet-stream",
+        "host": "parity.fcm.googleapis.com",
+        "ttl": "2419200",
+        "urgency": "high"
+      },
+      "payload": {
+        "options": {
+          "body": "Body\nline",
+          "data": {
+            "badge": 3,
+            "path": "/rooms/486777696"
+          },
+          "icon": "/account/logo"
+        },
+        "title": "Push <& Ω"
+      },
+      "vapid": {
+        "aud": "https://parity.fcm.googleapis.com",
+        "sub": "mailto:support@37signals.com"
+      }
+    },
+    "missing": {
+      "headers": {
+        "content-encoding": "aes128gcm",
+        "content-type": "application/octet-stream",
+        "host": "parity.fcm.googleapis.com",
+        "ttl": "2419200",
+        "urgency": "high"
+      },
+      "payload": {
+        "options": {
+          "body": "Body\nline",
+          "data": {
+            "badge": 3,
+            "path": "/rooms/486777696"
+          },
+          "icon": "/account/logo"
+        },
+        "title": "Push <& Ω"
+      },
+      "vapid": {
+        "aud": "https://parity.fcm.googleapis.com",
+        "sub": "mailto:support@37signals.com"
+      }
+    },
+    "server_error": {
+      "headers": {
+        "content-encoding": "aes128gcm",
+        "content-type": "application/octet-stream",
+        "host": "parity.fcm.googleapis.com",
+        "ttl": "2419200",
+        "urgency": "high"
+      },
+      "payload": {
+        "options": {
+          "body": "Body\nline",
+          "data": {
+            "badge": 3,
+            "path": "/rooms/486777696"
+          },
+          "icon": "/account/logo"
+        },
+        "title": "Push <& Ω"
+      },
+      "vapid": {
+        "aud": "https://parity.fcm.googleapis.com",
+        "sub": "mailto:support@37signals.com"
+      }
+    },
+    "success": {
+      "headers": {
+        "content-encoding": "aes128gcm",
+        "content-type": "application/octet-stream",
+        "host": "parity.fcm.googleapis.com",
+        "ttl": "2419200",
+        "urgency": "high"
+      },
+      "payload": {
+        "options": {
+          "body": "Body\nline",
+          "data": {
+            "badge": 3,
+            "path": "/rooms/486777696"
+          },
+          "icon": "/account/logo"
+        },
+        "title": "Push <& Ω"
+      },
+      "vapid": {
+        "aud": "https://parity.fcm.googleapis.com",
+        "sub": "mailto:support@37signals.com"
+      }
+    }
+  },
+  "passed": true,
+  "scope": [
+    "actual HTTPS wire requests",
+    "both runtime ciphertexts decrypted",
+    "AES-GCM authentication/framing",
+    "VAPID signature/public key/audience/expiry",
+    "payload JSON, badge and delivery headers"
+  ]
+}

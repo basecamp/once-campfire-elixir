@@ -1,0 +1,15 @@
+      
+
+<section class="panel txt-align-center">
+  <div class="flex flex-column gap ">
+    <div class="avatar txt-xx-large center" style="background: white">
+      <img alt="Profile avatar" class="avatar" src="<%= @avatar_src %>" />
+    </div>
+
+      <div class="pad-double--inline push--inline push--block-start">
+          <form class="button_to" method="post" action="/rooms/directs?user_ids%5B%5D=<%= @id %>"><button class="btn btn--primary full-width txt--large" type="submit"><img src="<%= Assets.path("messages.svg") %>" /></button><input type="hidden" name="authenticity_token" value="<%= @direct_token %>" /></form>
+      </div>
+  </div>
+</section>
+
+

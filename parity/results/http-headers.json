@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "scope": [
+    "security/version/cache headers",
+    "SHA256 body ETags",
+    "exact weak ETag conditional matching",
+    "HEAD body suppression",
+    "PWA format negotiation"
+  ]
+}

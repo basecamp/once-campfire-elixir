@@ -1,0 +1,26 @@
+{
+  "success": {
+    "exists": true
+  },
+  "gone": {
+    "exists": false
+  },
+  "missing": {
+    "exists": true
+  },
+  "server_error": {
+    "exists": true
+  },
+  "manual_gone": {
+    "exists": true
+  },
+  "bad_certificate": {
+    "exists": false
+  },
+  "manual_bad_certificate": {
+    "exists": true
+  },
+  "private": {
+    "exists": true
+  }
+}

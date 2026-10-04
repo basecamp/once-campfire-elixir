@@ -1,0 +1,9 @@
+compile: running
+compile: passed (0.994s)
+mutation_edges: running
+mutation_edges: passed (3.758s)
+message_scalars: running
+message_scalars: passed (3.944s)
+message_attachments: running
+message_attachments: passed (28.6s)
+All selected parity gates passed

@@ -1,0 +1,17 @@
+<li class="flex align-center gap margin-none" data-value="<%= @value %>">
+  <figure class="avatar flex-item-no-shrink" style="--avatar-size: 4ch;">
+    <%= @avatar %>
+  </figure>
+
+  <div class="min-width">
+    <div class="overflow-ellipsis fill-shade"><strong><%= @name %></strong></div>
+  </div>
+
+  <hr class="separator" aria-hidden="true">
+
+      <label class="switch flex-item-no-shrink">
+        <input type="checkbox" name="user_ids[]" value="<%= @id %>" class="switch__input"<%= @checked %> />
+        <span class="switch__btn round"></span>
+        <span class="for-screen-reader">Give <%= @name %> access to this room</span>
+      </label>
+</li>

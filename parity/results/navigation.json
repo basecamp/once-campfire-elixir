@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "scope": [
+    "open/closed/direct namespace index and show",
+    "remembered room cookies",
+    "namespace access restrictions",
+    "inaccessible room notice and consumption"
+  ]
+}

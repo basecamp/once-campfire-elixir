@@ -1,0 +1,29 @@
+test_benchmark_balances_order_and_rejects_different_output (test_toolkit.ToolkitTest.test_benchmark_balances_order_and_rejects_different_output) ... ok
+test_contract_test_requires_expected_values_and_is_not_ignored (test_toolkit.ToolkitTest.test_contract_test_requires_expected_values_and_is_not_ignored) ... ok
+test_empty_http_inventory_fails (test_toolkit.ToolkitTest.test_empty_http_inventory_fails) ... ok
+test_empty_mutation_snapshots_fail_before_action (test_toolkit.ToolkitTest.test_empty_mutation_snapshots_fail_before_action) ... ok
+test_failing_benchmark_command_never_produces_a_speedup_artifact (test_toolkit.ToolkitTest.test_failing_benchmark_command_never_produces_a_speedup_artifact) ... ok
+test_generators_cannot_escape_project_or_write_reference (test_toolkit.ToolkitTest.test_generators_cannot_escape_project_or_write_reference) ... ok
+test_init_pins_reference_and_installs_self_contained_tools_and_skills (test_toolkit.ToolkitTest.test_init_pins_reference_and_installs_self_contained_tools_and_skills) ... ok
+test_inventory_detects_legacy_formats_and_encoding_without_modification (test_toolkit.ToolkitTest.test_inventory_detects_legacy_formats_and_encoding_without_modification) ... ok
+test_json_ignores_object_order_but_not_record_identity (test_toolkit.ToolkitTest.test_json_ignores_object_order_but_not_record_identity) ... ok
+test_json_object_order_can_match (test_toolkit.ToolkitTest.test_json_object_order_can_match) ... ok
+test_matching_error_pages_do_not_pass_expected_success (test_toolkit.ToolkitTest.test_matching_error_pages_do_not_pass_expected_success) ... ok
+test_matching_success_passes_and_body_mismatch_fails (test_toolkit.ToolkitTest.test_matching_success_passes_and_body_mismatch_fails) ... ok
+test_mutation_diff_compares_equal_baselines_and_changed_state (test_toolkit.ToolkitTest.test_mutation_diff_compares_equal_baselines_and_changed_state) ... ok
+test_mutations_require_reset_before_any_request (test_toolkit.ToolkitTest.test_mutations_require_reset_before_any_request) ... ok
+test_normalizations_need_reasons_and_cannot_implicitly_change_bytes (test_toolkit.ToolkitTest.test_normalizations_need_reasons_and_cannot_implicitly_change_bytes) ... ok
+test_oracle_accepts_framing_but_rejects_stale_provenance_and_dirty_reference (test_toolkit.ToolkitTest.test_oracle_accepts_framing_but_rejects_stale_provenance_and_dirty_reference) ... ok
+test_oracle_that_changes_reference_cannot_write_evidence (test_toolkit.ToolkitTest.test_oracle_that_changes_reference_cannot_write_evidence) ... ok
+test_outputs_refuse_overwrite_and_are_idempotent (test_toolkit.ToolkitTest.test_outputs_refuse_overwrite_and_are_idempotent) ... ok
+test_record_generator_preserves_keys_nullability_unsigned_and_rejects_unknown_types (test_toolkit.ToolkitTest.test_record_generator_preserves_keys_nullability_unsigned_and_rejects_unknown_types) ... ok
+test_record_table_selection_is_explicit_and_unknown_selection_fails (test_toolkit.ToolkitTest.test_record_table_selection_is_explicit_and_unknown_selection_fails) ... ok
+test_redirects_are_compared_without_following (test_toolkit.ToolkitTest.test_redirects_are_compared_without_following) ... ok
+test_response_size_cap_fails_instead_of_comparing_truncated_bodies (test_toolkit.ToolkitTest.test_response_size_cap_fails_instead_of_comparing_truncated_bodies) ... ok
+test_route_order_constraints_and_unicode_are_preserved (test_toolkit.ToolkitTest.test_route_order_constraints_and_unicode_are_preserved) ... ok
+test_stale_vectors_are_rejected (test_toolkit.ToolkitTest.test_stale_vectors_are_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 24 tests in 7.129s
+
+OK

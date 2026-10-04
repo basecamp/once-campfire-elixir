@@ -1,0 +1,117 @@
+9:C 04 Oct 2026 11:35:20.149 # WARNING Memory overcommit must be enabled! Without it, a background save or replication may fail under low memory condition. Being disabled, it can also cause failures without low memory condition, see https://github.com/jemalloc/jemalloc/issues/1328. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+9:C 04 Oct 2026 11:35:20.149 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+9:C 04 Oct 2026 11:35:20.149 * Redis version=8.0.2, bits=64, commit=00000000, modified=0, pid=9, just started
+9:C 04 Oct 2026 11:35:20.149 * Configuration loaded
+9:M 04 Oct 2026 11:35:20.149 * monotonic clock: POSIX clock_gettime
+9:M 04 Oct 2026 11:35:20.150 * Running mode=standalone, port=6379.
+9:M 04 Oct 2026 11:35:20.150 * Server initialized
+9:M 04 Oct 2026 11:35:20.150 * Ready to accept connections tcp
+{"time":"2026-10-04T11:35:20.32022597Z","level":"INFO","msg":"Server started","http":":80"}
+resque-pool-manager[rails][11]: Resque Pool running in production environment
+{"time":"2026-10-04T11:35:20.421422815Z","level":"INFO","msg":"Unable to proxy request","path":"/up","error":"dial tcp [::1]:3000: connect: connection refused"}
+{"time":"2026-10-04T11:35:20.421547419Z","level":"INFO","msg":"Request","path":"/up","status":502,"dur":0,"method":"GET","req_content_length":0,"req_content_type":"","resp_content_length":26722,"resp_content_type":"text/html","remote_addr":"172.17.0.1:33156","user_agent":"Mozilla/5.0 Chrome/131.0.0.0 Safari/537.36","cache":"miss","query":"","proto":"HTTP/1.1"}
+{"time":"2026-10-04T11:35:20.522831735Z","level":"INFO","msg":"Unable to proxy request","path":"/up","error":"dial tcp [::1]:3000: connect: connection refused"}
+{"time":"2026-10-04T11:35:20.522953684Z","level":"INFO","msg":"Request","path":"/up","status":502,"dur":0,"method":"GET","req_content_length":0,"req_content_type":"","resp_content_length":26722,"resp_content_type":"text/html","remote_addr":"172.17.0.1:33158","user_agent":"Mozilla/5.0 Chrome/131.0.0.0 Safari/537.36","cache":"miss","query":"","proto":"HTTP/1.1"}
+{"time":"2026-10-04T11:35:20.6243811Z","level":"INFO","msg":"Unable to proxy request","path":"/up","error":"dial tcp [::1]:3000: connect: connection refused"}
+{"time":"2026-10-04T11:35:20.62449372Z","level":"INFO","msg":"Request","path":"/up","status":502,"dur":0,"method":"GET","req_content_length":0,"req_content_type":"","resp_content_length":26722,"resp_content_type":"text/html","remote_addr":"172.17.0.1:33174","user_agent":"Mozilla/5.0 Chrome/131.0.0.0 Safari/537.36","cache":"miss","query":"","proto":"HTTP/1.1"}
+{"time":"2026-10-04T11:35:20.725912089Z","level":"INFO","msg":"Unable to proxy request","path":"/up","error":"dial tcp [::1]:3000: connect: connection refused"}
+{"time":"2026-10-04T11:35:20.726049107Z","level":"INFO","msg":"Request","path":"/up","status":502,"dur":0,"method":"GET","req_content_length":0,"req_content_type":"","resp_content_length":26722,"resp_content_type":"text/html","remote_addr":"172.17.0.1:33180","user_agent":"Mozilla/5.0 Chrome/131.0.0.0 Safari/537.36","cache":"miss","query":"","proto":"HTTP/1.1"}
+{"time":"2026-10-04T11:35:20.827329114Z","level":"INFO","msg":"Unable to proxy request","path":"/up","error":"dial tcp [::1]:3000: connect: connection refused"}
+{"time":"2026-10-04T11:35:20.82744452Z","level":"INFO","msg":"Request","path":"/up","status":502,"dur":0,"method":"GET","req_content_length":0,"req_content_type":"","resp_content_length":26722,"resp_content_type":"text/html","remote_addr":"172.17.0.1:33196","user_agent":"Mozilla/5.0 Chrome/131.0.0.0 Safari/537.36","cache":"miss","query":"","proto":"HTTP/1.1"}
+{"time":"2026-10-04T11:35:20.92878162Z","level":"INFO","msg":"Unable to proxy request","path":"/up","error":"dial tcp [::1]:3000: connect: connection refused"}
+{"time":"2026-10-04T11:35:20.92891986Z","level":"INFO","msg":"Request","path":"/up","status":502,"dur":0,"method":"GET","req_content_length":0,"req_content_type":"","resp_content_length":26722,"resp_content_type":"text/html","remote_addr":"172.17.0.1:33202","user_agent":"Mozilla/5.0 Chrome/131.0.0.0 Safari/537.36","cache":"miss","query":"","proto":"HTTP/1.1"}
+{"time":"2026-10-04T11:35:21.030185449Z","level":"INFO","msg":"Unable to proxy request","path":"/up","error":"dial tcp [::1]:3000: connect: connection refused"}
+{"time":"2026-10-04T11:35:21.030336014Z","level":"INFO","msg":"Request","path":"/up","status":502,"dur":0,"method":"GET","req_content_length":0,"req_content_type":"","resp_content_length":26722,"resp_content_type":"text/html","remote_addr":"172.17.0.1:33208","user_agent":"Mozilla/5.0 Chrome/131.0.0.0 Safari/537.36","cache":"miss","query":"","proto":"HTTP/1.1"}
+{"time":"2026-10-04T11:35:21.131588257Z","level":"INFO","msg":"Unable to proxy request","path":"/up","error":"dial tcp [::1]:3000: connect: connection refused"}
+{"time":"2026-10-04T11:35:21.131749854Z","level":"INFO","msg":"Request","path":"/up","status":502,"dur":0,"method":"GET","req_content_length":0,"req_content_type":"","resp_content_length":26722,"resp_content_type":"text/html","remote_addr":"172.17.0.1:33224","user_agent":"Mozilla/5.0 Chrome/131.0.0.0 Safari/537.36","cache":"miss","query":"","proto":"HTTP/1.1"}
+{"time":"2026-10-04T11:35:21.233094037Z","level":"INFO","msg":"Unable to proxy request","path":"/up","error":"dial tcp [::1]:3000: connect: connection refused"}
+{"time":"2026-10-04T11:35:21.233220034Z","level":"INFO","msg":"Request","path":"/up","status":502,"dur":0,"method":"GET","req_content_length":0,"req_content_type":"","resp_content_length":26722,"resp_content_type":"text/html","remote_addr":"172.17.0.1:33228","user_agent":"Mozilla/5.0 Chrome/131.0.0.0 Safari/537.36","cache":"miss","query":"","proto":"HTTP/1.1"}
+{"time":"2026-10-04T11:35:21.334436266Z","level":"INFO","msg":"Unable to proxy request","path":"/up","error":"dial tcp [::1]:3000: connect: connection refused"}
+{"time":"2026-10-04T11:35:21.334594165Z","level":"INFO","msg":"Request","path":"/up","status":502,"dur":0,"method":"GET","req_content_length":0,"req_content_type":"","resp_content_length":26722,"resp_content_type":"text/html","remote_addr":"172.17.0.1:33240","user_agent":"Mozilla/5.0 Chrome/131.0.0.0 Safari/537.36","cache":"miss","query":"","proto":"HTTP/1.1"}
+{"time":"2026-10-04T11:35:21.43563789Z","level":"INFO","msg":"Unable to proxy request","path":"/up","error":"dial tcp [::1]:3000: connect: connection refused"}
+{"time":"2026-10-04T11:35:21.435737114Z","level":"INFO","msg":"Request","path":"/up","status":502,"dur":0,"method":"GET","req_content_length":0,"req_content_type":"","resp_content_length":26722,"resp_content_type":"text/html","remote_addr":"172.17.0.1:33252","user_agent":"Mozilla/5.0 Chrome/131.0.0.0 Safari/537.36","cache":"miss","query":"","proto":"HTTP/1.1"}
+{"time":"2026-10-04T11:35:21.536824795Z","level":"INFO","msg":"Unable to proxy request","path":"/up","error":"dial tcp [::1]:3000: connect: connection refused"}
+{"time":"2026-10-04T11:35:21.536929039Z","level":"INFO","msg":"Request","path":"/up","status":502,"dur":0,"method":"GET","req_content_length":0,"req_content_type":"","resp_content_length":26722,"resp_content_type":"text/html","remote_addr":"172.17.0.1:33264","user_agent":"Mozilla/5.0 Chrome/131.0.0.0 Safari/537.36","cache":"miss","query":"","proto":"HTTP/1.1"}
+{"time":"2026-10-04T11:35:21.638388157Z","level":"INFO","msg":"Unable to proxy request","path":"/up","error":"dial tcp [::1]:3000: connect: connection refused"}
+{"time":"2026-10-04T11:35:21.638535927Z","level":"INFO","msg":"Request","path":"/up","status":502,"dur":0,"method":"GET","req_content_length":0,"req_content_type":"","resp_content_length":26722,"resp_content_type":"text/html","remote_addr":"172.17.0.1:33270","user_agent":"Mozilla/5.0 Chrome/131.0.0.0 Safari/537.36","cache":"miss","query":"","proto":"HTTP/1.1"}
+resque-pool-worker[rails][38]: Starting worker b99388821082:38:default
+resque-pool-manager[rails][11]: started manager
+resque-pool-manager[rails][11]: Pool contains worker PIDs: [38, 46]
+resque-pool-worker[rails][46]: Starting worker b99388821082:46:default
+{"time":"2026-10-04T11:35:21.739906532Z","level":"INFO","msg":"Unable to proxy request","path":"/up","error":"dial tcp [::1]:3000: connect: connection refused"}
+{"time":"2026-10-04T11:35:21.740020946Z","level":"INFO","msg":"Request","path":"/up","status":502,"dur":0,"method":"GET","req_content_length":0,"req_content_type":"","resp_content_length":26722,"resp_content_type":"text/html","remote_addr":"172.17.0.1:33286","user_agent":"Mozilla/5.0 Chrome/131.0.0.0 Safari/537.36","cache":"miss","query":"","proto":"HTTP/1.1"}
+{"time":"2026-10-04T11:35:21.841198743Z","level":"INFO","msg":"Unable to proxy request","path":"/up","error":"dial tcp [::1]:3000: connect: connection refused"}
+{"time":"2026-10-04T11:35:21.841310772Z","level":"INFO","msg":"Request","path":"/up","status":502,"dur":0,"method":"GET","req_content_length":0,"req_content_type":"","resp_content_length":26722,"resp_content_type":"text/html","remote_addr":"172.17.0.1:33288","user_agent":"Mozilla/5.0 Chrome/131.0.0.0 Safari/537.36","cache":"miss","query":"","proto":"HTTP/1.1"}
+{"time":"2026-10-04T11:35:21.942551924Z","level":"INFO","msg":"Unable to proxy request","path":"/up","error":"dial tcp [::1]:3000: connect: connection refused"}
+{"time":"2026-10-04T11:35:21.942694984Z","level":"INFO","msg":"Request","path":"/up","status":502,"dur":0,"method":"GET","req_content_length":0,"req_content_type":"","resp_content_length":26722,"resp_content_type":"text/html","remote_addr":"172.17.0.1:33292","user_agent":"Mozilla/5.0 Chrome/131.0.0.0 Safari/537.36","cache":"miss","query":"","proto":"HTTP/1.1"}
+{"time":"2026-10-04T11:35:22.043983107Z","level":"INFO","msg":"Unable to proxy request","path":"/up","error":"dial tcp [::1]:3000: connect: connection refused"}
+{"time":"2026-10-04T11:35:22.04414807Z","level":"INFO","msg":"Request","path":"/up","status":502,"dur":0,"method":"GET","req_content_length":0,"req_content_type":"","resp_content_length":26722,"resp_content_type":"text/html","remote_addr":"172.17.0.1:33302","user_agent":"Mozilla/5.0 Chrome/131.0.0.0 Safari/537.36","cache":"miss","query":"","proto":"HTTP/1.1"}
+=> Booting Puma
+=> Rails 8.2.0.alpha application starting in production 
+=> Run `bin/rails server --help` for more startup options
+{"time":"2026-10-04T11:35:22.145261622Z","level":"INFO","msg":"Unable to proxy request","path":"/up","error":"dial tcp [::1]:3000: connect: connection refused"}
+{"time":"2026-10-04T11:35:22.145366236Z","level":"INFO","msg":"Request","path":"/up","status":502,"dur":0,"method":"GET","req_content_length":0,"req_content_type":"","resp_content_length":26722,"resp_content_type":"text/html","remote_addr":"172.17.0.1:33312","user_agent":"Mozilla/5.0 Chrome/131.0.0.0 Safari/537.36","cache":"miss","query":"","proto":"HTTP/1.1"}
+{"time":"2026-10-04T11:35:22.246524726Z","level":"INFO","msg":"Unable to proxy request","path":"/up","error":"dial tcp [::1]:3000: connect: connection refused"}
+{"time":"2026-10-04T11:35:22.246650833Z","level":"INFO","msg":"Request","path":"/up","status":502,"dur":0,"method":"GET","req_content_length":0,"req_content_type":"","resp_content_length":26722,"resp_content_type":"text/html","remote_addr":"172.17.0.1:33326","user_agent":"Mozilla/5.0 Chrome/131.0.0.0 Safari/537.36","cache":"miss","query":"","proto":"HTTP/1.1"}
+{"time":"2026-10-04T11:35:22.347924207Z","level":"INFO","msg":"Unable to proxy request","path":"/up","error":"dial tcp [::1]:3000: connect: connection refused"}
+{"time":"2026-10-04T11:35:22.348037689Z","level":"INFO","msg":"Request","path":"/up","status":502,"dur":0,"method":"GET","req_content_length":0,"req_content_type":"","resp_content_length":26722,"resp_content_type":"text/html","remote_addr":"172.17.0.1:33332","user_agent":"Mozilla/5.0 Chrome/131.0.0.0 Safari/537.36","cache":"miss","query":"","proto":"HTTP/1.1"}
+{"time":"2026-10-04T11:35:22.449215427Z","level":"INFO","msg":"Unable to proxy request","path":"/up","error":"dial tcp [::1]:3000: connect: connection refused"}
+{"time":"2026-10-04T11:35:22.449321635Z","level":"INFO","msg":"Request","path":"/up","status":502,"dur":0,"method":"GET","req_content_length":0,"req_content_type":"","resp_content_length":26722,"resp_content_type":"text/html","remote_addr":"172.17.0.1:33346","user_agent":"Mozilla/5.0 Chrome/131.0.0.0 Safari/537.36","cache":"miss","query":"","proto":"HTTP/1.1"}
+{"time":"2026-10-04T11:35:22.550387823Z","level":"INFO","msg":"Unable to proxy request","path":"/up","error":"dial tcp [::1]:3000: connect: connection refused"}
+{"time":"2026-10-04T11:35:22.55049353Z","level":"INFO","msg":"Request","path":"/up","status":502,"dur":0,"method":"GET","req_content_length":0,"req_content_type":"","resp_content_length":26722,"resp_content_type":"text/html","remote_addr":"172.17.0.1:33350","user_agent":"Mozilla/5.0 Chrome/131.0.0.0 Safari/537.36","cache":"miss","query":"","proto":"HTTP/1.1"}
+{"time":"2026-10-04T11:35:22.651737217Z","level":"INFO","msg":"Unable to proxy request","path":"/up","error":"dial tcp [::1]:3000: connect: connection refused"}
+{"time":"2026-10-04T11:35:22.651882551Z","level":"INFO","msg":"Request","path":"/up","status":502,"dur":0,"method":"GET","req_content_length":0,"req_content_type":"","resp_content_length":26722,"resp_content_type":"text/html","remote_addr":"172.17.0.1:33358","user_agent":"Mozilla/5.0 Chrome/131.0.0.0 Safari/537.36","cache":"miss","query":"","proto":"HTTP/1.1"}
+[36] Puma starting in cluster mode...
+[36] * Puma version: 7.2.1 ("On The Corner")
+[36] * Ruby version: ruby 3.4.10 (2026-06-30 revision 2b0b7728dc) +YJIT +PRISM [x86_64-linux]
+[36] *  Min threads: 5
+[36] *  Max threads: 5
+[36] *  Environment: production
+[36] *   Master PID: 36
+[36] *      Workers: 1
+[36] *     Restarts: (✔) hot (✔) phased (✖) refork
+[36] * Listening on http://0.0.0.0:3000
+[36] Use Ctrl-C to stop
+[36] ! WARNING: Detected running cluster mode with 1 worker.
+[36] ! Running Puma in cluster mode with a single worker is often a misconfiguration.
+[36] ! Consider running Puma in single-mode (workers = 0) in order to reduce memory overhead.
+[36] ! Set the `silence_single_worker_warning` option to silence this warning message.
+[36] - Worker 0 (PID: 62) booted in 0.0s, phase: 0
+{"time":"2026-10-04T11:35:22.760658536Z","level":"INFO","msg":"Request","path":"/up","status":200,"dur":7,"method":"GET","req_content_length":0,"req_content_type":"","resp_content_length":73,"resp_content_type":"text/html; charset=utf-8","remote_addr":"172.17.0.1:33362","user_agent":"Mozilla/5.0 Chrome/131.0.0.0 Safari/537.36","cache":"miss","query":"","proto":"HTTP/1.1"}
+I, [2026-10-04T11:35:22.761728 #62]  INFO -- : [a2966dca-aed4-4666-ad16-4cc2c64cf2b8] Started GET "/first_run" for 172.17.0.1 at 2026-10-04 11:35:22 +0000
+I, [2026-10-04T11:35:22.762245 #62]  INFO -- : [a2966dca-aed4-4666-ad16-4cc2c64cf2b8] Processing by FirstRunsController#show as HTML
+I, [2026-10-04T11:35:22.825444 #62]  INFO -- : [a2966dca-aed4-4666-ad16-4cc2c64cf2b8] Completed 200 OK in 63ms (Views: 50.1ms | ActiveRecord: 1.0ms (5 queries, 3 cached) | GC: 16.2ms)
+{"time":"2026-10-04T11:35:22.82694243Z","level":"INFO","msg":"Request","path":"/first_run","status":200,"dur":65,"method":"GET","req_content_length":0,"req_content_type":"","resp_content_length":26809,"resp_content_type":"text/html; charset=utf-8","remote_addr":"172.17.0.1:33372","user_agent":"Mozilla/5.0 Chrome/131.0.0.0 Safari/537.36","cache":"miss","query":"","proto":"HTTP/1.1"}
+I, [2026-10-04T11:35:22.831420 #62]  INFO -- : [ab64e68d-ca41-41a0-b32e-8876a444c508] Started POST "/first_run" for 172.17.0.1 at 2026-10-04 11:35:22 +0000
+I, [2026-10-04T11:35:22.831875 #62]  INFO -- : [ab64e68d-ca41-41a0-b32e-8876a444c508] Processing by FirstRunsController#create as HTML
+I, [2026-10-04T11:35:22.831893 #62]  INFO -- : [ab64e68d-ca41-41a0-b32e-8876a444c508]   Parameters: {"user" => {"name" => "Fresh owner", "email_address" => "[FILTERED]", "password" => "[FILTERED]"}, "authenticity_token" => "[FILTERED]"}
+I, [2026-10-04T11:35:23.022851 #62]  INFO -- : [ab64e68d-ca41-41a0-b32e-8876a444c508] Redirected to http://campfire.test/
+I, [2026-10-04T11:35:23.022990 #62]  INFO -- : [ab64e68d-ca41-41a0-b32e-8876a444c508] Completed 302 Found in 191ms (ActiveRecord: 6.1ms (12 queries, 0 cached) | GC: 0.4ms)
+{"time":"2026-10-04T11:35:23.023880818Z","level":"INFO","msg":"Request","path":"/first_run","status":302,"dur":196,"method":"POST","req_content_length":210,"req_content_type":"application/x-www-form-urlencoded","resp_content_length":0,"resp_content_type":"text/html; charset=utf-8","remote_addr":"172.17.0.1:33386","user_agent":"Mozilla/5.0 Chrome/131.0.0.0 Safari/537.36","cache":"bypass","query":"","proto":"HTTP/1.1"}
+I, [2026-10-04T11:35:23.025517 #62]  INFO -- : [50a8ba12-4530-4bdf-9800-a497a088eeb2] Started GET "/" for 172.17.0.1 at 2026-10-04 11:35:23 +0000
+I, [2026-10-04T11:35:23.025930 #62]  INFO -- : [50a8ba12-4530-4bdf-9800-a497a088eeb2] Processing by WelcomeController#show as HTML
+I, [2026-10-04T11:35:23.034961 #62]  INFO -- : [50a8ba12-4530-4bdf-9800-a497a088eeb2] Redirected to http://campfire.test/rooms/1
+I, [2026-10-04T11:35:23.035058 #62]  INFO -- : [50a8ba12-4530-4bdf-9800-a497a088eeb2] Completed 302 Found in 9ms (ActiveRecord: 3.7ms (5 queries, 0 cached) | GC: 0.1ms)
+{"time":"2026-10-04T11:35:23.035654701Z","level":"INFO","msg":"Request","path":"/","status":302,"dur":10,"method":"GET","req_content_length":0,"req_content_type":"","resp_content_length":0,"resp_content_type":"text/html; charset=utf-8","remote_addr":"172.17.0.1:33390","user_agent":"Mozilla/5.0 Chrome/131.0.0.0 Safari/537.36","cache":"miss","query":"","proto":"HTTP/1.1"}
+I, [2026-10-04T11:35:23.037734 #62]  INFO -- : [5b7b12bd-6dfe-4350-a7f9-96013d3770bf] Started GET "/rooms/1" for 172.17.0.1 at 2026-10-04 11:35:23 +0000
+I, [2026-10-04T11:35:23.037995 #62]  INFO -- : [5b7b12bd-6dfe-4350-a7f9-96013d3770bf] Processing by RoomsController#show as HTML
+I, [2026-10-04T11:35:23.038009 #62]  INFO -- : [5b7b12bd-6dfe-4350-a7f9-96013d3770bf]   Parameters: {"id" => "1"}
+I, [2026-10-04T11:35:23.082796 #62]  INFO -- : [5b7b12bd-6dfe-4350-a7f9-96013d3770bf] Completed 200 OK in 45ms (Views: 38.4ms | ActiveRecord: 1.5ms (16 queries, 7 cached) | GC: 0.1ms)
+{"time":"2026-10-04T11:35:23.083616742Z","level":"INFO","msg":"Request","path":"/rooms/1","status":200,"dur":46,"method":"GET","req_content_length":0,"req_content_type":"","resp_content_length":38547,"resp_content_type":"text/html; charset=utf-8","remote_addr":"172.17.0.1:33396","user_agent":"Mozilla/5.0 Chrome/131.0.0.0 Safari/537.36","cache":"miss","query":"","proto":"HTTP/1.1"}
+I, [2026-10-04T11:35:23.086251 #62]  INFO -- : [46bf909c-fe10-4db4-9dce-d2c924518c7d] Started POST "/rooms/1/messages" for 172.17.0.1 at 2026-10-04 11:35:23 +0000
+I, [2026-10-04T11:35:23.086659 #62]  INFO -- : [46bf909c-fe10-4db4-9dce-d2c924518c7d] Processing by MessagesController#create as TURBO_STREAM
+I, [2026-10-04T11:35:23.086680 #62]  INFO -- : [46bf909c-fe10-4db4-9dce-d2c924518c7d]   Parameters: {"message" => {"body" => "[FILTERED]", "client_message_id" => "fresh-production-message"}, "authenticity_token" => "[FILTERED]", "room_id" => "1"}
+I, [2026-10-04T11:35:23.125030 #62]  INFO -- : [46bf909c-fe10-4db4-9dce-d2c924518c7d] [ActiveJob] Enqueued Room::PushMessageJob (Job ID: 8245d0f5-3493-4805-85f1-40a6bab7eca0) to Resque(default) with arguments: #<GlobalID:0x0000723c4b91ab00 @uri=#<URI::GID gid://campfire/Rooms::Open/1>>, #<GlobalID:0x0000723c4b91a510 @uri=#<URI::GID gid://campfire/Message/1>>
+I, [2026-10-04T11:35:23.177078 #62]  INFO -- : [46bf909c-fe10-4db4-9dce-d2c924518c7d] Completed 200 OK in 89ms (Views: 2.1ms | ActiveRecord: 3.1ms (16 queries, 1 cached) | GC: 11.3ms)
+{"time":"2026-10-04T11:35:23.177977251Z","level":"INFO","msg":"Request","path":"/rooms/1/messages","status":200,"dur":92,"method":"POST","req_content_length":217,"req_content_type":"application/x-www-form-urlencoded","resp_content_length":9354,"resp_content_type":"text/vnd.turbo-stream.html; charset=utf-8","remote_addr":"172.17.0.1:33400","user_agent":"Mozilla/5.0 Chrome/131.0.0.0 Safari/537.36","cache":"bypass","query":"","proto":"HTTP/1.1"}
+I, [2026-10-04T11:35:23.208123 #38]  INFO -- : [ActiveJob] [Room::PushMessageJob] [8245d0f5-3493-4805-85f1-40a6bab7eca0] Performing Room::PushMessageJob (Job ID: 8245d0f5-3493-4805-85f1-40a6bab7eca0) from (default) enqueued at 2026-10-04T11:35:23.123190628Z with arguments: #<GlobalID:0x00007bb60282e8d8 @uri=#<URI::GID gid://campfire/Rooms::Open/1>>, #<GlobalID:0x00007bb60282e1a8 @uri=#<URI::GID gid://campfire/Message/1>>
+I, [2026-10-04T11:35:23.246343 #38]  INFO -- : [ActiveJob] [Room::PushMessageJob] [8245d0f5-3493-4805-85f1-40a6bab7eca0] Performed Room::PushMessageJob (Job ID: 8245d0f5-3493-4805-85f1-40a6bab7eca0) from Resque(default) in 59.82ms
+9:signal-handler (1791113724) Received SIGTERM scheduling shutdown...
+{"time":"2026-10-04T11:35:24.75591978Z","level":"INFO","msg":"Relaying signal to upstream process","signal":"terminated"}
+9:signal-handler (1791113724) Received SIGTERM scheduling shutdown...
+{"time":"2026-10-04T11:35:24.756203876Z","level":"INFO","msg":"Server stopping"}
+{"time":"2026-10-04T11:35:24.756265146Z","level":"INFO","msg":"Server stopped"}
+9:signal-handler (1791113724) Received SIGTERM scheduling shutdown...
+9:M 04 Oct 2026 11:35:24.773 * User requested shutdown...
+9:M 04 Oct 2026 11:35:24.773 # Redis is now ready to exit, bye bye...
+sh: 1: ps: not found

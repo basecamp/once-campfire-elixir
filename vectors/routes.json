@@ -1,0 +1,3662 @@
+{
+  "version": 1,
+  "kind": "routes",
+  "reference_sha": "90b330024dec3e757c79b6a7e6568f93da8e3148",
+  "runtime": {
+    "ruby_version": "3.4.10",
+    "rails_version": "8.2.0.alpha",
+    "adapter": "SQLite",
+    "gems": {
+      "action_text-trix": {
+        "version": "2.1.19",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/action_text-trix-2.1.19"
+      },
+      "actioncable": {
+        "version": "8.2.0.alpha",
+        "source": "/usr/local/bundle/ruby/3.4.0/bundler/gems/rails-1a02651ac37f/actioncable"
+      },
+      "actionmailbox": {
+        "version": "8.2.0.alpha",
+        "source": "/usr/local/bundle/ruby/3.4.0/bundler/gems/rails-1a02651ac37f/actionmailbox"
+      },
+      "actionmailer": {
+        "version": "8.2.0.alpha",
+        "source": "/usr/local/bundle/ruby/3.4.0/bundler/gems/rails-1a02651ac37f/actionmailer"
+      },
+      "actionpack": {
+        "version": "8.2.0.alpha",
+        "source": "/usr/local/bundle/ruby/3.4.0/bundler/gems/rails-1a02651ac37f/actionpack"
+      },
+      "actiontext": {
+        "version": "8.2.0.alpha",
+        "source": "/usr/local/bundle/ruby/3.4.0/bundler/gems/rails-1a02651ac37f/actiontext"
+      },
+      "actionview": {
+        "version": "8.2.0.alpha",
+        "source": "/usr/local/bundle/ruby/3.4.0/bundler/gems/rails-1a02651ac37f/actionview"
+      },
+      "activejob": {
+        "version": "8.2.0.alpha",
+        "source": "/usr/local/bundle/ruby/3.4.0/bundler/gems/rails-1a02651ac37f/activejob"
+      },
+      "activemodel": {
+        "version": "8.2.0.alpha",
+        "source": "/usr/local/bundle/ruby/3.4.0/bundler/gems/rails-1a02651ac37f/activemodel"
+      },
+      "activerecord": {
+        "version": "8.2.0.alpha",
+        "source": "/usr/local/bundle/ruby/3.4.0/bundler/gems/rails-1a02651ac37f/activerecord"
+      },
+      "activestorage": {
+        "version": "8.2.0.alpha",
+        "source": "/usr/local/bundle/ruby/3.4.0/bundler/gems/rails-1a02651ac37f/activestorage"
+      },
+      "activesupport": {
+        "version": "8.2.0.alpha",
+        "source": "/usr/local/bundle/ruby/3.4.0/bundler/gems/rails-1a02651ac37f/activesupport"
+      },
+      "addressable": {
+        "version": "2.9.0",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/addressable-2.9.0"
+      },
+      "ast": {
+        "version": "2.4.3",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/ast-2.4.3"
+      },
+      "base64": {
+        "version": "0.3.0",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/base64-0.3.0"
+      },
+      "bcrypt": {
+        "version": "3.1.22",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/bcrypt-3.1.22"
+      },
+      "benchmark": {
+        "version": "0.5.0",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/benchmark-0.5.0"
+      },
+      "bigdecimal": {
+        "version": "3.3.1",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/bigdecimal-3.3.1"
+      },
+      "brakeman": {
+        "version": "8.0.6",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/brakeman-8.0.6"
+      },
+      "builder": {
+        "version": "3.3.0",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/builder-3.3.0"
+      },
+      "bundler": {
+        "version": "4.0.13",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/bundler-4.0.13"
+      },
+      "bundler-audit": {
+        "version": "0.9.3",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/bundler-audit-0.9.3"
+      },
+      "capybara": {
+        "version": "3.40.0",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/capybara-3.40.0"
+      },
+      "chunky_png": {
+        "version": "1.4.0",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/chunky_png-1.4.0"
+      },
+      "concurrent-ruby": {
+        "version": "1.3.7",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/concurrent-ruby-1.3.7"
+      },
+      "connection_pool": {
+        "version": "2.5.5",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/connection_pool-2.5.5"
+      },
+      "crack": {
+        "version": "1.0.0",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/crack-1.0.0"
+      },
+      "crass": {
+        "version": "1.0.7",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/crass-1.0.7"
+      },
+      "date": {
+        "version": "3.5.1",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/date-3.5.1"
+      },
+      "debug": {
+        "version": "1.11.0",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/debug-1.11.0"
+      },
+      "did_you_mean": {
+        "version": "2.0.0",
+        "source": "/usr/local/lib/ruby/gems/3.4.0/gems/did_you_mean-2.0.0"
+      },
+      "drb": {
+        "version": "2.2.3",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/drb-2.2.3"
+      },
+      "erb": {
+        "version": "6.0.4",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/erb-6.0.4"
+      },
+      "error_highlight": {
+        "version": "0.7.0",
+        "source": "/usr/local/lib/ruby/gems/3.4.0/gems/error_highlight-0.7.0"
+      },
+      "erubi": {
+        "version": "1.13.1",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/erubi-1.13.1"
+      },
+      "faker": {
+        "version": "3.5.2",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/faker-3.5.2"
+      },
+      "ffi": {
+        "version": "1.17.2",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/ffi-1.17.2-x86_64-linux-gnu"
+      },
+      "geared_pagination": {
+        "version": "1.2.0",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/geared_pagination-1.2.0"
+      },
+      "globalid": {
+        "version": "1.3.0",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/globalid-1.3.0"
+      },
+      "hashdiff": {
+        "version": "1.2.0",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/hashdiff-1.2.0"
+      },
+      "i18n": {
+        "version": "1.14.7",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/i18n-1.14.7"
+      },
+      "image_processing": {
+        "version": "1.14.0",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/image_processing-1.14.0"
+      },
+      "importmap-rails": {
+        "version": "2.2.2",
+        "source": "/usr/local/bundle/ruby/3.4.0/bundler/gems/importmap-rails-51c1a531327f"
+      },
+      "io-console": {
+        "version": "0.8.1",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/io-console-0.8.1"
+      },
+      "irb": {
+        "version": "1.15.3",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/irb-1.15.3"
+      },
+      "jbuilder": {
+        "version": "2.14.1",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/jbuilder-2.14.1"
+      },
+      "json": {
+        "version": "2.21.2",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/json-2.21.2"
+      },
+      "jwt": {
+        "version": "3.2.0",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/jwt-3.2.0"
+      },
+      "kredis": {
+        "version": "1.8.0",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/kredis-1.8.0"
+      },
+      "language_server-protocol": {
+        "version": "3.17.0.5",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/language_server-protocol-3.17.0.5"
+      },
+      "lexxy": {
+        "version": "0.9.24",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/lexxy-0.9.24"
+      },
+      "lint_roller": {
+        "version": "1.1.0",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/lint_roller-1.1.0"
+      },
+      "logger": {
+        "version": "1.7.0",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/logger-1.7.0"
+      },
+      "loofah": {
+        "version": "2.25.2",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/loofah-2.25.2"
+      },
+      "mail": {
+        "version": "2.9.1",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/mail-2.9.1"
+      },
+      "marcel": {
+        "version": "1.1.0",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/marcel-1.1.0"
+      },
+      "matrix": {
+        "version": "0.4.3",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/matrix-0.4.3"
+      },
+      "mini_magick": {
+        "version": "5.3.1",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/mini_magick-5.3.1"
+      },
+      "mini_mime": {
+        "version": "1.1.5",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/mini_mime-1.1.5"
+      },
+      "minitest": {
+        "version": "5.26.2",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/minitest-5.26.2"
+      },
+      "mocha": {
+        "version": "3.1.0",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/mocha-3.1.0"
+      },
+      "mono_logger": {
+        "version": "1.1.2",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/mono_logger-1.1.2"
+      },
+      "multi_json": {
+        "version": "1.17.0",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/multi_json-1.17.0"
+      },
+      "mustermann": {
+        "version": "3.0.4",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/mustermann-3.0.4"
+      },
+      "net-http-persistent": {
+        "version": "4.0.6",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/net-http-persistent-4.0.6"
+      },
+      "net-imap": {
+        "version": "0.6.4.1",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/net-imap-0.6.4.1"
+      },
+      "net-pop": {
+        "version": "0.1.2",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/net-pop-0.1.2"
+      },
+      "net-protocol": {
+        "version": "0.2.2",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/net-protocol-0.2.2"
+      },
+      "net-smtp": {
+        "version": "0.5.1",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/net-smtp-0.5.1"
+      },
+      "nio4r": {
+        "version": "2.7.5",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/nio4r-2.7.5"
+      },
+      "nokogiri": {
+        "version": "1.19.4",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/nokogiri-1.19.4-x86_64-linux-gnu"
+      },
+      "openssl": {
+        "version": "4.0.2",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/openssl-4.0.2"
+      },
+      "ostruct": {
+        "version": "0.6.3",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/ostruct-0.6.3"
+      },
+      "parallel": {
+        "version": "1.27.0",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/parallel-1.27.0"
+      },
+      "parser": {
+        "version": "3.3.9.0",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/parser-3.3.9.0"
+      },
+      "pathname": {
+        "version": "0.4.0",
+        "source": "/usr/local/lib/ruby/gems/3.4.0/gems/pathname-0.4.0"
+      },
+      "platform_agent": {
+        "version": "1.0.1",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/platform_agent-1.0.1"
+      },
+      "pp": {
+        "version": "0.6.3",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/pp-0.6.3"
+      },
+      "prettyprint": {
+        "version": "0.2.0",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/prettyprint-0.2.0"
+      },
+      "prism": {
+        "version": "1.4.0",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/prism-1.4.0"
+      },
+      "propshaft": {
+        "version": "1.2.1",
+        "source": "/usr/local/bundle/ruby/3.4.0/bundler/gems/propshaft-e49a9de659ff"
+      },
+      "psych": {
+        "version": "5.2.6",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/psych-5.2.6"
+      },
+      "public_suffix": {
+        "version": "6.0.2",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/public_suffix-6.0.2"
+      },
+      "puma": {
+        "version": "7.2.1",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/puma-7.2.1"
+      },
+      "racc": {
+        "version": "1.8.1",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/racc-1.8.1"
+      },
+      "rack": {
+        "version": "3.2.6",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/rack-3.2.6"
+      },
+      "rack-protection": {
+        "version": "4.2.1",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/rack-protection-4.2.1"
+      },
+      "rack-session": {
+        "version": "2.1.2",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/rack-session-2.1.2"
+      },
+      "rack-test": {
+        "version": "2.2.0",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/rack-test-2.2.0"
+      },
+      "rackup": {
+        "version": "2.2.1",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/rackup-2.2.1"
+      },
+      "rails": {
+        "version": "8.2.0.alpha",
+        "source": "/usr/local/bundle/ruby/3.4.0/bundler/gems/rails-1a02651ac37f"
+      },
+      "rails-dom-testing": {
+        "version": "2.3.0",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/rails-dom-testing-2.3.0"
+      },
+      "rails-html-sanitizer": {
+        "version": "1.7.1",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/rails-html-sanitizer-1.7.1"
+      },
+      "rails_autolink": {
+        "version": "1.1.8",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/rails_autolink-1.1.8"
+      },
+      "railties": {
+        "version": "8.2.0.alpha",
+        "source": "/usr/local/bundle/ruby/3.4.0/bundler/gems/rails-1a02651ac37f/railties"
+      },
+      "rainbow": {
+        "version": "3.1.1",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/rainbow-3.1.1"
+      },
+      "rake": {
+        "version": "13.3.1",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/rake-13.3.1"
+      },
+      "rdoc": {
+        "version": "6.16.1",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/rdoc-6.16.1"
+      },
+      "redis": {
+        "version": "5.4.1",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/redis-5.4.1"
+      },
+      "redis-client": {
+        "version": "0.25.2",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/redis-client-0.25.2"
+      },
+      "redis-namespace": {
+        "version": "1.11.0",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/redis-namespace-1.11.0"
+      },
+      "regexp_parser": {
+        "version": "2.11.2",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/regexp_parser-2.11.2"
+      },
+      "reline": {
+        "version": "0.6.3",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/reline-0.6.3"
+      },
+      "resque": {
+        "version": "2.7.0",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/resque-2.7.0"
+      },
+      "resque-pool": {
+        "version": "0.7.1",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/resque-pool-0.7.1"
+      },
+      "rexml": {
+        "version": "3.4.4",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/rexml-3.4.4"
+      },
+      "rqrcode": {
+        "version": "3.2.0",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/rqrcode-3.2.0"
+      },
+      "rqrcode_core": {
+        "version": "2.1.0",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/rqrcode_core-2.1.0"
+      },
+      "rubocop": {
+        "version": "1.80.2",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/rubocop-1.80.2"
+      },
+      "rubocop-ast": {
+        "version": "1.46.0",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/rubocop-ast-1.46.0"
+      },
+      "rubocop-performance": {
+        "version": "1.25.0",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/rubocop-performance-1.25.0"
+      },
+      "rubocop-rails": {
+        "version": "2.33.3",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/rubocop-rails-2.33.3"
+      },
+      "rubocop-rails-omakase": {
+        "version": "1.1.0",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/rubocop-rails-omakase-1.1.0"
+      },
+      "ruby-progressbar": {
+        "version": "1.13.0",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/ruby-progressbar-1.13.0"
+      },
+      "ruby-vips": {
+        "version": "2.2.5",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/ruby-vips-2.2.5"
+      },
+      "ruby2_keywords": {
+        "version": "0.0.5",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/ruby2_keywords-0.0.5"
+      },
+      "rubyzip": {
+        "version": "3.4.0",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/rubyzip-3.4.0"
+      },
+      "securerandom": {
+        "version": "0.4.1",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/securerandom-0.4.1"
+      },
+      "selenium-webdriver": {
+        "version": "4.35.0",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/selenium-webdriver-4.35.0"
+      },
+      "sentry-rails": {
+        "version": "5.26.0",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/sentry-rails-5.26.0"
+      },
+      "sentry-ruby": {
+        "version": "5.26.0",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/sentry-ruby-5.26.0"
+      },
+      "sinatra": {
+        "version": "4.2.1",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/sinatra-4.2.1"
+      },
+      "sqlite3": {
+        "version": "2.9.6",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/sqlite3-2.9.6-x86_64-linux-gnu"
+      },
+      "stimulus-rails": {
+        "version": "1.3.4",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/stimulus-rails-1.3.4"
+      },
+      "stringio": {
+        "version": "3.1.8",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/stringio-3.1.8"
+      },
+      "surfguard": {
+        "version": "0.2.0",
+        "source": "/usr/local/bundle/ruby/3.4.0/bundler/gems/surfguard-59e278c01a53"
+      },
+      "syntax_suggest": {
+        "version": "2.0.3",
+        "source": "/usr/local/lib/ruby/gems/3.4.0/gems/syntax_suggest-2.0.3"
+      },
+      "thor": {
+        "version": "1.4.0",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/thor-1.4.0"
+      },
+      "thruster": {
+        "version": "0.1.23",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/thruster-0.1.23-x86_64-linux"
+      },
+      "tilt": {
+        "version": "2.6.1",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/tilt-2.6.1"
+      },
+      "timeout": {
+        "version": "0.6.1",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/timeout-0.6.1"
+      },
+      "tsort": {
+        "version": "0.2.0",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/tsort-0.2.0"
+      },
+      "turbo-rails": {
+        "version": "2.0.16",
+        "source": "/usr/local/bundle/ruby/3.4.0/bundler/gems/turbo-rails-30cd8fcc6f82"
+      },
+      "tzinfo": {
+        "version": "2.0.6",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/tzinfo-2.0.6"
+      },
+      "unicode-display_width": {
+        "version": "3.2.0",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/unicode-display_width-3.2.0"
+      },
+      "unicode-emoji": {
+        "version": "4.2.0",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/unicode-emoji-4.2.0"
+      },
+      "uri": {
+        "version": "1.1.1",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/uri-1.1.1"
+      },
+      "useragent": {
+        "version": "0.16.11",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/useragent-0.16.11"
+      },
+      "web-push": {
+        "version": "3.1.0",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/web-push-3.1.0"
+      },
+      "webmock": {
+        "version": "3.25.1",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/webmock-3.25.1"
+      },
+      "websocket": {
+        "version": "1.2.11",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/websocket-1.2.11"
+      },
+      "websocket-driver": {
+        "version": "0.8.2",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/websocket-driver-0.8.2"
+      },
+      "websocket-extensions": {
+        "version": "0.1.5",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/websocket-extensions-0.1.5"
+      },
+      "xpath": {
+        "version": "3.2.0",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/xpath-3.2.0"
+      },
+      "zeitwerk": {
+        "version": "2.7.3",
+        "source": "/usr/local/bundle/ruby/3.4.0/gems/zeitwerk-2.7.3"
+      }
+    }
+  },
+  "data": [
+    {
+      "ordinal": 0,
+      "name": null,
+      "path": "/cable",
+      "verb": "",
+      "defaults": {},
+      "requirements": {},
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::Mapper::Constraints",
+      "internal": true
+    },
+    {
+      "ordinal": 1,
+      "name": "root",
+      "path": "/",
+      "verb": "GET",
+      "defaults": {
+        "controller": "welcome",
+        "action": "show"
+      },
+      "requirements": {
+        "controller": "welcome",
+        "action": "show"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 2,
+      "name": "new_first_run",
+      "path": "/first_run/new(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "first_runs",
+        "action": "new"
+      },
+      "requirements": {
+        "controller": "first_runs",
+        "action": "new"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 3,
+      "name": "edit_first_run",
+      "path": "/first_run/edit(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "first_runs",
+        "action": "edit"
+      },
+      "requirements": {
+        "controller": "first_runs",
+        "action": "edit"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 4,
+      "name": "first_run",
+      "path": "/first_run(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "first_runs",
+        "action": "show"
+      },
+      "requirements": {
+        "controller": "first_runs",
+        "action": "show"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 5,
+      "name": null,
+      "path": "/first_run(.:format)",
+      "verb": "PATCH",
+      "defaults": {
+        "controller": "first_runs",
+        "action": "update"
+      },
+      "requirements": {
+        "controller": "first_runs",
+        "action": "update"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 6,
+      "name": null,
+      "path": "/first_run(.:format)",
+      "verb": "PUT",
+      "defaults": {
+        "controller": "first_runs",
+        "action": "update"
+      },
+      "requirements": {
+        "controller": "first_runs",
+        "action": "update"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 7,
+      "name": null,
+      "path": "/first_run(.:format)",
+      "verb": "DELETE",
+      "defaults": {
+        "controller": "first_runs",
+        "action": "destroy"
+      },
+      "requirements": {
+        "controller": "first_runs",
+        "action": "destroy"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 8,
+      "name": null,
+      "path": "/first_run(.:format)",
+      "verb": "POST",
+      "defaults": {
+        "controller": "first_runs",
+        "action": "create"
+      },
+      "requirements": {
+        "controller": "first_runs",
+        "action": "create"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 9,
+      "name": "session_transfer",
+      "path": "/session/transfers/:id(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "sessions/transfers",
+        "action": "show"
+      },
+      "requirements": {
+        "controller": "sessions/transfers",
+        "action": "show"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 10,
+      "name": null,
+      "path": "/session/transfers/:id(.:format)",
+      "verb": "PATCH",
+      "defaults": {
+        "controller": "sessions/transfers",
+        "action": "update"
+      },
+      "requirements": {
+        "controller": "sessions/transfers",
+        "action": "update"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 11,
+      "name": null,
+      "path": "/session/transfers/:id(.:format)",
+      "verb": "PUT",
+      "defaults": {
+        "controller": "sessions/transfers",
+        "action": "update"
+      },
+      "requirements": {
+        "controller": "sessions/transfers",
+        "action": "update"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 12,
+      "name": "new_session",
+      "path": "/session/new(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "sessions",
+        "action": "new"
+      },
+      "requirements": {
+        "controller": "sessions",
+        "action": "new"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 13,
+      "name": "edit_session",
+      "path": "/session/edit(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "sessions",
+        "action": "edit"
+      },
+      "requirements": {
+        "controller": "sessions",
+        "action": "edit"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 14,
+      "name": "session",
+      "path": "/session(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "sessions",
+        "action": "show"
+      },
+      "requirements": {
+        "controller": "sessions",
+        "action": "show"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 15,
+      "name": null,
+      "path": "/session(.:format)",
+      "verb": "PATCH",
+      "defaults": {
+        "controller": "sessions",
+        "action": "update"
+      },
+      "requirements": {
+        "controller": "sessions",
+        "action": "update"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 16,
+      "name": null,
+      "path": "/session(.:format)",
+      "verb": "PUT",
+      "defaults": {
+        "controller": "sessions",
+        "action": "update"
+      },
+      "requirements": {
+        "controller": "sessions",
+        "action": "update"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 17,
+      "name": null,
+      "path": "/session(.:format)",
+      "verb": "DELETE",
+      "defaults": {
+        "controller": "sessions",
+        "action": "destroy"
+      },
+      "requirements": {
+        "controller": "sessions",
+        "action": "destroy"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 18,
+      "name": null,
+      "path": "/session(.:format)",
+      "verb": "POST",
+      "defaults": {
+        "controller": "sessions",
+        "action": "create"
+      },
+      "requirements": {
+        "controller": "sessions",
+        "action": "create"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 19,
+      "name": "account_users",
+      "path": "/account/users(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "accounts/users",
+        "action": "index"
+      },
+      "requirements": {
+        "controller": "accounts/users",
+        "action": "index"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 20,
+      "name": null,
+      "path": "/account/users(.:format)",
+      "verb": "POST",
+      "defaults": {
+        "controller": "accounts/users",
+        "action": "create"
+      },
+      "requirements": {
+        "controller": "accounts/users",
+        "action": "create"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 21,
+      "name": "new_account_user",
+      "path": "/account/users/new(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "accounts/users",
+        "action": "new"
+      },
+      "requirements": {
+        "controller": "accounts/users",
+        "action": "new"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 22,
+      "name": "edit_account_user",
+      "path": "/account/users/:id/edit(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "accounts/users",
+        "action": "edit"
+      },
+      "requirements": {
+        "controller": "accounts/users",
+        "action": "edit"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 23,
+      "name": "account_user",
+      "path": "/account/users/:id(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "accounts/users",
+        "action": "show"
+      },
+      "requirements": {
+        "controller": "accounts/users",
+        "action": "show"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 24,
+      "name": null,
+      "path": "/account/users/:id(.:format)",
+      "verb": "PATCH",
+      "defaults": {
+        "controller": "accounts/users",
+        "action": "update"
+      },
+      "requirements": {
+        "controller": "accounts/users",
+        "action": "update"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 25,
+      "name": null,
+      "path": "/account/users/:id(.:format)",
+      "verb": "PUT",
+      "defaults": {
+        "controller": "accounts/users",
+        "action": "update"
+      },
+      "requirements": {
+        "controller": "accounts/users",
+        "action": "update"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 26,
+      "name": null,
+      "path": "/account/users/:id(.:format)",
+      "verb": "DELETE",
+      "defaults": {
+        "controller": "accounts/users",
+        "action": "destroy"
+      },
+      "requirements": {
+        "controller": "accounts/users",
+        "action": "destroy"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 27,
+      "name": "account_bot_key",
+      "path": "/account/bots/:bot_id/key(.:format)",
+      "verb": "PATCH",
+      "defaults": {
+        "controller": "accounts/bots/keys",
+        "action": "update"
+      },
+      "requirements": {
+        "controller": "accounts/bots/keys",
+        "action": "update"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 28,
+      "name": null,
+      "path": "/account/bots/:bot_id/key(.:format)",
+      "verb": "PUT",
+      "defaults": {
+        "controller": "accounts/bots/keys",
+        "action": "update"
+      },
+      "requirements": {
+        "controller": "accounts/bots/keys",
+        "action": "update"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 29,
+      "name": "account_bots",
+      "path": "/account/bots(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "accounts/bots",
+        "action": "index"
+      },
+      "requirements": {
+        "controller": "accounts/bots",
+        "action": "index"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 30,
+      "name": null,
+      "path": "/account/bots(.:format)",
+      "verb": "POST",
+      "defaults": {
+        "controller": "accounts/bots",
+        "action": "create"
+      },
+      "requirements": {
+        "controller": "accounts/bots",
+        "action": "create"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 31,
+      "name": "new_account_bot",
+      "path": "/account/bots/new(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "accounts/bots",
+        "action": "new"
+      },
+      "requirements": {
+        "controller": "accounts/bots",
+        "action": "new"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 32,
+      "name": "edit_account_bot",
+      "path": "/account/bots/:id/edit(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "accounts/bots",
+        "action": "edit"
+      },
+      "requirements": {
+        "controller": "accounts/bots",
+        "action": "edit"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 33,
+      "name": "account_bot",
+      "path": "/account/bots/:id(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "accounts/bots",
+        "action": "show"
+      },
+      "requirements": {
+        "controller": "accounts/bots",
+        "action": "show"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 34,
+      "name": null,
+      "path": "/account/bots/:id(.:format)",
+      "verb": "PATCH",
+      "defaults": {
+        "controller": "accounts/bots",
+        "action": "update"
+      },
+      "requirements": {
+        "controller": "accounts/bots",
+        "action": "update"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 35,
+      "name": null,
+      "path": "/account/bots/:id(.:format)",
+      "verb": "PUT",
+      "defaults": {
+        "controller": "accounts/bots",
+        "action": "update"
+      },
+      "requirements": {
+        "controller": "accounts/bots",
+        "action": "update"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 36,
+      "name": null,
+      "path": "/account/bots/:id(.:format)",
+      "verb": "DELETE",
+      "defaults": {
+        "controller": "accounts/bots",
+        "action": "destroy"
+      },
+      "requirements": {
+        "controller": "accounts/bots",
+        "action": "destroy"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 37,
+      "name": "account_join_code",
+      "path": "/account/join_code(.:format)",
+      "verb": "POST",
+      "defaults": {
+        "controller": "accounts/join_codes",
+        "action": "create"
+      },
+      "requirements": {
+        "controller": "accounts/join_codes",
+        "action": "create"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 38,
+      "name": "account_logo",
+      "path": "/account/logo(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "accounts/logos",
+        "action": "show"
+      },
+      "requirements": {
+        "controller": "accounts/logos",
+        "action": "show"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 39,
+      "name": null,
+      "path": "/account/logo(.:format)",
+      "verb": "DELETE",
+      "defaults": {
+        "controller": "accounts/logos",
+        "action": "destroy"
+      },
+      "requirements": {
+        "controller": "accounts/logos",
+        "action": "destroy"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 40,
+      "name": "edit_account_custom_styles",
+      "path": "/account/custom_styles/edit(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "accounts/custom_styles",
+        "action": "edit"
+      },
+      "requirements": {
+        "controller": "accounts/custom_styles",
+        "action": "edit"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 41,
+      "name": "account_custom_styles",
+      "path": "/account/custom_styles(.:format)",
+      "verb": "PATCH",
+      "defaults": {
+        "controller": "accounts/custom_styles",
+        "action": "update"
+      },
+      "requirements": {
+        "controller": "accounts/custom_styles",
+        "action": "update"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 42,
+      "name": null,
+      "path": "/account/custom_styles(.:format)",
+      "verb": "PUT",
+      "defaults": {
+        "controller": "accounts/custom_styles",
+        "action": "update"
+      },
+      "requirements": {
+        "controller": "accounts/custom_styles",
+        "action": "update"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 43,
+      "name": "new_account",
+      "path": "/account/new(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "accounts",
+        "action": "new"
+      },
+      "requirements": {
+        "controller": "accounts",
+        "action": "new"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 44,
+      "name": "edit_account",
+      "path": "/account/edit(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "accounts",
+        "action": "edit"
+      },
+      "requirements": {
+        "controller": "accounts",
+        "action": "edit"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 45,
+      "name": "account",
+      "path": "/account(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "accounts",
+        "action": "show"
+      },
+      "requirements": {
+        "controller": "accounts",
+        "action": "show"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 46,
+      "name": null,
+      "path": "/account(.:format)",
+      "verb": "PATCH",
+      "defaults": {
+        "controller": "accounts",
+        "action": "update"
+      },
+      "requirements": {
+        "controller": "accounts",
+        "action": "update"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 47,
+      "name": null,
+      "path": "/account(.:format)",
+      "verb": "PUT",
+      "defaults": {
+        "controller": "accounts",
+        "action": "update"
+      },
+      "requirements": {
+        "controller": "accounts",
+        "action": "update"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 48,
+      "name": null,
+      "path": "/account(.:format)",
+      "verb": "DELETE",
+      "defaults": {
+        "controller": "accounts",
+        "action": "destroy"
+      },
+      "requirements": {
+        "controller": "accounts",
+        "action": "destroy"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 49,
+      "name": null,
+      "path": "/account(.:format)",
+      "verb": "POST",
+      "defaults": {
+        "controller": "accounts",
+        "action": "create"
+      },
+      "requirements": {
+        "controller": "accounts",
+        "action": "create"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 50,
+      "name": "join",
+      "path": "/join/:join_code(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "users",
+        "action": "new"
+      },
+      "requirements": {
+        "controller": "users",
+        "action": "new"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 51,
+      "name": null,
+      "path": "/join/:join_code(.:format)",
+      "verb": "POST",
+      "defaults": {
+        "controller": "users",
+        "action": "create"
+      },
+      "requirements": {
+        "controller": "users",
+        "action": "create"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 52,
+      "name": "qr_code",
+      "path": "/qr_code/:id(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "qr_code",
+        "action": "show"
+      },
+      "requirements": {
+        "controller": "qr_code",
+        "action": "show"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 53,
+      "name": "user_avatar",
+      "path": "/users/:user_id/avatar(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "users/avatars",
+        "action": "show"
+      },
+      "requirements": {
+        "controller": "users/avatars",
+        "action": "show"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 54,
+      "name": null,
+      "path": "/users/:user_id/avatar(.:format)",
+      "verb": "DELETE",
+      "defaults": {
+        "controller": "users/avatars",
+        "action": "destroy"
+      },
+      "requirements": {
+        "controller": "users/avatars",
+        "action": "destroy"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 55,
+      "name": "user_ban",
+      "path": "/users/:user_id/ban(.:format)",
+      "verb": "DELETE",
+      "defaults": {
+        "controller": "users/bans",
+        "action": "destroy"
+      },
+      "requirements": {
+        "controller": "users/bans",
+        "action": "destroy"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 56,
+      "name": null,
+      "path": "/users/:user_id/ban(.:format)",
+      "verb": "POST",
+      "defaults": {
+        "controller": "users/bans",
+        "action": "create"
+      },
+      "requirements": {
+        "controller": "users/bans",
+        "action": "create"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 57,
+      "name": "user_sidebar",
+      "path": "/users/:user_id/sidebar(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "user_id": "me",
+        "controller": "users/sidebars",
+        "action": "show"
+      },
+      "requirements": {
+        "user_id": "me",
+        "controller": "users/sidebars",
+        "action": "show"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 58,
+      "name": "new_user_profile",
+      "path": "/users/:user_id/profile/new(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "user_id": "me",
+        "controller": "users/profiles",
+        "action": "new"
+      },
+      "requirements": {
+        "user_id": "me",
+        "controller": "users/profiles",
+        "action": "new"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 59,
+      "name": "edit_user_profile",
+      "path": "/users/:user_id/profile/edit(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "user_id": "me",
+        "controller": "users/profiles",
+        "action": "edit"
+      },
+      "requirements": {
+        "user_id": "me",
+        "controller": "users/profiles",
+        "action": "edit"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 60,
+      "name": "user_profile",
+      "path": "/users/:user_id/profile(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "user_id": "me",
+        "controller": "users/profiles",
+        "action": "show"
+      },
+      "requirements": {
+        "user_id": "me",
+        "controller": "users/profiles",
+        "action": "show"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 61,
+      "name": null,
+      "path": "/users/:user_id/profile(.:format)",
+      "verb": "PATCH",
+      "defaults": {
+        "user_id": "me",
+        "controller": "users/profiles",
+        "action": "update"
+      },
+      "requirements": {
+        "user_id": "me",
+        "controller": "users/profiles",
+        "action": "update"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 62,
+      "name": null,
+      "path": "/users/:user_id/profile(.:format)",
+      "verb": "PUT",
+      "defaults": {
+        "user_id": "me",
+        "controller": "users/profiles",
+        "action": "update"
+      },
+      "requirements": {
+        "user_id": "me",
+        "controller": "users/profiles",
+        "action": "update"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 63,
+      "name": null,
+      "path": "/users/:user_id/profile(.:format)",
+      "verb": "DELETE",
+      "defaults": {
+        "user_id": "me",
+        "controller": "users/profiles",
+        "action": "destroy"
+      },
+      "requirements": {
+        "user_id": "me",
+        "controller": "users/profiles",
+        "action": "destroy"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 64,
+      "name": null,
+      "path": "/users/:user_id/profile(.:format)",
+      "verb": "POST",
+      "defaults": {
+        "user_id": "me",
+        "controller": "users/profiles",
+        "action": "create"
+      },
+      "requirements": {
+        "user_id": "me",
+        "controller": "users/profiles",
+        "action": "create"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 65,
+      "name": "user_push_subscription_test_notifications",
+      "path": "/users/:user_id/push_subscriptions/:push_subscription_id/test_notifications(.:format)",
+      "verb": "POST",
+      "defaults": {
+        "user_id": "me",
+        "controller": "users/push_subscriptions/test_notifications",
+        "action": "create"
+      },
+      "requirements": {
+        "user_id": "me",
+        "controller": "users/push_subscriptions/test_notifications",
+        "action": "create"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 66,
+      "name": "user_push_subscriptions",
+      "path": "/users/:user_id/push_subscriptions(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "user_id": "me",
+        "controller": "users/push_subscriptions",
+        "action": "index"
+      },
+      "requirements": {
+        "user_id": "me",
+        "controller": "users/push_subscriptions",
+        "action": "index"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 67,
+      "name": null,
+      "path": "/users/:user_id/push_subscriptions(.:format)",
+      "verb": "POST",
+      "defaults": {
+        "user_id": "me",
+        "controller": "users/push_subscriptions",
+        "action": "create"
+      },
+      "requirements": {
+        "user_id": "me",
+        "controller": "users/push_subscriptions",
+        "action": "create"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 68,
+      "name": "new_user_push_subscription",
+      "path": "/users/:user_id/push_subscriptions/new(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "user_id": "me",
+        "controller": "users/push_subscriptions",
+        "action": "new"
+      },
+      "requirements": {
+        "user_id": "me",
+        "controller": "users/push_subscriptions",
+        "action": "new"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 69,
+      "name": "edit_user_push_subscription",
+      "path": "/users/:user_id/push_subscriptions/:id/edit(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "user_id": "me",
+        "controller": "users/push_subscriptions",
+        "action": "edit"
+      },
+      "requirements": {
+        "user_id": "me",
+        "controller": "users/push_subscriptions",
+        "action": "edit"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 70,
+      "name": "user_push_subscription",
+      "path": "/users/:user_id/push_subscriptions/:id(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "user_id": "me",
+        "controller": "users/push_subscriptions",
+        "action": "show"
+      },
+      "requirements": {
+        "user_id": "me",
+        "controller": "users/push_subscriptions",
+        "action": "show"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 71,
+      "name": null,
+      "path": "/users/:user_id/push_subscriptions/:id(.:format)",
+      "verb": "PATCH",
+      "defaults": {
+        "user_id": "me",
+        "controller": "users/push_subscriptions",
+        "action": "update"
+      },
+      "requirements": {
+        "user_id": "me",
+        "controller": "users/push_subscriptions",
+        "action": "update"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 72,
+      "name": null,
+      "path": "/users/:user_id/push_subscriptions/:id(.:format)",
+      "verb": "PUT",
+      "defaults": {
+        "user_id": "me",
+        "controller": "users/push_subscriptions",
+        "action": "update"
+      },
+      "requirements": {
+        "user_id": "me",
+        "controller": "users/push_subscriptions",
+        "action": "update"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 73,
+      "name": null,
+      "path": "/users/:user_id/push_subscriptions/:id(.:format)",
+      "verb": "DELETE",
+      "defaults": {
+        "user_id": "me",
+        "controller": "users/push_subscriptions",
+        "action": "destroy"
+      },
+      "requirements": {
+        "user_id": "me",
+        "controller": "users/push_subscriptions",
+        "action": "destroy"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 74,
+      "name": "user",
+      "path": "/users/:id(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "users",
+        "action": "show"
+      },
+      "requirements": {
+        "controller": "users",
+        "action": "show"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 75,
+      "name": "autocompletable_users",
+      "path": "/autocompletable/users(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "autocompletable/users",
+        "action": "index"
+      },
+      "requirements": {
+        "controller": "autocompletable/users",
+        "action": "index"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 76,
+      "name": "room_messages",
+      "path": "/rooms/:room_id/messages(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "messages",
+        "action": "index"
+      },
+      "requirements": {
+        "controller": "messages",
+        "action": "index"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 77,
+      "name": null,
+      "path": "/rooms/:room_id/messages(.:format)",
+      "verb": "POST",
+      "defaults": {
+        "controller": "messages",
+        "action": "create"
+      },
+      "requirements": {
+        "controller": "messages",
+        "action": "create"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 78,
+      "name": "new_room_message",
+      "path": "/rooms/:room_id/messages/new(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "messages",
+        "action": "new"
+      },
+      "requirements": {
+        "controller": "messages",
+        "action": "new"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 79,
+      "name": "edit_room_message",
+      "path": "/rooms/:room_id/messages/:id/edit(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "messages",
+        "action": "edit"
+      },
+      "requirements": {
+        "controller": "messages",
+        "action": "edit"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 80,
+      "name": "room_message",
+      "path": "/rooms/:room_id/messages/:id(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "messages",
+        "action": "show"
+      },
+      "requirements": {
+        "controller": "messages",
+        "action": "show"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 81,
+      "name": null,
+      "path": "/rooms/:room_id/messages/:id(.:format)",
+      "verb": "PATCH",
+      "defaults": {
+        "controller": "messages",
+        "action": "update"
+      },
+      "requirements": {
+        "controller": "messages",
+        "action": "update"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 82,
+      "name": null,
+      "path": "/rooms/:room_id/messages/:id(.:format)",
+      "verb": "PUT",
+      "defaults": {
+        "controller": "messages",
+        "action": "update"
+      },
+      "requirements": {
+        "controller": "messages",
+        "action": "update"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 83,
+      "name": null,
+      "path": "/rooms/:room_id/messages/:id(.:format)",
+      "verb": "DELETE",
+      "defaults": {
+        "controller": "messages",
+        "action": "destroy"
+      },
+      "requirements": {
+        "controller": "messages",
+        "action": "destroy"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 84,
+      "name": "room_bot_message_boosts",
+      "path": "/rooms/:room_id/:bot_key/messages/:message_id/boosts(.:format)",
+      "verb": "POST",
+      "defaults": {
+        "format": "json",
+        "controller": "messages/boosts/by_bots",
+        "action": "create"
+      },
+      "requirements": {
+        "format": "json",
+        "controller": "messages/boosts/by_bots",
+        "action": "create"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 85,
+      "name": "room_bot_message_boost",
+      "path": "/rooms/:room_id/:bot_key/messages/:message_id/boosts/:id(.:format)",
+      "verb": "DELETE",
+      "defaults": {
+        "format": "json",
+        "controller": "messages/boosts/by_bots",
+        "action": "destroy"
+      },
+      "requirements": {
+        "format": "json",
+        "controller": "messages/boosts/by_bots",
+        "action": "destroy"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 86,
+      "name": "room_bot_messages",
+      "path": "/rooms/:room_id/:bot_key/messages(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "format": "json",
+        "controller": "messages/by_bots",
+        "action": "index"
+      },
+      "requirements": {
+        "format": "json",
+        "controller": "messages/by_bots",
+        "action": "index"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 87,
+      "name": null,
+      "path": "/rooms/:room_id/:bot_key/messages(.:format)",
+      "verb": "POST",
+      "defaults": {
+        "format": "json",
+        "controller": "messages/by_bots",
+        "action": "create"
+      },
+      "requirements": {
+        "format": "json",
+        "controller": "messages/by_bots",
+        "action": "create"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 88,
+      "name": "room_bot_message",
+      "path": "/rooms/:room_id/:bot_key/messages/:id(.:format)",
+      "verb": "PATCH",
+      "defaults": {
+        "format": "json",
+        "controller": "messages/by_bots",
+        "action": "update"
+      },
+      "requirements": {
+        "format": "json",
+        "controller": "messages/by_bots",
+        "action": "update"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 89,
+      "name": null,
+      "path": "/rooms/:room_id/:bot_key/messages/:id(.:format)",
+      "verb": "PUT",
+      "defaults": {
+        "format": "json",
+        "controller": "messages/by_bots",
+        "action": "update"
+      },
+      "requirements": {
+        "format": "json",
+        "controller": "messages/by_bots",
+        "action": "update"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 90,
+      "name": null,
+      "path": "/rooms/:room_id/:bot_key/messages/:id(.:format)",
+      "verb": "DELETE",
+      "defaults": {
+        "format": "json",
+        "controller": "messages/by_bots",
+        "action": "destroy"
+      },
+      "requirements": {
+        "format": "json",
+        "controller": "messages/by_bots",
+        "action": "destroy"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 91,
+      "name": "room_refresh",
+      "path": "/rooms/:room_id/refresh(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "rooms/refreshes",
+        "action": "show"
+      },
+      "requirements": {
+        "controller": "rooms/refreshes",
+        "action": "show"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 92,
+      "name": "room_settings",
+      "path": "/rooms/:room_id/settings(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "rooms/settings",
+        "action": "show"
+      },
+      "requirements": {
+        "controller": "rooms/settings",
+        "action": "show"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 93,
+      "name": "room_involvement",
+      "path": "/rooms/:room_id/involvement(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "rooms/involvements",
+        "action": "show"
+      },
+      "requirements": {
+        "controller": "rooms/involvements",
+        "action": "show"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 94,
+      "name": null,
+      "path": "/rooms/:room_id/involvement(.:format)",
+      "verb": "PATCH",
+      "defaults": {
+        "controller": "rooms/involvements",
+        "action": "update"
+      },
+      "requirements": {
+        "controller": "rooms/involvements",
+        "action": "update"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 95,
+      "name": null,
+      "path": "/rooms/:room_id/involvement(.:format)",
+      "verb": "PUT",
+      "defaults": {
+        "controller": "rooms/involvements",
+        "action": "update"
+      },
+      "requirements": {
+        "controller": "rooms/involvements",
+        "action": "update"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 96,
+      "name": "room_at_message",
+      "path": "/rooms/:room_id/@:message_id(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "rooms",
+        "action": "show"
+      },
+      "requirements": {
+        "controller": "rooms",
+        "action": "show"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 97,
+      "name": "rooms",
+      "path": "/rooms(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "rooms",
+        "action": "index"
+      },
+      "requirements": {
+        "controller": "rooms",
+        "action": "index"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 98,
+      "name": null,
+      "path": "/rooms(.:format)",
+      "verb": "POST",
+      "defaults": {
+        "controller": "rooms",
+        "action": "create"
+      },
+      "requirements": {
+        "controller": "rooms",
+        "action": "create"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 99,
+      "name": "new_room",
+      "path": "/rooms/new(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "rooms",
+        "action": "new"
+      },
+      "requirements": {
+        "controller": "rooms",
+        "action": "new"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 100,
+      "name": "edit_room",
+      "path": "/rooms/:id/edit(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "rooms",
+        "action": "edit"
+      },
+      "requirements": {
+        "controller": "rooms",
+        "action": "edit"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 101,
+      "name": "room",
+      "path": "/rooms/:id(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "rooms",
+        "action": "show"
+      },
+      "requirements": {
+        "controller": "rooms",
+        "action": "show"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 102,
+      "name": null,
+      "path": "/rooms/:id(.:format)",
+      "verb": "PATCH",
+      "defaults": {
+        "controller": "rooms",
+        "action": "update"
+      },
+      "requirements": {
+        "controller": "rooms",
+        "action": "update"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 103,
+      "name": null,
+      "path": "/rooms/:id(.:format)",
+      "verb": "PUT",
+      "defaults": {
+        "controller": "rooms",
+        "action": "update"
+      },
+      "requirements": {
+        "controller": "rooms",
+        "action": "update"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 104,
+      "name": null,
+      "path": "/rooms/:id(.:format)",
+      "verb": "DELETE",
+      "defaults": {
+        "controller": "rooms",
+        "action": "destroy"
+      },
+      "requirements": {
+        "controller": "rooms",
+        "action": "destroy"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 105,
+      "name": "rooms_opens",
+      "path": "/rooms/opens(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "rooms/opens",
+        "action": "index"
+      },
+      "requirements": {
+        "controller": "rooms/opens",
+        "action": "index"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 106,
+      "name": null,
+      "path": "/rooms/opens(.:format)",
+      "verb": "POST",
+      "defaults": {
+        "controller": "rooms/opens",
+        "action": "create"
+      },
+      "requirements": {
+        "controller": "rooms/opens",
+        "action": "create"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 107,
+      "name": "new_rooms_open",
+      "path": "/rooms/opens/new(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "rooms/opens",
+        "action": "new"
+      },
+      "requirements": {
+        "controller": "rooms/opens",
+        "action": "new"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 108,
+      "name": "edit_rooms_open",
+      "path": "/rooms/opens/:id/edit(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "rooms/opens",
+        "action": "edit"
+      },
+      "requirements": {
+        "controller": "rooms/opens",
+        "action": "edit"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 109,
+      "name": "rooms_open",
+      "path": "/rooms/opens/:id(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "rooms/opens",
+        "action": "show"
+      },
+      "requirements": {
+        "controller": "rooms/opens",
+        "action": "show"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 110,
+      "name": null,
+      "path": "/rooms/opens/:id(.:format)",
+      "verb": "PATCH",
+      "defaults": {
+        "controller": "rooms/opens",
+        "action": "update"
+      },
+      "requirements": {
+        "controller": "rooms/opens",
+        "action": "update"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 111,
+      "name": null,
+      "path": "/rooms/opens/:id(.:format)",
+      "verb": "PUT",
+      "defaults": {
+        "controller": "rooms/opens",
+        "action": "update"
+      },
+      "requirements": {
+        "controller": "rooms/opens",
+        "action": "update"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 112,
+      "name": null,
+      "path": "/rooms/opens/:id(.:format)",
+      "verb": "DELETE",
+      "defaults": {
+        "controller": "rooms/opens",
+        "action": "destroy"
+      },
+      "requirements": {
+        "controller": "rooms/opens",
+        "action": "destroy"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 113,
+      "name": "rooms_closeds",
+      "path": "/rooms/closeds(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "rooms/closeds",
+        "action": "index"
+      },
+      "requirements": {
+        "controller": "rooms/closeds",
+        "action": "index"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 114,
+      "name": null,
+      "path": "/rooms/closeds(.:format)",
+      "verb": "POST",
+      "defaults": {
+        "controller": "rooms/closeds",
+        "action": "create"
+      },
+      "requirements": {
+        "controller": "rooms/closeds",
+        "action": "create"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 115,
+      "name": "new_rooms_closed",
+      "path": "/rooms/closeds/new(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "rooms/closeds",
+        "action": "new"
+      },
+      "requirements": {
+        "controller": "rooms/closeds",
+        "action": "new"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 116,
+      "name": "edit_rooms_closed",
+      "path": "/rooms/closeds/:id/edit(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "rooms/closeds",
+        "action": "edit"
+      },
+      "requirements": {
+        "controller": "rooms/closeds",
+        "action": "edit"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 117,
+      "name": "rooms_closed",
+      "path": "/rooms/closeds/:id(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "rooms/closeds",
+        "action": "show"
+      },
+      "requirements": {
+        "controller": "rooms/closeds",
+        "action": "show"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 118,
+      "name": null,
+      "path": "/rooms/closeds/:id(.:format)",
+      "verb": "PATCH",
+      "defaults": {
+        "controller": "rooms/closeds",
+        "action": "update"
+      },
+      "requirements": {
+        "controller": "rooms/closeds",
+        "action": "update"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 119,
+      "name": null,
+      "path": "/rooms/closeds/:id(.:format)",
+      "verb": "PUT",
+      "defaults": {
+        "controller": "rooms/closeds",
+        "action": "update"
+      },
+      "requirements": {
+        "controller": "rooms/closeds",
+        "action": "update"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 120,
+      "name": null,
+      "path": "/rooms/closeds/:id(.:format)",
+      "verb": "DELETE",
+      "defaults": {
+        "controller": "rooms/closeds",
+        "action": "destroy"
+      },
+      "requirements": {
+        "controller": "rooms/closeds",
+        "action": "destroy"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 121,
+      "name": "rooms_directs",
+      "path": "/rooms/directs(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "rooms/directs",
+        "action": "index"
+      },
+      "requirements": {
+        "controller": "rooms/directs",
+        "action": "index"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 122,
+      "name": null,
+      "path": "/rooms/directs(.:format)",
+      "verb": "POST",
+      "defaults": {
+        "controller": "rooms/directs",
+        "action": "create"
+      },
+      "requirements": {
+        "controller": "rooms/directs",
+        "action": "create"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 123,
+      "name": "new_rooms_direct",
+      "path": "/rooms/directs/new(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "rooms/directs",
+        "action": "new"
+      },
+      "requirements": {
+        "controller": "rooms/directs",
+        "action": "new"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 124,
+      "name": "edit_rooms_direct",
+      "path": "/rooms/directs/:id/edit(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "rooms/directs",
+        "action": "edit"
+      },
+      "requirements": {
+        "controller": "rooms/directs",
+        "action": "edit"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 125,
+      "name": "rooms_direct",
+      "path": "/rooms/directs/:id(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "rooms/directs",
+        "action": "show"
+      },
+      "requirements": {
+        "controller": "rooms/directs",
+        "action": "show"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 126,
+      "name": null,
+      "path": "/rooms/directs/:id(.:format)",
+      "verb": "PATCH",
+      "defaults": {
+        "controller": "rooms/directs",
+        "action": "update"
+      },
+      "requirements": {
+        "controller": "rooms/directs",
+        "action": "update"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 127,
+      "name": null,
+      "path": "/rooms/directs/:id(.:format)",
+      "verb": "PUT",
+      "defaults": {
+        "controller": "rooms/directs",
+        "action": "update"
+      },
+      "requirements": {
+        "controller": "rooms/directs",
+        "action": "update"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 128,
+      "name": null,
+      "path": "/rooms/directs/:id(.:format)",
+      "verb": "DELETE",
+      "defaults": {
+        "controller": "rooms/directs",
+        "action": "destroy"
+      },
+      "requirements": {
+        "controller": "rooms/directs",
+        "action": "destroy"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 129,
+      "name": "message_boosts",
+      "path": "/messages/:message_id/boosts(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "messages/boosts",
+        "action": "index"
+      },
+      "requirements": {
+        "controller": "messages/boosts",
+        "action": "index"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 130,
+      "name": null,
+      "path": "/messages/:message_id/boosts(.:format)",
+      "verb": "POST",
+      "defaults": {
+        "controller": "messages/boosts",
+        "action": "create"
+      },
+      "requirements": {
+        "controller": "messages/boosts",
+        "action": "create"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 131,
+      "name": "new_message_boost",
+      "path": "/messages/:message_id/boosts/new(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "messages/boosts",
+        "action": "new"
+      },
+      "requirements": {
+        "controller": "messages/boosts",
+        "action": "new"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 132,
+      "name": "edit_message_boost",
+      "path": "/messages/:message_id/boosts/:id/edit(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "messages/boosts",
+        "action": "edit"
+      },
+      "requirements": {
+        "controller": "messages/boosts",
+        "action": "edit"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 133,
+      "name": "message_boost",
+      "path": "/messages/:message_id/boosts/:id(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "messages/boosts",
+        "action": "show"
+      },
+      "requirements": {
+        "controller": "messages/boosts",
+        "action": "show"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 134,
+      "name": null,
+      "path": "/messages/:message_id/boosts/:id(.:format)",
+      "verb": "PATCH",
+      "defaults": {
+        "controller": "messages/boosts",
+        "action": "update"
+      },
+      "requirements": {
+        "controller": "messages/boosts",
+        "action": "update"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 135,
+      "name": null,
+      "path": "/messages/:message_id/boosts/:id(.:format)",
+      "verb": "PUT",
+      "defaults": {
+        "controller": "messages/boosts",
+        "action": "update"
+      },
+      "requirements": {
+        "controller": "messages/boosts",
+        "action": "update"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 136,
+      "name": null,
+      "path": "/messages/:message_id/boosts/:id(.:format)",
+      "verb": "DELETE",
+      "defaults": {
+        "controller": "messages/boosts",
+        "action": "destroy"
+      },
+      "requirements": {
+        "controller": "messages/boosts",
+        "action": "destroy"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 137,
+      "name": "messages",
+      "path": "/messages(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "messages",
+        "action": "index"
+      },
+      "requirements": {
+        "controller": "messages",
+        "action": "index"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 138,
+      "name": null,
+      "path": "/messages(.:format)",
+      "verb": "POST",
+      "defaults": {
+        "controller": "messages",
+        "action": "create"
+      },
+      "requirements": {
+        "controller": "messages",
+        "action": "create"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 139,
+      "name": "new_message",
+      "path": "/messages/new(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "messages",
+        "action": "new"
+      },
+      "requirements": {
+        "controller": "messages",
+        "action": "new"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 140,
+      "name": "edit_message",
+      "path": "/messages/:id/edit(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "messages",
+        "action": "edit"
+      },
+      "requirements": {
+        "controller": "messages",
+        "action": "edit"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 141,
+      "name": "message",
+      "path": "/messages/:id(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "messages",
+        "action": "show"
+      },
+      "requirements": {
+        "controller": "messages",
+        "action": "show"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 142,
+      "name": null,
+      "path": "/messages/:id(.:format)",
+      "verb": "PATCH",
+      "defaults": {
+        "controller": "messages",
+        "action": "update"
+      },
+      "requirements": {
+        "controller": "messages",
+        "action": "update"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 143,
+      "name": null,
+      "path": "/messages/:id(.:format)",
+      "verb": "PUT",
+      "defaults": {
+        "controller": "messages",
+        "action": "update"
+      },
+      "requirements": {
+        "controller": "messages",
+        "action": "update"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 144,
+      "name": null,
+      "path": "/messages/:id(.:format)",
+      "verb": "DELETE",
+      "defaults": {
+        "controller": "messages",
+        "action": "destroy"
+      },
+      "requirements": {
+        "controller": "messages",
+        "action": "destroy"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 145,
+      "name": "clear_searches",
+      "path": "/searches/clear(.:format)",
+      "verb": "DELETE",
+      "defaults": {
+        "controller": "searches",
+        "action": "clear"
+      },
+      "requirements": {
+        "controller": "searches",
+        "action": "clear"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 146,
+      "name": "searches",
+      "path": "/searches(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "searches",
+        "action": "index"
+      },
+      "requirements": {
+        "controller": "searches",
+        "action": "index"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 147,
+      "name": null,
+      "path": "/searches(.:format)",
+      "verb": "POST",
+      "defaults": {
+        "controller": "searches",
+        "action": "create"
+      },
+      "requirements": {
+        "controller": "searches",
+        "action": "create"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 148,
+      "name": "unfurl_link",
+      "path": "/unfurl_link(.:format)",
+      "verb": "POST",
+      "defaults": {
+        "controller": "unfurl_links",
+        "action": "create"
+      },
+      "requirements": {
+        "controller": "unfurl_links",
+        "action": "create"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 149,
+      "name": "webmanifest",
+      "path": "/webmanifest(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "pwa",
+        "action": "manifest"
+      },
+      "requirements": {
+        "controller": "pwa",
+        "action": "manifest"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 150,
+      "name": "service_worker",
+      "path": "/service-worker(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "pwa",
+        "action": "service_worker"
+      },
+      "requirements": {
+        "controller": "pwa",
+        "action": "service_worker"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 151,
+      "name": "rails_health_check",
+      "path": "/up(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "rails/health",
+        "action": "show"
+      },
+      "requirements": {
+        "controller": "rails/health",
+        "action": "show"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 152,
+      "name": "turbo_recede_historical_location",
+      "path": "/recede_historical_location(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "turbo/native/navigation",
+        "action": "recede"
+      },
+      "requirements": {
+        "controller": "turbo/native/navigation",
+        "action": "recede"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 153,
+      "name": "turbo_resume_historical_location",
+      "path": "/resume_historical_location(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "turbo/native/navigation",
+        "action": "resume"
+      },
+      "requirements": {
+        "controller": "turbo/native/navigation",
+        "action": "resume"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 154,
+      "name": "turbo_refresh_historical_location",
+      "path": "/refresh_historical_location(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "turbo/native/navigation",
+        "action": "refresh"
+      },
+      "requirements": {
+        "controller": "turbo/native/navigation",
+        "action": "refresh"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 155,
+      "name": "rails_postmark_inbound_emails",
+      "path": "/rails/action_mailbox/postmark/inbound_emails(.:format)",
+      "verb": "POST",
+      "defaults": {
+        "controller": "action_mailbox/ingresses/postmark/inbound_emails",
+        "action": "create"
+      },
+      "requirements": {
+        "controller": "action_mailbox/ingresses/postmark/inbound_emails",
+        "action": "create"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 156,
+      "name": "rails_relay_inbound_emails",
+      "path": "/rails/action_mailbox/relay/inbound_emails(.:format)",
+      "verb": "POST",
+      "defaults": {
+        "controller": "action_mailbox/ingresses/relay/inbound_emails",
+        "action": "create"
+      },
+      "requirements": {
+        "controller": "action_mailbox/ingresses/relay/inbound_emails",
+        "action": "create"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 157,
+      "name": "rails_sendgrid_inbound_emails",
+      "path": "/rails/action_mailbox/sendgrid/inbound_emails(.:format)",
+      "verb": "POST",
+      "defaults": {
+        "controller": "action_mailbox/ingresses/sendgrid/inbound_emails",
+        "action": "create"
+      },
+      "requirements": {
+        "controller": "action_mailbox/ingresses/sendgrid/inbound_emails",
+        "action": "create"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 158,
+      "name": "rails_mandrill_inbound_health_check",
+      "path": "/rails/action_mailbox/mandrill/inbound_emails(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "action_mailbox/ingresses/mandrill/inbound_emails",
+        "action": "health_check"
+      },
+      "requirements": {
+        "controller": "action_mailbox/ingresses/mandrill/inbound_emails",
+        "action": "health_check"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 159,
+      "name": "rails_mandrill_inbound_emails",
+      "path": "/rails/action_mailbox/mandrill/inbound_emails(.:format)",
+      "verb": "POST",
+      "defaults": {
+        "controller": "action_mailbox/ingresses/mandrill/inbound_emails",
+        "action": "create"
+      },
+      "requirements": {
+        "controller": "action_mailbox/ingresses/mandrill/inbound_emails",
+        "action": "create"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 160,
+      "name": "rails_mailgun_inbound_emails",
+      "path": "/rails/action_mailbox/mailgun/inbound_emails/mime(.:format)",
+      "verb": "POST",
+      "defaults": {
+        "controller": "action_mailbox/ingresses/mailgun/inbound_emails",
+        "action": "create"
+      },
+      "requirements": {
+        "controller": "action_mailbox/ingresses/mailgun/inbound_emails",
+        "action": "create"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 161,
+      "name": "rails_conductor_inbound_emails",
+      "path": "/rails/conductor/action_mailbox/inbound_emails(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "rails/conductor/action_mailbox/inbound_emails",
+        "action": "index"
+      },
+      "requirements": {
+        "controller": "rails/conductor/action_mailbox/inbound_emails",
+        "action": "index"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 162,
+      "name": null,
+      "path": "/rails/conductor/action_mailbox/inbound_emails(.:format)",
+      "verb": "POST",
+      "defaults": {
+        "controller": "rails/conductor/action_mailbox/inbound_emails",
+        "action": "create"
+      },
+      "requirements": {
+        "controller": "rails/conductor/action_mailbox/inbound_emails",
+        "action": "create"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 163,
+      "name": "new_rails_conductor_inbound_email",
+      "path": "/rails/conductor/action_mailbox/inbound_emails/new(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "rails/conductor/action_mailbox/inbound_emails",
+        "action": "new"
+      },
+      "requirements": {
+        "controller": "rails/conductor/action_mailbox/inbound_emails",
+        "action": "new"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 164,
+      "name": "rails_conductor_inbound_email",
+      "path": "/rails/conductor/action_mailbox/inbound_emails/:id(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "rails/conductor/action_mailbox/inbound_emails",
+        "action": "show"
+      },
+      "requirements": {
+        "controller": "rails/conductor/action_mailbox/inbound_emails",
+        "action": "show"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 165,
+      "name": "new_rails_conductor_inbound_email_source",
+      "path": "/rails/conductor/action_mailbox/inbound_emails/sources/new(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "rails/conductor/action_mailbox/inbound_emails/sources",
+        "action": "new"
+      },
+      "requirements": {
+        "controller": "rails/conductor/action_mailbox/inbound_emails/sources",
+        "action": "new"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 166,
+      "name": "rails_conductor_inbound_email_sources",
+      "path": "/rails/conductor/action_mailbox/inbound_emails/sources(.:format)",
+      "verb": "POST",
+      "defaults": {
+        "controller": "rails/conductor/action_mailbox/inbound_emails/sources",
+        "action": "create"
+      },
+      "requirements": {
+        "controller": "rails/conductor/action_mailbox/inbound_emails/sources",
+        "action": "create"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 167,
+      "name": "rails_conductor_inbound_email_reroute",
+      "path": "/rails/conductor/action_mailbox/:inbound_email_id/reroute(.:format)",
+      "verb": "POST",
+      "defaults": {
+        "controller": "rails/conductor/action_mailbox/reroutes",
+        "action": "create"
+      },
+      "requirements": {
+        "controller": "rails/conductor/action_mailbox/reroutes",
+        "action": "create"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 168,
+      "name": "rails_conductor_inbound_email_incinerate",
+      "path": "/rails/conductor/action_mailbox/:inbound_email_id/incinerate(.:format)",
+      "verb": "POST",
+      "defaults": {
+        "controller": "rails/conductor/action_mailbox/incinerates",
+        "action": "create"
+      },
+      "requirements": {
+        "controller": "rails/conductor/action_mailbox/incinerates",
+        "action": "create"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 169,
+      "name": "rails_service_blob",
+      "path": "/rails/active_storage/blobs/redirect/:signed_id/*filename(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "active_storage/blobs/redirect",
+        "action": "show"
+      },
+      "requirements": {
+        "controller": "active_storage/blobs/redirect",
+        "action": "show"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 170,
+      "name": "rails_service_blob_proxy",
+      "path": "/rails/active_storage/blobs/proxy/:signed_id/*filename(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "active_storage/blobs/proxy",
+        "action": "show"
+      },
+      "requirements": {
+        "controller": "active_storage/blobs/proxy",
+        "action": "show"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 171,
+      "name": null,
+      "path": "/rails/active_storage/blobs/:signed_id/*filename(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "active_storage/blobs/redirect",
+        "action": "show"
+      },
+      "requirements": {
+        "controller": "active_storage/blobs/redirect",
+        "action": "show"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 172,
+      "name": "rails_blob_representation",
+      "path": "/rails/active_storage/representations/redirect/:signed_blob_id/:variation_key/*filename(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "active_storage/representations/redirect",
+        "action": "show"
+      },
+      "requirements": {
+        "controller": "active_storage/representations/redirect",
+        "action": "show"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 173,
+      "name": "rails_blob_representation_proxy",
+      "path": "/rails/active_storage/representations/proxy/:signed_blob_id/:variation_key/*filename(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "active_storage/representations/proxy",
+        "action": "show"
+      },
+      "requirements": {
+        "controller": "active_storage/representations/proxy",
+        "action": "show"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 174,
+      "name": null,
+      "path": "/rails/active_storage/representations/:signed_blob_id/:variation_key/*filename(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "active_storage/representations/redirect",
+        "action": "show"
+      },
+      "requirements": {
+        "controller": "active_storage/representations/redirect",
+        "action": "show"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 175,
+      "name": "rails_disk_service",
+      "path": "/rails/active_storage/disk/:encoded_key/*filename(.:format)",
+      "verb": "GET",
+      "defaults": {
+        "controller": "active_storage/disk",
+        "action": "show"
+      },
+      "requirements": {
+        "controller": "active_storage/disk",
+        "action": "show"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 176,
+      "name": "update_rails_disk_service",
+      "path": "/rails/active_storage/disk/:encoded_token(.:format)",
+      "verb": "PUT",
+      "defaults": {
+        "controller": "active_storage/disk",
+        "action": "update"
+      },
+      "requirements": {
+        "controller": "active_storage/disk",
+        "action": "update"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    },
+    {
+      "ordinal": 177,
+      "name": "rails_direct_uploads",
+      "path": "/rails/active_storage/direct_uploads(.:format)",
+      "verb": "POST",
+      "defaults": {
+        "controller": "active_storage/direct_uploads",
+        "action": "create"
+      },
+      "requirements": {
+        "controller": "active_storage/direct_uploads",
+        "action": "create"
+      },
+      "constraints": {},
+      "endpoint_class": "ActionDispatch::Routing::RouteSet::Dispatcher",
+      "internal": null
+    }
+  ]
+}

@@ -1,0 +1,198 @@
+{
+  "text/html": {
+    "type": "text/html",
+    "symbol": "html"
+  },
+  "application/xhtml+xml": {
+    "type": "text/html",
+    "symbol": "html"
+  },
+  "text/plain": {
+    "type": "text/plain",
+    "symbol": "text"
+  },
+  "text/javascript": {
+    "type": "text/javascript",
+    "symbol": "js"
+  },
+  "application/javascript": {
+    "type": "text/javascript",
+    "symbol": "js"
+  },
+  "application/x-javascript": {
+    "type": "text/javascript",
+    "symbol": "js"
+  },
+  "text/css": {
+    "type": "text/css",
+    "symbol": "css"
+  },
+  "text/calendar": {
+    "type": "text/calendar",
+    "symbol": "ics"
+  },
+  "text/csv": {
+    "type": "text/csv",
+    "symbol": "csv"
+  },
+  "text/vcard": {
+    "type": "text/vcard",
+    "symbol": "vcf"
+  },
+  "text/vtt": {
+    "type": "text/vtt",
+    "symbol": "vtt"
+  },
+  "vtt": {
+    "type": "text/vtt",
+    "symbol": "vtt"
+  },
+  "text/markdown": {
+    "type": "text/markdown",
+    "symbol": "md"
+  },
+  "image/png": {
+    "type": "image/png",
+    "symbol": "png"
+  },
+  "image/jpeg": {
+    "type": "image/jpeg",
+    "symbol": "jpeg"
+  },
+  "image/gif": {
+    "type": "image/gif",
+    "symbol": "gif"
+  },
+  "image/bmp": {
+    "type": "image/bmp",
+    "symbol": "bmp"
+  },
+  "image/tiff": {
+    "type": "image/tiff",
+    "symbol": "tiff"
+  },
+  "image/svg+xml": {
+    "type": "image/svg+xml",
+    "symbol": "svg"
+  },
+  "image/webp": {
+    "type": "image/webp",
+    "symbol": "webp"
+  },
+  "video/mpeg": {
+    "type": "video/mpeg",
+    "symbol": "mpeg"
+  },
+  "audio/mpeg": {
+    "type": "audio/mpeg",
+    "symbol": "mp3"
+  },
+  "audio/ogg": {
+    "type": "audio/ogg",
+    "symbol": "ogg"
+  },
+  "audio/aac": {
+    "type": "audio/aac",
+    "symbol": "m4a"
+  },
+  "audio/mp4": {
+    "type": "audio/aac",
+    "symbol": "m4a"
+  },
+  "video/webm": {
+    "type": "video/webm",
+    "symbol": "webm"
+  },
+  "video/mp4": {
+    "type": "video/mp4",
+    "symbol": "mp4"
+  },
+  "font/otf": {
+    "type": "font/otf",
+    "symbol": "otf"
+  },
+  "font/ttf": {
+    "type": "font/ttf",
+    "symbol": "ttf"
+  },
+  "font/woff": {
+    "type": "font/woff",
+    "symbol": "woff"
+  },
+  "font/woff2": {
+    "type": "font/woff2",
+    "symbol": "woff2"
+  },
+  "application/xml": {
+    "type": "application/xml",
+    "symbol": "xml"
+  },
+  "text/xml": {
+    "type": "application/xml",
+    "symbol": "xml"
+  },
+  "application/x-xml": {
+    "type": "application/xml",
+    "symbol": "xml"
+  },
+  "application/rss+xml": {
+    "type": "application/rss+xml",
+    "symbol": "rss"
+  },
+  "application/atom+xml": {
+    "type": "application/atom+xml",
+    "symbol": "atom"
+  },
+  "application/x-yaml": {
+    "type": "application/x-yaml",
+    "symbol": "yaml"
+  },
+  "text/yaml": {
+    "type": "application/x-yaml",
+    "symbol": "yaml"
+  },
+  "multipart/form-data": {
+    "type": "multipart/form-data",
+    "symbol": "multipart_form"
+  },
+  "application/x-www-form-urlencoded": {
+    "type": "application/x-www-form-urlencoded",
+    "symbol": "url_encoded_form"
+  },
+  "application/json": {
+    "type": "application/json",
+    "symbol": "json"
+  },
+  "text/x-json": {
+    "type": "application/json",
+    "symbol": "json"
+  },
+  "application/jsonrequest": {
+    "type": "application/json",
+    "symbol": "json"
+  },
+  "application/problem+json": {
+    "type": "application/json",
+    "symbol": "json"
+  },
+  "application/pdf": {
+    "type": "application/pdf",
+    "symbol": "pdf"
+  },
+  "application/zip": {
+    "type": "application/zip",
+    "symbol": "zip"
+  },
+  "application/gzip": {
+    "type": "application/gzip",
+    "symbol": "gzip"
+  },
+  "application/x-gzip": {
+    "type": "application/gzip",
+    "symbol": "gzip"
+  },
+  "text/vnd.turbo-stream.html": {
+    "type": "text/vnd.turbo-stream.html",
+    "symbol": "turbo_stream"
+  }
+}

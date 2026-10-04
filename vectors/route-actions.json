@@ -1,0 +1,1241 @@
+[
+  {
+    "path": "/",
+    "verb": "GET",
+    "controller": "welcome",
+    "action": "show",
+    "status": "implemented"
+  },
+  {
+    "path": "/first_run/new(.:format)",
+    "verb": "GET",
+    "controller": "first_runs",
+    "action": "new",
+    "status": "missing_action"
+  },
+  {
+    "path": "/first_run/edit(.:format)",
+    "verb": "GET",
+    "controller": "first_runs",
+    "action": "edit",
+    "status": "missing_action"
+  },
+  {
+    "path": "/first_run(.:format)",
+    "verb": "GET",
+    "controller": "first_runs",
+    "action": "show",
+    "status": "implemented"
+  },
+  {
+    "path": "/first_run(.:format)",
+    "verb": "PATCH",
+    "controller": "first_runs",
+    "action": "update",
+    "status": "missing_action"
+  },
+  {
+    "path": "/first_run(.:format)",
+    "verb": "PUT",
+    "controller": "first_runs",
+    "action": "update",
+    "status": "missing_action"
+  },
+  {
+    "path": "/first_run(.:format)",
+    "verb": "DELETE",
+    "controller": "first_runs",
+    "action": "destroy",
+    "status": "missing_action"
+  },
+  {
+    "path": "/first_run(.:format)",
+    "verb": "POST",
+    "controller": "first_runs",
+    "action": "create",
+    "status": "implemented"
+  },
+  {
+    "path": "/session/transfers/:id(.:format)",
+    "verb": "GET",
+    "controller": "sessions/transfers",
+    "action": "show",
+    "status": "implemented"
+  },
+  {
+    "path": "/session/transfers/:id(.:format)",
+    "verb": "PATCH",
+    "controller": "sessions/transfers",
+    "action": "update",
+    "status": "implemented"
+  },
+  {
+    "path": "/session/transfers/:id(.:format)",
+    "verb": "PUT",
+    "controller": "sessions/transfers",
+    "action": "update",
+    "status": "implemented"
+  },
+  {
+    "path": "/session/new(.:format)",
+    "verb": "GET",
+    "controller": "sessions",
+    "action": "new",
+    "status": "implemented"
+  },
+  {
+    "path": "/session/edit(.:format)",
+    "verb": "GET",
+    "controller": "sessions",
+    "action": "edit",
+    "status": "missing_action"
+  },
+  {
+    "path": "/session(.:format)",
+    "verb": "GET",
+    "controller": "sessions",
+    "action": "show",
+    "status": "missing_action"
+  },
+  {
+    "path": "/session(.:format)",
+    "verb": "PATCH",
+    "controller": "sessions",
+    "action": "update",
+    "status": "missing_action"
+  },
+  {
+    "path": "/session(.:format)",
+    "verb": "PUT",
+    "controller": "sessions",
+    "action": "update",
+    "status": "missing_action"
+  },
+  {
+    "path": "/session(.:format)",
+    "verb": "DELETE",
+    "controller": "sessions",
+    "action": "destroy",
+    "status": "implemented"
+  },
+  {
+    "path": "/session(.:format)",
+    "verb": "POST",
+    "controller": "sessions",
+    "action": "create",
+    "status": "implemented"
+  },
+  {
+    "path": "/account/users(.:format)",
+    "verb": "GET",
+    "controller": "accounts/users",
+    "action": "index",
+    "status": "implemented"
+  },
+  {
+    "path": "/account/users(.:format)",
+    "verb": "POST",
+    "controller": "accounts/users",
+    "action": "create",
+    "status": "missing_action"
+  },
+  {
+    "path": "/account/users/new(.:format)",
+    "verb": "GET",
+    "controller": "accounts/users",
+    "action": "new",
+    "status": "missing_action"
+  },
+  {
+    "path": "/account/users/:id/edit(.:format)",
+    "verb": "GET",
+    "controller": "accounts/users",
+    "action": "edit",
+    "status": "missing_action"
+  },
+  {
+    "path": "/account/users/:id(.:format)",
+    "verb": "GET",
+    "controller": "accounts/users",
+    "action": "show",
+    "status": "missing_action"
+  },
+  {
+    "path": "/account/users/:id(.:format)",
+    "verb": "PATCH",
+    "controller": "accounts/users",
+    "action": "update",
+    "status": "implemented"
+  },
+  {
+    "path": "/account/users/:id(.:format)",
+    "verb": "PUT",
+    "controller": "accounts/users",
+    "action": "update",
+    "status": "implemented"
+  },
+  {
+    "path": "/account/users/:id(.:format)",
+    "verb": "DELETE",
+    "controller": "accounts/users",
+    "action": "destroy",
+    "status": "implemented"
+  },
+  {
+    "path": "/account/bots/:bot_id/key(.:format)",
+    "verb": "PATCH",
+    "controller": "accounts/bots/keys",
+    "action": "update",
+    "status": "implemented"
+  },
+  {
+    "path": "/account/bots/:bot_id/key(.:format)",
+    "verb": "PUT",
+    "controller": "accounts/bots/keys",
+    "action": "update",
+    "status": "implemented"
+  },
+  {
+    "path": "/account/bots(.:format)",
+    "verb": "GET",
+    "controller": "accounts/bots",
+    "action": "index",
+    "status": "implemented"
+  },
+  {
+    "path": "/account/bots(.:format)",
+    "verb": "POST",
+    "controller": "accounts/bots",
+    "action": "create",
+    "status": "implemented"
+  },
+  {
+    "path": "/account/bots/new(.:format)",
+    "verb": "GET",
+    "controller": "accounts/bots",
+    "action": "new",
+    "status": "implemented"
+  },
+  {
+    "path": "/account/bots/:id/edit(.:format)",
+    "verb": "GET",
+    "controller": "accounts/bots",
+    "action": "edit",
+    "status": "implemented"
+  },
+  {
+    "path": "/account/bots/:id(.:format)",
+    "verb": "GET",
+    "controller": "accounts/bots",
+    "action": "show",
+    "status": "missing_action"
+  },
+  {
+    "path": "/account/bots/:id(.:format)",
+    "verb": "PATCH",
+    "controller": "accounts/bots",
+    "action": "update",
+    "status": "implemented"
+  },
+  {
+    "path": "/account/bots/:id(.:format)",
+    "verb": "PUT",
+    "controller": "accounts/bots",
+    "action": "update",
+    "status": "implemented"
+  },
+  {
+    "path": "/account/bots/:id(.:format)",
+    "verb": "DELETE",
+    "controller": "accounts/bots",
+    "action": "destroy",
+    "status": "implemented"
+  },
+  {
+    "path": "/account/join_code(.:format)",
+    "verb": "POST",
+    "controller": "accounts/join_codes",
+    "action": "create",
+    "status": "implemented"
+  },
+  {
+    "path": "/account/logo(.:format)",
+    "verb": "GET",
+    "controller": "accounts/logos",
+    "action": "show",
+    "status": "implemented"
+  },
+  {
+    "path": "/account/logo(.:format)",
+    "verb": "DELETE",
+    "controller": "accounts/logos",
+    "action": "destroy",
+    "status": "implemented"
+  },
+  {
+    "path": "/account/custom_styles/edit(.:format)",
+    "verb": "GET",
+    "controller": "accounts/custom_styles",
+    "action": "edit",
+    "status": "implemented"
+  },
+  {
+    "path": "/account/custom_styles(.:format)",
+    "verb": "PATCH",
+    "controller": "accounts/custom_styles",
+    "action": "update",
+    "status": "implemented"
+  },
+  {
+    "path": "/account/custom_styles(.:format)",
+    "verb": "PUT",
+    "controller": "accounts/custom_styles",
+    "action": "update",
+    "status": "implemented"
+  },
+  {
+    "path": "/account/new(.:format)",
+    "verb": "GET",
+    "controller": "accounts",
+    "action": "new",
+    "status": "missing_action"
+  },
+  {
+    "path": "/account/edit(.:format)",
+    "verb": "GET",
+    "controller": "accounts",
+    "action": "edit",
+    "status": "implemented"
+  },
+  {
+    "path": "/account(.:format)",
+    "verb": "GET",
+    "controller": "accounts",
+    "action": "show",
+    "status": "missing_action"
+  },
+  {
+    "path": "/account(.:format)",
+    "verb": "PATCH",
+    "controller": "accounts",
+    "action": "update",
+    "status": "implemented"
+  },
+  {
+    "path": "/account(.:format)",
+    "verb": "PUT",
+    "controller": "accounts",
+    "action": "update",
+    "status": "implemented"
+  },
+  {
+    "path": "/account(.:format)",
+    "verb": "DELETE",
+    "controller": "accounts",
+    "action": "destroy",
+    "status": "missing_action"
+  },
+  {
+    "path": "/account(.:format)",
+    "verb": "POST",
+    "controller": "accounts",
+    "action": "create",
+    "status": "missing_action"
+  },
+  {
+    "path": "/join/:join_code(.:format)",
+    "verb": "GET",
+    "controller": "users",
+    "action": "new",
+    "status": "implemented"
+  },
+  {
+    "path": "/join/:join_code(.:format)",
+    "verb": "POST",
+    "controller": "users",
+    "action": "create",
+    "status": "implemented"
+  },
+  {
+    "path": "/qr_code/:id(.:format)",
+    "verb": "GET",
+    "controller": "qr_code",
+    "action": "show",
+    "status": "implemented"
+  },
+  {
+    "path": "/users/:user_id/avatar(.:format)",
+    "verb": "GET",
+    "controller": "users/avatars",
+    "action": "show",
+    "status": "implemented"
+  },
+  {
+    "path": "/users/:user_id/avatar(.:format)",
+    "verb": "DELETE",
+    "controller": "users/avatars",
+    "action": "destroy",
+    "status": "implemented"
+  },
+  {
+    "path": "/users/:user_id/ban(.:format)",
+    "verb": "DELETE",
+    "controller": "users/bans",
+    "action": "destroy",
+    "status": "implemented"
+  },
+  {
+    "path": "/users/:user_id/ban(.:format)",
+    "verb": "POST",
+    "controller": "users/bans",
+    "action": "create",
+    "status": "implemented"
+  },
+  {
+    "path": "/users/:user_id/sidebar(.:format)",
+    "verb": "GET",
+    "controller": "users/sidebars",
+    "action": "show",
+    "status": "implemented"
+  },
+  {
+    "path": "/users/:user_id/profile/new(.:format)",
+    "verb": "GET",
+    "controller": "users/profiles",
+    "action": "new",
+    "status": "missing_action"
+  },
+  {
+    "path": "/users/:user_id/profile/edit(.:format)",
+    "verb": "GET",
+    "controller": "users/profiles",
+    "action": "edit",
+    "status": "missing_action"
+  },
+  {
+    "path": "/users/:user_id/profile(.:format)",
+    "verb": "GET",
+    "controller": "users/profiles",
+    "action": "show",
+    "status": "implemented"
+  },
+  {
+    "path": "/users/:user_id/profile(.:format)",
+    "verb": "PATCH",
+    "controller": "users/profiles",
+    "action": "update",
+    "status": "implemented"
+  },
+  {
+    "path": "/users/:user_id/profile(.:format)",
+    "verb": "PUT",
+    "controller": "users/profiles",
+    "action": "update",
+    "status": "implemented"
+  },
+  {
+    "path": "/users/:user_id/profile(.:format)",
+    "verb": "DELETE",
+    "controller": "users/profiles",
+    "action": "destroy",
+    "status": "missing_action"
+  },
+  {
+    "path": "/users/:user_id/profile(.:format)",
+    "verb": "POST",
+    "controller": "users/profiles",
+    "action": "create",
+    "status": "missing_action"
+  },
+  {
+    "path": "/users/:user_id/push_subscriptions/:push_subscription_id/test_notifications(.:format)",
+    "verb": "POST",
+    "controller": "users/push_subscriptions/test_notifications",
+    "action": "create",
+    "status": "implemented"
+  },
+  {
+    "path": "/users/:user_id/push_subscriptions(.:format)",
+    "verb": "GET",
+    "controller": "users/push_subscriptions",
+    "action": "index",
+    "status": "implemented"
+  },
+  {
+    "path": "/users/:user_id/push_subscriptions(.:format)",
+    "verb": "POST",
+    "controller": "users/push_subscriptions",
+    "action": "create",
+    "status": "implemented"
+  },
+  {
+    "path": "/users/:user_id/push_subscriptions/new(.:format)",
+    "verb": "GET",
+    "controller": "users/push_subscriptions",
+    "action": "new",
+    "status": "missing_action"
+  },
+  {
+    "path": "/users/:user_id/push_subscriptions/:id/edit(.:format)",
+    "verb": "GET",
+    "controller": "users/push_subscriptions",
+    "action": "edit",
+    "status": "missing_action"
+  },
+  {
+    "path": "/users/:user_id/push_subscriptions/:id(.:format)",
+    "verb": "GET",
+    "controller": "users/push_subscriptions",
+    "action": "show",
+    "status": "missing_action"
+  },
+  {
+    "path": "/users/:user_id/push_subscriptions/:id(.:format)",
+    "verb": "PATCH",
+    "controller": "users/push_subscriptions",
+    "action": "update",
+    "status": "missing_action"
+  },
+  {
+    "path": "/users/:user_id/push_subscriptions/:id(.:format)",
+    "verb": "PUT",
+    "controller": "users/push_subscriptions",
+    "action": "update",
+    "status": "missing_action"
+  },
+  {
+    "path": "/users/:user_id/push_subscriptions/:id(.:format)",
+    "verb": "DELETE",
+    "controller": "users/push_subscriptions",
+    "action": "destroy",
+    "status": "implemented"
+  },
+  {
+    "path": "/users/:id(.:format)",
+    "verb": "GET",
+    "controller": "users",
+    "action": "show",
+    "status": "implemented"
+  },
+  {
+    "path": "/autocompletable/users(.:format)",
+    "verb": "GET",
+    "controller": "autocompletable/users",
+    "action": "index",
+    "status": "implemented"
+  },
+  {
+    "path": "/rooms/:room_id/messages(.:format)",
+    "verb": "GET",
+    "controller": "messages",
+    "action": "index",
+    "status": "implemented"
+  },
+  {
+    "path": "/rooms/:room_id/messages(.:format)",
+    "verb": "POST",
+    "controller": "messages",
+    "action": "create",
+    "status": "implemented"
+  },
+  {
+    "path": "/rooms/:room_id/messages/new(.:format)",
+    "verb": "GET",
+    "controller": "messages",
+    "action": "new",
+    "status": "missing_action"
+  },
+  {
+    "path": "/rooms/:room_id/messages/:id/edit(.:format)",
+    "verb": "GET",
+    "controller": "messages",
+    "action": "edit",
+    "status": "implemented"
+  },
+  {
+    "path": "/rooms/:room_id/messages/:id(.:format)",
+    "verb": "GET",
+    "controller": "messages",
+    "action": "show",
+    "status": "implemented"
+  },
+  {
+    "path": "/rooms/:room_id/messages/:id(.:format)",
+    "verb": "PATCH",
+    "controller": "messages",
+    "action": "update",
+    "status": "implemented"
+  },
+  {
+    "path": "/rooms/:room_id/messages/:id(.:format)",
+    "verb": "PUT",
+    "controller": "messages",
+    "action": "update",
+    "status": "implemented"
+  },
+  {
+    "path": "/rooms/:room_id/messages/:id(.:format)",
+    "verb": "DELETE",
+    "controller": "messages",
+    "action": "destroy",
+    "status": "implemented"
+  },
+  {
+    "path": "/rooms/:room_id/:bot_key/messages/:message_id/boosts(.:format)",
+    "verb": "POST",
+    "controller": "messages/boosts/by_bots",
+    "action": "create",
+    "status": "implemented"
+  },
+  {
+    "path": "/rooms/:room_id/:bot_key/messages/:message_id/boosts/:id(.:format)",
+    "verb": "DELETE",
+    "controller": "messages/boosts/by_bots",
+    "action": "destroy",
+    "status": "implemented"
+  },
+  {
+    "path": "/rooms/:room_id/:bot_key/messages(.:format)",
+    "verb": "GET",
+    "controller": "messages/by_bots",
+    "action": "index",
+    "status": "implemented"
+  },
+  {
+    "path": "/rooms/:room_id/:bot_key/messages(.:format)",
+    "verb": "POST",
+    "controller": "messages/by_bots",
+    "action": "create",
+    "status": "implemented"
+  },
+  {
+    "path": "/rooms/:room_id/:bot_key/messages/:id(.:format)",
+    "verb": "PATCH",
+    "controller": "messages/by_bots",
+    "action": "update",
+    "status": "implemented"
+  },
+  {
+    "path": "/rooms/:room_id/:bot_key/messages/:id(.:format)",
+    "verb": "PUT",
+    "controller": "messages/by_bots",
+    "action": "update",
+    "status": "implemented"
+  },
+  {
+    "path": "/rooms/:room_id/:bot_key/messages/:id(.:format)",
+    "verb": "DELETE",
+    "controller": "messages/by_bots",
+    "action": "destroy",
+    "status": "implemented"
+  },
+  {
+    "path": "/rooms/:room_id/refresh(.:format)",
+    "verb": "GET",
+    "controller": "rooms/refreshes",
+    "action": "show",
+    "status": "implemented"
+  },
+  {
+    "path": "/rooms/:room_id/settings(.:format)",
+    "verb": "GET",
+    "controller": "rooms/settings",
+    "action": "show",
+    "status": "missing_controller"
+  },
+  {
+    "path": "/rooms/:room_id/involvement(.:format)",
+    "verb": "GET",
+    "controller": "rooms/involvements",
+    "action": "show",
+    "status": "implemented"
+  },
+  {
+    "path": "/rooms/:room_id/involvement(.:format)",
+    "verb": "PATCH",
+    "controller": "rooms/involvements",
+    "action": "update",
+    "status": "implemented"
+  },
+  {
+    "path": "/rooms/:room_id/involvement(.:format)",
+    "verb": "PUT",
+    "controller": "rooms/involvements",
+    "action": "update",
+    "status": "implemented"
+  },
+  {
+    "path": "/rooms/:room_id/@:message_id(.:format)",
+    "verb": "GET",
+    "controller": "rooms",
+    "action": "show",
+    "status": "implemented"
+  },
+  {
+    "path": "/rooms(.:format)",
+    "verb": "GET",
+    "controller": "rooms",
+    "action": "index",
+    "status": "implemented"
+  },
+  {
+    "path": "/rooms(.:format)",
+    "verb": "POST",
+    "controller": "rooms",
+    "action": "create",
+    "status": "missing_action"
+  },
+  {
+    "path": "/rooms/new(.:format)",
+    "verb": "GET",
+    "controller": "rooms",
+    "action": "new",
+    "status": "missing_action"
+  },
+  {
+    "path": "/rooms/:id/edit(.:format)",
+    "verb": "GET",
+    "controller": "rooms",
+    "action": "edit",
+    "status": "missing_action"
+  },
+  {
+    "path": "/rooms/:id(.:format)",
+    "verb": "GET",
+    "controller": "rooms",
+    "action": "show",
+    "status": "implemented"
+  },
+  {
+    "path": "/rooms/:id(.:format)",
+    "verb": "PATCH",
+    "controller": "rooms",
+    "action": "update",
+    "status": "missing_action"
+  },
+  {
+    "path": "/rooms/:id(.:format)",
+    "verb": "PUT",
+    "controller": "rooms",
+    "action": "update",
+    "status": "missing_action"
+  },
+  {
+    "path": "/rooms/:id(.:format)",
+    "verb": "DELETE",
+    "controller": "rooms",
+    "action": "destroy",
+    "status": "implemented"
+  },
+  {
+    "path": "/rooms/opens(.:format)",
+    "verb": "GET",
+    "controller": "rooms/opens",
+    "action": "index",
+    "status": "implemented"
+  },
+  {
+    "path": "/rooms/opens(.:format)",
+    "verb": "POST",
+    "controller": "rooms/opens",
+    "action": "create",
+    "status": "implemented"
+  },
+  {
+    "path": "/rooms/opens/new(.:format)",
+    "verb": "GET",
+    "controller": "rooms/opens",
+    "action": "new",
+    "status": "implemented"
+  },
+  {
+    "path": "/rooms/opens/:id/edit(.:format)",
+    "verb": "GET",
+    "controller": "rooms/opens",
+    "action": "edit",
+    "status": "implemented"
+  },
+  {
+    "path": "/rooms/opens/:id(.:format)",
+    "verb": "GET",
+    "controller": "rooms/opens",
+    "action": "show",
+    "status": "implemented"
+  },
+  {
+    "path": "/rooms/opens/:id(.:format)",
+    "verb": "PATCH",
+    "controller": "rooms/opens",
+    "action": "update",
+    "status": "implemented"
+  },
+  {
+    "path": "/rooms/opens/:id(.:format)",
+    "verb": "PUT",
+    "controller": "rooms/opens",
+    "action": "update",
+    "status": "implemented"
+  },
+  {
+    "path": "/rooms/opens/:id(.:format)",
+    "verb": "DELETE",
+    "controller": "rooms/opens",
+    "action": "destroy",
+    "status": "implemented"
+  },
+  {
+    "path": "/rooms/closeds(.:format)",
+    "verb": "GET",
+    "controller": "rooms/closeds",
+    "action": "index",
+    "status": "implemented"
+  },
+  {
+    "path": "/rooms/closeds(.:format)",
+    "verb": "POST",
+    "controller": "rooms/closeds",
+    "action": "create",
+    "status": "implemented"
+  },
+  {
+    "path": "/rooms/closeds/new(.:format)",
+    "verb": "GET",
+    "controller": "rooms/closeds",
+    "action": "new",
+    "status": "implemented"
+  },
+  {
+    "path": "/rooms/closeds/:id/edit(.:format)",
+    "verb": "GET",
+    "controller": "rooms/closeds",
+    "action": "edit",
+    "status": "implemented"
+  },
+  {
+    "path": "/rooms/closeds/:id(.:format)",
+    "verb": "GET",
+    "controller": "rooms/closeds",
+    "action": "show",
+    "status": "implemented"
+  },
+  {
+    "path": "/rooms/closeds/:id(.:format)",
+    "verb": "PATCH",
+    "controller": "rooms/closeds",
+    "action": "update",
+    "status": "implemented"
+  },
+  {
+    "path": "/rooms/closeds/:id(.:format)",
+    "verb": "PUT",
+    "controller": "rooms/closeds",
+    "action": "update",
+    "status": "implemented"
+  },
+  {
+    "path": "/rooms/closeds/:id(.:format)",
+    "verb": "DELETE",
+    "controller": "rooms/closeds",
+    "action": "destroy",
+    "status": "implemented"
+  },
+  {
+    "path": "/rooms/directs(.:format)",
+    "verb": "GET",
+    "controller": "rooms/directs",
+    "action": "index",
+    "status": "implemented"
+  },
+  {
+    "path": "/rooms/directs(.:format)",
+    "verb": "POST",
+    "controller": "rooms/directs",
+    "action": "create",
+    "status": "implemented"
+  },
+  {
+    "path": "/rooms/directs/new(.:format)",
+    "verb": "GET",
+    "controller": "rooms/directs",
+    "action": "new",
+    "status": "implemented"
+  },
+  {
+    "path": "/rooms/directs/:id/edit(.:format)",
+    "verb": "GET",
+    "controller": "rooms/directs",
+    "action": "edit",
+    "status": "implemented"
+  },
+  {
+    "path": "/rooms/directs/:id(.:format)",
+    "verb": "GET",
+    "controller": "rooms/directs",
+    "action": "show",
+    "status": "implemented"
+  },
+  {
+    "path": "/rooms/directs/:id(.:format)",
+    "verb": "PATCH",
+    "controller": "rooms/directs",
+    "action": "update",
+    "status": "missing_action"
+  },
+  {
+    "path": "/rooms/directs/:id(.:format)",
+    "verb": "PUT",
+    "controller": "rooms/directs",
+    "action": "update",
+    "status": "missing_action"
+  },
+  {
+    "path": "/rooms/directs/:id(.:format)",
+    "verb": "DELETE",
+    "controller": "rooms/directs",
+    "action": "destroy",
+    "status": "implemented"
+  },
+  {
+    "path": "/messages/:message_id/boosts(.:format)",
+    "verb": "GET",
+    "controller": "messages/boosts",
+    "action": "index",
+    "status": "implemented"
+  },
+  {
+    "path": "/messages/:message_id/boosts(.:format)",
+    "verb": "POST",
+    "controller": "messages/boosts",
+    "action": "create",
+    "status": "implemented"
+  },
+  {
+    "path": "/messages/:message_id/boosts/new(.:format)",
+    "verb": "GET",
+    "controller": "messages/boosts",
+    "action": "new",
+    "status": "implemented"
+  },
+  {
+    "path": "/messages/:message_id/boosts/:id/edit(.:format)",
+    "verb": "GET",
+    "controller": "messages/boosts",
+    "action": "edit",
+    "status": "missing_action"
+  },
+  {
+    "path": "/messages/:message_id/boosts/:id(.:format)",
+    "verb": "GET",
+    "controller": "messages/boosts",
+    "action": "show",
+    "status": "missing_action"
+  },
+  {
+    "path": "/messages/:message_id/boosts/:id(.:format)",
+    "verb": "PATCH",
+    "controller": "messages/boosts",
+    "action": "update",
+    "status": "missing_action"
+  },
+  {
+    "path": "/messages/:message_id/boosts/:id(.:format)",
+    "verb": "PUT",
+    "controller": "messages/boosts",
+    "action": "update",
+    "status": "missing_action"
+  },
+  {
+    "path": "/messages/:message_id/boosts/:id(.:format)",
+    "verb": "DELETE",
+    "controller": "messages/boosts",
+    "action": "destroy",
+    "status": "implemented"
+  },
+  {
+    "path": "/messages(.:format)",
+    "verb": "GET",
+    "controller": "messages",
+    "action": "index",
+    "status": "implemented"
+  },
+  {
+    "path": "/messages(.:format)",
+    "verb": "POST",
+    "controller": "messages",
+    "action": "create",
+    "status": "implemented"
+  },
+  {
+    "path": "/messages/new(.:format)",
+    "verb": "GET",
+    "controller": "messages",
+    "action": "new",
+    "status": "missing_action"
+  },
+  {
+    "path": "/messages/:id/edit(.:format)",
+    "verb": "GET",
+    "controller": "messages",
+    "action": "edit",
+    "status": "implemented"
+  },
+  {
+    "path": "/messages/:id(.:format)",
+    "verb": "GET",
+    "controller": "messages",
+    "action": "show",
+    "status": "implemented"
+  },
+  {
+    "path": "/messages/:id(.:format)",
+    "verb": "PATCH",
+    "controller": "messages",
+    "action": "update",
+    "status": "implemented"
+  },
+  {
+    "path": "/messages/:id(.:format)",
+    "verb": "PUT",
+    "controller": "messages",
+    "action": "update",
+    "status": "implemented"
+  },
+  {
+    "path": "/messages/:id(.:format)",
+    "verb": "DELETE",
+    "controller": "messages",
+    "action": "destroy",
+    "status": "implemented"
+  },
+  {
+    "path": "/searches/clear(.:format)",
+    "verb": "DELETE",
+    "controller": "searches",
+    "action": "clear",
+    "status": "implemented"
+  },
+  {
+    "path": "/searches(.:format)",
+    "verb": "GET",
+    "controller": "searches",
+    "action": "index",
+    "status": "implemented"
+  },
+  {
+    "path": "/searches(.:format)",
+    "verb": "POST",
+    "controller": "searches",
+    "action": "create",
+    "status": "implemented"
+  },
+  {
+    "path": "/unfurl_link(.:format)",
+    "verb": "POST",
+    "controller": "unfurl_links",
+    "action": "create",
+    "status": "implemented"
+  },
+  {
+    "path": "/webmanifest(.:format)",
+    "verb": "GET",
+    "controller": "pwa",
+    "action": "manifest",
+    "status": "implemented"
+  },
+  {
+    "path": "/service-worker(.:format)",
+    "verb": "GET",
+    "controller": "pwa",
+    "action": "service_worker",
+    "status": "implemented"
+  },
+  {
+    "path": "/up(.:format)",
+    "verb": "GET",
+    "controller": "rails/health",
+    "action": "show",
+    "status": "implemented"
+  },
+  {
+    "path": "/recede_historical_location(.:format)",
+    "verb": "GET",
+    "controller": "turbo/native/navigation",
+    "action": "recede",
+    "status": "implemented"
+  },
+  {
+    "path": "/resume_historical_location(.:format)",
+    "verb": "GET",
+    "controller": "turbo/native/navigation",
+    "action": "resume",
+    "status": "implemented"
+  },
+  {
+    "path": "/refresh_historical_location(.:format)",
+    "verb": "GET",
+    "controller": "turbo/native/navigation",
+    "action": "refresh",
+    "status": "implemented"
+  },
+  {
+    "path": "/rails/action_mailbox/postmark/inbound_emails(.:format)",
+    "verb": "POST",
+    "controller": "action_mailbox/ingresses/postmark/inbound_emails",
+    "action": "create",
+    "status": "implemented"
+  },
+  {
+    "path": "/rails/action_mailbox/relay/inbound_emails(.:format)",
+    "verb": "POST",
+    "controller": "action_mailbox/ingresses/relay/inbound_emails",
+    "action": "create",
+    "status": "implemented"
+  },
+  {
+    "path": "/rails/action_mailbox/sendgrid/inbound_emails(.:format)",
+    "verb": "POST",
+    "controller": "action_mailbox/ingresses/sendgrid/inbound_emails",
+    "action": "create",
+    "status": "implemented"
+  },
+  {
+    "path": "/rails/action_mailbox/mandrill/inbound_emails(.:format)",
+    "verb": "GET",
+    "controller": "action_mailbox/ingresses/mandrill/inbound_emails",
+    "action": "health_check",
+    "status": "implemented"
+  },
+  {
+    "path": "/rails/action_mailbox/mandrill/inbound_emails(.:format)",
+    "verb": "POST",
+    "controller": "action_mailbox/ingresses/mandrill/inbound_emails",
+    "action": "create",
+    "status": "implemented"
+  },
+  {
+    "path": "/rails/action_mailbox/mailgun/inbound_emails/mime(.:format)",
+    "verb": "POST",
+    "controller": "action_mailbox/ingresses/mailgun/inbound_emails",
+    "action": "create",
+    "status": "implemented"
+  },
+  {
+    "path": "/rails/conductor/action_mailbox/inbound_emails(.:format)",
+    "verb": "GET",
+    "controller": "rails/conductor/action_mailbox/inbound_emails",
+    "action": "index",
+    "status": "implemented"
+  },
+  {
+    "path": "/rails/conductor/action_mailbox/inbound_emails(.:format)",
+    "verb": "POST",
+    "controller": "rails/conductor/action_mailbox/inbound_emails",
+    "action": "create",
+    "status": "implemented"
+  },
+  {
+    "path": "/rails/conductor/action_mailbox/inbound_emails/new(.:format)",
+    "verb": "GET",
+    "controller": "rails/conductor/action_mailbox/inbound_emails",
+    "action": "new",
+    "status": "implemented"
+  },
+  {
+    "path": "/rails/conductor/action_mailbox/inbound_emails/:id(.:format)",
+    "verb": "GET",
+    "controller": "rails/conductor/action_mailbox/inbound_emails",
+    "action": "show",
+    "status": "implemented"
+  },
+  {
+    "path": "/rails/conductor/action_mailbox/inbound_emails/sources/new(.:format)",
+    "verb": "GET",
+    "controller": "rails/conductor/action_mailbox/inbound_emails/sources",
+    "action": "new",
+    "status": "implemented"
+  },
+  {
+    "path": "/rails/conductor/action_mailbox/inbound_emails/sources(.:format)",
+    "verb": "POST",
+    "controller": "rails/conductor/action_mailbox/inbound_emails/sources",
+    "action": "create",
+    "status": "implemented"
+  },
+  {
+    "path": "/rails/conductor/action_mailbox/:inbound_email_id/reroute(.:format)",
+    "verb": "POST",
+    "controller": "rails/conductor/action_mailbox/reroutes",
+    "action": "create",
+    "status": "implemented"
+  },
+  {
+    "path": "/rails/conductor/action_mailbox/:inbound_email_id/incinerate(.:format)",
+    "verb": "POST",
+    "controller": "rails/conductor/action_mailbox/incinerates",
+    "action": "create",
+    "status": "implemented"
+  },
+  {
+    "path": "/rails/active_storage/blobs/redirect/:signed_id/*filename(.:format)",
+    "verb": "GET",
+    "controller": "active_storage/blobs/redirect",
+    "action": "show",
+    "status": "implemented"
+  },
+  {
+    "path": "/rails/active_storage/blobs/proxy/:signed_id/*filename(.:format)",
+    "verb": "GET",
+    "controller": "active_storage/blobs/proxy",
+    "action": "show",
+    "status": "implemented"
+  },
+  {
+    "path": "/rails/active_storage/blobs/:signed_id/*filename(.:format)",
+    "verb": "GET",
+    "controller": "active_storage/blobs/redirect",
+    "action": "show",
+    "status": "implemented"
+  },
+  {
+    "path": "/rails/active_storage/representations/redirect/:signed_blob_id/:variation_key/*filename(.:format)",
+    "verb": "GET",
+    "controller": "active_storage/representations/redirect",
+    "action": "show",
+    "status": "implemented"
+  },
+  {
+    "path": "/rails/active_storage/representations/proxy/:signed_blob_id/:variation_key/*filename(.:format)",
+    "verb": "GET",
+    "controller": "active_storage/representations/proxy",
+    "action": "show",
+    "status": "implemented"
+  },
+  {
+    "path": "/rails/active_storage/representations/:signed_blob_id/:variation_key/*filename(.:format)",
+    "verb": "GET",
+    "controller": "active_storage/representations/redirect",
+    "action": "show",
+    "status": "implemented"
+  },
+  {
+    "path": "/rails/active_storage/disk/:encoded_key/*filename(.:format)",
+    "verb": "GET",
+    "controller": "active_storage/disk",
+    "action": "show",
+    "status": "implemented"
+  },
+  {
+    "path": "/rails/active_storage/disk/:encoded_token(.:format)",
+    "verb": "PUT",
+    "controller": "active_storage/disk",
+    "action": "update",
+    "status": "implemented"
+  },
+  {
+    "path": "/rails/active_storage/direct_uploads(.:format)",
+    "verb": "POST",
+    "controller": "active_storage/direct_uploads",
+    "action": "create",
+    "status": "implemented"
+  }
+]

@@ -1,0 +1,77 @@
+      
+
+<section class="panel flex flex-column gap" style="view-transition-name: avatar-<%= @id %>">
+<%= @pwa %>  <div class="align-center center avatar__form gap" data-controller="upload-preview">
+    <form class="txt-medium" data-controller="form" enctype="multipart/form-data" action="/users/me/profile" accept-charset="UTF-8" method="post"><input type="hidden" name="_method" value="patch" /><input type="hidden" name="authenticity_token" value="<%= @token %>" />
+      <label class="btn input--file">
+        <img aria-hidden="true" src="<%= Assets.path("camera.svg") %>" width="20" height="20" />
+        <input id="file" class="input" accept="image/*" data-upload-preview-target="input" data-action="upload-preview#previewImage change-&gt;form#submit" type="file" name="user[avatar]" />
+        <span class="for-screen-reader">Upload avatar</span>
+      </label>
+</form>
+    <form data-controller="form" enctype="multipart/form-data" action="/users/me/profile" accept-charset="UTF-8" method="post"><input type="hidden" name="_method" value="patch" /><input type="hidden" name="authenticity_token" value="<%= @token %>" />
+      <label class="btn avatar input--file txt-xx-large">
+        <img aria-hidden="true" data-upload-preview-target="image" src="<%= @avatar_src %>" width="300" height="300" />
+        <input id="file" class="input" accept="image/*" data-upload-preview-target="input" data-action="upload-preview#previewImage change-&gt;form#submit" type="file" name="user[avatar]" />
+        <span class="for-screen-reader">Avatar</span>
+      </label>
+</form>
+<%= @delete_avatar %>  </div>
+
+  <form data-controller="form" action="/users/me/profile" accept-charset="UTF-8" method="post"><input type="hidden" name="_method" value="patch" /><input type="hidden" name="authenticity_token" value="<%= @token %>" />
+    <div class="flex flex-column gap">
+      <div class="flex align-center gap">
+        <details class="position-relative" data-controller="popup" data-action="keydown.esc-&gt;popup#close toggle-&gt;popup#toggle click@document-&gt;popup#closeOnClickOutside" data-popup-orientation-top-class="popup-orientation-top"><summary class="btn" tabindex="-1"><img aria-hidden="true" class="color-icon" src="<%= Assets.path("globe.svg") %>" width="20" height="20" /><span class="for-screen-reader">Translate</span></summary><div class="language-list-menu shadow" data-popup-target="menu"><dl class="language-list"><dt>🇺🇸</dt><dd class="margin-none">Enter your name</dd><dt>🇪🇸</dt><dd class="margin-none">Introduce tu nombre</dd><dt>🇫🇷</dt><dd class="margin-none">Entrez votre nom</dd><dt>🇮🇳</dt><dd class="margin-none">अपना नाम दर्ज करें</dd><dt>🇩🇪</dt><dd class="margin-none">Geben Sie Ihren Namen ein</dd><dt>🇧🇷</dt><dd class="margin-none">Insira seu nome</dd><dt>🇯🇵</dt><dd class="margin-none">お名前を入力してください</dd></dl></div></details>
+
+        <label class="flex align-center gap flex-item-grow input input--actor">
+          <input class="input txt-large " autocomplete="name" placeholder="Enter your name" autofocus="autofocus" required="required" data-1p-ignore="true" type="text" value="<%= @name %>" name="user[name]" id="user_name" />
+          <img aria-hidden="true" class="colorize--black" src="<%= Assets.path("person.svg") %>" width="24" height="24" />
+        </label>
+      </div>
+
+      <div class="flex align-center gap">
+        <details class="position-relative" data-controller="popup" data-action="keydown.esc-&gt;popup#close toggle-&gt;popup#toggle click@document-&gt;popup#closeOnClickOutside" data-popup-orientation-top-class="popup-orientation-top"><summary class="btn" tabindex="-1"><img aria-hidden="true" class="color-icon" src="<%= Assets.path("globe.svg") %>" width="20" height="20" /><span class="for-screen-reader">Translate</span></summary><div class="language-list-menu shadow" data-popup-target="menu"><dl class="language-list"><dt>🇺🇸</dt><dd class="margin-none">Enter your email address</dd><dt>🇪🇸</dt><dd class="margin-none">Introduce tu correo electrónico</dd><dt>🇫🇷</dt><dd class="margin-none">Entrez votre adresse courriel</dd><dt>🇮🇳</dt><dd class="margin-none">अपना ईमेल पता दर्ज करें</dd><dt>🇩🇪</dt><dd class="margin-none">Geben Sie Ihre E-Mail-Adresse ein</dd><dt>🇧🇷</dt><dd class="margin-none">Insira seu endereço de email</dd><dt>🇯🇵</dt><dd class="margin-none">メールアドレスを入力してください</dd></dl></div></details>
+
+        <label class="flex align-center gap flex-item-grow input input--actor">
+          <input class="input txt-large" value="<%= @email %>" autocomplete="username" placeholder="Enter your email address" type="email" name="user[email_address]" id="user_email_address" />
+          <img aria-hidden="true" class="colorize--black" src="<%= Assets.path("email.svg") %>" width="24" height="24" />
+        </label>
+      </div>
+
+      <div class="flex align-center gap">
+        <details class="position-relative" data-controller="popup" data-action="keydown.esc-&gt;popup#close toggle-&gt;popup#toggle click@document-&gt;popup#closeOnClickOutside" data-popup-orientation-top-class="popup-orientation-top"><summary class="btn" tabindex="-1"><img aria-hidden="true" class="color-icon" src="<%= Assets.path("globe.svg") %>" width="20" height="20" /><span class="for-screen-reader">Translate</span></summary><div class="language-list-menu shadow" data-popup-target="menu"><dl class="language-list"><dt>🇺🇸</dt><dd class="margin-none">Change password</dd><dt>🇪🇸</dt><dd class="margin-none">Cambiar contraseña</dd><dt>🇫🇷</dt><dd class="margin-none">Changer le mot de passe</dd><dt>🇮🇳</dt><dd class="margin-none">पासवर्ड बदलें</dd><dt>🇩🇪</dt><dd class="margin-none">Passwort ändern</dd><dt>🇧🇷</dt><dd class="margin-none">Alterar senha</dd><dt>🇯🇵</dt><dd class="margin-none">パスワードを変更</dd></dl></div></details>
+
+        <label class="flex align-center gap flex-item-grow input input--actor">
+          <input class="input txt-large" autocomplete="new-password" placeholder="Change password" maxlength="72" size="72" type="password" name="user[password]" id="user_password" />
+          <img aria-hidden="true" class="colorize--black" src="<%= Assets.path("password.svg") %>" width="24" height="24" />
+        </label>
+      </div>
+
+      <div class="flex align-start gap">
+        <details class="position-relative" data-controller="popup" data-action="keydown.esc-&gt;popup#close toggle-&gt;popup#toggle click@document-&gt;popup#closeOnClickOutside" data-popup-orientation-top-class="popup-orientation-top"><summary class="btn" tabindex="-1"><img aria-hidden="true" class="color-icon" src="<%= Assets.path("globe.svg") %>" width="20" height="20" /><span class="for-screen-reader">Translate</span></summary><div class="language-list-menu shadow" data-popup-target="menu"><dl class="language-list"><dt>🇺🇸</dt><dd class="margin-none">Enter a few words about yourself.</dd><dt>🇪🇸</dt><dd class="margin-none">Ingresa algunas palabras sobre ti mismo.</dd><dt>🇫🇷</dt><dd class="margin-none">Saisissez quelques mots à propos de vous-même.</dd><dt>🇮🇳</dt><dd class="margin-none">अपने बारे में कुछ शब्द लिखें.</dd><dt>🇩🇪</dt><dd class="margin-none">Geben Sie ein paar Worte über sich selbst ein.</dd><dt>🇧🇷</dt><dd class="margin-none">Insira alguma palavras sobre você.</dd><dt>🇯🇵</dt><dd class="margin-none">ご自分について簡単に記入してください。</dd></dl></div></details>
+
+        <label class="flex align--center gap flex-item--grow input input--actor">
+          <textarea class="input txt-large" placeholder="A few words about yourself…" maxlength="200" rows="3" name="user[bio]" id="user_bio">
+<%= @bio %></textarea>
+          <img aria-hidden="true" class="colorize--black" src="<%= Assets.path("bio.svg") %>" width="24" height="24" />
+        </label>
+      </div>
+
+      <button class="btn btn--reversed center txt-large" type="submit"><img aria-hidden="true" src="<%= Assets.path("check.svg") %>" width="20" height="20" /><span class="for-screen-reader">Save changes</span></button>
+    </div>
+</form>
+  <div class="margin-block pad-inline pad-block fill-shade border-radius">
+    <menu class="flex flex-column gap margin-none pad">
+      <%= @shared %>
+<%= if @separator, do: "\n        <hr class=\"separator full-width\" style=\"--border-style: solid\">\n", else: "" %>
+      <%= @direct %>
+    </menu>
+  </div>
+
+  
+<%= @transfer %>
+
+
+</section>
+
+

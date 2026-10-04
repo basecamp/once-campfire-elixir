@@ -1,0 +1,23 @@
+unit: running
+unit: passed (21.059s)
+route_errors: running
+route_errors: passed (3.145s)
+format_probe: running
+format_probe: passed (5.046s)
+assets: running
+assets: passed (3.348s)
+room_page: running
+room_page: passed (4.569s)
+messages: running
+messages: passed (4.072s)
+message_cache: running
+message_cache: passed (4.045s)
+cable: running
+cable: passed (3.885s)
+cable_interop: running
+cable_interop: passed (3.462s)
+message_broadcasts: running
+message_broadcasts: passed (3.705s)
+worker_lifecycle: running
+worker_lifecycle: passed (19.842s)
+All selected parity gates passed

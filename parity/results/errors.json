@@ -1,0 +1,8 @@
+{
+  "passed": true,
+  "scope": [
+    "CSRF public exception HTML/JSON bodies and headers",
+    "missing required URL",
+    "invalid/private/media unfurl URLs"
+  ]
+}

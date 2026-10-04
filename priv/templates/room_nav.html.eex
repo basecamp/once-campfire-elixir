@@ -1,0 +1,47 @@
+        
+
+  <span class="btn btn--reversed btn--faux room--current">
+    <h1 class="room__contents txt-medium overflow-ellipsis">
+<%= if @direct, do: ~s(        <span class="for-screen-reader">Ping with</span>\n), else: "" %>
+      <%= @room_name %>
+    </h1>
+</span>
+  <a class="btn" style="view-transition-name: edit-room-<%= @room_id %>" data-room-id="<%= @room_id %>" href="/rooms/<%= @namespace %>/<%= @room_id %>/edit">
+    <img aria-hidden="true" src="<%= Campfire.Assets.path("menu-dots-horizontal.svg") %>" width="20" height="20" />
+    <span class="for-screen-reader">Settings for this <%= if @direct, do: "Ping", else: "room" %></span>
+</a>
+  <span>
+  <span class="button_to_change_notifying"
+      data-controller="notifications" data-notifications-subscriptions-url-value="/users/me/push_subscriptions" data-notifications-attention-class="btn--pulsing">
+    <turbo-frame data-controller="turbo-frame" data-action="notifications:ready@window-&gt;turbo-frame#load" data-turbo-frame-url-param="/rooms/<%= @room_id %>/involvement" id="involvement_<%= @room_key %>">
+      <button class="btn" data-action="click->notifications#attemptToSubscribe" data-notifications-target="bell">
+        <img aria-hidden="true" src="<%= Campfire.Assets.path("notification-bell-loading.svg") %>" width="20" height="20" />
+        <img aria-hidden="true" hidden="hidden" src="<%= Campfire.Assets.path("notification-bell-alert.svg") %>" width="20" height="20" />
+        <span class="for-screen-reader">Notification settings for this <%= if @direct, do: "Ping", else: "room" %></span>
+      </button>
+</turbo-frame>
+    <dialog data-notifications-target="notAllowedNotice" class="dialog pad center center-block border-radius border shadow" style="--inline-space: var(--block-space)">
+      <div class="flex flex-column txt-align-center">
+        <span class="btn btn--faux center txt-x-large">
+          <img aria-hidden="true" src="<%= Campfire.Assets.path("notification-bell-alert.svg") %>" width="48" height="48" />
+          <span class="for-screen-reader">Notifications alert</span>
+        </span>
+
+        <section>
+          <h1 class="txt-large margin-none">Notifications aren’t allowed</h1>
+          <div class="txt-align-start margin-block-start">
+<%= @pwa %>          </div>
+        </section>
+
+        <form method="dialog" class="flex align-center gap center">
+          <button class="btn dialog__close" autofocus="true">
+            <span class="for-screen-reader">Close</span>
+            <img aria-hidden="true" src="<%= Campfire.Assets.path("remove.svg") %>" width="20" height="20" />
+          </button>
+        </form>
+      </div>
+    </dialog>
+  </span>
+</span>
+
+

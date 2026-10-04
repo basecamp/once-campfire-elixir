@@ -1,0 +1,111 @@
+{
+  "response": {
+    "id": 15,
+    "byte_size": 35,
+    "checksum": "zTztcB3cTBgvVOB5Rs3vgA==",
+    "content_type": "text/plain",
+    "created_at": "2026-03-02T16:00:00.000Z",
+    "filename": "resume & file.txt",
+    "key": "<VALIDATED_BASE36_KEY>",
+    "metadata": {
+      "parity": true
+    },
+    "service_name": "local",
+    "attachable_sgid": "eyJfcmFpbHMiOnsiZGF0YSI6ImdpZDovL2NhbXBmaXJlL0FjdGl2ZVN0b3JhZ2U6OkJsb2IvMTU_ZXhwaXJlc19pbiIsInB1ciI6ImF0dGFjaGFibGUifX0=--837c8e19112987123118feb0606d16192a4a07b1",
+    "signed_id": {
+      "data": 15,
+      "pur": "blob_id"
+    },
+    "direct_upload": {
+      "url": {
+        "data": {
+          "key": "<VALIDATED_BASE36_KEY>",
+          "content_type": "text/plain",
+          "content_length": 35,
+          "checksum": "zTztcB3cTBgvVOB5Rs3vgA==",
+          "service_name": "local"
+        },
+        "exp": "2026-03-02T16:05:00.000Z",
+        "pur": "blob_token"
+      },
+      "headers": {
+        "Content-Type": "text/plain"
+      }
+    }
+  },
+  "disk": {
+    "data": {
+      "key": "<VALIDATED_BASE36_KEY>",
+      "disposition": "attachment; filename=\"resume %26 file.txt\"; filename*=UTF-8''resume%20&%20file.txt",
+      "content_type": "text/plain",
+      "service_name": "local"
+    },
+    "exp": "2026-03-02T16:05:00.000Z",
+    "pur": "blob_key"
+  },
+  "requests": [
+    {
+      "range": null,
+      "status": 200,
+      "body_hex": "303132333435363738392043616d70666972652073746f72616765207061726974790a",
+      "headers": {
+        "content-type": "text/plain",
+        "content-disposition": "attachment; filename=\"resume %26 file.txt\"; filename*=UTF-8''resume%20&%20file.txt",
+        "cache-control": "max-age=3600, public"
+      }
+    },
+    {
+      "range": "bytes=0-9",
+      "status": 206,
+      "body_hex": "30313233343536373839",
+      "headers": {
+        "content-type": "text/plain",
+        "content-range": "bytes 0-9/35",
+        "content-disposition": "attachment; filename=\"resume %26 file.txt\"; filename*=UTF-8''resume%20&%20file.txt",
+        "cache-control": "max-age=3600, public"
+      }
+    },
+    {
+      "range": "bytes=-4",
+      "status": 206,
+      "body_hex": "6974790a",
+      "headers": {
+        "content-type": "text/plain",
+        "content-range": "bytes 31-34/35",
+        "content-disposition": "attachment; filename=\"resume %26 file.txt\"; filename*=UTF-8''resume%20&%20file.txt",
+        "cache-control": "max-age=3600, public"
+      }
+    },
+    {
+      "range": "bytes=0-2,5-8",
+      "status": 206,
+      "body_hex": "0d0a2d2d4161423033780d0a636f6e74656e742d747970653a20746578742f706c61696e0d0a636f6e74656e742d72616e67653a20627974657320302d322f33350d0a0d0a3031320d0a2d2d4161423033780d0a636f6e74656e742d747970653a20746578742f706c61696e0d0a636f6e74656e742d72616e67653a20627974657320352d382f33350d0a0d0a353637380d0a2d2d4161423033782d2d0d0a",
+      "headers": {
+        "content-type": "text/plain",
+        "content-disposition": "attachment; filename=\"resume %26 file.txt\"; filename*=UTF-8''resume%20&%20file.txt",
+        "cache-control": "max-age=3600, public"
+      }
+    },
+    {
+      "range": "bytes=999-1000",
+      "status": 416,
+      "body_hex": "427974652072616e676520756e7361746973666961626c650a",
+      "headers": {
+        "content-type": "text/plain",
+        "content-range": "bytes */35",
+        "content-disposition": "attachment; filename=\"resume %26 file.txt\"; filename*=UTF-8''resume%20&%20file.txt",
+        "cache-control": "max-age=3600, public"
+      }
+    },
+    {
+      "range": "invalid",
+      "status": 200,
+      "body_hex": "303132333435363738392043616d70666972652073746f72616765207061726974790a",
+      "headers": {
+        "content-type": "text/plain",
+        "content-disposition": "attachment; filename=\"resume %26 file.txt\"; filename*=UTF-8''resume%20&%20file.txt",
+        "cache-control": "max-age=3600, public"
+      }
+    }
+  ]
+}

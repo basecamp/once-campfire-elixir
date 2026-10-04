@@ -1,0 +1,57 @@
+date: 2026-10-04T13:21:21+02:00
+host: 7.2.5-4-omarchy, AMD RYZEN AI MAX+ 395 w/ Radeon 8060S, 32 threads, 30GB
+server cpus: 8-11 (nproc 4); loadgen cpus: 12-15; network: host
+env: WEB_CONCURRENCY=3 JOB_CONCURRENCY=3 RAILS_MAX_THREADS=5 
+seed sha256: 433ccdce78759eef0524b2840a512077e52cc8e867f6c095430a8871d47a2e38  /home/dhh/Work/basecamp/once-campfire-rust/parity/.seed/default/db/production.sqlite3
+elixir source digest: e6813acbccd2cca2cb23770d8a8a5b177a2110c7bb3bbfc1d8f52dd8a7a51ca6
+rust extra env: 
+workload: suites=http cable upload HTTP_SECS=4 HTTP_CONCS=1 16 64 CABLE_CLIENTS=100 500 1000 CABLE_TPUT_SECS=15 CABLE_POSTERS=4 UPLOAD_REPS=5 REPS=2
+quiet wait: LOAD_MAX=1.5 LOAD_WAIT_SECS=30
+user agent: (none)
+elixir image: campfire-elixir:release sha256:4219cbb01c2077c581dfe4cc560e01656b5e9d57af66f66b080afa3d3bf52b71 2026-10-04T13:19:50.181769298+02:00 unpacked_bytes=2611456173
+rust image: campfire-rust:app sha256:7042897243ae9e9f6fc47c3e18d0ae00165de1ad8a3488369bd79d01a8d46ac7 2026-09-28T11:10:14.617808723+02:00 unpacked_bytes=236729642
+rust HEAD: 195457b (dirty: 0 files)
+[13:21:51] load before run: 1.73 3.07 2.76 (waited 30s)
+[13:21:51] elixir rep 1: starting (load: 1.73 3.07 2.76)
+[13:22:02] elixir rep 1: cold start 515ms, idle 156MB (anon 120MB)
+[13:22:08] elixir rep 1: room_show c=1 293.0 rps p50 3.381 p99 3.995 {'200': 1173} err 0
+[13:22:12] elixir rep 1: room_show c=16 711.1 rps p50 22.175 p99 31.695 {'200': 2857} err 0
+[13:22:16] elixir rep 1: room_show c=64 771.0 rps p50 82.239 p99 110.271 {'200': 3127} err 0
+[13:22:22] elixir rep 1: messages_page c=1 406.5 rps p50 2.433 p99 2.975 {'200': 1626} err 0
+[13:22:26] elixir rep 1: messages_page c=16 1051.9 rps p50 15.087 p99 23.103 {'200': 4217} err 0
+[13:22:31] elixir rep 1: messages_page c=64 1026.1 rps p50 61.887 p99 80.319 {'200': 4158} err 0
+[13:22:37] elixir rep 1: sidebar c=1 837.8 rps p50 1.171 p99 1.547 {'200': 3352} err 0
+[13:22:41] elixir rep 1: sidebar c=16 1280.5 rps p50 12.303 p99 17.439 {'200': 5134} err 0
+[13:22:45] elixir rep 1: sidebar c=64 1315.7 rps p50 48.159 p99 61.247 {'200': 5308} err 0
+[13:22:51] elixir rep 1: search c=1 604.8 rps p50 1.632 p99 1.99 {'200': 2420} err 0
+[13:22:55] elixir rep 1: search c=16 1139.9 rps p50 13.815 p99 18.975 {'200': 4571} err 0
+[13:22:59] elixir rep 1: search c=64 1136.2 rps p50 55.839 p99 66.815 {'200': 4589} err 0
+[13:23:05] elixir rep 1: avatar c=1 28422.2 rps p50 0.032 p99 0.096 {'200': 113692} err 0
+[13:23:09] elixir rep 1: avatar c=16 97694.9 rps p50 0.1 p99 0.897 {'200': 390806} err 0
+[13:23:13] elixir rep 1: avatar c=64 77656.4 rps p50 0.287 p99 5.011 {'200': 310717} err 0
+[13:23:19] elixir rep 1: static_css c=1 33832.7 rps p50 0.027 p99 0.071 {'200': 135333} err 0
+[13:23:23] elixir rep 1: static_css c=16 129577.2 rps p50 0.085 p99 0.639 {'200': 518346} err 0
+[13:23:27] elixir rep 1: static_css c=64 106755.8 rps p50 0.282 p99 3.515 {'200': 427136} err 0
+[13:23:33] elixir rep 1: up c=1 4400.0 rps p50 0.216 p99 0.369 {'200': 17601} err 0
+[13:23:37] elixir rep 1: up c=16 8442.1 rps p50 1.838 p99 4.283 {'200': 33779} err 0
+[13:23:41] elixir rep 1: up c=64 8826.3 rps p50 6.783 p99 16.543 {'200': 35353} err 0
+[13:23:47] elixir rep 1: post_message c=1 412.7 rps p50 2.313 p99 7.227 {'200': 1651} err 0
+[13:23:51] elixir rep 1: post_message c=16 803.3 rps p50 19.423 p99 27.455 {'200': 3220} err 0
+[13:23:56] elixir rep 1: post_message c=64 854.8 rps p50 74.751 p99 85.055 {'200': 3459} err 0
+[13:24:18] elixir rep 1: cable 100 clients ready 100 lat all p50 3.871 p99 40.735 tput 436.3 msg/s 6547 / 6547
+[13:25:43] elixir rep 1: cable 500 clients ready 500 lat all p50 10.095 p99 15.743 tput 36.7 msg/s 2754 / 3590
+[13:27:08] elixir rep 1: cable 1000 clients ready 1000 lat all p50 50.719 p99 65.919 tput 20.6 msg/s 1548 / 2340
+[13:27:11] elixir rep 1: upload median 134.6ms
+[13:27:13] elixir rep 1: done -> bench/results/tuned-20261004/elixir-1.json
+[13:27:43] load before run: 3.26 3.96 3.30 (waited 30s)
+[13:27:43] rust rep 1: starting (load: 3.26 3.96 3.30)
+[13:27:53] rust rep 1: cold start 186ms, idle 64MB (anon 13MB)
+[13:27:59] rust rep 1: room_show c=1 4827.2 rps p50 0.2 p99 0.313 {'200': 19309} err 0
+[13:28:03] rust rep 1: room_show c=16 19543.7 rps p50 0.793 p99 1.596 {'200': 78190} err 0
+[13:28:07] rust rep 1: room_show c=64 19365.2 rps p50 3.281 p99 5.715 {'200': 77514} err 0
+[13:28:13] rust rep 1: messages_page c=1 5449.8 rps p50 0.176 p99 0.284 {'200': 21800} err 0
+[13:28:17] rust rep 1: messages_page c=16 21742.1 rps p50 0.687 p99 1.68 {'200': 86983} err 0
+[13:28:21] rust rep 1: messages_page c=64 22144.8 rps p50 2.797 p99 5.107 {'200': 88636} err 0
+[13:28:27] rust rep 1: sidebar c=1 2766.3 rps p50 0.344 p99 0.568 {'200': 11066} err 0
+[13:28:31] rust rep 1: sidebar c=16 11812.9 rps p50 1.316 p99 2.533 {'200': 47267} err 0
+[13:28:36] rust rep 1: sidebar c=64 11996.5 rps p50 5.275 p99 9.287 {'200': 48040} err 0

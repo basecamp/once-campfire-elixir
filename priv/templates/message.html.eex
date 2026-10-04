@@ -1,0 +1,96 @@
+  <div id="message_<%= @client_id %>" class="message <%= @emoji_class %>" data-controller="reply" data-user-id="<%= @creator_id %>" data-message-id="<%= @id %>" data-message-timestamp="<%= @created_epoch %>" data-message-updated-at="<%= @updated_epoch %>" data-sort-value="<%= @created_epoch %>" data-messages-target="message" data-search-results-target="message" data-refresh-room-target="message" data-reply-composer-outlet="#composer">
+    <h2 class="message__day-separator"><time datetime="<%= @created_iso %>" data-local-time-target="date"></time></h2>
+
+    <figure class="avatar message__avatar">
+      <%= @avatar %>
+    </figure>
+
+    <turbo-frame id="edit_message_<%= @client_id %>">
+      <div class="message__body">
+        <div class="message__body-content">
+          <div class="message__meta">
+            <h3 class="message__heading">
+              <span class="message__author" title="<%= @creator_title %>">
+                <strong data-reply-target="author"><%= @creator_name %></strong>
+              </span>
+              <a target="_top" class="message__permalink" href="/rooms/<%= @room_id %>/@<%= @id %>"><time class="message__timestamp" datetime="<%= @created_iso %>" data-local-time-target="time"></time></a>
+              <span class="message__room">
+                <a target="_top" data-reply-target="link" href="/rooms/<%= @room_id %>/@<%= @id %>"><%= @room_name %></a>
+              </span>
+            </h3>
+            
+<div class="message__actions" data-controller="soft-keyboard">
+  <details class="position-relative" data-controller="popup" data-action="keydown.esc-&gt;popup#close toggle-&gt;popup#toggle click@document-&gt;popup#closeOnClickOutside" data-popup-orientation-top-class="popup-orientation-top">
+    <summary class="btn message__action-btn message__options-btn">
+      <img class="colorize--black" aria-hidden="true" src="<%= Campfire.Assets.path("menu-dots-horizontal.svg") %>" width="20" height="20" />
+      <span class="for-screen-reader">Message options</span>
+    </summary>
+
+    <div class="message__actions-menu border shadow" data-popup-target="menu">
+      <div class="quick-boosts">
+          <form data-turbo-frame="boosting_message_<%= @client_id %>" data-action="popup#close" action="/messages/<%= @id %>/boosts" accept-charset="UTF-8" method="post"><%= @csrf_input %>
+            <input type="hidden" name="boost[content]" id="boost_content" value="👍" />
+            <button name="button" type="submit" title="Thumbs up" class="btn message__action-btn" data-emoji="👍">
+              <figure class="margin-none boost-character">👍</figure>
+              <span class="for-screen-reader">Thumbs up</span>
+</button></form>          <form data-turbo-frame="boosting_message_<%= @client_id %>" data-action="popup#close" action="/messages/<%= @id %>/boosts" accept-charset="UTF-8" method="post"><%= @csrf_input %>
+            <input type="hidden" name="boost[content]" id="boost_content" value="👏" />
+            <button name="button" type="submit" title="Clapping" class="btn message__action-btn" data-emoji="👏">
+              <figure class="margin-none boost-character">👏</figure>
+              <span class="for-screen-reader">Clapping</span>
+</button></form>          <form data-turbo-frame="boosting_message_<%= @client_id %>" data-action="popup#close" action="/messages/<%= @id %>/boosts" accept-charset="UTF-8" method="post"><%= @csrf_input %>
+            <input type="hidden" name="boost[content]" id="boost_content" value="👋" />
+            <button name="button" type="submit" title="Waving hand" class="btn message__action-btn" data-emoji="👋">
+              <figure class="margin-none boost-character">👋</figure>
+              <span class="for-screen-reader">Waving hand</span>
+</button></form>          <form data-turbo-frame="boosting_message_<%= @client_id %>" data-action="popup#close" action="/messages/<%= @id %>/boosts" accept-charset="UTF-8" method="post"><%= @csrf_input %>
+            <input type="hidden" name="boost[content]" id="boost_content" value="💪" />
+            <button name="button" type="submit" title="Muscle" class="btn message__action-btn" data-emoji="💪">
+              <figure class="margin-none boost-character">💪</figure>
+              <span class="for-screen-reader">Muscle</span>
+</button></form>          <form data-turbo-frame="boosting_message_<%= @client_id %>" data-action="popup#close" action="/messages/<%= @id %>/boosts" accept-charset="UTF-8" method="post"><%= @csrf_input %>
+            <input type="hidden" name="boost[content]" id="boost_content" value="❤️" />
+            <button name="button" type="submit" title="Red heart" class="btn message__action-btn" data-emoji="❤️">
+              <figure class="margin-none boost-character">❤️</figure>
+              <span class="for-screen-reader">Red heart</span>
+</button></form>          <form data-turbo-frame="boosting_message_<%= @client_id %>" data-action="popup#close" action="/messages/<%= @id %>/boosts" accept-charset="UTF-8" method="post"><%= @csrf_input %>
+            <input type="hidden" name="boost[content]" id="boost_content" value="😂" />
+            <button name="button" type="submit" title="Face with tears of joy" class="btn message__action-btn" data-emoji="😂">
+              <figure class="margin-none boost-character">😂</figure>
+              <span class="for-screen-reader">Face with tears of joy</span>
+</button></form>          <form data-turbo-frame="boosting_message_<%= @client_id %>" data-action="popup#close" action="/messages/<%= @id %>/boosts" accept-charset="UTF-8" method="post"><%= @csrf_input %>
+            <input type="hidden" name="boost[content]" id="boost_content" value="🎉" />
+            <button name="button" type="submit" title="Party popper" class="btn message__action-btn" data-emoji="🎉">
+              <figure class="margin-none boost-character">🎉</figure>
+              <span class="for-screen-reader">Party popper</span>
+</button></form>          <form data-turbo-frame="boosting_message_<%= @client_id %>" data-action="popup#close" action="/messages/<%= @id %>/boosts" accept-charset="UTF-8" method="post"><%= @csrf_input %>
+            <input type="hidden" name="boost[content]" id="boost_content" value="🔥" />
+            <button name="button" type="submit" title="Fire" class="btn message__action-btn" data-emoji="🔥">
+              <figure class="margin-none boost-character">🔥</figure>
+              <span class="for-screen-reader">Fire</span>
+</button></form>
+        <a class="btn message__action-btn message__boost-btn" data-turbo-frame="new_boost_message_<%= @client_id %>" data-action="soft-keyboard#open popup#close" href="/messages/<%= @id %>/boosts/new">
+          <img class="colorize--black" aria-hidden="true" src="<%= Campfire.Assets.path("boost.svg") %>" width="20" height="20" />
+          <span class="for-screen-reader">New boost</span>
+</a>      </div>
+
+      <div class="flex flex-wrap border-top margin-block-start-half pad-block-start-half message__actions-grid">
+<%= @attachment_actions %>        <button class="btn message__action-btn center full-width" title="Copy link" aria-label="Copy link" data-controller="copy-to-clipboard" data-action="copy-to-clipboard#copy" data-copy-to-clipboard-success-class="btn--success" data-copy-to-clipboard-content-value="<%= @base %>/rooms/<%= @room_id %>/@<%= @id %>">
+          <img class="colorize--black" aria-hidden="true" src="<%= Campfire.Assets.path("link.svg") %>" width="20" height="20" />
+</button>
+        <a class="btn message__action-btn center full-width message__edit-btn" data-turbo-frame="edit_message_<%= @client_id %>" title="Edit" aria-label="Edit" href="/rooms/<%= @room_id %>/messages/<%= @id %>/edit">
+          <img class="colorize--black" aria-hidden="true" src="<%= Campfire.Assets.path("pencil.svg") %>" width="20" height="20" />
+</a>      </div>
+    </div>
+</details></div>
+
+          </div>
+          <div id="presentation_message_<%= @client_id %>" dir="auto" data-reply-target="body" data-messages-target="body">
+  <%= @presentation %>
+</div>
+
+          <%= @boosting %>
+        </div>
+      </div>
+    </turbo-frame>
+</div>

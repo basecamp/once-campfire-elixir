@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "scope": [
+    "exported CSS, JavaScript, compressed files, images and fonts",
+    "exact bytes and selected headers",
+    "GET and HEAD",
+    "gzip request",
+    "If-Modified-Since",
+    "single/multipart/unsatisfiable Rack ranges"
+  ]
+}

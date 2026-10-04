@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "scope": [
+    "fixture-only SQLite abort triggers",
+    "first-run room failure preserves account and rolls back user",
+    "bot webhook failure preserves committed user and callbacks",
+    "null name/boolean name/null webhook",
+    "domain rows and autoincrement sequence"
+  ]
+}

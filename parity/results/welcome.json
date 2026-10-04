@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "scope": [
+    "no-room landing page",
+    "escaped user name",
+    "full and Turbo frame layouts",
+    "existing-room redirect",
+    "authentication"
+  ]
+}

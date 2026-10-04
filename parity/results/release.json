@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "scope": [
+    "production Mix release",
+    "no application source mount",
+    "native parser and bundled media executables",
+    "login",
+    "room/profile/account/push pages",
+    "public PWA responses",
+    "compiled static assets",
+    "no Ruby runtime or Rails reference present"
+  ]
+}

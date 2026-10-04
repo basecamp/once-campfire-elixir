@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "scope": [
+    "administrator/member HTML",
+    "role controls and promotion",
+    "actual singleton form action and CSRF tokens",
+    "account name escaping",
+    "typed settings switches",
+    "invitation links",
+    "logo controls and body classes",
+    "flash notice"
+  ]
+}

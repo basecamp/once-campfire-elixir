@@ -1,0 +1,12 @@
+{
+  "passed": true,
+  "scope": [
+    "return-to query preserved",
+    "session resume one-hour boundary",
+    "transfer links and invalid ids",
+    "logout socket revocation",
+    "old tab rejection",
+    "separate session survives logout",
+    "login rate limit"
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "complete": false,
+  "elixir_tests": 616,
+  "toolkit_tests": 24,
+  "skills_validated": 7,
+  "http_cases": 17,
+  "http_passed": true,
+  "mutation_passed": true,
+  "format_checked": true,
+  "warnings_as_errors_checked": true,
+  "application_benchmarks_run": false,
+  "reference_clean": true,
+  "limits": "Selected bot/PWA APIs, data writes and queued effects only. Full browser/auth/admin/storage/realtime/job-execution/rollback parity remains incomplete."
+}

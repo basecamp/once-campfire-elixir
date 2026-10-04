@@ -1,0 +1,47 @@
+[
+  {
+    "step": "login",
+    "path": "/rooms/104393281",
+    "title": "All Pets"
+  },
+  {
+    "step": "create_room",
+    "path": "/rooms/699448330",
+    "title": "Browser room \u03a9"
+  },
+  {
+    "step": "composer",
+    "path": "/rooms/699448330",
+    "title": "Browser room \u03a9"
+  },
+  {
+    "step": "composer_file_upload",
+    "path": "/rooms/699448330",
+    "title": "Browser room \u03a9"
+  },
+  {
+    "step": "edit_room",
+    "path": "/rooms/699448330",
+    "title": "Browser renamed \u03a9"
+  },
+  {
+    "step": "profile",
+    "path": "/users/me/profile",
+    "title": "Browser profile \u03a9"
+  },
+  {
+    "step": "avatar_upload",
+    "path": "/users/me/profile",
+    "title": "Browser profile \u03a9"
+  },
+  {
+    "step": "account",
+    "path": "/account/edit",
+    "title": "Account settings"
+  },
+  {
+    "step": "logout",
+    "path": "/session/new",
+    "title": "Sign in"
+  }
+]

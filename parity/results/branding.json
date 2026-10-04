@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "scope": [
+    "signed-blob avatar/logo changes",
+    "fresh variant file bytes",
+    "avatar/logo removal",
+    "queued analysis and purge",
+    "all persisted tables"
+  ]
+}

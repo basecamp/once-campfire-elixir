@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "scope": [
+    "subscription listing and empty list",
+    "browser/version/platform labels",
+    "full and frame layouts",
+    "actual form token deletion",
+    "authentication"
+  ]
+}

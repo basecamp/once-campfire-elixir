@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "scope": [
+    "same pinned Thruster 0.1.23 binary",
+    "real TLS using isolated cached certificates",
+    "ALPN HTTP/2 and HTTP/1.1",
+    "HTTP to HTTPS redirect",
+    "HTTPS Rails authentication authority",
+    "no public ACME request needed for cached certificate fixture"
+  ]
+}

@@ -1,0 +1,719 @@
+{
+  "passed": true,
+  "flows": [
+    "real Chromium login",
+    "sidebar frame loading",
+    "native composer submit",
+    "Turbo message edit",
+    "quick boost"
+  ],
+  "room": "104393281",
+  "message": "933434638",
+  "exceptions": [],
+  "responses": [
+    {
+      "url": "http://campfire.test:47070/session/new",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/actiontext-7b8d51ea.css",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/animation-bcdb4bab.css",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/autocomplete-9de8c93f.css",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/avatars-279376ab.css",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/_reset-9c3efd7b.css",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/base-637a0ec8.css",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/boosts-da4032a8.css",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/buttons-c7d39fd4.css",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/code-333ae548.css",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/colorize-eb391ca0.css",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/colors-aee62523.css",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/composer-e490638a.css",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/embeds-c20d0a3a.css",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/filters-8a4d63ed.css",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/flash-a561c1e5.css",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/inputs-9e58a07c.css",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/layout-ff6ddfc6.css",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/lexxy-content-0ff2f961.css",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/lexxy-editor-2d5c7ebe.css",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/lexxy-variables-3fef4323.css",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/lexxy-2876c58e.css",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/lightbox-af496d39.css",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/messages-c5485fef.css",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/nav-05e7183a.css",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/panels-af44ec6d.css",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/separators-172b3ab8.css",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/sidebar-0be58db9.css",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/signup-6e02d591.css",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/spinner-5a118f25.css",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/trix-65afdb1d.css",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/utilities-e2f32466.css",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/application-a54c74a7.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/stimulus-loading-1fc53fe7.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/stimulus.min-4b1e420e.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/actioncable.esm-e0ec9819.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/initializers/autocomplete-ba9abe45.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/@rails--request-3fc8489d.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/turbo-a1e3a50a.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/initializers/current-3a3b90da.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/initializers/highlight-5bd558f1.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/initializers/index-d2bbfae4.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/highlight.js/core-4e141f64.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/initializers/rich_text-f451a05e.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/lib/autocomplete/autocomplete_handler-becd1e1a.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/lib/autocomplete/base_autocomplete_handler-e29a896e.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/lib/autocomplete/constants-17c2858b.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/lib/autocomplete/custom_elements/suggestion_option-ac7846b3.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/lib/autocomplete/collection-3e251a0e.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/lib/autocomplete/helpers-651308b9.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/lib/autocomplete/renderer-5caf6120.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/lib/autocomplete/custom_elements/suggestion_select-f0045305.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/lib/autocomplete/selection-862705bf.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/lib/autocomplete/suggestion_context-b265ffb4.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/lib/autocomplete/utils-296fb278.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/lib/autocomplete/suggestion_controller-10624c40.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/lib/cookie-76006835.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/lib/rich_text/campfire_extension-f62f017b.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/lib/rich_text/cite_node-b4d2b89a.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/lib/autocomplete/suggestion_results_controller-91405749.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/controllers/application-f004202c.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/controllers/auto_submit_controller-ee52d396.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/controllers/autocomplete_controller-eaf5b07d.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/controllers/badge_dot_controller-e0d733c8.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/controllers/boost_delete_controller-29fd1686.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/controllers/copy_to_clipboard_controller-07e32f4d.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/lexxy-a21f41d4.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/controllers/drop_target_controller-3a205782.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/controllers/element_removal_controller-4526910a.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/controllers/form_controller-6f3d64db.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/controllers/index-594ba2fb.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/controllers/filter_controller-ca9769d5.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/controllers/composer_controller-73c33f9f.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/controllers/local_time_controller-7daf3d0c.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/controllers/lightbox_controller-98fc07ca.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/controllers/maintain_scroll_controller-1debbbfb.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/controllers/popup_controller-9f8ea824.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/controllers/messages_controller-3d90944a.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/controllers/notifications_controller-746d0662.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/controllers/presence_controller-28f14aad.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/controllers/pwa_install_controller-3fe3fc5e.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/controllers/read_rooms_controller-8245522a.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/controllers/refresh_room_controller-4e4b6014.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/controllers/reply_controller-278bb9cc.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/controllers/rooms_list_controller-64840fcd.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/controllers/scroll_into_view_controller-8a0bc733.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/controllers/search_results_controller-aab46974.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/controllers/sessions_controller-a9fdfe3d.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/controllers/soft_keyboard_controller-be1da837.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/controllers/sorted_list_controller-9f9ae485.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/controllers/sound_controller-d3e5656e.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/controllers/toggle_class_controller-b67fa681.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/controllers/turbo_frame_controller-9f4f722f.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/controllers/typing_notifications_controller-86906ab9.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/controllers/turbo_streaming_controller-04b85a80.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/controllers/unfurl_controller-4a868f9a.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/controllers/web_share_controller-f7236b6f.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/controllers/upload_preview_controller-9b8b26bb.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/helpers/dom_helpers-0f234176.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/helpers/navigator_helpers-3c9f4c31.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/helpers/timing_helpers-94d95529.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/helpers/string_helpers-40941ba8.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/helpers/turbo_helpers-a3c01462.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/models/message_formatter-f39a0c5d.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/models/file_uploader-d3a5c44b.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/models/client_message-de3c07cf.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/models/scroll_manager-ed559629.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/languages/go-10465864.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/languages/css-a7f2e40b.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/models/message_paginator-b79013e3.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/languages/bash-13136668.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/languages/java-95f3a30f.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/languages/json-60184e1b.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/languages/diff-94a335fe.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/models/typing_tracker-42a444a5.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/languages/rust-d48f93d8.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/languages/javascript-18eb0dd8.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/languages/python-8f48fd1a.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/languages/ruby-287ccd0f.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/password-0896da4e.svg",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/languages/sql-642be05a.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/globe-8c54d23b.svg",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/email-6c595bc5.svg",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/arrow-right-8f3eb40d.svg",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/account/logo?v=20260101160000",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/lifebuoy-f31f26aa.svg",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/remove-0e7a045d.svg",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/share-bf28da4f.svg",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/download-04029899.svg",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/campfire-icon-3d9986c5.png",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/languages/xml-fa7f1eda.js",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/webmanifest.json",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/rooms/104393281",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/notification-bell-loading-7533ce55.svg",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/menu-dots-horizontal-f6a5d793.svg",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/notification-bell-alert-b467cde7.svg",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/external/web-24ffe636.svg",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/external/sliders-3979a007.svg",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/disclosure-26d63471.svg",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/external/switch-eec22a2d.svg",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/external/gear-50e77d2b.svg",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/person-add-1432b76b.svg",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/qr-code-dac3b273.svg",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/refresh-249f0509.svg",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/copy-paste-4c379063.svg",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/arrow-down-3f174d76.svg",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/search-5f29565f.svg",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/messages-outlined-87ff0331.svg",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/attachment-8bcccab0.svg",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/text-options-055e0d16.svg",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/arrow-up-f96b3895.svg",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/rooms/104393281/refresh?since=1767456000000&reason=connection",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/users/me/sidebar",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/users/me/sidebar",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/messages-add-d229e6c2.svg",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/users/eyJfcmFpbHMiOnsiZGF0YSI6Mzk0OTU5ODU5LCJwdXIiOiJ1c2VyL2F2YXRhciJ9fQ--48059d515a972512c695caed73bb6d52d0b1a84609515f2e0de0748414b0da37/avatar?v=20260102200000",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/users/eyJfcmFpbHMiOnsiZGF0YSI6NzEyMDY0NTQ4LCJwdXIiOiJ1c2VyL2F2YXRhciJ9fQ--24266f3c12491a2bac3805904b69ddeab0735455b7506b41b2cafe75aa085301/avatar?v=20260102190000",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/users/eyJfcmFpbHMiOnsiZGF0YSI6NzczNTIzOTUzLCJwdXIiOiJ1c2VyL2F2YXRhciJ9fQ--fb7c18bffeb78aebcbda5445ccc959fd4f68670b8549c1e7f84ac46d5699b15c/avatar?v=20260102180000",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/menu-5462dfd3.svg",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/add-f232d8a6.svg",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/users/eyJfcmFpbHMiOnsiZGF0YSI6NzczNTIzOTU4LCJwdXIiOiJ1c2VyL2F2YXRhciJ9fQ--189e4e371430cb20e4621d79d0e75e6e15256a92650ae7ab3fc6c5704a7236d5/avatar?v=20260203160000",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/users/eyJfcmFpbHMiOnsiZGF0YSI6MTI3MzI2MTQxLCJwdXIiOiJ1c2VyL2F2YXRhciJ9fQ--0ac8233a4786ee6c413408416bb81e7107534db5702d351533dc2ecd3876e97f/avatar?v=20260102160000",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/users/eyJfcmFpbHMiOnsiZGF0YSI6MTQ5MDg3NjU5LCJwdXIiOiJ1c2VyL2F2YXRhciJ9fQ--3717de512c048bb2a011a08236969887ee56ae9f8bd2fb510959b9915f449e17/avatar?v=20260125160000",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/users/eyJfcmFpbHMiOnsiZGF0YSI6NzczNTIzOTU2LCJwdXIiOiJ1c2VyL2F2YXRhciJ9fQ--3082ce6e219f07d789fa73ff1dbcb901211ea80c27c9b679e277ca21bd416ce4/avatar?v=20260125160100",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/settings-aee56972.svg",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/rooms/104393281/messages",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/boost-4a7bab66.svg",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/reply-edb77e33.svg",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/pencil-cf9d28aa.svg",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/link-e546a5df.svg",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/rooms/104393281/messages/933434638/edit",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/check-7897ff7e.svg",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/trash-708c7eb2.svg",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/rooms/104393281/messages/933434638",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/messages/933434638/boosts",
+      "status": 200
+    },
+    {
+      "url": "http://campfire.test:47070/assets/minus-b31a1093.svg",
+      "status": 200
+    }
+  ]
+}

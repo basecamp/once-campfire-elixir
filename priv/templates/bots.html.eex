@@ -1,0 +1,25 @@
+      
+
+<section class="panel panel--wide txt-align-center flex flex-column position-relative" style="view-transition-name: chat-bots">
+  <div class="flex align-center gap">
+    <div class="panel__button">
+      <details class="position-relative" data-controller="popup" data-action="keydown.esc-&gt;popup#close toggle-&gt;popup#toggle click@document-&gt;popup#closeOnClickOutside" data-popup-orientation-top-class="popup-orientation-top"><summary class="btn" tabindex="-1"><img aria-hidden="true" class="color-icon" src="<%= Assets.path("globe.svg") %>" width="20" height="20" /><span class="for-screen-reader">Translate</span></summary><div class="language-list-menu shadow" data-popup-target="menu"><dl class="language-list"><dt>🇺🇸</dt><dd class="margin-none">Chat bots. With Chat bots, other sites and services can post updates directly to Campfire.</dd><dt>🇪🇸</dt><dd class="margin-none">Bots de chat. Con los bots de chat, otros sitios y servicios pueden publicar actualizaciones directamente en Campfire.</dd><dt>🇫🇷</dt><dd class="margin-none">Bots de discussion. Avec les bots de discussion, d&#39;autres sites et services peuvent publier des mises à jour directement sur Campfire.</dd><dt>🇮🇳</dt><dd class="margin-none">चैट बॉट। चैट बॉट के साथ, अन्य साइटों और सेवाएं सीधे कैम्पफायर में अपडेट पोस्ट कर सकती हैं।</dd><dt>🇩🇪</dt><dd class="margin-none">Chat-Bots. Mit Chat-Bots können andere Websites und Dienste Updates direkt in Campfire veröffentlichen.</dd><dt>🇧🇷</dt><dd class="margin-none">Chat bots. Com Chat bots, outros sites e serviços podem postar atualizações diretamente no Campfire.</dd><dt>🇯🇵</dt><dd class="margin-none">チャットボット。チャットボットを使用すると、他のサイトやサービスがCampfireに直接更新情報を投稿できます。</dd></dl></div></details>
+    </div>
+    <div class="pad-inline-double center">
+      <h1 class="margin-none">Chat bots</h1>
+      <p class="margin-none-block-start">With Chat bots, other sites and services can post updates directly to Campfire.</p>
+
+      <a class="btn btn--reversed txt-large" aria-label="Add a chat bot" href="/account/bots/new">
+        <img aria-hidden="true" src="<%= Assets.path("bot.svg") %>" width="20" height="20" />
+        <img aria-hidden="true" src="<%= Assets.path("add.svg") %>" width="20" height="20" />
+</a>    </div>
+  </div>
+
+  <div class="pad-inline pad-block-start ">
+    <menu class="flex flex-column gap margin-none pad">
+      <%= @bots %>
+    </menu>
+  </div>
+</section>
+
+

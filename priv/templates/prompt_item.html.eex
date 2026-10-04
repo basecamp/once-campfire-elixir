@@ -1,0 +1,12 @@
+<lexxy-prompt-item search="<%= @name %>" sgid="<%= @sgid %>">
+  <template type="menu">
+    <span class="autocomplete__item flex align-center gap unpad">
+      <%= @avatar %>
+      <span class="autocompletable__name"><%= @name %></span>
+    </span>
+  </template>
+  <template type="editor">
+    <span class="mention" sgid="<%= @sgid %>"><%= @avatar %> <%= @name %></span>
+
+  </template>
+</lexxy-prompt-item>

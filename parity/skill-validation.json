@@ -1,0 +1,40 @@
+{
+  "passed": true,
+  "skills": [
+    {
+      "skill": "rails-cutover",
+      "passed": true,
+      "output": "Skill is valid!\n"
+    },
+    {
+      "skill": "rails-inventory",
+      "passed": true,
+      "output": "Skill is valid!\n"
+    },
+    {
+      "skill": "rails-oracle",
+      "passed": true,
+      "output": "Skill is valid!\n"
+    },
+    {
+      "skill": "rails-parity",
+      "passed": true,
+      "output": "Skill is valid!\n"
+    },
+    {
+      "skill": "rails-performance",
+      "passed": true,
+      "output": "Skill is valid!\n"
+    },
+    {
+      "skill": "rails-port",
+      "passed": true,
+      "output": "Skill is valid!\n"
+    },
+    {
+      "skill": "rails-to-elixir",
+      "passed": true,
+      "output": "Skill is valid!\n"
+    }
+  ]
+}

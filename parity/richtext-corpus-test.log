@@ -1,0 +1,16 @@
+Compiling 2 files (.ex)
+Generated campfire app
+Running ExUnit with seed: 494701, max_cases: 64
+
+
+
+  1) test differential stored rich-text corpus (Campfire.RichTextCorpusTest)
+     test/richtext_corpus_test.exs:9
+     2 rich-text differences; see parity/results/richtext-corpus-differences.json
+     code: assert differences == [],
+     stacktrace:
+       test/richtext_corpus_test.exs:49: (test)
+
+
+Finished in 1.7 seconds (0.00s async, 1.7s sync)
+1 test, 1 failure

@@ -1,0 +1,38 @@
+version = 1
+
+[project]
+name = "campfire"
+reference_sha = "90b330024dec3e757c79b6a7e6568f93da8e3148"
+
+[oracle]
+# Runs inside the pinned Rails runtime, with isolated fixture databases and test secrets.
+# argv placeholders: {project}, {reference}, {script}. No implicit local-Ruby fallback.
+# Modern example: ["bundle", "exec", "rails", "runner", "{script}"]
+# Legacy example: ["bundle", "exec", "ruby", "script/runner", "{script}"]
+# For Docker, mount {project} at /work and pass /work/reference-tools/export.rb.
+command = ["{project}/bin/oracle", "{script}"]
+working_directory = "reference"
+timeout_seconds = 180
+
+[parity]
+reference_url = "http://127.0.0.1:47071"
+candidate_url = "http://127.0.0.1:47070"
+cases = "parity/cases.json"
+# Required for mutating requests: restore independently to the same seed on each side.
+# The command receives {side} = reference or candidate. It must affect fixture data only.
+reset_command = ["{project}/bin/parity-services", "reset", "{side}"]
+timeout_seconds = 15
+
+[checks]
+format = ["bin/mix", "format", "--check-formatted"]
+lint = ["bin/mix", "compile", "--warnings-as-errors"]
+test = ["bin/mix", "test", "--warnings-as-errors"]
+# Rehearse against the owned production release and disposable fixture copies.
+rollback = ["python3", "parity/rollback.py"]
+
+[mutations]
+reset_command = ["{project}/bin/parity-services", "reset", "{side}"]
+snapshot_command = ["python3", "parity/mutations.py", "snapshot", "{side}"]
+reference_command = ["python3", "parity/mutations.py", "perform", "reference"]
+candidate_command = ["python3", "parity/mutations.py", "perform", "candidate"]
+timeout_seconds = 180

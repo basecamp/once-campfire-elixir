@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "scope": [
+    "open/closed/direct new and edit forms",
+    "type conversion views",
+    "administrator/creator/readonly permissions",
+    "selected and unselected membership controls",
+    "one-person/group direct settings",
+    "CSRF form submission",
+    "escaped room name",
+    "inaccessible room flash",
+    "full and Turbo frame layouts"
+  ]
+}

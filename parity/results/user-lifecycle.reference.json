@@ -1,0 +1,424 @@
+{
+  "ban": {
+    "disconnects": [
+      {
+        "type": "disconnect",
+        "reason": "remote",
+        "reconnect": false
+      },
+      {
+        "type": "disconnect",
+        "reason": "remote",
+        "reconnect": false
+      }
+    ],
+    "old_sessions": [
+      302,
+      302
+    ],
+    "state": {
+      "users": [
+        {
+          "id": 149087659,
+          "bio": null,
+          "bot_token": null,
+          "created_at": "2026-01-02 17:00:00",
+          "email_address": "jason@37signals.com",
+          "name": "Jason",
+          "password_digest": "$2a$12$Gz1V3e1PgXe5HFJ5lLlH8eP5BlvdNLdGGdQyacJSn7rvquw4Lt0ue",
+          "role": 1,
+          "status": 2,
+          "updated_at": "2026-03-02 16:00:00"
+        }
+      ],
+      "sessions": [],
+      "memberships": [
+        {
+          "id": 198590975,
+          "connected_at": null,
+          "connections": 0,
+          "created_at": "2026-01-04 16:14:00",
+          "involvement": "everything",
+          "room_id": 186869642,
+          "unread_at": null,
+          "updated_at": "2026-03-02 11:02:00",
+          "user_id": 149087659
+        },
+        {
+          "id": 505016279,
+          "connected_at": null,
+          "connections": 0,
+          "created_at": "2026-01-04 16:07:00",
+          "involvement": "everything",
+          "room_id": 486777696,
+          "unread_at": null,
+          "updated_at": "2026-03-02 15:40:00",
+          "user_id": 149087659
+        },
+        {
+          "id": 515358788,
+          "connected_at": null,
+          "connections": 0,
+          "created_at": "2026-01-04 16:05:00",
+          "involvement": "everything",
+          "room_id": 104393281,
+          "unread_at": null,
+          "updated_at": "2026-01-04 16:05:00",
+          "user_id": 149087659
+        },
+        {
+          "id": 690221570,
+          "connected_at": null,
+          "connections": 0,
+          "created_at": "2026-01-04 16:10:00",
+          "involvement": "everything",
+          "room_id": 201306877,
+          "unread_at": null,
+          "updated_at": "2026-01-04 16:10:00",
+          "user_id": 149087659
+        },
+        {
+          "id": 897066373,
+          "connected_at": null,
+          "connections": 0,
+          "created_at": "2026-01-04 16:01:00",
+          "involvement": "everything",
+          "room_id": 654632876,
+          "unread_at": null,
+          "updated_at": "2026-03-01 13:00:00",
+          "user_id": 149087659
+        },
+        {
+          "id": 1021579664,
+          "connected_at": null,
+          "connections": 0,
+          "created_at": "2026-01-27 16:00:00",
+          "involvement": "mentions",
+          "room_id": 699448327,
+          "unread_at": null,
+          "updated_at": "2026-01-27 16:00:00",
+          "user_id": 149087659
+        },
+        {
+          "id": 1021579683,
+          "connected_at": null,
+          "connections": 0,
+          "created_at": "2026-01-29 16:00:00",
+          "involvement": "everything",
+          "room_id": 699448329,
+          "unread_at": null,
+          "updated_at": "2026-03-02 13:00:00",
+          "user_id": 149087659
+        }
+      ],
+      "bans": [
+        {
+          "id": 2,
+          "created_at": "2026-03-02 16:00:00",
+          "ip_address": "198.51.100.9",
+          "updated_at": "2026-03-02 16:00:00",
+          "user_id": 149087659
+        }
+      ],
+      "push_subscriptions": [
+        {
+          "id": 782661003,
+          "auth_key": "xxx2DtgvmLkevKRwoyahJl0efg",
+          "created_at": "2026-01-06 16:01:00",
+          "endpoint": "https://fcm.googleapis.com/fcm/send/567",
+          "p256dh_key": "456-RIXcMgkdjhRnFZaYjjGvo00dydRQbCpQTuXFjLaCPSE7ofxi19awgGc3Doqa1RmYQqsbQDfQTifFZgc",
+          "updated_at": "2026-01-06 16:01:00",
+          "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36",
+          "user_id": 149087659
+        }
+      ],
+      "searches": [],
+      "message_count": 63
+    }
+  },
+  "unban": {
+    "users": [
+      {
+        "id": 149087659,
+        "bio": null,
+        "bot_token": null,
+        "created_at": "2026-01-02 17:00:00",
+        "email_address": "jason@37signals.com",
+        "name": "Jason",
+        "password_digest": "$2a$12$Gz1V3e1PgXe5HFJ5lLlH8eP5BlvdNLdGGdQyacJSn7rvquw4Lt0ue",
+        "role": 1,
+        "status": 0,
+        "updated_at": "2026-03-02 16:00:00"
+      }
+    ],
+    "sessions": [],
+    "memberships": [
+      {
+        "id": 198590975,
+        "connected_at": null,
+        "connections": 0,
+        "created_at": "2026-01-04 16:14:00",
+        "involvement": "everything",
+        "room_id": 186869642,
+        "unread_at": null,
+        "updated_at": "2026-03-02 11:02:00",
+        "user_id": 149087659
+      },
+      {
+        "id": 505016279,
+        "connected_at": null,
+        "connections": 0,
+        "created_at": "2026-01-04 16:07:00",
+        "involvement": "everything",
+        "room_id": 486777696,
+        "unread_at": null,
+        "updated_at": "2026-03-02 15:40:00",
+        "user_id": 149087659
+      },
+      {
+        "id": 515358788,
+        "connected_at": null,
+        "connections": 0,
+        "created_at": "2026-01-04 16:05:00",
+        "involvement": "everything",
+        "room_id": 104393281,
+        "unread_at": null,
+        "updated_at": "2026-01-04 16:05:00",
+        "user_id": 149087659
+      },
+      {
+        "id": 690221570,
+        "connected_at": null,
+        "connections": 0,
+        "created_at": "2026-01-04 16:10:00",
+        "involvement": "everything",
+        "room_id": 201306877,
+        "unread_at": null,
+        "updated_at": "2026-01-04 16:10:00",
+        "user_id": 149087659
+      },
+      {
+        "id": 897066373,
+        "connected_at": null,
+        "connections": 0,
+        "created_at": "2026-01-04 16:01:00",
+        "involvement": "everything",
+        "room_id": 654632876,
+        "unread_at": null,
+        "updated_at": "2026-03-01 13:00:00",
+        "user_id": 149087659
+      },
+      {
+        "id": 1021579664,
+        "connected_at": null,
+        "connections": 0,
+        "created_at": "2026-01-27 16:00:00",
+        "involvement": "mentions",
+        "room_id": 699448327,
+        "unread_at": null,
+        "updated_at": "2026-01-27 16:00:00",
+        "user_id": 149087659
+      },
+      {
+        "id": 1021579683,
+        "connected_at": null,
+        "connections": 0,
+        "created_at": "2026-01-29 16:00:00",
+        "involvement": "everything",
+        "room_id": 699448329,
+        "unread_at": null,
+        "updated_at": "2026-03-02 13:00:00",
+        "user_id": 149087659
+      }
+    ],
+    "bans": [],
+    "push_subscriptions": [
+      {
+        "id": 782661003,
+        "auth_key": "xxx2DtgvmLkevKRwoyahJl0efg",
+        "created_at": "2026-01-06 16:01:00",
+        "endpoint": "https://fcm.googleapis.com/fcm/send/567",
+        "p256dh_key": "456-RIXcMgkdjhRnFZaYjjGvo00dydRQbCpQTuXFjLaCPSE7ofxi19awgGc3Doqa1RmYQqsbQDfQTifFZgc",
+        "updated_at": "2026-01-06 16:01:00",
+        "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36",
+        "user_id": 149087659
+      }
+    ],
+    "searches": [],
+    "message_count": 63
+  },
+  "cleanup_after_unban": {
+    "users": [
+      {
+        "id": 149087659,
+        "bio": null,
+        "bot_token": null,
+        "created_at": "2026-01-02 17:00:00",
+        "email_address": "jason@37signals.com",
+        "name": "Jason",
+        "password_digest": "$2a$12$Gz1V3e1PgXe5HFJ5lLlH8eP5BlvdNLdGGdQyacJSn7rvquw4Lt0ue",
+        "role": 1,
+        "status": 0,
+        "updated_at": "2026-03-02 16:00:00"
+      }
+    ],
+    "sessions": [],
+    "memberships": [
+      {
+        "id": 198590975,
+        "connected_at": null,
+        "connections": 0,
+        "created_at": "2026-01-04 16:14:00",
+        "involvement": "everything",
+        "room_id": 186869642,
+        "unread_at": null,
+        "updated_at": "2026-03-02 11:02:00",
+        "user_id": 149087659
+      },
+      {
+        "id": 505016279,
+        "connected_at": null,
+        "connections": 0,
+        "created_at": "2026-01-04 16:07:00",
+        "involvement": "everything",
+        "room_id": 486777696,
+        "unread_at": null,
+        "updated_at": "2026-03-02 15:40:00",
+        "user_id": 149087659
+      },
+      {
+        "id": 515358788,
+        "connected_at": null,
+        "connections": 0,
+        "created_at": "2026-01-04 16:05:00",
+        "involvement": "everything",
+        "room_id": 104393281,
+        "unread_at": null,
+        "updated_at": "2026-01-04 16:05:00",
+        "user_id": 149087659
+      },
+      {
+        "id": 690221570,
+        "connected_at": null,
+        "connections": 0,
+        "created_at": "2026-01-04 16:10:00",
+        "involvement": "everything",
+        "room_id": 201306877,
+        "unread_at": null,
+        "updated_at": "2026-01-04 16:10:00",
+        "user_id": 149087659
+      },
+      {
+        "id": 897066373,
+        "connected_at": null,
+        "connections": 0,
+        "created_at": "2026-01-04 16:01:00",
+        "involvement": "everything",
+        "room_id": 654632876,
+        "unread_at": null,
+        "updated_at": "2026-03-01 13:00:00",
+        "user_id": 149087659
+      },
+      {
+        "id": 1021579664,
+        "connected_at": null,
+        "connections": 0,
+        "created_at": "2026-01-27 16:00:00",
+        "involvement": "mentions",
+        "room_id": 699448327,
+        "unread_at": null,
+        "updated_at": "2026-01-27 16:00:00",
+        "user_id": 149087659
+      },
+      {
+        "id": 1021579683,
+        "connected_at": null,
+        "connections": 0,
+        "created_at": "2026-01-29 16:00:00",
+        "involvement": "everything",
+        "room_id": 699448329,
+        "unread_at": null,
+        "updated_at": "2026-03-02 13:00:00",
+        "user_id": 149087659
+      }
+    ],
+    "bans": [],
+    "push_subscriptions": [
+      {
+        "id": 782661003,
+        "auth_key": "xxx2DtgvmLkevKRwoyahJl0efg",
+        "created_at": "2026-01-06 16:01:00",
+        "endpoint": "https://fcm.googleapis.com/fcm/send/567",
+        "p256dh_key": "456-RIXcMgkdjhRnFZaYjjGvo00dydRQbCpQTuXFjLaCPSE7ofxi19awgGc3Doqa1RmYQqsbQDfQTifFZgc",
+        "updated_at": "2026-01-06 16:01:00",
+        "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36",
+        "user_id": 149087659
+      }
+    ],
+    "searches": [],
+    "message_count": 0
+  },
+  "deactivate": {
+    "disconnects": [
+      {
+        "type": "disconnect",
+        "reason": "remote",
+        "reconnect": false
+      },
+      {
+        "type": "disconnect",
+        "reason": "remote",
+        "reconnect": false
+      }
+    ],
+    "old_sessions": [
+      302,
+      302
+    ],
+    "state": {
+      "users": [
+        {
+          "id": 149087659,
+          "bio": null,
+          "bot_token": null,
+          "created_at": "2026-01-02 17:00:00",
+          "email_address": "jason-deactivated-<VALIDATED_UUID>@37signals.com",
+          "name": "Jason",
+          "password_digest": "$2a$12$Gz1V3e1PgXe5HFJ5lLlH8eP5BlvdNLdGGdQyacJSn7rvquw4Lt0ue",
+          "role": 1,
+          "status": 1,
+          "updated_at": "2026-03-02 16:00:00"
+        }
+      ],
+      "sessions": [],
+      "memberships": [
+        {
+          "id": 198590975,
+          "connected_at": null,
+          "connections": 0,
+          "created_at": "2026-01-04 16:14:00",
+          "involvement": "everything",
+          "room_id": 186869642,
+          "unread_at": null,
+          "updated_at": "2026-03-02 11:02:00",
+          "user_id": 149087659
+        },
+        {
+          "id": 1021579683,
+          "connected_at": null,
+          "connections": 0,
+          "created_at": "2026-01-29 16:00:00",
+          "involvement": "everything",
+          "room_id": 699448329,
+          "unread_at": null,
+          "updated_at": "2026-03-02 13:00:00",
+          "user_id": 149087659
+        }
+      ],
+      "bans": [],
+      "push_subscriptions": [],
+      "searches": [],
+      "message_count": 0
+    }
+  }
+}

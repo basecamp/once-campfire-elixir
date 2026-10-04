@@ -1,0 +1,88 @@
+Compiling 3 files (.ex)
+Generated campfire app
+Running ExUnit with seed: 379101, max_cases: 64
+
+...............................................................
+
+  1) test CSRF validity 71 (Campfire.RailsTest)
+     test/rails_test.exs:76
+     %{"case" => "masked global token, standard alphabet", "expected" => true, "method" => "POST", "path" => "/other", "token" => "92UpvZ0uKkd9Pj/Ff0mtp8Uf6iKD7AXWj9nZ2bgulm+ZpV/GdRIGks5kZh/hTXHEXELypjH4LUPubw6LNPbLWA"}
+     code: assert Rails.csrf_valid?(
+     stacktrace:
+       test/rails_test.exs:77: (test)
+
+...............
+
+  2) test CSRF validity 63 (Campfire.RailsTest)
+     test/rails_test.exs:76
+     %{"case" => "masked global token, standard alphabet", "expected" => true, "method" => "POST", "path" => "/session", "token" => "92UpvZ0uKkd9Pj/Ff0mtp8Uf6iKD7AXWj9nZ2bgulm+ZpV/GdRIGks5kZh/hTXHEXELypjH4LUPubw6LNPbLWA"}
+     code: assert Rails.csrf_valid?(
+     stacktrace:
+       test/rails_test.exs:77: (test)
+
+.........
+
+  3) test CSRF validity 70 (Campfire.RailsTest)
+     test/rails_test.exs:76
+     %{"case" => "masked global token, standard alphabet", "expected" => true, "method" => "POST", "path" => "/account/edit", "token" => "92UpvZ0uKkd9Pj/Ff0mtp8Uf6iKD7AXWj9nZ2bgulm+ZpV/GdRIGks5kZh/hTXHEXELypjH4LUPubw6LNPbLWA"}
+     code: assert Rails.csrf_valid?(
+     stacktrace:
+       test/rails_test.exs:77: (test)
+
+...........................................................
+
+  4) test CSRF validity 67 (Campfire.RailsTest)
+     test/rails_test.exs:76
+     %{"case" => "masked global token, standard alphabet", "expected" => true, "method" => "PATCH", "path" => "/rooms/1", "token" => "92UpvZ0uKkd9Pj/Ff0mtp8Uf6iKD7AXWj9nZ2bgulm+ZpV/GdRIGks5kZh/hTXHEXELypjH4LUPubw6LNPbLWA"}
+     code: assert Rails.csrf_valid?(
+     stacktrace:
+       test/rails_test.exs:77: (test)
+
+.....
+
+  5) test CSRF validity 66 (Campfire.RailsTest)
+     test/rails_test.exs:76
+     %{"case" => "masked global token, standard alphabet", "expected" => true, "method" => "POST", "path" => "/rooms/1/messages", "token" => "92UpvZ0uKkd9Pj/Ff0mtp8Uf6iKD7AXWj9nZ2bgulm+ZpV/GdRIGks5kZh/hTXHEXELypjH4LUPubw6LNPbLWA"}
+     code: assert Rails.csrf_valid?(
+     stacktrace:
+       test/rails_test.exs:77: (test)
+
+..........................................................
+
+  6) test CSRF validity 68 (Campfire.RailsTest)
+     test/rails_test.exs:76
+     %{"case" => "masked global token, standard alphabet", "expected" => true, "method" => "DELETE", "path" => "/rooms/1", "token" => "92UpvZ0uKkd9Pj/Ff0mtp8Uf6iKD7AXWj9nZ2bgulm+ZpV/GdRIGks5kZh/hTXHEXELypjH4LUPubw6LNPbLWA"}
+     code: assert Rails.csrf_valid?(
+     stacktrace:
+       test/rails_test.exs:77: (test)
+
+.........................
+
+  7) test CSRF validity 64 (Campfire.RailsTest)
+     test/rails_test.exs:76
+     %{"case" => "masked global token, standard alphabet", "expected" => true, "method" => "POST", "path" => "/session/", "token" => "92UpvZ0uKkd9Pj/Ff0mtp8Uf6iKD7AXWj9nZ2bgulm+ZpV/GdRIGks5kZh/hTXHEXELypjH4LUPubw6LNPbLWA"}
+     code: assert Rails.csrf_valid?(
+     stacktrace:
+       test/rails_test.exs:77: (test)
+
+..................................
+
+  8) test CSRF validity 69 (Campfire.RailsTest)
+     test/rails_test.exs:76
+     %{"case" => "masked global token, standard alphabet", "expected" => true, "method" => "PUT", "path" => "/rooms/1/involvement", "token" => "92UpvZ0uKkd9Pj/Ff0mtp8Uf6iKD7AXWj9nZ2bgulm+ZpV/GdRIGks5kZh/hTXHEXELypjH4LUPubw6LNPbLWA"}
+     code: assert Rails.csrf_valid?(
+     stacktrace:
+       test/rails_test.exs:77: (test)
+
+...........................................
+
+  9) test CSRF validity 65 (Campfire.RailsTest)
+     test/rails_test.exs:76
+     %{"case" => "masked global token, standard alphabet", "expected" => true, "method" => "PUT", "path" => "/session", "token" => "92UpvZ0uKkd9Pj/Ff0mtp8Uf6iKD7AXWj9nZ2bgulm+ZpV/GdRIGks5kZh/hTXHEXELypjH4LUPubw6LNPbLWA"}
+     code: assert Rails.csrf_valid?(
+     stacktrace:
+       test/rails_test.exs:77: (test)
+
+..................................
+Finished in 14.6 seconds (14.6s async, 0.00s sync)
+354 tests, 9 failures

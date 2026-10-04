@@ -1,0 +1,26 @@
+#!/usr/bin/env python3
+"""Compare two completed, matched benchmark directories."""
+import json,pathlib,statistics,sys
+baseline,final=map(pathlib.Path,sys.argv[1:3])
+for root in [baseline,final]:
+ if (root/"INCOMPLETE.md").exists():raise SystemExit("Incomplete diagnostic run: refusing comparison")
+def runs(root,app):
+ return [x for p in root.glob(app+'-*.json') if 'app' in (x:=json.loads(p.read_text()))]
+def median(root,app,get):return statistics.median(get(r) for r in runs(root,app))
+def http(route):return lambda r:next(h['rps'] for h in r['http'] if h['route']==route and h['conc']==64)
+def cable(clients):return lambda r:next(c['throughput']['delivered_msgs_per_sec'] for c in r['cable'] if c['clients']==clients)
+print('# Tuning comparison\n')
+print('Two alternating rounds per app per build, same seed, four server CPU cores, gzip, validated responses. HTTP uses 64 concurrent connections. Cable counts messages delivered to every subscribed client. These short runs describe this workload; they are not long-duration production capacity estimates.\n')
+print('| Throughput | Elixir baseline | Elixir tuned | Improvement | Rust final | Remaining Rust advantage |\n|---|---:|---:|---:|---:|---:|')
+for name,get in [(x,http(x)) for x in ['room_show','messages_page','sidebar','search','post_message','static_css','up','avatar']]+[(f'Cable {n} clients',cable(n)) for n in [100,500,1000]]:
+ a=median(baseline,'elixir',get);b=median(final,'elixir',get);c=median(final,'rust',get)
+ print(f'| {name} | {a:,.1f} | {b:,.1f} | {b/a:.2f}× | {c:,.1f} | {c/b:.2f}× |')
+print('\n| Cost | Elixir baseline | Elixir tuned | Rust final |\n|---|---:|---:|---:|')
+for name,get in [('Cold start (ms)',lambda r:r['cold_start_ms']),('Idle anonymous memory (MB)',lambda r:r['memory']['idle_anon_mb']),('Peak anonymous memory (MB)',lambda r:r['memory']['peak_anon_mb']),('Upload → thumbnail (ms)',lambda r:r['upload']['median_total_ms'])]:
+ vals=[median(root,app,get) for root,app in [(baseline,'elixir'),(final,'elixir'),(final,'rust')]]
+ print(f'| {name} | '+' | '.join(f'{v:,.1f}' for v in vals)+' |')
+print('\nEnd-of-run native background queue counts (accepted HTTP writes can precede job completion):\n')
+print('| Build / round | Queued | Processed | Failed |\n|---|---:|---:|---:|')
+for root in [baseline,final]:
+ for p in sorted(root.glob('elixir-*-jobs.json')):
+  j=json.loads(p.read_text());print(f'| {root.name} / {p.stem} | {j["queued"]:,} | {j["processed"]:,} | {j["failed"]:,} |')

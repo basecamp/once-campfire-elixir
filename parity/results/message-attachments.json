@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "scope": [
+    "signed attachment replacement/removal",
+    "body unchanged by attachment-only edits",
+    "body edits retain attachments",
+    "rich-text signed blob embeds",
+    "blank body preserves embeds per Rails callback",
+    "nonblank replacement removes embeds",
+    "all persisted tables after real queue drains",
+    "native Action Text image blob HTML"
+  ]
+}

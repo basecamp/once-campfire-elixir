@@ -1,0 +1,44 @@
+{
+  "tls_http2_up": {
+    "status": 200,
+    "protocol": "2",
+    "location": null,
+    "body_sha256": "7e6c9877b2dec7dfadc43e742246d94d515f703dc8e04611320aaca6e26c3af3"
+  },
+  "public_document": {
+    "status": 200,
+    "protocol": "2",
+    "location": null,
+    "body_sha256": "2f15987e4606501202b9d337085439339e53a374e3d194847192c12f85ba78f8",
+    "type": [
+      "text/plain"
+    ],
+    "cache": [
+      "public, max-age=2592000"
+    ]
+  },
+  "startup_page_sha256": "5d5877b558b7c02eb0db14900352652beec4f37b4c72d592d53026d5f2a3322a",
+  "tls_http1_up": {
+    "status": 200,
+    "protocol": "1.1",
+    "location": null,
+    "body_sha256": "7e6c9877b2dec7dfadc43e742246d94d515f703dc8e04611320aaca6e26c3af3"
+  },
+  "http_redirect": {
+    "status": 301,
+    "protocol": "1.1",
+    "location": [
+      "https://campfire.test/up"
+    ],
+    "body_sha256": "1b7212a14f73519c05992cbeacab7e931868b0352ff1695be562c88d84fd737f"
+  },
+  "https_auth_redirect": {
+    "status": 302,
+    "protocol": "2",
+    "location": [
+      "https://campfire.test/session/new"
+    ],
+    "body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "proxy_sha256": "0dc6606e316dff1c44212797b02f03ff339098ff20cca240e26802d342d0244e"
+}

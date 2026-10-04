@@ -1,0 +1,63 @@
+{
+  "passed": true,
+  "scope": [
+    "production release",
+    "all persisted tables and no additional foreign key violations",
+    "all storage files copied byte-for-byte",
+    "Rails session accepted by release",
+    "Elixir cookies accepted by Rails",
+    "room HTML after each handoff",
+    "native avatar and message attachment",
+    "Rails consumes mixed-runtime jobs",
+    "Rails writes after rollback"
+  ],
+  "fixture_foreign_key_violations": [
+    [
+      "messages",
+      933434637,
+      "users",
+      0
+    ]
+  ],
+  "final_tables": {
+    "accounts": 1,
+    "action_text_rich_texts": 171,
+    "active_storage_blobs": 14,
+    "memberships": 39,
+    "rooms": 11,
+    "users": 10,
+    "active_storage_attachments": 16,
+    "active_storage_variant_records": 6,
+    "bans": 1,
+    "boosts": 12,
+    "messages": 172,
+    "push_subscriptions": 0,
+    "searches": 3,
+    "sessions": 2,
+    "webhooks": 2,
+    "message_search_index": 172,
+    "message_search_index_data": 8,
+    "message_search_index_idx": 6,
+    "message_search_index_content": 172,
+    "message_search_index_docsize": 172,
+    "message_search_index_config": 1,
+    "schema_migrations": 15,
+    "ar_internal_metadata": 2
+  },
+  "final_files": {
+    "ra/od/raodqbbpbhm7xp5hfgb3tu8on8vi": "6ce7061de3595da77975e268a979f9dd0e1f187b7ebdbb42a88ac211a79aa3aa",
+    "5d/ad/5dadz19ls6axuhw3ago9wumgc26k": "c91f8a1ad71744b40c6da1567ce8080dd3a58934c1cad12ec0e17a3d688eb3e0",
+    "ex/0u/ex0ujd9i7haorvtq2hku4qo22hd8": "e1229db9bf54715acfed155e4513ace66b3e961e74190d7ca3e04d79fffde87b",
+    "3o/8e/3o8eizy6lzq4d0bh82x5ddncbtdn": "eae9cdc9dae94aa8042a3bef1ff142818e0d0883016bd599555cc13deea8eff4",
+    "35/3m/353m578luh88ii4tp6d8yuyva55v": "420726f9cdff7b48f6bb2d6c79af6ff69dfcc4d290a8376d1901be0de9c62286",
+    "35/9w/359ws0k2x3iscwqju6x1z5fotuj9": "57f272b82b06593ab72d04dc1c1108558c9981f271bf3574016c3bb55751d6e2",
+    "4l/ih/4lihdellmqlan3dkoguy17k7b3u9": "b83abe479559cd6ea61e5abc721de0c178be118a02580f4551ac99c3a2287527",
+    "2y/en/2yenb2ld8ninydzf9y2cpqyrbjqx": "c2bb690aae06d44635f525a8a5594e286e10a5fb547d116e1a7d38e3782e7a09",
+    "1l/a4/1la4o27xxpq9ksfz8queu37rsz24": "e862029b2398043281a748f77485525f8ae3c3d951db21c0ce806f2488216246",
+    "5j/2c/5j2ce1yctlrqocxcrb749gk74d70": "f95cac806ae17f0d59ad75e5d03d82a05019a65469e9e325baae898d46e7f1e5",
+    "6b/tc/6btcnksw2px5m61m8ttuft8qq5sg": "03511ce37fe4c163e6af2b64238248fbfc7461241cb125c73f708ea1f4d170de",
+    "5y/n8/5yn8o54bcl3ruybz88hlc6blvenf": "f95cac806ae17f0d59ad75e5d03d82a05019a65469e9e325baae898d46e7f1e5",
+    "5n/lq/5nlq52kvmcweobxncp0zy1zvu9bg": "03511ce37fe4c163e6af2b64238248fbfc7461241cb125c73f708ea1f4d170de",
+    "2k/7n/2k7n5s996jb5k5xwhx14f5oetpj4": "f95cac806ae17f0d59ad75e5d03d82a05019a65469e9e325baae898d46e7f1e5"
+  }
+}

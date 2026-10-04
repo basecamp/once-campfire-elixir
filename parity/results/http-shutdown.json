@@ -1,0 +1,35 @@
+{
+  "passed": true,
+  "scope": [
+    "production server termination during in-flight HTTP request",
+    "real HTTPS external call in namespace without external access",
+    "completed response and preserved valid subscription",
+    "process shutdown after response"
+  ],
+  "results": {
+    "reference": {
+      "response": {
+        "status": 302,
+        "location": "http://campfire.test/users/me/push_subscriptions",
+        "body": ""
+      },
+      "request_completed_after_term": true,
+      "valid_subscription_preserved": true,
+      "process_exited": true,
+      "exit_code": "1",
+      "drain_seconds": 6.297256825026125
+    },
+    "candidate": {
+      "response": {
+        "status": 302,
+        "location": "http://campfire.test/users/me/push_subscriptions",
+        "body": ""
+      },
+      "request_completed_after_term": true,
+      "valid_subscription_preserved": true,
+      "process_exited": true,
+      "exit_code": "0",
+      "drain_seconds": 7.0789336250163615
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "scope": [
+    "18 authenticated browser endpoints",
+    "explicit HTML/JSON/XML/Turbo Stream formats",
+    "HTML rows and layouts",
+    "JSON autocomplete fields",
+    "exception response bodies and MIME types"
+  ]
+}

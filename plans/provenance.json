@@ -1,0 +1,85 @@
+{
+  "reference_sha": "90b330024dec3e757c79b6a7e6568f93da8e3148",
+  "rust_port_sha": "195457bc5e96b696e7530536ced0a67234ba4bac",
+  "toolkit_source_sha": "8b276420c405de2669be3b09372017f7be01b9d9",
+  "vectors": {
+    "cache-entries.json": "81172f9542a05f49cc0ae1bdabef4e59837b1a536918b1997831e074a351f51c",
+    "campfire_routes.json": "268b41e9c3c17ff73d58810f23bebb50dbc4c23095799b93c88d79fa24050874",
+    "campfire_sessions.json": "062f7de6a7cdb6cd6858047b2347205cc616cea4ed69b631cf083b5f0a70abe8",
+    "campfire_user_agents.json": "2eea58cd75ef6112d1d468d1904787e04411317dc20a90ece54b58486c314522",
+    "database-pragmas.json": "4ee54e2d55c68403b88256aa4dc243fac635e843c570365f7a57aefdb71b0638",
+    "fragment-digests.json": "c8562e6e13e15797d1c533d1d56171a47551644a14b2d7c0d47dd3596065ad5a",
+    "image-etags.json": "e61c55ed0d3cebe93693840a43472184d7928edd3742a1b8cee89eeec5673a8a",
+    "ip_policy.json": "f2dfd014df8623eca60d55abd3b052dfa0931d684e53c52e198308b4990dd8ef",
+    "marshal-core.json": "8ddb655a97318f1a3ded875206c93a44618a8c192a6e6cc76955108ae14e1002",
+    "marshal-floats.json": "8607127ccd397e9883c93b21501f77a291d1801b532c0e7f466fdfd5a787aa73",
+    "message-etags.json": "411d7ccf5ef48dced1ea717262cfd3a1c7c2e3fa3f0fc75955fe894e565b3a5f",
+    "mime-types.json": "c4cf77eaa2d0b0348458cf249cf5b691e21602dccc3f660f0c0afc69be7ab8b5",
+    "opengraph-document.json": "4f99d2898e7160b3923e4a19e4a98c6631666b6d4f25125b53636fef0343d558",
+    "opengraph-metadata.json": "5c404c9ed004eb7350a8c53b5bf9a3ea4cf07bc289baf9edbd674a300475f26e",
+    "pwa-views.json": "9cab6307feab00edc764b8a80d725ace009ad05393aafcb59edcd0c6456512ed",
+    "qr.json": "a3b2ac9bdc95071a58eb537fffdb46bc64a2ef81e90654fea48f11f7b403bf5c",
+    "rails_compat.json": "4d5eb13617567e6dbd1974d880709d2a0d898cf4abc9ee66a6b432fb66a2c809",
+    "remote-ip.json": "0fed55d1a2ea33f754e153dad25ce5b32b23cc868b1bab05dea37cd09829f399",
+    "richtext-corpus.json": "2f598dea318df100e169eb2f93d111767d94a9206db006c843944f4434596fe2",
+    "richtext.json": "2339dfb0fa574c7976a2a46f6f1a1a556ec90ed98fc11e85e7e1c6f0f605b83b",
+    "route-actions.json": "29f6a5b21bd3e60a74b9c3257982f96946a441160822c74a288e6e1fbf651f87",
+    "route-samples.json": "17014c9cb4be4dbf7b1b7e64bac2a05485e2555bfe790f08e0c622811caf10e3",
+    "routes.json": "2518ebf01a295ad5cb71f966e0427ab1e253cceab7841656906fb4021d70c8d4",
+    "ruby_core.json": "82242a6dd069a65bb2e8e08cac58c5ea1913fa8d97247fed620517660032d88c",
+    "runtime.json": "55d3755a7814f5a1d2a648fe846230d1f2f465c1f6cceffe326f83ad6da18011",
+    "schema.json": "4a6d5a475cf77ad4cce1e0f87dbfe330464314279e885ca6eb02246560c731c1",
+    "sounds.json": "4041f82a307cbbbcdc41307112ff3bcc6add1774367e6aa2f8df92a0aa14af1d",
+    "storage.json": "9fcd5f3e43d7d97cc39588239e44d319fffe95739d0aad55cc95bff2d37befa1",
+    "transformations.json": "c8dd9ab0996198b98426a9284dc064d328a624a0a2e100464718640d028d3a06",
+    "url-shapes.json": "8ceed00694331b4e7e2a1570ce2472df4d37761b4d6f81d1bf2a95e301685c45",
+    "web_push.json": "e83f2acd3c4943c2a65a2c8aff51fc72b6d56e83a47322db48f1ae762037b990"
+  },
+  "native_html_parser": "native/vendor/gumbo/PROVENANCE.md",
+  "browser_parser": {
+    "reference_gem": "useragent 0.16.11",
+    "application_policy": "reference/app/models/application_platform.rb",
+    "views_source": "reference-tools/capture_pwa.py",
+    "view_branches": 12
+  },
+  "additional_oracles": {
+    "mime-types.json": "reference-tools/http/mime_types.rb",
+    "message-etags.json": "reference-tools/http/message_etags.rb",
+    "route-actions.json": "reference-tools/http/route_actions.rb",
+    "route-samples.json": "reference-tools/http/route_samples.rb",
+    "url-shapes.json": "reference-tools/http/url_shapes.rb",
+    "transformations.json": "reference-tools/storage/transformations.rb",
+    "marshal-floats.json": "reference-tools/storage/marshal_floats.rb",
+    "marshal-core.json": "reference-tools/storage/marshal_core.rb",
+    "remote-ip.json": "reference-tools/http/remote_ip.rb",
+    "opengraph-document.json": "reference-tools/http/opengraph_document.rb",
+    "opengraph-metadata.json": "reference-tools/http/opengraph.rb",
+    "database-pragmas.json": "reference-tools/storage/pragmas.rb",
+    "priv/compat/rack-mime.json": "reference-tools/http/static_mime.rb"
+  },
+  "media_runtime": {
+    "image_processing": "1.14.0",
+    "libvips": "8.16.1",
+    "ffmpeg": "7.1.5",
+    "native_pipeline": "native/vips.c"
+  },
+  "database_bootstrap": {
+    "source": "test/fixtures/seed.json: schema, schema_migrations, ar_internal_metadata.schema_sha1",
+    "artifact": "priv/compat/database-schema.json",
+    "sha256": "fcd2058fae14877a0b0b06fab011df050c8d5d2b0a437fc9bf7e38bde85360d7"
+  },
+  "public_documents": {
+    "404.html": "6e04b180174f49e36df7d4c24e65e0545575d68d69aadf094e4c697db299c477",
+    "422.html": "6333cb93c372a54db0c344c95b87e1d6205a87a585b55b84744f975de9573f61",
+    "500.html": "faa2c0fd9a62e4cf93e8358bb892632b870c46956ff9162f0fabaabdc7ddb92e",
+    "502.html": "5d5877b558b7c02eb0db14900352652beec4f37b4c72d592d53026d5f2a3322a",
+    "robots.txt": "2f15987e4606501202b9d337085439339e53a374e3d194847192c12f85ba78f8"
+  },
+  "production_proxy": {
+    "runtime": "Thruster 0.1.23",
+    "source_image": "campfire-reference:app",
+    "binary_sha256": "0dc6606e316dff1c44212797b02f03ff339098ff20cca240e26802d342d0244e",
+    "upstream": "private loopback listener; forwarded URL context limited to loopback peers"
+  },
+  "static_mime_sha256": "dda44f5b842633152ebbf8d96d34991bb7908480cbc90a754c345fe2c9ed87d5"
+}

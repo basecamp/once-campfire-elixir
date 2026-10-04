@@ -1,0 +1,35 @@
+      <turbo-frame id="edit_message_<%= @client_id %>">
+  <div class="message__body position-relative" data-controller="scroll-into-view">
+    <div class="message__body-content message__body-content--editing gap">
+        <div class="composer--edit composer--rich-text">
+          <form id="form_message_<%= @client_id %>" data-controller="form" data-action="lexxy:file-accept-&gt;form#preventAttachment keydown.esc-&gt;form#cancel keydown.ctrl+enter-&gt;form#submit:prevent keydown.meta+enter-&gt;form#submit:prevent" action="/rooms/<%= @room_id %>/messages/<%= @id %>" accept-charset="UTF-8" method="post"><input type="hidden" name="_method" value="patch" /><input type="hidden" name="authenticity_token" value="<%= @patch_token %>" />
+            <div class="full-width input input--actor min-width fill-white">
+              <lexxy-editor rows="1" class="input lexxy-content" aria-multiline="true" aria-label="Edit message" autofocus="autofocus" permitted-attachment-types="application/vnd.campfire.mention application/vnd.actiontext.opengraph-embed" data-action="lexxy:change-&gt;typing-notifications#start keydown-&gt;composer#submitByKeyboard:capture" data-direct-upload-url="<%= @base %>/rails/active_storage/direct_uploads" data-blob-url-template="<%= @base %>/rails/active_storage/blobs/redirect/:signed_id/:filename" id="message_body" input="message_body_trix_input_message_<%= @client_id %>" name="message[body]" value="<%= @body %>">
+                <lexxy-prompt trigger="@" name="mention" src="/autocompletable/users?room_id=<%= @room_id %>" remote-filtering="true" empty-results="No matches"></lexxy-prompt>
+</lexxy-editor>            </div>
+
+            <a data-form-target="cancel" hidden="hidden" href="/rooms/<%= @room_id %>/messages/<%= @id %>">Close editor and discard changes</a>
+
+            <div class="message__edit-btns flex align-center justify-space-between gap full-width pad-block-start-half">
+              <button name="button" type="submit" class="btn btn--reversed">
+                <img aria-hidden="true" src="<%= Campfire.Assets.path("check.svg") %>" />
+                <span class="for-screen-reader">Save changes</span>
+</button>
+              <button name="button" type="submit" class="btn btn--negative" form="delete_form_message_<%= @client_id %>" data-turbo-confirm="Are you sure you want to delete this message?">
+                <img aria-hidden="true" src="<%= Campfire.Assets.path("trash.svg") %>" />
+                <span class="for-screen-reader">Delete message</span>
+</button>            </div>
+</form>        </div>
+    </div>
+
+    <div class="message__actions flex flex-wrap">
+      <a class="message__action-btn message__edit-close-btn txt-small btn btn--borderless" href="/rooms/<%= @room_id %>/messages/<%= @id %>">
+        <img class="colorize--black" aria-hidden="true" src="<%= Campfire.Assets.path("remove.svg") %>" />
+        <span class="for-screen-reader">Close editor and discard changes</span>
+</a>    </div>
+
+    <form id="delete_form_message_<%= @client_id %>" data-turbo-frame="edit_message_<%= @client_id %>" action="/rooms/<%= @room_id %>/messages/<%= @id %>" accept-charset="UTF-8" method="post"><input type="hidden" name="_method" value="delete" /><input type="hidden" name="authenticity_token" value="<%= @delete_token %>" />
+  </div>
+</turbo-frame>
+
+

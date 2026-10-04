@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "scope": [
+    "profile form HTML",
+    "escaped profile updates",
+    "admin and member",
+    "referrer navigation",
+    "avatar replacement/delete control",
+    "room involvement",
+    "four-hour transfer link",
+    "flash consumption",
+    "full and frame layout"
+  ]
+}

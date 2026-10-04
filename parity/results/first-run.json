@@ -1,0 +1,4 @@
+{
+  "passed": true,
+  "scope": "no-avatar setup, full tables, CSRF form, repeat prevention, password login"
+}

@@ -1,0 +1,12 @@
+<li class="flex align-center gap margin-none <%= @banned %>">
+  <figure class="avatar flex-item-no-shrink" style="--avatar-size: 3.75ch;">
+    <%= @avatar %>
+  </figure>
+
+  <div class="min-width">
+    <div class="overflow-ellipsis fill-shade"><strong><%= @name %></strong></div>
+  </div>
+
+  <hr class="separator" aria-hidden="true">
+
+<%= @controls %></li>

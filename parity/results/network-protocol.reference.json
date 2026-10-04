@@ -1,0 +1,87 @@
+{
+  "plain": {
+    "status": 200,
+    "headers": {
+      "content-type": "text/html",
+      "content-length": "30"
+    },
+    "body": "PHA+UHJvdG9jb2wgJmFtcDsgcmVwbHkgzqk8L3A+"
+  },
+  "gzip": {
+    "status": 200,
+    "headers": {
+      "content-type": "text/html",
+      "content-length": "30"
+    },
+    "body": "PHA+UHJvdG9jb2wgJmFtcDsgcmVwbHkgzqk8L3A+"
+  },
+  "deflate": {
+    "status": 200,
+    "headers": {
+      "content-type": "text/html",
+      "content-length": "30"
+    },
+    "body": "PHA+UHJvdG9jb2wgJmFtcDsgcmVwbHkgzqk8L3A+"
+  },
+  "chunked": {
+    "status": 200,
+    "headers": {
+      "content-type": "text/html",
+      "transfer-encoding": "chunked"
+    },
+    "body": "PHA+UHJvdG9jb2wgJmFtcDsgcmVwbHkgzqk8L3A+"
+  },
+  "informational": {
+    "status": 200,
+    "headers": {
+      "content-type": "text/html"
+    },
+    "body": "PHA+UHJvdG9jb2wgJmFtcDsgcmVwbHkgzqk8L3A+"
+  },
+  "repeated_headers": {
+    "status": 200,
+    "headers": {
+      "x-fixture": "one, two",
+      "content-type": "text/html"
+    },
+    "body": "PHA+UHJvdG9jb2wgJmFtcDsgcmVwbHkgzqk8L3A+"
+  },
+  "folded_headers": {
+    "status": 200,
+    "headers": {
+      "x-fixture": "one two",
+      "content-type": "text/html"
+    },
+    "body": "PHA+UHJvdG9jb2wgJmFtcDsgcmVwbHkgzqk8L3A+"
+  },
+  "bodyless_204": {
+    "status": 204,
+    "headers": {
+      "content-type": "text/plain",
+      "content-length": "12345"
+    },
+    "body": null
+  },
+  "bodyless_304": {
+    "status": 304,
+    "headers": {
+      "content-type": "text/plain",
+      "content-length": "12345"
+    },
+    "body": null
+  },
+  "truncated_length": {
+    "status": 200,
+    "headers": {
+      "content-type": "text/html",
+      "content-length": "12345"
+    },
+    "body": "PHA+UHJvdG9jb2wgJmFtcDsgcmVwbHkgzqk8L3A+"
+  },
+  "invalid_chunk": {
+    "error": "Net::HTTPBadResponse"
+  },
+  "timeout": {
+    "error": "Net::ReadTimeout"
+  }
+}

@@ -1,0 +1,247 @@
+{
+  "version": 1,
+  "kind": "http-parity",
+  "reference_sha": "90b330024dec3e757c79b6a7e6568f93da8e3148",
+  "passed": true,
+  "cases": [
+    {
+      "id": "bot-latest",
+      "passed": true,
+      "problems": [],
+      "status": {
+        "reference": 200,
+        "candidate": 200
+      },
+      "body_sha256": {
+        "reference": "035680a4440362ecb5c07391f49de57155b29682aae05cb7aa67e50638afa751",
+        "candidate": "6500ddc05029b45b7ed8a38c0d5236aca1b3c270e3c03c83efc1dc35adf35374"
+      },
+      "normalizations": []
+    },
+    {
+      "id": "bot-before",
+      "passed": true,
+      "problems": [],
+      "status": {
+        "reference": 200,
+        "candidate": 200
+      },
+      "body_sha256": {
+        "reference": "0539e6aaf6201a71f9909e45b0677deb3ac7fbe61c1d060beae0203feeeec358",
+        "candidate": "703b12e582a2531b48859d9aada6ba08faa19d3b54a43cf85450739a453b0676"
+      },
+      "normalizations": []
+    },
+    {
+      "id": "bot-after",
+      "passed": true,
+      "problems": [],
+      "status": {
+        "reference": 200,
+        "candidate": 200
+      },
+      "body_sha256": {
+        "reference": "5180ac64d0508167902dae851e9ff0a6c23c68a362e86bc67fe5796403789b8e",
+        "candidate": "ae27ffb2f99a2ae146d76052a3f1df3db242073ee0941dfd701576da693ed34a"
+      },
+      "normalizations": []
+    },
+    {
+      "id": "health",
+      "passed": true,
+      "problems": [],
+      "status": {
+        "reference": 200,
+        "candidate": 200
+      },
+      "body_sha256": {
+        "reference": "7e6c9877b2dec7dfadc43e742246d94d515f703dc8e04611320aaca6e26c3af3",
+        "candidate": "7e6c9877b2dec7dfadc43e742246d94d515f703dc8e04611320aaca6e26c3af3"
+      },
+      "normalizations": []
+    },
+    {
+      "id": "manifest",
+      "passed": true,
+      "problems": [],
+      "status": {
+        "reference": 200,
+        "candidate": 200
+      },
+      "body_sha256": {
+        "reference": "dab147e8456039b0f12f2157421e62ef8370b3467a931cc7618011006c7bc201",
+        "candidate": "dab147e8456039b0f12f2157421e62ef8370b3467a931cc7618011006c7bc201"
+      },
+      "normalizations": []
+    },
+    {
+      "id": "service-worker",
+      "passed": true,
+      "problems": [],
+      "status": {
+        "reference": 200,
+        "candidate": 200
+      },
+      "body_sha256": {
+        "reference": "26694d89aeba03969b5ff8ef07d36c85be3d7d3952da4b656d44809596e44fa0",
+        "candidate": "26694d89aeba03969b5ff8ef07d36c85be3d7d3952da4b656d44809596e44fa0"
+      },
+      "normalizations": []
+    },
+    {
+      "id": "inaccessible-room",
+      "passed": true,
+      "problems": [],
+      "status": {
+        "reference": 404,
+        "candidate": 404
+      },
+      "body_sha256": {
+        "reference": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "candidate": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "normalizations": []
+    },
+    {
+      "id": "missing-cursor",
+      "passed": true,
+      "problems": [],
+      "status": {
+        "reference": 404,
+        "candidate": 404
+      },
+      "body_sha256": {
+        "reference": "3b830281ce3538e005214b1c9798dc7f146e7319ac5c8d5a55ac1f002285e8a2",
+        "candidate": "3b830281ce3538e005214b1c9798dc7f146e7319ac5c8d5a55ac1f002285e8a2"
+      },
+      "normalizations": []
+    },
+    {
+      "id": "invalid-bot",
+      "passed": true,
+      "problems": [],
+      "status": {
+        "reference": 302,
+        "candidate": 302
+      },
+      "body_sha256": {
+        "reference": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "candidate": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "normalizations": []
+    },
+    {
+      "id": "empty-message",
+      "passed": true,
+      "problems": [],
+      "status": {
+        "reference": 422,
+        "candidate": 422
+      },
+      "body_sha256": {
+        "reference": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "candidate": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "normalizations": []
+    },
+    {
+      "id": "create-message",
+      "passed": true,
+      "problems": [],
+      "status": {
+        "reference": 201,
+        "candidate": 201
+      },
+      "body_sha256": {
+        "reference": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "candidate": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "normalizations": []
+    },
+    {
+      "id": "edit-own-message",
+      "passed": true,
+      "problems": [],
+      "status": {
+        "reference": 200,
+        "candidate": 200
+      },
+      "body_sha256": {
+        "reference": "8650c1cce9f7f11b45ecdb6d67a7f575d5db4b5eb15ba29d3478f0deccd46605",
+        "candidate": "04caf5380cca8ddef4a9d04e8f9ea02346f1ad3d3e7688b3f8e04e91526fc548"
+      },
+      "normalizations": []
+    },
+    {
+      "id": "delete-own-message",
+      "passed": true,
+      "problems": [],
+      "status": {
+        "reference": 204,
+        "candidate": 204
+      },
+      "body_sha256": {
+        "reference": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "candidate": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "normalizations": []
+    },
+    {
+      "id": "delete-other-message",
+      "passed": true,
+      "problems": [],
+      "status": {
+        "reference": 403,
+        "candidate": 403
+      },
+      "body_sha256": {
+        "reference": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "candidate": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "normalizations": []
+    },
+    {
+      "id": "missing-boost-message",
+      "passed": true,
+      "problems": [],
+      "status": {
+        "reference": 404,
+        "candidate": 404
+      },
+      "body_sha256": {
+        "reference": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "candidate": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "normalizations": []
+    },
+    {
+      "id": "empty-boost",
+      "passed": true,
+      "problems": [],
+      "status": {
+        "reference": 422,
+        "candidate": 422
+      },
+      "body_sha256": {
+        "reference": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "candidate": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "normalizations": []
+    },
+    {
+      "id": "create-boost",
+      "passed": true,
+      "problems": [],
+      "status": {
+        "reference": 201,
+        "candidate": 201
+      },
+      "body_sha256": {
+        "reference": "92ee1959ed4f52f750801ab1fa842348a74dbfce345196f02a180ee483be5521",
+        "candidate": "ba0a21980c8c9732728e58096aecf2ef4fe013ae419eb7c110e77e7433074fb5"
+      },
+      "normalizations": []
+    }
+  ],
+  "limits": "HTTP evidence only; browser interaction, persisted mutation state, realtime and rollback require separate checks."
+}

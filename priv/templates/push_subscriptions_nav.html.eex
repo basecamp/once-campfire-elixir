@@ -1,0 +1,4 @@
+        <div class="flex-item-justify-start">
+    <a class="btn" href="<%= @back %>"><img aria-hidden="true" src="<%= Campfire.Assets.path("arrow-left.svg") %>" width="20" height="20" /><span class="for-screen-reader">Go Back</span></a>
+  </div>
+

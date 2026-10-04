@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "scope": [
+    "public URL-safe tokens with/without padding",
+    "exact invitation/transfer/unicode/numeric/alphanumeric SVG",
+    "cache lifetime and MIME",
+    "malformed and noncanonical Base64 errors"
+  ]
+}

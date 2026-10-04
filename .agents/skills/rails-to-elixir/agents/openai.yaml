@@ -1,0 +1,4 @@
+interface:
+  display_name: "Rails to Elixir"
+  short_description: "Guide a compatible Rails-to-Elixir migration"
+  default_prompt: "Use $rails-to-elixir for this Rails-to-Elixir migration phase."

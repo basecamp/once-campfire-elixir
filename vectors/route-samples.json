@@ -1,0 +1,1496 @@
+[
+  {
+    "path": "/",
+    "method": "GET",
+    "params": {
+      "controller": "welcome",
+      "action": "show"
+    }
+  },
+  {
+    "path": "/first_run/new",
+    "method": "GET",
+    "params": {
+      "controller": "first_runs",
+      "action": "new"
+    }
+  },
+  {
+    "path": "/first_run/edit",
+    "method": "GET",
+    "params": {
+      "controller": "first_runs",
+      "action": "edit"
+    }
+  },
+  {
+    "path": "/first_run",
+    "method": "GET",
+    "params": {
+      "controller": "first_runs",
+      "action": "show"
+    }
+  },
+  {
+    "path": "/first_run",
+    "method": "PATCH",
+    "params": {
+      "controller": "first_runs",
+      "action": "update"
+    }
+  },
+  {
+    "path": "/first_run",
+    "method": "PUT",
+    "params": {
+      "controller": "first_runs",
+      "action": "update"
+    }
+  },
+  {
+    "path": "/first_run",
+    "method": "DELETE",
+    "params": {
+      "controller": "first_runs",
+      "action": "destroy"
+    }
+  },
+  {
+    "path": "/first_run",
+    "method": "POST",
+    "params": {
+      "controller": "first_runs",
+      "action": "create"
+    }
+  },
+  {
+    "path": "/session/transfers/933434638",
+    "method": "GET",
+    "params": {
+      "controller": "sessions/transfers",
+      "action": "show",
+      "id": "933434638"
+    }
+  },
+  {
+    "path": "/session/transfers/933434638",
+    "method": "PATCH",
+    "params": {
+      "controller": "sessions/transfers",
+      "action": "update",
+      "id": "933434638"
+    }
+  },
+  {
+    "path": "/session/transfers/933434638",
+    "method": "PUT",
+    "params": {
+      "controller": "sessions/transfers",
+      "action": "update",
+      "id": "933434638"
+    }
+  },
+  {
+    "path": "/session/new",
+    "method": "GET",
+    "params": {
+      "controller": "sessions",
+      "action": "new"
+    }
+  },
+  {
+    "path": "/session/edit",
+    "method": "GET",
+    "params": {
+      "controller": "sessions",
+      "action": "edit"
+    }
+  },
+  {
+    "path": "/session",
+    "method": "GET",
+    "params": {
+      "controller": "sessions",
+      "action": "show"
+    }
+  },
+  {
+    "path": "/session",
+    "method": "PATCH",
+    "params": {
+      "controller": "sessions",
+      "action": "update"
+    }
+  },
+  {
+    "path": "/session",
+    "method": "PUT",
+    "params": {
+      "controller": "sessions",
+      "action": "update"
+    }
+  },
+  {
+    "path": "/session",
+    "method": "DELETE",
+    "params": {
+      "controller": "sessions",
+      "action": "destroy"
+    }
+  },
+  {
+    "path": "/session",
+    "method": "POST",
+    "params": {
+      "controller": "sessions",
+      "action": "create"
+    }
+  },
+  {
+    "path": "/account/users",
+    "method": "GET",
+    "params": {
+      "controller": "accounts/users",
+      "action": "index"
+    }
+  },
+  {
+    "path": "/account/users",
+    "method": "POST",
+    "params": {
+      "controller": "accounts/users",
+      "action": "create"
+    }
+  },
+  {
+    "path": "/account/users/new",
+    "method": "GET",
+    "params": {
+      "controller": "accounts/users",
+      "action": "new"
+    }
+  },
+  {
+    "path": "/account/users/933434638/edit",
+    "method": "GET",
+    "params": {
+      "controller": "accounts/users",
+      "action": "edit",
+      "id": "933434638"
+    }
+  },
+  {
+    "path": "/account/users/933434638",
+    "method": "GET",
+    "params": {
+      "controller": "accounts/users",
+      "action": "show",
+      "id": "933434638"
+    }
+  },
+  {
+    "path": "/account/users/933434638",
+    "method": "PATCH",
+    "params": {
+      "controller": "accounts/users",
+      "action": "update",
+      "id": "933434638"
+    }
+  },
+  {
+    "path": "/account/users/933434638",
+    "method": "PUT",
+    "params": {
+      "controller": "accounts/users",
+      "action": "update",
+      "id": "933434638"
+    }
+  },
+  {
+    "path": "/account/users/933434638",
+    "method": "DELETE",
+    "params": {
+      "controller": "accounts/users",
+      "action": "destroy",
+      "id": "933434638"
+    }
+  },
+  {
+    "path": "/account/bots/:bot_id/key",
+    "method": "PATCH",
+    "params": {
+      "controller": "accounts/bots/keys",
+      "action": "update",
+      "bot_id": ":bot_id"
+    }
+  },
+  {
+    "path": "/account/bots/:bot_id/key",
+    "method": "PUT",
+    "params": {
+      "controller": "accounts/bots/keys",
+      "action": "update",
+      "bot_id": ":bot_id"
+    }
+  },
+  {
+    "path": "/account/bots",
+    "method": "GET",
+    "params": {
+      "controller": "accounts/bots",
+      "action": "index"
+    }
+  },
+  {
+    "path": "/account/bots",
+    "method": "POST",
+    "params": {
+      "controller": "accounts/bots",
+      "action": "create"
+    }
+  },
+  {
+    "path": "/account/bots/new",
+    "method": "GET",
+    "params": {
+      "controller": "accounts/bots",
+      "action": "new"
+    }
+  },
+  {
+    "path": "/account/bots/933434638/edit",
+    "method": "GET",
+    "params": {
+      "controller": "accounts/bots",
+      "action": "edit",
+      "id": "933434638"
+    }
+  },
+  {
+    "path": "/account/bots/933434638",
+    "method": "GET",
+    "params": {
+      "controller": "accounts/bots",
+      "action": "show",
+      "id": "933434638"
+    }
+  },
+  {
+    "path": "/account/bots/933434638",
+    "method": "PATCH",
+    "params": {
+      "controller": "accounts/bots",
+      "action": "update",
+      "id": "933434638"
+    }
+  },
+  {
+    "path": "/account/bots/933434638",
+    "method": "PUT",
+    "params": {
+      "controller": "accounts/bots",
+      "action": "update",
+      "id": "933434638"
+    }
+  },
+  {
+    "path": "/account/bots/933434638",
+    "method": "DELETE",
+    "params": {
+      "controller": "accounts/bots",
+      "action": "destroy",
+      "id": "933434638"
+    }
+  },
+  {
+    "path": "/account/join_code",
+    "method": "POST",
+    "params": {
+      "controller": "accounts/join_codes",
+      "action": "create"
+    }
+  },
+  {
+    "path": "/account/logo",
+    "method": "GET",
+    "params": {
+      "controller": "accounts/logos",
+      "action": "show"
+    }
+  },
+  {
+    "path": "/account/logo",
+    "method": "DELETE",
+    "params": {
+      "controller": "accounts/logos",
+      "action": "destroy"
+    }
+  },
+  {
+    "path": "/account/custom_styles/edit",
+    "method": "GET",
+    "params": {
+      "controller": "accounts/custom_styles",
+      "action": "edit"
+    }
+  },
+  {
+    "path": "/account/custom_styles",
+    "method": "PATCH",
+    "params": {
+      "controller": "accounts/custom_styles",
+      "action": "update"
+    }
+  },
+  {
+    "path": "/account/custom_styles",
+    "method": "PUT",
+    "params": {
+      "controller": "accounts/custom_styles",
+      "action": "update"
+    }
+  },
+  {
+    "path": "/account/new",
+    "method": "GET",
+    "params": {
+      "controller": "accounts",
+      "action": "new"
+    }
+  },
+  {
+    "path": "/account/edit",
+    "method": "GET",
+    "params": {
+      "controller": "accounts",
+      "action": "edit"
+    }
+  },
+  {
+    "path": "/account",
+    "method": "GET",
+    "params": {
+      "controller": "accounts",
+      "action": "show"
+    }
+  },
+  {
+    "path": "/account",
+    "method": "PATCH",
+    "params": {
+      "controller": "accounts",
+      "action": "update"
+    }
+  },
+  {
+    "path": "/account",
+    "method": "PUT",
+    "params": {
+      "controller": "accounts",
+      "action": "update"
+    }
+  },
+  {
+    "path": "/account",
+    "method": "DELETE",
+    "params": {
+      "controller": "accounts",
+      "action": "destroy"
+    }
+  },
+  {
+    "path": "/account",
+    "method": "POST",
+    "params": {
+      "controller": "accounts",
+      "action": "create"
+    }
+  },
+  {
+    "path": "/join/CampfireJoinToken",
+    "method": "GET",
+    "params": {
+      "controller": "users",
+      "action": "new",
+      "join_code": "CampfireJoinToken"
+    }
+  },
+  {
+    "path": "/join/CampfireJoinToken",
+    "method": "POST",
+    "params": {
+      "controller": "users",
+      "action": "create",
+      "join_code": "CampfireJoinToken"
+    }
+  },
+  {
+    "path": "/qr_code/933434638",
+    "method": "GET",
+    "params": {
+      "controller": "qr_code",
+      "action": "show",
+      "id": "933434638"
+    }
+  },
+  {
+    "path": "/users/127326141/avatar",
+    "method": "GET",
+    "params": {
+      "controller": "users/avatars",
+      "action": "show",
+      "user_id": "127326141"
+    }
+  },
+  {
+    "path": "/users/127326141/avatar",
+    "method": "DELETE",
+    "params": {
+      "controller": "users/avatars",
+      "action": "destroy",
+      "user_id": "127326141"
+    }
+  },
+  {
+    "path": "/users/127326141/ban",
+    "method": "DELETE",
+    "params": {
+      "controller": "users/bans",
+      "action": "destroy",
+      "user_id": "127326141"
+    }
+  },
+  {
+    "path": "/users/127326141/ban",
+    "method": "POST",
+    "params": {
+      "controller": "users/bans",
+      "action": "create",
+      "user_id": "127326141"
+    }
+  },
+  {
+    "path": "/users/127326141/sidebar",
+    "method": "GET",
+    "params": {
+      "user_id": "127326141",
+      "controller": "users/sidebars",
+      "action": "show"
+    }
+  },
+  {
+    "path": "/users/127326141/profile/new",
+    "method": "GET",
+    "params": {
+      "user_id": "127326141",
+      "controller": "users/profiles",
+      "action": "new"
+    }
+  },
+  {
+    "path": "/users/127326141/profile/edit",
+    "method": "GET",
+    "params": {
+      "user_id": "127326141",
+      "controller": "users/profiles",
+      "action": "edit"
+    }
+  },
+  {
+    "path": "/users/127326141/profile",
+    "method": "GET",
+    "params": {
+      "user_id": "127326141",
+      "controller": "users/profiles",
+      "action": "show"
+    }
+  },
+  {
+    "path": "/users/127326141/profile",
+    "method": "PATCH",
+    "params": {
+      "user_id": "127326141",
+      "controller": "users/profiles",
+      "action": "update"
+    }
+  },
+  {
+    "path": "/users/127326141/profile",
+    "method": "PUT",
+    "params": {
+      "user_id": "127326141",
+      "controller": "users/profiles",
+      "action": "update"
+    }
+  },
+  {
+    "path": "/users/127326141/profile",
+    "method": "DELETE",
+    "params": {
+      "user_id": "127326141",
+      "controller": "users/profiles",
+      "action": "destroy"
+    }
+  },
+  {
+    "path": "/users/127326141/profile",
+    "method": "POST",
+    "params": {
+      "user_id": "127326141",
+      "controller": "users/profiles",
+      "action": "create"
+    }
+  },
+  {
+    "path": "/users/127326141/push_subscriptions/:push_subscription_id/test_notifications",
+    "method": "POST",
+    "params": {
+      "user_id": "127326141",
+      "controller": "users/push_subscriptions/test_notifications",
+      "action": "create",
+      "push_subscription_id": ":push_subscription_id"
+    }
+  },
+  {
+    "path": "/users/127326141/push_subscriptions",
+    "method": "GET",
+    "params": {
+      "user_id": "127326141",
+      "controller": "users/push_subscriptions",
+      "action": "index"
+    }
+  },
+  {
+    "path": "/users/127326141/push_subscriptions",
+    "method": "POST",
+    "params": {
+      "user_id": "127326141",
+      "controller": "users/push_subscriptions",
+      "action": "create"
+    }
+  },
+  {
+    "path": "/users/127326141/push_subscriptions/new",
+    "method": "GET",
+    "params": {
+      "user_id": "127326141",
+      "controller": "users/push_subscriptions",
+      "action": "new"
+    }
+  },
+  {
+    "path": "/users/127326141/push_subscriptions/933434638/edit",
+    "method": "GET",
+    "params": {
+      "user_id": "127326141",
+      "controller": "users/push_subscriptions",
+      "action": "edit",
+      "id": "933434638"
+    }
+  },
+  {
+    "path": "/users/127326141/push_subscriptions/933434638",
+    "method": "GET",
+    "params": {
+      "user_id": "127326141",
+      "controller": "users/push_subscriptions",
+      "action": "show",
+      "id": "933434638"
+    }
+  },
+  {
+    "path": "/users/127326141/push_subscriptions/933434638",
+    "method": "PATCH",
+    "params": {
+      "user_id": "127326141",
+      "controller": "users/push_subscriptions",
+      "action": "update",
+      "id": "933434638"
+    }
+  },
+  {
+    "path": "/users/127326141/push_subscriptions/933434638",
+    "method": "PUT",
+    "params": {
+      "user_id": "127326141",
+      "controller": "users/push_subscriptions",
+      "action": "update",
+      "id": "933434638"
+    }
+  },
+  {
+    "path": "/users/127326141/push_subscriptions/933434638",
+    "method": "DELETE",
+    "params": {
+      "user_id": "127326141",
+      "controller": "users/push_subscriptions",
+      "action": "destroy",
+      "id": "933434638"
+    }
+  },
+  {
+    "path": "/users/933434638",
+    "method": "GET",
+    "params": {
+      "controller": "users",
+      "action": "show",
+      "id": "933434638"
+    }
+  },
+  {
+    "path": "/autocompletable/users",
+    "method": "GET",
+    "params": {
+      "controller": "autocompletable/users",
+      "action": "index"
+    }
+  },
+  {
+    "path": "/rooms/486777696/messages",
+    "method": "GET",
+    "params": {
+      "controller": "messages",
+      "action": "index",
+      "room_id": "486777696"
+    }
+  },
+  {
+    "path": "/rooms/486777696/messages",
+    "method": "POST",
+    "params": {
+      "controller": "messages",
+      "action": "create",
+      "room_id": "486777696"
+    }
+  },
+  {
+    "path": "/rooms/486777696/messages/new",
+    "method": "GET",
+    "params": {
+      "controller": "messages",
+      "action": "new",
+      "room_id": "486777696"
+    }
+  },
+  {
+    "path": "/rooms/486777696/messages/933434638/edit",
+    "method": "GET",
+    "params": {
+      "controller": "messages",
+      "action": "edit",
+      "room_id": "486777696",
+      "id": "933434638"
+    }
+  },
+  {
+    "path": "/rooms/486777696/messages/933434638",
+    "method": "GET",
+    "params": {
+      "controller": "messages",
+      "action": "show",
+      "room_id": "486777696",
+      "id": "933434638"
+    }
+  },
+  {
+    "path": "/rooms/486777696/messages/933434638",
+    "method": "PATCH",
+    "params": {
+      "controller": "messages",
+      "action": "update",
+      "room_id": "486777696",
+      "id": "933434638"
+    }
+  },
+  {
+    "path": "/rooms/486777696/messages/933434638",
+    "method": "PUT",
+    "params": {
+      "controller": "messages",
+      "action": "update",
+      "room_id": "486777696",
+      "id": "933434638"
+    }
+  },
+  {
+    "path": "/rooms/486777696/messages/933434638",
+    "method": "DELETE",
+    "params": {
+      "controller": "messages",
+      "action": "destroy",
+      "room_id": "486777696",
+      "id": "933434638"
+    }
+  },
+  {
+    "path": "/rooms/486777696/394959859-BenderBot123/messages/933434638/boosts",
+    "method": "POST",
+    "params": {
+      "format": "json",
+      "controller": "messages/boosts/by_bots",
+      "action": "create",
+      "room_id": "486777696",
+      "bot_key": "394959859-BenderBot123",
+      "message_id": "933434638"
+    }
+  },
+  {
+    "path": "/rooms/486777696/394959859-BenderBot123/messages/933434638/boosts/933434638",
+    "method": "DELETE",
+    "params": {
+      "format": "json",
+      "controller": "messages/boosts/by_bots",
+      "action": "destroy",
+      "room_id": "486777696",
+      "bot_key": "394959859-BenderBot123",
+      "message_id": "933434638",
+      "id": "933434638"
+    }
+  },
+  {
+    "path": "/rooms/486777696/394959859-BenderBot123/messages",
+    "method": "GET",
+    "params": {
+      "format": "json",
+      "controller": "messages/by_bots",
+      "action": "index",
+      "room_id": "486777696",
+      "bot_key": "394959859-BenderBot123"
+    }
+  },
+  {
+    "path": "/rooms/486777696/394959859-BenderBot123/messages",
+    "method": "POST",
+    "params": {
+      "format": "json",
+      "controller": "messages/by_bots",
+      "action": "create",
+      "room_id": "486777696",
+      "bot_key": "394959859-BenderBot123"
+    }
+  },
+  {
+    "path": "/rooms/486777696/394959859-BenderBot123/messages/933434638",
+    "method": "PATCH",
+    "params": {
+      "format": "json",
+      "controller": "messages/by_bots",
+      "action": "update",
+      "room_id": "486777696",
+      "bot_key": "394959859-BenderBot123",
+      "id": "933434638"
+    }
+  },
+  {
+    "path": "/rooms/486777696/394959859-BenderBot123/messages/933434638",
+    "method": "PUT",
+    "params": {
+      "format": "json",
+      "controller": "messages/by_bots",
+      "action": "update",
+      "room_id": "486777696",
+      "bot_key": "394959859-BenderBot123",
+      "id": "933434638"
+    }
+  },
+  {
+    "path": "/rooms/486777696/394959859-BenderBot123/messages/933434638",
+    "method": "DELETE",
+    "params": {
+      "format": "json",
+      "controller": "messages/by_bots",
+      "action": "destroy",
+      "room_id": "486777696",
+      "bot_key": "394959859-BenderBot123",
+      "id": "933434638"
+    }
+  },
+  {
+    "path": "/rooms/486777696/refresh",
+    "method": "GET",
+    "params": {
+      "controller": "rooms/refreshes",
+      "action": "show",
+      "room_id": "486777696"
+    }
+  },
+  {
+    "path": "/rooms/486777696/settings",
+    "method": "GET",
+    "params": null
+  },
+  {
+    "path": "/rooms/486777696/involvement",
+    "method": "GET",
+    "params": {
+      "controller": "rooms/involvements",
+      "action": "show",
+      "room_id": "486777696"
+    }
+  },
+  {
+    "path": "/rooms/486777696/involvement",
+    "method": "PATCH",
+    "params": {
+      "controller": "rooms/involvements",
+      "action": "update",
+      "room_id": "486777696"
+    }
+  },
+  {
+    "path": "/rooms/486777696/involvement",
+    "method": "PUT",
+    "params": {
+      "controller": "rooms/involvements",
+      "action": "update",
+      "room_id": "486777696"
+    }
+  },
+  {
+    "path": "/rooms/486777696/@933434638",
+    "method": "GET",
+    "params": {
+      "controller": "rooms",
+      "action": "show",
+      "room_id": "486777696",
+      "message_id": "933434638"
+    }
+  },
+  {
+    "path": "/rooms",
+    "method": "GET",
+    "params": {
+      "controller": "rooms",
+      "action": "index"
+    }
+  },
+  {
+    "path": "/rooms",
+    "method": "POST",
+    "params": {
+      "controller": "rooms",
+      "action": "create"
+    }
+  },
+  {
+    "path": "/rooms/new",
+    "method": "GET",
+    "params": {
+      "controller": "rooms",
+      "action": "new"
+    }
+  },
+  {
+    "path": "/rooms/933434638/edit",
+    "method": "GET",
+    "params": {
+      "controller": "rooms",
+      "action": "edit",
+      "id": "933434638"
+    }
+  },
+  {
+    "path": "/rooms/933434638",
+    "method": "GET",
+    "params": {
+      "controller": "rooms",
+      "action": "show",
+      "id": "933434638"
+    }
+  },
+  {
+    "path": "/rooms/933434638",
+    "method": "PATCH",
+    "params": {
+      "controller": "rooms",
+      "action": "update",
+      "id": "933434638"
+    }
+  },
+  {
+    "path": "/rooms/933434638",
+    "method": "PUT",
+    "params": {
+      "controller": "rooms",
+      "action": "update",
+      "id": "933434638"
+    }
+  },
+  {
+    "path": "/rooms/933434638",
+    "method": "DELETE",
+    "params": {
+      "controller": "rooms",
+      "action": "destroy",
+      "id": "933434638"
+    }
+  },
+  {
+    "path": "/rooms/opens",
+    "method": "GET",
+    "params": {
+      "controller": "rooms",
+      "action": "show",
+      "id": "opens"
+    }
+  },
+  {
+    "path": "/rooms/opens",
+    "method": "POST",
+    "params": {
+      "controller": "rooms/opens",
+      "action": "create"
+    }
+  },
+  {
+    "path": "/rooms/opens/new",
+    "method": "GET",
+    "params": {
+      "controller": "rooms/opens",
+      "action": "new"
+    }
+  },
+  {
+    "path": "/rooms/opens/933434638/edit",
+    "method": "GET",
+    "params": {
+      "controller": "rooms/opens",
+      "action": "edit",
+      "id": "933434638"
+    }
+  },
+  {
+    "path": "/rooms/opens/933434638",
+    "method": "GET",
+    "params": {
+      "controller": "rooms/opens",
+      "action": "show",
+      "id": "933434638"
+    }
+  },
+  {
+    "path": "/rooms/opens/933434638",
+    "method": "PATCH",
+    "params": {
+      "controller": "rooms/opens",
+      "action": "update",
+      "id": "933434638"
+    }
+  },
+  {
+    "path": "/rooms/opens/933434638",
+    "method": "PUT",
+    "params": {
+      "controller": "rooms/opens",
+      "action": "update",
+      "id": "933434638"
+    }
+  },
+  {
+    "path": "/rooms/opens/933434638",
+    "method": "DELETE",
+    "params": {
+      "controller": "rooms/opens",
+      "action": "destroy",
+      "id": "933434638"
+    }
+  },
+  {
+    "path": "/rooms/closeds",
+    "method": "GET",
+    "params": {
+      "controller": "rooms",
+      "action": "show",
+      "id": "closeds"
+    }
+  },
+  {
+    "path": "/rooms/closeds",
+    "method": "POST",
+    "params": {
+      "controller": "rooms/closeds",
+      "action": "create"
+    }
+  },
+  {
+    "path": "/rooms/closeds/new",
+    "method": "GET",
+    "params": {
+      "controller": "rooms/closeds",
+      "action": "new"
+    }
+  },
+  {
+    "path": "/rooms/closeds/933434638/edit",
+    "method": "GET",
+    "params": {
+      "controller": "rooms/closeds",
+      "action": "edit",
+      "id": "933434638"
+    }
+  },
+  {
+    "path": "/rooms/closeds/933434638",
+    "method": "GET",
+    "params": {
+      "controller": "rooms/closeds",
+      "action": "show",
+      "id": "933434638"
+    }
+  },
+  {
+    "path": "/rooms/closeds/933434638",
+    "method": "PATCH",
+    "params": {
+      "controller": "rooms/closeds",
+      "action": "update",
+      "id": "933434638"
+    }
+  },
+  {
+    "path": "/rooms/closeds/933434638",
+    "method": "PUT",
+    "params": {
+      "controller": "rooms/closeds",
+      "action": "update",
+      "id": "933434638"
+    }
+  },
+  {
+    "path": "/rooms/closeds/933434638",
+    "method": "DELETE",
+    "params": {
+      "controller": "rooms/closeds",
+      "action": "destroy",
+      "id": "933434638"
+    }
+  },
+  {
+    "path": "/rooms/directs",
+    "method": "GET",
+    "params": {
+      "controller": "rooms",
+      "action": "show",
+      "id": "directs"
+    }
+  },
+  {
+    "path": "/rooms/directs",
+    "method": "POST",
+    "params": {
+      "controller": "rooms/directs",
+      "action": "create"
+    }
+  },
+  {
+    "path": "/rooms/directs/new",
+    "method": "GET",
+    "params": {
+      "controller": "rooms/directs",
+      "action": "new"
+    }
+  },
+  {
+    "path": "/rooms/directs/933434638/edit",
+    "method": "GET",
+    "params": {
+      "controller": "rooms/directs",
+      "action": "edit",
+      "id": "933434638"
+    }
+  },
+  {
+    "path": "/rooms/directs/933434638",
+    "method": "GET",
+    "params": {
+      "controller": "rooms/directs",
+      "action": "show",
+      "id": "933434638"
+    }
+  },
+  {
+    "path": "/rooms/directs/933434638",
+    "method": "PATCH",
+    "params": {
+      "controller": "rooms/directs",
+      "action": "update",
+      "id": "933434638"
+    }
+  },
+  {
+    "path": "/rooms/directs/933434638",
+    "method": "PUT",
+    "params": {
+      "controller": "rooms/directs",
+      "action": "update",
+      "id": "933434638"
+    }
+  },
+  {
+    "path": "/rooms/directs/933434638",
+    "method": "DELETE",
+    "params": {
+      "controller": "rooms/directs",
+      "action": "destroy",
+      "id": "933434638"
+    }
+  },
+  {
+    "path": "/messages/933434638/boosts",
+    "method": "GET",
+    "params": {
+      "controller": "messages/boosts",
+      "action": "index",
+      "message_id": "933434638"
+    }
+  },
+  {
+    "path": "/messages/933434638/boosts",
+    "method": "POST",
+    "params": {
+      "controller": "messages/boosts",
+      "action": "create",
+      "message_id": "933434638"
+    }
+  },
+  {
+    "path": "/messages/933434638/boosts/new",
+    "method": "GET",
+    "params": {
+      "controller": "messages/boosts",
+      "action": "new",
+      "message_id": "933434638"
+    }
+  },
+  {
+    "path": "/messages/933434638/boosts/933434638/edit",
+    "method": "GET",
+    "params": {
+      "controller": "messages/boosts",
+      "action": "edit",
+      "message_id": "933434638",
+      "id": "933434638"
+    }
+  },
+  {
+    "path": "/messages/933434638/boosts/933434638",
+    "method": "GET",
+    "params": {
+      "controller": "messages/boosts",
+      "action": "show",
+      "message_id": "933434638",
+      "id": "933434638"
+    }
+  },
+  {
+    "path": "/messages/933434638/boosts/933434638",
+    "method": "PATCH",
+    "params": {
+      "controller": "messages/boosts",
+      "action": "update",
+      "message_id": "933434638",
+      "id": "933434638"
+    }
+  },
+  {
+    "path": "/messages/933434638/boosts/933434638",
+    "method": "PUT",
+    "params": {
+      "controller": "messages/boosts",
+      "action": "update",
+      "message_id": "933434638",
+      "id": "933434638"
+    }
+  },
+  {
+    "path": "/messages/933434638/boosts/933434638",
+    "method": "DELETE",
+    "params": {
+      "controller": "messages/boosts",
+      "action": "destroy",
+      "message_id": "933434638",
+      "id": "933434638"
+    }
+  },
+  {
+    "path": "/messages",
+    "method": "GET",
+    "params": {
+      "controller": "messages",
+      "action": "index"
+    }
+  },
+  {
+    "path": "/messages",
+    "method": "POST",
+    "params": {
+      "controller": "messages",
+      "action": "create"
+    }
+  },
+  {
+    "path": "/messages/new",
+    "method": "GET",
+    "params": {
+      "controller": "messages",
+      "action": "new"
+    }
+  },
+  {
+    "path": "/messages/933434638/edit",
+    "method": "GET",
+    "params": {
+      "controller": "messages",
+      "action": "edit",
+      "id": "933434638"
+    }
+  },
+  {
+    "path": "/messages/933434638",
+    "method": "GET",
+    "params": {
+      "controller": "messages",
+      "action": "show",
+      "id": "933434638"
+    }
+  },
+  {
+    "path": "/messages/933434638",
+    "method": "PATCH",
+    "params": {
+      "controller": "messages",
+      "action": "update",
+      "id": "933434638"
+    }
+  },
+  {
+    "path": "/messages/933434638",
+    "method": "PUT",
+    "params": {
+      "controller": "messages",
+      "action": "update",
+      "id": "933434638"
+    }
+  },
+  {
+    "path": "/messages/933434638",
+    "method": "DELETE",
+    "params": {
+      "controller": "messages",
+      "action": "destroy",
+      "id": "933434638"
+    }
+  },
+  {
+    "path": "/searches/clear",
+    "method": "DELETE",
+    "params": {
+      "controller": "searches",
+      "action": "clear"
+    }
+  },
+  {
+    "path": "/searches",
+    "method": "GET",
+    "params": {
+      "controller": "searches",
+      "action": "index"
+    }
+  },
+  {
+    "path": "/searches",
+    "method": "POST",
+    "params": {
+      "controller": "searches",
+      "action": "create"
+    }
+  },
+  {
+    "path": "/unfurl_link",
+    "method": "POST",
+    "params": {
+      "controller": "unfurl_links",
+      "action": "create"
+    }
+  },
+  {
+    "path": "/webmanifest",
+    "method": "GET",
+    "params": {
+      "controller": "pwa",
+      "action": "manifest"
+    }
+  },
+  {
+    "path": "/service-worker",
+    "method": "GET",
+    "params": {
+      "controller": "pwa",
+      "action": "service_worker"
+    }
+  },
+  {
+    "path": "/up",
+    "method": "GET",
+    "params": {
+      "controller": "rails/health",
+      "action": "show"
+    }
+  },
+  {
+    "path": "/recede_historical_location",
+    "method": "GET",
+    "params": {
+      "controller": "turbo/native/navigation",
+      "action": "recede"
+    }
+  },
+  {
+    "path": "/resume_historical_location",
+    "method": "GET",
+    "params": {
+      "controller": "turbo/native/navigation",
+      "action": "resume"
+    }
+  },
+  {
+    "path": "/refresh_historical_location",
+    "method": "GET",
+    "params": {
+      "controller": "turbo/native/navigation",
+      "action": "refresh"
+    }
+  },
+  {
+    "path": "/rails/action_mailbox/postmark/inbound_emails",
+    "method": "POST",
+    "params": {
+      "controller": "action_mailbox/ingresses/postmark/inbound_emails",
+      "action": "create"
+    }
+  },
+  {
+    "path": "/rails/action_mailbox/relay/inbound_emails",
+    "method": "POST",
+    "params": {
+      "controller": "action_mailbox/ingresses/relay/inbound_emails",
+      "action": "create"
+    }
+  },
+  {
+    "path": "/rails/action_mailbox/sendgrid/inbound_emails",
+    "method": "POST",
+    "params": {
+      "controller": "action_mailbox/ingresses/sendgrid/inbound_emails",
+      "action": "create"
+    }
+  },
+  {
+    "path": "/rails/action_mailbox/mandrill/inbound_emails",
+    "method": "GET",
+    "params": {
+      "controller": "action_mailbox/ingresses/mandrill/inbound_emails",
+      "action": "health_check"
+    }
+  },
+  {
+    "path": "/rails/action_mailbox/mandrill/inbound_emails",
+    "method": "POST",
+    "params": {
+      "controller": "action_mailbox/ingresses/mandrill/inbound_emails",
+      "action": "create"
+    }
+  },
+  {
+    "path": "/rails/action_mailbox/mailgun/inbound_emails/mime",
+    "method": "POST",
+    "params": {
+      "controller": "action_mailbox/ingresses/mailgun/inbound_emails",
+      "action": "create"
+    }
+  },
+  {
+    "path": "/rails/conductor/action_mailbox/inbound_emails",
+    "method": "GET",
+    "params": {
+      "controller": "rails/conductor/action_mailbox/inbound_emails",
+      "action": "index"
+    }
+  },
+  {
+    "path": "/rails/conductor/action_mailbox/inbound_emails",
+    "method": "POST",
+    "params": {
+      "controller": "rails/conductor/action_mailbox/inbound_emails",
+      "action": "create"
+    }
+  },
+  {
+    "path": "/rails/conductor/action_mailbox/inbound_emails/new",
+    "method": "GET",
+    "params": {
+      "controller": "rails/conductor/action_mailbox/inbound_emails",
+      "action": "new"
+    }
+  },
+  {
+    "path": "/rails/conductor/action_mailbox/inbound_emails/933434638",
+    "method": "GET",
+    "params": {
+      "controller": "rails/conductor/action_mailbox/inbound_emails",
+      "action": "show",
+      "id": "933434638"
+    }
+  },
+  {
+    "path": "/rails/conductor/action_mailbox/inbound_emails/sources/new",
+    "method": "GET",
+    "params": {
+      "controller": "rails/conductor/action_mailbox/inbound_emails/sources",
+      "action": "new"
+    }
+  },
+  {
+    "path": "/rails/conductor/action_mailbox/inbound_emails/sources",
+    "method": "POST",
+    "params": {
+      "controller": "rails/conductor/action_mailbox/inbound_emails/sources",
+      "action": "create"
+    }
+  },
+  {
+    "path": "/rails/conductor/action_mailbox/:inbound_email_id/reroute",
+    "method": "POST",
+    "params": {
+      "controller": "rails/conductor/action_mailbox/reroutes",
+      "action": "create",
+      "inbound_email_id": ":inbound_email_id"
+    }
+  },
+  {
+    "path": "/rails/conductor/action_mailbox/:inbound_email_id/incinerate",
+    "method": "POST",
+    "params": {
+      "controller": "rails/conductor/action_mailbox/incinerates",
+      "action": "create",
+      "inbound_email_id": ":inbound_email_id"
+    }
+  },
+  {
+    "path": "/rails/active_storage/disk/:encoded_token",
+    "method": "PUT",
+    "params": {
+      "controller": "active_storage/disk",
+      "action": "update",
+      "encoded_token": ":encoded_token"
+    }
+  },
+  {
+    "path": "/rails/active_storage/direct_uploads",
+    "method": "POST",
+    "params": {
+      "controller": "active_storage/direct_uploads",
+      "action": "create"
+    }
+  }
+]

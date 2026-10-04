@@ -1,0 +1,70 @@
+[
+  {
+    "status": 302,
+    "location": "http://campfire.test/session/new"
+  },
+  {
+    "status": 302,
+    "location": "https://campfire.test/session/new"
+  },
+  {
+    "status": 302,
+    "location": "https://campfire.test/session/new"
+  },
+  {
+    "status": 302,
+    "location": "https://campfire.test/session/new"
+  },
+  {
+    "status": 302,
+    "location": "https://campfire.test/session/new"
+  },
+  {
+    "status": 302,
+    "location": "http://campfire.test/session/new"
+  },
+  {
+    "status": 302,
+    "location": "https://campfire.test/session/new"
+  },
+  {
+    "status": 302,
+    "location": "https://campfire.test/session/new"
+  },
+  {
+    "status": 302,
+    "location": "https://campfire.test/session/new"
+  },
+  {
+    "status": 302,
+    "location": "https://campfire.test/session/new"
+  },
+  {
+    "status": 302,
+    "location": "https://campfire.test/session/new"
+  },
+  {
+    "status": 302,
+    "location": "https://campfire.test/session/new"
+  },
+  {
+    "status": 302,
+    "location": "https://forwarded.test:8443/session/new"
+  },
+  {
+    "status": 302,
+    "location": "https://forwarded.test/session/new"
+  },
+  {
+    "status": 302,
+    "location": "https://campfire.test:80/session/new"
+  },
+  {
+    "status": 302,
+    "location": "http://campfire.test:443/session/new"
+  },
+  {
+    "status": 302,
+    "location": "https://[::1]:8443/session/new"
+  }
+]

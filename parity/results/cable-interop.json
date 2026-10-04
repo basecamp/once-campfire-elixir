@@ -1,0 +1,8 @@
+{
+  "passed": true,
+  "flows": [
+    "native-to-Rails typing",
+    "Rails-to-native typing",
+    "native membership revocation disconnects both runtimes"
+  ]
+}

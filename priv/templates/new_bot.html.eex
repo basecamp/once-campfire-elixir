@@ -1,0 +1,38 @@
+      
+
+<section class="panel">
+  <form class="flex flex-column gap" enctype="multipart/form-data" action="/account/bots" accept-charset="UTF-8" method="post"><input type="hidden" name="authenticity_token" value="<%= @form_token %>" />
+    <h1 class="for-screen-reader">Chat Bot Setup</h1>
+<label class="align-center center avatar__form gap" data-controller="upload-preview">
+  <div class="btn input--file">
+    <img aria-hidden="true" src="<%= Campfire.Assets.path("camera.svg") %>" width="20" height="20" />
+    <input class="input" accept="image/*" data-upload-preview-target="input" data-action="upload-preview#previewImage" type="file" name="user[avatar]" id="user_avatar" />
+    <span class="for-screen-reader">Upload bot avatar</span>
+  </div>
+
+  <div class="avatar input--file txt-xx-large" style="--avatar-size: var(--btn-size);">
+    <img alt="Bot avatar" data-upload-preview-target="image" src="<%= @avatar_src %>" width="48" height="48" />
+  </div>
+</label>
+
+<div class="flex align-center gap">
+  <details class="position-relative" data-controller="popup" data-action="keydown.esc-&gt;popup#close toggle-&gt;popup#toggle click@document-&gt;popup#closeOnClickOutside" data-popup-orientation-top-class="popup-orientation-top"><summary class="btn" tabindex="-1"><img aria-hidden="true" class="color-icon" src="<%= Campfire.Assets.path("globe.svg") %>" width="20" height="20" /><span class="for-screen-reader">Translate</span></summary><div class="language-list-menu shadow" data-popup-target="menu"><dl class="language-list"><dt>🇺🇸</dt><dd class="margin-none">Name the bot</dd><dt>🇪🇸</dt><dd class="margin-none">Nombrar al bot</dd><dt>🇫🇷</dt><dd class="margin-none">Nommer le bot</dd><dt>🇮🇳</dt><dd class="margin-none">बॉट का नाम दें</dd><dt>🇩🇪</dt><dd class="margin-none">Benenne den Bot</dd><dt>🇧🇷</dt><dd class="margin-none">Dê um nome ao bot</dd><dt>🇯🇵</dt><dd class="margin-none">ボットに名前を付ける</dd></dl></div></details>
+  <label class="flex align-center gap flex-item-grow txt-large input input--actor">
+    <input class="input" autocomplete="name" placeholder="Name the bot" autofocus="autofocus" required="required" data-1p-ignore="true" type="text" name="user[name]" id="user_name" />
+    <img aria-hidden="true" class="colorize--black" src="<%= Campfire.Assets.path("bot.svg") %>" width="24" height="24" />
+  </label>
+</div>
+
+<div class="flex align-center gap">
+  <details class="position-relative" data-controller="popup" data-action="keydown.esc-&gt;popup#close toggle-&gt;popup#toggle click@document-&gt;popup#closeOnClickOutside" data-popup-orientation-top-class="popup-orientation-top"><summary class="btn" tabindex="-1"><img aria-hidden="true" class="color-icon" src="<%= Campfire.Assets.path("globe.svg") %>" width="20" height="20" /><span class="for-screen-reader">Translate</span></summary><div class="language-list-menu shadow" data-popup-target="menu"><dl class="language-list"><dt>🇺🇸</dt><dd class="margin-none">Webhook URL</dd><dt>🇪🇸</dt><dd class="margin-none">URL del Webhook</dd><dt>🇫🇷</dt><dd class="margin-none">URL du webhook</dd><dt>🇮🇳</dt><dd class="margin-none">वेबहुक URL</dd><dt>🇩🇪</dt><dd class="margin-none">Webhook-URL</dd><dt>🇧🇷</dt><dd class="margin-none">URL do Webhook</dd><dt>🇯🇵</dt><dd class="margin-none">Webhook URL</dd></dl></div></details>
+  <label class="flex align-center gap flex-item-grow txt-large input input--actor">
+    <input class="input" placeholder="Webhook URL" type="url"<%= @webhook_value %> name="user[webhook_url]" id="user_webhook_url" />
+    <img aria-hidden="true" class="colorize--black" src="<%= Campfire.Assets.path("web.svg") %>" width="24" height="24" />
+  </label>
+</div>
+
+<button class="btn btn--reversed center txt-large" type="submit"><img aria-hidden="true" src="<%= Campfire.Assets.path("check.svg") %>" width="20" height="20" /><span class="for-screen-reader">Save changes</span></button>
+
+</form></section>
+
+

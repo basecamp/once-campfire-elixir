@@ -1,0 +1,14 @@
+/_build/
+/deps/
+/.hex/
+/.mix/
+/var/
+/erl_crash.dump
+/priv/static/assets/
+__pycache__/
+*.pyc
+
+/target/
+/bench/.work/
+
+/bench/loadgen/target/

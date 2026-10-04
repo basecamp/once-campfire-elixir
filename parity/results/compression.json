@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "scope": [
+    "gzip wire bytes",
+    "encoding quality negotiation",
+    "public exception responses",
+    "CSRF pages",
+    "HEAD compressed response metadata"
+  ]
+}

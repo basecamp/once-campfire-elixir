@@ -1,0 +1,76 @@
+```
+date: 2026-10-04T13:36:15+02:00
+host: 7.2.5-4-omarchy, AMD RYZEN AI MAX+ 395 w/ Radeon 8060S, 32 threads, 30GB
+server cpus: 8-11 (nproc 4); loadgen cpus: 12-15; network: host
+env: WEB_CONCURRENCY=3 JOB_CONCURRENCY=3 RAILS_MAX_THREADS=5 
+seed sha256: 433ccdce78759eef0524b2840a512077e52cc8e867f6c095430a8871d47a2e38  /home/dhh/Work/basecamp/once-campfire-rust/parity/.seed/default/db/production.sqlite3
+elixir source digest: ad793a949fb8bc0f03f370a2b562b9226f3e86d9304fc4be6110ea72b0179056
+rust extra env: 
+workload: suites=cable HTTP_SECS=4 HTTP_CONCS=1 16 64 CABLE_CLIENTS=1000 CABLE_TPUT_SECS=15 CABLE_POSTERS=4 UPLOAD_REPS=5 REPS=1
+quiet wait: LOAD_MAX=1.5 LOAD_WAIT_SECS=30
+user agent: (none)
+elixir image: campfire-elixir:release sha256:6faa05c3c97f1ce8a93dd626a7f5e4f84b008ccd4714b53115e9399d7c41a984 2026-10-04T13:35:12.949290566+02:00 unpacked_bytes=2611451232
+rust HEAD: 195457b (dirty: 0 files)
+```
+
+Reps: elixir 1. Cells: median [min–max].
+
+### Startup and memory
+
+| Metric | Elixir | Rust adv. |
+|---|---|---|
+| cold start: docker run → /up 200 (ms) | 513 | – |
+| idle memory.current (MB) | 156 | – |
+| idle anon (MB) | 120 | – |
+| peak memory.current under load (MB) | 443 | – |
+| peak anon under load (MB) | 379 | – |
+
+### HTTP (signed in as david; keep-alive; c = concurrent connections)
+
+| Metric | Elixir | Rust adv. |
+|---|---|---|
+
+### HTTP errors / non-2xx-3xx (first rep, per app)
+
+| Metric | Elixir | Rust adv. |
+|---|---|---|
+- elixir: none
+
+### Action Cable fan-out (one room; chatter.js subscriptions per client)
+
+| Metric | Elixir | Rust adv. |
+|---|---|---|
+| 1000 clients: subscribed | 1,000 | – |
+| 1000 clients: connect+subscribe all (s) | 0.39 | – |
+| 1000 clients: paced post→one client p50 ms | 10.4 | – |
+| 1000 clients: paced post→all clients p50 ms | 17.5 | – |
+| 1000 clients: paced post→all clients p99 ms | 22.0 | – |
+| 1000 clients: max sustained msgs/s (delivered to all) | 61.0 | – |
+| 1000 clients: deliveries/s (client×message) | 61,045 | – |
+| 1000 clients: saturated post→all p50 ms | 54.6 | – |
+| 1000 clients: saturated POST p50 ms | 65.4 | – |
+
+### Upload + thumbnail (black_hole.jpg, 505 KB)
+
+| Metric | Elixir | Rust adv. |
+|---|---|---|
+| POST with attachment (ms) | – | – |
+| then GET thumb → 200 (ms) | – | – |
+| POST → thumbnail served (ms) | – | – |
+
+### Memory during cable fan-out, by process (MB, peak within the phase)
+
+App process: Rails' Puma master and workers (Action Cable runs in them), or Rust's one campfire
+process (its front server included). Pss counts pages shared between forked workers once;
+RssAnon counts them in every process.
+
+| Metric | Elixir | Rust adv. |
+|---|---|---|
+| 1000 clients, all subscribed, idle: app process Pss | 234 | – |
+| 1000 clients, all subscribed, idle: app process RssAnon | 192 | – |
+| 1000 clients, all subscribed, idle: app + Redis + Thruster Pss | 313 | – |
+| 1000 clients, all subscribed, idle: whole container Pss | 314 | – |
+| 1000 clients, saturated fan-out: app process Pss | 313 | – |
+| 1000 clients, saturated fan-out: app process RssAnon | 271 | – |
+| 1000 clients, saturated fan-out: app + Redis + Thruster Pss | 431 | – |
+| 1000 clients, saturated fan-out: whole container Pss | 432 | – |

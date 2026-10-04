@@ -1,0 +1,311 @@
+#!/usr/bin/env bash
+# Benchmark the Elixir and Rust ports on the same Rails seed and CPUs.
+#
+#   bench/run [--apps elixir,rust[,reference]] [--reps 4] [--out DIR] [--user-agent UA]
+#   bench/report DIR            # median + spread table from a results dir
+#
+# Each rep, for each app in turn (never two at once; the order alternates between reps): a fresh
+# copy of parity/.seed/default, a fresh container pinned to SERVER_CPUS, then cold start, idle
+# memory, the HTTP suite, the Action Cable fan-out suite and the upload suite, with container
+# memory sampled throughout and each process's memory, by role, during the fan-out
+# (bench/lib/procmem.py). The load generator (bench/loadgen) runs pinned to LOADGEN_CPUS. Before
+# each app's run it waits (up to LOAD_WAIT_SECS) for the 1-minute load average to drop below
+# LOAD_MAX, and records it.
+#
+# `rust-identity` is the Rust image again, running only the HTTP suite with
+# `Accept-Encoding: identity`: the app's cost without gzip.
+#
+# The load generator sends no User-Agent unless given one with --user-agent, which it then sends on
+# every request; a desktop Chrome, say:
+#   --user-agent 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36'
+#
+# Images (unmodified production images, not the parity ones: no libfaketime, no pinned cable pool,
+# the reference's own resque-pool.yml):
+#   REFERENCE_IMAGE  campfire-reference:app   (parity/bin/reference build)
+#   RUST_IMAGE       campfire-rust:app        (parity/bin/candidate build, from /Dockerfile)
+#
+# Knobs (env): SERVER_CPUS=8-11 LOADGEN_CPUS=12-15 HTTP_SECS=8 HTTP_CONCS="1 16 64"
+#   CABLE_CLIENTS="100 500 1000" CABLE_TPUT_SECS=15 CABLE_POSTERS=4 UPLOAD_REPS=5 PORT=4390
+# The apps run with --network host: PORT and PORT+1 (and 6379, for the reference's Redis) must be
+# free on the host. NETWORK=bridge measures as the preliminary run did instead: the container on
+# Docker's bridge, reached through a published port (docker-proxy), with no DNS resolver.
+#   LOAD_MAX=1.5 LOAD_WAIT_SECS=900 PROCMEM_CPUS=0 SUITES="http cable upload"
+set -euo pipefail
+
+ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
+BENCH=$ROOT/bench
+RUST_ROOT=${RUST_ROOT:-/home/dhh/Work/basecamp/once-campfire-rust}
+SEED=$RUST_ROOT/parity/.seed/default
+LABELS=$SEED/labels.json
+ENV_FILE=$ROOT/parity/reference.env
+
+REFERENCE_IMAGE=${REFERENCE_IMAGE:-campfire-reference:app}
+RUST_IMAGE=${RUST_IMAGE:-campfire-rust:app}
+ELIXIR_IMAGE=${ELIXIR_IMAGE:-campfire-elixir:release}
+SERVER_CPUS=${SERVER_CPUS:-8-11}
+LOADGEN_CPUS=${LOADGEN_CPUS:-12-15}
+HTTP_SECS=${HTTP_SECS:-8}
+HTTP_CONCS=${HTTP_CONCS:-1 16 64}
+CABLE_CLIENTS=${CABLE_CLIENTS:-100 500 1000}
+CABLE_TPUT_SECS=${CABLE_TPUT_SECS:-15}
+CABLE_POSTERS=${CABLE_POSTERS:-4}
+UPLOAD_REPS=${UPLOAD_REPS:-5}
+PORT=${PORT:-47130}
+NETWORK=${NETWORK:-host}
+LOAD_MAX=${LOAD_MAX:-1.5}
+LOAD_WAIT_SECS=${LOAD_WAIT_SECS:-900}
+PROCMEM_CPUS=${PROCMEM_CPUS:-0}
+SUITES=${SUITES:-http cable upload}
+suite() { [[ " $SUITES " = *" $1 "* ]]; }
+# Extra environment for the Rust container only (space-separated K=V). The preliminary run
+# (results/prelim-20260926) used RAILS_MAX_THREADS=128 to dodge a writer/reader-pool deadlock that
+# 1c22a94 fixed; the app now runs as configured.
+RUST_EXTRA_ENV=${RUST_EXTRA_ENV-}
+BASE=http://127.0.0.1:$PORT
+LOADGEN=$ROOT/target/bench/release/loadgen
+
+APPS=elixir,rust REPS=4 OUT="" USER_AGENT_ARGS=()
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --apps) APPS=$2; shift 2 ;;
+    --reps) REPS=$2; shift 2 ;;
+    --out)  OUT=$2; shift 2 ;;
+    --user-agent) USER_AGENT_ARGS=(--user-agent "$2"); shift 2 ;;
+    *) echo "unknown option $1" >&2; exit 2 ;;
+  esac
+done
+OUT=${OUT:-$BENCH/results/$(date +%Y%m%d-%H%M%S)}
+mkdir -p "$OUT"
+WORK=$BENCH/.work
+CONTAINER=bench-campfire-elixir-$PORT
+
+log() { echo "[$(date +%T)] $*" >&2; }
+label() { python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))[sys.argv[2]])' "$LABELS" "$1"; }
+lg() { taskset -c "$LOADGEN_CPUS" "$LOADGEN" "$@" "${USER_AGENT_ARGS[@]}"; }
+
+teardown() {
+  [ -n "${SAMPLER:-}" ] && kill "$SAMPLER" 2>/dev/null || true
+  [ -n "${PROCMEM:-}" ] && kill "$PROCMEM" 2>/dev/null || true
+  docker rm -f "$CONTAINER" >/dev/null 2>&1 || true
+}
+trap teardown EXIT INT TERM
+
+python3 "$BENCH/validate.py" ledger
+python3 - "$PORT" "$NETWORK" <<'PYPORT'
+import socket,sys
+ports=[int(sys.argv[1])]
+if sys.argv[2]=='host':ports += [int(sys.argv[1])+1,6379]
+for port in ports:
+ with socket.socket() as s:
+  s.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)
+  try:s.bind(('127.0.0.1',port))
+  except OSError:raise SystemExit(f'Benchmark port {port} is already occupied')
+PYPORT
+(cd "$BENCH/loadgen" && CARGO_TARGET_DIR=$ROOT/target/bench mise exec rust@1.98.1 -- cargo build --release --locked --offline -q)
+
+ROOM=$(label rooms.watercooler)        # the busy room (131 messages)
+WRITE_ROOM=$(label rooms.hq)           # writes and uploads go here, so the busy room stays put
+BEFORE=$(label messages.busy_060)      # a page in the middle of the busy room
+AVATAR=$(label avatar_tokens.jason)    # image avatar
+EMAIL=$(label emails.david)
+PASSWORD=$(label passwords.all)
+
+image_for() { case "$1" in reference) echo "$REFERENCE_IMAGE" ;; elixir) echo "$ELIXIR_IMAGE" ;; rust|rust-identity) echo "$RUST_IMAGE" ;; esac; }
+
+# Environment: parity/.env.reference, but with the reference's *default* process model for
+# SERVER_CPUS (config/puma.rb: workers = ceil(nproc * 0.666), JOB_CONCURRENCY the same, 5 threads;
+# config/resque-pool.yml: ceil(nproc * 0.5) Resque workers). The Rust app reads RAILS_MAX_THREADS
+# (reader pool) and JOB_CONCURRENCY (job workers) the same way; it is always one process.
+env_args() {
+  if [ "${1:-}" = elixir ]; then printf '%s\n' -e "PORT=$PORT"; fi
+  local ncpu; ncpu=$(taskset -c "$SERVER_CPUS" nproc)
+  local workers=$(( (ncpu * 666 + 999) / 1000 ))
+  grep -Ev '^(#|$|WEB_CONCURRENCY|JOB_CONCURRENCY|RAILS_MAX_THREADS|RAILS_LOG_LEVEL)' "$ENV_FILE" | sed 's/^/-e\n/'
+  printf '%s\n' -e "WEB_CONCURRENCY=$workers" -e "JOB_CONCURRENCY=$workers" -e RAILS_MAX_THREADS=5 -e RAILS_LOG_LEVEL=warn
+  if [[ "${1:-}" = rust* ]]; then local e; for e in $RUST_EXTRA_ENV; do printf '%s\n' -e "$e"; done; fi
+}
+
+# Web Push and webhook deliveries to the seed's real endpoints (fcm.googleapis.com, ...) go to a
+# closed local port instead, so they fail fast without leaving the box (host networking rules out
+# the --dns 127.0.0.1 this used to rely on).
+neuter_deliveries() {
+  python3 - "$1" <<'PY'
+import sqlite3, sys
+db = sqlite3.connect(sys.argv[1])
+db.execute("UPDATE push_subscriptions SET endpoint = 'https://127.0.0.1:9/push/' || id")
+db.execute("UPDATE webhooks SET url = 'http://127.0.0.1:9/hook/' || id")
+db.commit()
+PY
+}
+
+cgroup_dir() { echo "/sys/fs/cgroup/system.slice/docker-$(docker inspect -f '{{.Id}}' "$CONTAINER").scope"; }
+mem_anon() { awk '$1=="anon"{print $2}' "$1/memory.stat"; }
+
+# Samples memory.current and anon every 200ms, keeping the maxima in $1.
+start_sampler() {
+  local cg=$1 out=$2
+  ( max_cur=0 max_anon=0
+    while [ -d "$cg" ]; do
+      cur=$(cat "$cg/memory.current" 2>/dev/null || echo 0); an=$(mem_anon "$cg" 2>/dev/null || echo 0)
+      [ "$cur" -gt "$max_cur" ] && max_cur=$cur; [ "$an" -gt "$max_anon" ] && max_anon=$an
+      echo "{\"peak_current_mb\": $((max_cur / 1048576)), \"peak_anon_mb\": $((max_anon / 1048576))}" > "$out.tmp" && mv "$out.tmp" "$out"
+      sleep 0.2
+    done ) &
+  SAMPLER=$!
+}
+
+start_app() {
+  local app=$1 dir=$WORK/$app
+  docker rm -f "$CONTAINER" >/dev/null 2>&1 || true
+  rm -rf "$dir"; mkdir -p "$dir/db" "$dir/storage"
+  cp -a --reflink=auto "$SEED/db/." "$dir/db/"; cp -a --reflink=auto "$SEED/storage/." "$dir/storage/"
+  neuter_deliveries "$dir/db/production.sqlite3"
+  local args=(); mapfile -t args < <(env_args "$app")
+  sync
+  local t0; t0=$(date +%s.%N)
+  # --network host: no docker-proxy between the load generator and the app (it only exists for
+  # published ports reached from the host, and cost up to ~20% of a request; see
+  # plans/perf-attribution.md §1). Both front servers (Thruster, the Rust app's own) listen on
+  # HTTP_PORT, their app on TARGET_PORT; the reference's Redis takes the host's 6379.
+  local net=(--network host -e "HTTP_PORT=$PORT" -e "TARGET_PORT=$((PORT + 1))")
+  [ "$NETWORK" = bridge ] && net=(--dns 127.0.0.1 -p "127.0.0.1:$PORT:80")
+  docker run -d --name "$CONTAINER" --cpuset-cpus "$SERVER_CPUS" --user "$(id -u):$(id -g)" \
+    "${net[@]}" "${args[@]}" \
+    -v "$dir/db:/rails/storage/db" -v "$dir/storage:/rails/storage/files" \
+    "$(image_for "$app")" >/dev/null
+  for _ in $(seq 1 3000); do
+    if curl -fsS -o /dev/null "$BASE/up" 2>/dev/null; then break; fi
+    sleep 0.02
+  done
+  curl -fsS -o /dev/null "$BASE/up" || { docker logs "$CONTAINER" | tail -30 >&2; return 1; }
+  python3 -c "import sys; print(round((float(sys.argv[2]) - float(sys.argv[1])) * 1000))" "$t0" "$(date +%s.%N)"
+}
+
+# Waits for the 1-minute load average to drop below LOAD_MAX (the previous run's load decays with
+# a one-minute time constant), for at most LOAD_WAIT_SECS.
+wait_for_quiet() {
+  local waited=0
+  while awk -v max="$LOAD_MAX" '{exit !($1 >= max)}' /proc/loadavg && [ "$waited" -lt "$LOAD_WAIT_SECS" ]; do
+    sleep 10; waited=$((waited + 10))
+  done
+  log "load before run: $(cut -d' ' -f1-3 /proc/loadavg) (waited ${waited}s)"
+}
+
+run_rep() {
+  local app=$1 rep=$2 f=$OUT/$app-$rep.json
+  wait_for_quiet
+  local load_start; load_start=$(cat /proc/loadavg)
+  log "$app rep $rep: starting (load: $(cut -d' ' -f1-3 /proc/loadavg))"
+  local cold_ms; cold_ms=$(start_app "$app")
+  local cg; cg=$(cgroup_dir)
+  sleep 10
+  local idle_cur idle_anon
+  idle_cur=$(( $(cat "$cg/memory.current") / 1048576 )); idle_anon=$(( $(mem_anon "$cg") / 1048576 ))
+  start_sampler "$cg" "$OUT/.$app-$rep.mem"
+  log "$app rep $rep: cold start ${cold_ms}ms, idle ${idle_cur}MB (anon ${idle_anon}MB)"
+
+  local cookie scrape csrf streams css
+  cookie=$(lg login --base "$BASE" --email "$EMAIL" --password "$PASSWORD" | python3 -c 'import json,sys; print(json.load(sys.stdin)["cookie"])')
+  scrape=$(lg scrape --base "$BASE" --cookie "$cookie" --room "$ROOM")
+  csrf=$(python3 -c 'import json,sys; print(json.loads(sys.argv[1])["csrf"] or "")' "$scrape")
+  streams=$(python3 -c 'import json,sys; print(",".join(json.loads(sys.argv[1])["streams"]))' "$scrape")
+  css=$(python3 -c 'import json,sys; print(json.loads(sys.argv[1])["css"])' "$scrape")
+
+  local routes=(
+    "room_show|/rooms/$ROOM"
+    "messages_page|/rooms/$ROOM/messages?before=$BEFORE"
+    "sidebar|/users/me/sidebar"
+    "search|/searches?q=coffee"
+    "avatar|/users/$AVATAR/avatar"
+    "static_css|$css"
+    "up|/up"
+    "post_message|POST"
+  )
+  python3 "$BENCH/validate.py" preflight "$BASE" "$cookie" "$ROOM" "$BEFORE" "$AVATAR" "$css" "$WORK/$app/db/production.sqlite3" "$OUT/$app-$rep-validation.json"
+  local http_json="[]" r name path args enc=()
+  [ "$app" = rust-identity ] && enc=(--gzip 0)
+  suite http || routes=()
+  for r in "${routes[@]}"; do
+    name=${r%%|*}; path=${r#*|}
+    if [ "$path" = POST ]; then args=(--post-room "$WRITE_ROOM" --csrf "$csrf"); else args=(--path "$path"); fi
+    args+=("${enc[@]}")
+    lg http --base "$BASE" --cookie "$cookie" "${args[@]}" --conc 4 --duration 2 >/dev/null # warm up
+    for c in $HTTP_CONCS; do
+      local cpu_before; cpu_before=$(awk '$1=="usage_usec" {print $2}' "$cg/cpu.stat")
+      local res; res=$(lg http --base "$BASE" --cookie "$cookie" "${args[@]}" --conc "$c" --duration "$HTTP_SECS")
+      local cpu_after; cpu_after=$(awk '$1=="usage_usec" {print $2}' "$cg/cpu.stat")
+      res=$(python3 -c 'import json,sys; r=json.loads(sys.argv[1]); assert r["errors"]==0 and r.get("invalid_responses",0)==0 and set(r["statuses"])=={"200"}, r; r["cpu_us_per_success"]=(int(sys.argv[3])-int(sys.argv[2]))/r["ok"]; print(json.dumps(r))' "$res" "$cpu_before" "$cpu_after")
+      http_json=$(python3 -c 'import json,sys; a=json.loads(sys.argv[1]); r=json.loads(sys.argv[2]); r["route"]=sys.argv[3]; a.append(r); print(json.dumps(a))' "$http_json" "$res" "$name")
+      log "$app rep $rep: $name c=$c $(python3 -c 'import json,sys; r=json.loads(sys.argv[1]); print(r["rps"], "rps p50", r["latency"].get("p50_ms"), "p99", r["latency"].get("p99_ms"), r["statuses"], "err", r["errors"])' "$res")"
+    done
+  done
+
+  local cable_json="[]" n upload_json='{}'
+  if [ "$app" = rust-identity ] || ! suite cable; then CABLE_CLIENTS_RUN=""; else CABLE_CLIENTS_RUN=$CABLE_CLIENTS; fi
+  for n in $CABLE_CLIENTS_RUN; do
+    local pm=$OUT/.$app-$rep-cable$n
+    taskset -c "$PROCMEM_CPUS" python3 "$BENCH/lib/procmem.py" sample "$cg" "$pm.jsonl" & PROCMEM=$!
+    local res; res=$(lg cable --base "$BASE" --cookie "$cookie" --room "$ROOM" --csrf "$csrf" --streams "$streams" \
+      --clients "$n" --tput-secs "$CABLE_TPUT_SECS" --posters "$CABLE_POSTERS" 2> "$pm.stderr")
+    sleep 0.5; kill "$PROCMEM" 2>/dev/null || true; wait "$PROCMEM" 2>/dev/null || true; PROCMEM=""
+    res=$(python3 -c 'import json,sys; r=json.loads(sys.argv[1]); r["process_memory"]=json.loads(sys.argv[2]); print(json.dumps(r))' \
+      "$res" "$(python3 "$BENCH/lib/procmem.py" phases "$pm.jsonl" "$pm.stderr")")
+    python3 -c 'import json,sys; r=json.loads(sys.argv[1]); assert r["ready"]==r["clients"] and r["failed"]==0 and r["latency"]["complete"]==r["latency"]["messages"] and r["throughput"]["complete"]==r["throughput"]["posted"],r' "$res"
+    cable_json=$(python3 -c 'import json,sys; a=json.loads(sys.argv[1]); a.append(json.loads(sys.argv[2])); print(json.dumps(a))' "$cable_json" "$res")
+    log "$app rep $rep: cable $n clients $(python3 -c 'import json,sys; r=json.loads(sys.argv[1]); print("ready", r["ready"], "lat all p50", r["latency"]["all_clients"].get("p50_ms"), "p99", r["latency"]["all_clients"].get("p99_ms"), "tput", r["throughput"]["delivered_msgs_per_sec"], "msg/s", r["throughput"]["complete"], "/", r["throughput"]["posted"])' "$res")"
+    sleep 2
+  done
+
+  if [ "$app" != rust-identity ] && suite upload; then
+    upload_json=$(lg upload --base "$BASE" --cookie "$cookie" --room "$WRITE_ROOM" --csrf "$csrf" \
+      --file "$ROOT/reference/test/fixtures/files/black_hole.jpg" --reps "$UPLOAD_REPS")
+    python3 -c 'import json,sys; r=json.loads(sys.argv[1]); assert all(x.get("post_status")==200 and x.get("thumb_status")==200 and x.get("thumb_bytes",0)>100 and "error" not in x for x in r["runs"]),r' "$upload_json"
+    log "$app rep $rep: upload median $(python3 -c 'import json,sys; print(json.loads(sys.argv[1])["median_total_ms"])' "$upload_json")ms"
+  fi
+
+  sleep 0.5
+  local peak; peak=$(cat "$OUT/.$app-$rep.mem")
+  local cg_peak; cg_peak=$(( $(cat "$cg/memory.peak" 2>/dev/null || echo 0) / 1048576 ))
+  python3 "$BENCH/job-state.py" > "$OUT/$app-$rep-jobs.json"
+  kill "$SAMPLER" 2>/dev/null || true; SAMPLER=""
+  python3 - "$f" "$app" "$rep" "$cold_ms" "$idle_cur" "$idle_anon" "$peak" "$cg_peak" "$http_json" "$cable_json" "$upload_json" "$load_start" "$(cat /proc/loadavg)" <<'PY'
+import json, sys
+f, app, rep, cold, idle_cur, idle_anon, peak, cg_peak, http, cable, upload, load0, load = sys.argv[1:]
+json.dump({
+  "app": app, "rep": int(rep), "cold_start_ms": int(cold),
+  "memory": {"idle_current_mb": int(idle_cur), "idle_anon_mb": int(idle_anon), **json.loads(peak), "cgroup_peak_mb": int(cg_peak)},
+  "http": json.loads(http), "cable": json.loads(cable), "upload": json.loads(upload), "loadavg_start": load0, "loadavg_end": load,
+}, open(f, "w"), indent=1)
+PY
+  docker rm -f "$CONTAINER" >/dev/null
+  rm -rf "$WORK/$app"
+  log "$app rep $rep: done -> $f"
+}
+
+{
+  echo "date: $(date -Is)"
+  echo "host: $(uname -r), $(grep -m1 'model name' /proc/cpuinfo | cut -d: -f2 | xargs), $(nproc) threads, $(free -g | awk '/Mem:/{print $2}')GB"
+  echo "server cpus: $SERVER_CPUS (nproc $(taskset -c "$SERVER_CPUS" nproc)); loadgen cpus: $LOADGEN_CPUS; network: $NETWORK"
+  echo "env: $(env_args | grep -E 'WEB_CONC|JOB_CONC|MAX_THREADS' | tr '\n' ' ')"
+  echo "seed sha256: $(sha256sum "$SEED/db/production.sqlite3")"
+  echo "elixir source digest: $(python3 "$BENCH/validate.py" digest)"
+  echo "rust extra env: $RUST_EXTRA_ENV"
+  echo "workload: suites=$SUITES HTTP_SECS=$HTTP_SECS HTTP_CONCS=$HTTP_CONCS CABLE_CLIENTS=$CABLE_CLIENTS CABLE_TPUT_SECS=$CABLE_TPUT_SECS CABLE_POSTERS=$CABLE_POSTERS UPLOAD_REPS=$UPLOAD_REPS REPS=$REPS"
+  echo "quiet wait: LOAD_MAX=$LOAD_MAX LOAD_WAIT_SECS=$LOAD_WAIT_SECS"
+  echo "user agent: ${USER_AGENT_ARGS[1]:-(none)}"
+  for app in ${APPS//,/ }; do echo "$app image: $(image_for "$app") $(docker image inspect -f '{{.Id}} {{.Created}} unpacked_bytes={{.Size}}' "$(image_for "$app")")"; done
+  echo "rust HEAD: $(git -C "$RUST_ROOT" rev-parse --short HEAD) (dirty: $(git -C "$RUST_ROOT" status --porcelain -- crates Cargo.toml Cargo.lock | wc -l) files)"
+} > "$OUT/env.txt"
+cat "$OUT/env.txt" >&2
+
+ORDER=(${APPS//,/ })
+for rep in $(seq 1 "$REPS"); do
+  apps=("${ORDER[@]}")
+  if [ $((rep % 2)) -eq 0 ]; then apps=(); for ((i = ${#ORDER[@]} - 1; i >= 0; i--)); do apps+=("${ORDER[$i]}"); done; fi
+  for app in "${apps[@]}"; do
+    echo "$(date +%T) $app rep $rep start: $(uptime)" >> "$OUT/uptime.log"
+    run_rep "$app" "$rep"
+    echo "$(date +%T) $app rep $rep end:   $(uptime)" >> "$OUT/uptime.log"
+  done
+done
+"$BENCH/report" "$OUT" | tee "$OUT/report.md"

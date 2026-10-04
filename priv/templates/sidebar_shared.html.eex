@@ -1,0 +1,3 @@
+<a id="list_<%= @key %>" data-rooms-list-target="room" data-room-id="<%= @id %>" data-badge-dot-target="unread" data-sorted-list-target="item" data-sorted-list-name="<%= @name %>" style="--column-gap: 0.5em" class="align-center gap room btn txt-nowrap<%= if @unread, do: " unread", else: "" %>" href="/rooms/<%= @id %>">
+  <span class="overflow-ellipsis"><%= @name %></span>
+</a>

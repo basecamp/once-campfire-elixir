@@ -1,0 +1,172 @@
+#!/usr/bin/env python3
+"""Summarize a bench/run results dir: median [min-max] across reps, Rails vs Rust.
+
+  bench/report bench/results/<stamp>
+
+"Rust adv." is the Rust advantage: >1 means Rust is better (higher throughput, or lower
+latency/memory/time), computed from the medians. When the results include `rust-identity` runs
+(the Rust image serving `Accept-Encoding: identity`), the HTTP table adds a "Rust, no gzip" column
+and its advantage over Rust with gzip.
+"""
+import glob, json, os, statistics, sys
+
+out = sys.argv[1]
+if os.path.exists(os.path.join(out, "INCOMPLETE.md")):
+    raise SystemExit("Incomplete diagnostic run: refusing to publish benchmark report")
+runs = {}
+for f in sorted(glob.glob(os.path.join(out, "*-*.json"))):
+    r = json.load(open(f))
+    if "app" in r:
+        for h in r.get("http", []):
+            assert h["errors"] == 0 and h.get("invalid_responses", 0) == 0 and set(h["statuses"]) == {"200"}, f
+        for c in r.get("cable", []):
+            assert c["ready"] == c["clients"] and c["failed"] == 0 and c["latency"]["complete"] == c["latency"]["messages"] and c["throughput"]["complete"] == c["throughput"]["posted"], f
+        runs.setdefault(r["app"], []).append(r)
+identity = runs.pop("rust-identity", None)
+apps = [a for a in ("reference", "elixir", "rust") if a in runs]
+
+
+def cell(vals):
+    vals = [v for v in vals if v is not None]
+    if not vals:
+        return None, "–"
+    m = statistics.median(vals)
+    fmt = (lambda v: f"{v:,.0f}") if m >= 100 else (lambda v: f"{v:.1f}") if m >= 10 else (lambda v: f"{v:.2f}")
+    spread = f" [{fmt(min(vals))}–{fmt(max(vals))}]" if len(vals) > 1 else ""
+    return m, fmt(m) + spread
+
+
+def row(name, getter, higher_better, with_identity=False):
+    meds, cells = {}, []
+    for a in apps:
+        vals = []
+        for r in runs[a]:
+            try:
+                vals.append(getter(r))
+            except (KeyError, IndexError, TypeError, StopIteration):
+                vals.append(None)
+        m, c = cell(vals)
+        meds[a] = m
+        cells.append(c)
+    ratio = "–"
+    baseline = "elixir" if "elixir" in meds else "reference"
+    if meds.get(baseline) and meds.get("rust"):
+        x = meds["rust"] / meds[baseline] if higher_better else meds[baseline] / meds["rust"]
+        ratio = f"{x:.1f}×"
+    extra = ""
+    if with_identity:
+        vals = []
+        for r in identity:
+            try:
+                vals.append(getter(r))
+            except (KeyError, IndexError, TypeError, StopIteration):
+                vals.append(None)
+        m, c = cell(vals)
+        vs = "–"
+        if m and meds.get("rust"):
+            vs = f"{(m / meds['rust'] if higher_better else meds['rust'] / m):.2f}×"
+        extra = f" {c} | {vs} |"
+    print(f"| {name} | " + " | ".join(cells) + f" | {ratio} |" + extra)
+
+
+def header(title, with_identity=False, note=""):
+    print(f"\n### {title}\n")
+    if note:
+        print(note + "\n")
+    more = " Rust, no gzip | vs Rust gzip |" if with_identity else ""
+    print("| Metric | " + " | ".join({"reference":"Rails", "elixir":"Elixir", "rust":"Rust"}[a] for a in apps) + " | Rust adv. |" + more)
+    print("|---|" + "---|" * len(apps) + "---|" + ("---|---|" if with_identity else ""))
+
+
+env = os.path.join(out, "env.txt")
+if os.path.exists(env):
+    print("```\n" + open(env).read().strip() + "\n```")
+print(f"\nReps: " + ", ".join(f"{a} {len(runs[a])}" for a in apps) + (f", rust-identity {len(identity)}" if identity else "")
+      + ". Cells: median [min–max].")
+
+header("Startup and memory")
+row("cold start: docker run → /up 200 (ms)", lambda r: r["cold_start_ms"], False)
+row("idle memory.current (MB)", lambda r: r["memory"]["idle_current_mb"], False)
+row("idle anon (MB)", lambda r: r["memory"]["idle_anon_mb"], False)
+row("peak memory.current under load (MB)", lambda r: r["memory"]["peak_current_mb"], False)
+row("peak anon under load (MB)", lambda r: r["memory"]["peak_anon_mb"], False)
+
+first = runs[apps[0]][0]
+routes = []
+for h in first["http"]:
+    if (h["route"], h["conc"]) not in routes:
+        routes.append((h["route"], h["conc"]))
+
+
+def http(route, conc, key):
+    def get(r):
+        h = next(h for h in r["http"] if h["route"] == route and h["conc"] == conc)
+        if h["latency"].get("n", 0) == 0 or h["ok"] == 0:
+            return None
+        return h[key] if key in ["rps", "cpu_us_per_success"] else h["latency"][key]
+    return get
+
+
+wi = bool(identity)
+header("HTTP (signed in as david; keep-alive; c = concurrent connections)", wi)
+for route, conc in routes:
+    row(f"{route} c={conc} req/s", http(route, conc, "rps"), True, wi)
+    row(f"{route} c={conc} p50 ms", http(route, conc, "p50_ms"), False, wi)
+    row(f"{route} c={conc} p99 ms", http(route, conc, "p99_ms"), False, wi)
+    row(f"{route} c={conc} CPU µs/success", http(route, conc, "cpu_us_per_success"), False, wi)
+
+header("HTTP errors / non-2xx-3xx (first rep, per app)")
+for a in apps + (["rust-identity"] if identity else []):
+    bad = [f"{h['route']} c={h['conc']}: {h['statuses']} errors={h['errors']}" for h in (runs.get(a) or identity)[0]["http"]
+           if h["errors"] or any(int(k) >= 400 for k in h["statuses"])]
+    print(f"- {a}: " + ("; ".join(bad) if bad else "none"))
+
+header("Action Cable fan-out (one room; chatter.js subscriptions per client)")
+for i, c in enumerate(first["cable"]):
+    n = c["clients"]
+    g = lambda i=i: (lambda r: r["cable"][i])
+    row(f"{n} clients: subscribed", lambda r, i=i: r["cable"][i]["ready"], True)
+    row(f"{n} clients: connect+subscribe all (s)", lambda r, i=i: r["cable"][i]["connect_secs"], False)
+    row(f"{n} clients: paced post→one client p50 ms", lambda r, i=i: r["cable"][i]["latency"]["per_client"]["p50_ms"], False)
+    row(f"{n} clients: paced post→all clients p50 ms", lambda r, i=i: r["cable"][i]["latency"]["all_clients"]["p50_ms"], False)
+    row(f"{n} clients: paced post→all clients p99 ms", lambda r, i=i: r["cable"][i]["latency"]["all_clients"]["p99_ms"], False)
+    row(f"{n} clients: max sustained msgs/s (delivered to all)", lambda r, i=i: r["cable"][i]["throughput"]["delivered_msgs_per_sec"], True)
+    row(f"{n} clients: deliveries/s (client×message)", lambda r, i=i: r["cable"][i]["throughput"]["frames_per_sec"], True)
+    row(f"{n} clients: saturated post→all p50 ms", lambda r, i=i: r["cable"][i]["throughput"]["all_clients"]["p50_ms"], False)
+    row(f"{n} clients: saturated POST p50 ms", lambda r, i=i: r["cable"][i]["throughput"]["post"]["p50_ms"], False)
+
+header("Upload + thumbnail (black_hole.jpg, 505 KB)")
+med = lambda key: (lambda r: statistics.median([x[key] for x in r["upload"]["runs"] if key in x]))
+row("POST with attachment (ms)", med("post_ms"), False)
+row("then GET thumb → 200 (ms)", med("thumb_ms"), False)
+row("POST → thumbnail served (ms)", lambda r: r["upload"]["median_total_ms"], False)
+
+
+def procmem(n, phase, what):
+    def get(r):
+        c = next(c for c in r["cable"] if c["clients"] == n)
+        p = c["process_memory"][phase]
+        roles = p["roles"]
+        if what == "app":
+            return roles[{"rust":"campfire","elixir":"beam","reference":"puma"}[r["app"]]]["peak_pss_mb"]
+        if what == "app_anon":
+            return roles[{"rust":"campfire","elixir":"beam","reference":"puma"}[r["app"]]]["peak_anon_mb"]
+        if what == "serving":  # everything that takes part in a cable delivery
+            keys = ["campfire"] if r["app"] == "rust" else ["beam", "redis", "helpers", "thrust"] if r["app"] == "elixir" else ["puma", "redis", "thrust"]
+            return sum(roles[k]["peak_pss_mb"] for k in keys if k in roles)
+        return p["peak_total_pss_mb"]
+    return get
+
+
+if all("process_memory" in c for a in apps for r in runs[a] for c in r["cable"]):
+    header("Memory during cable fan-out, by process (MB, peak within the phase)", note=(
+        "App process: Elixir BEAM; Rails Puma master/workers when included;\n"
+        "Rust's integrated campfire process. Serving totals include native helpers, Redis and Thruster.\n"
+        "PSS apportions shared pages; RssAnon counts them in each process."))
+    for c in first["cable"]:
+        n = c["clients"]
+        for phase, label in (("connected", "all subscribed, idle"), ("saturated", "saturated fan-out")):
+            row(f"{n} clients, {label}: app process Pss", procmem(n, phase, "app"), False)
+            row(f"{n} clients, {label}: app process RssAnon", procmem(n, phase, "app_anon"), False)
+            row(f"{n} clients, {label}: app + Redis + Thruster Pss", procmem(n, phase, "serving"), False)
+            row(f"{n} clients, {label}: whole container Pss", procmem(n, phase, "total"), False)

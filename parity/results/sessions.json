@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "flows": [
+    "HTML",
+    "csrf_rejection",
+    "credential_rejection",
+    "login",
+    "session_rows",
+    "bidirectional_cookie_interoperability"
+  ]
+}

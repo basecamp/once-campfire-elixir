@@ -1,0 +1,62 @@
+{
+  "passed": true,
+  "responses": {
+    "room_show": {
+      "status": 200,
+      "type": "text/html; charset=utf-8",
+      "encoding": "gzip",
+      "wire_bytes": 21231,
+      "body_bytes": 463753,
+      "body_sha256": "e5d1a08ac89bd63ee81546260b926737615a3e2dc5fc839d36431366e73ce666"
+    },
+    "messages_page": {
+      "status": 200,
+      "type": "text/html; charset=utf-8",
+      "encoding": "gzip",
+      "wire_bytes": 12082,
+      "body_bytes": 430965,
+      "body_sha256": "64bcd62457e761a17545568c92203458108fdd27b2da66fa58bc3e16b09854c2"
+    },
+    "sidebar": {
+      "status": 200,
+      "type": "text/html; charset=utf-8",
+      "encoding": "gzip",
+      "wire_bytes": 6105,
+      "body_bytes": 31427,
+      "body_sha256": "ff1ae5ad8af391f0f9b8b9d7245819f97b6f9015d73ebd2c35c957c5fe75ab29"
+    },
+    "search": {
+      "status": 200,
+      "type": "text/html; charset=utf-8",
+      "encoding": "gzip",
+      "wire_bytes": 10269,
+      "body_bytes": 165534,
+      "body_sha256": "f576d1d0d2d7abe0254e1c08d76e92d9613da18d52cb478539f342adb5a9c8a4"
+    },
+    "avatar": {
+      "status": 200,
+      "type": "image/webp",
+      "encoding": "gzip",
+      "wire_bytes": 3360,
+      "body_bytes": 3364,
+      "body_sha256": "03511ce37fe4c163e6af2b64238248fbfc7461241cb125c73f708ea1f4d170de"
+    },
+    "static_css": {
+      "status": 200,
+      "type": "text/css",
+      "encoding": "gzip",
+      "wire_bytes": 656,
+      "body_bytes": 1218,
+      "body_sha256": "506e23f429d9d56fc5716e4dbe135c35dd0f017c6883290d58fab02ece4a141c"
+    },
+    "up": {
+      "status": 200,
+      "type": "text/html; charset=utf-8",
+      "encoding": "gzip",
+      "wire_bytes": 88,
+      "body_bytes": 73,
+      "body_sha256": "7e6c9877b2dec7dfadc43e742246d94d515f703dc8e04611320aaca6e26c3af3"
+    }
+  },
+  "populated_fixture_and_integrity": true
+}

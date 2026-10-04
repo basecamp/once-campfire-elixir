@@ -1,0 +1,35 @@
+      
+
+<section class="panel txt-align-center">
+  <div class="flex flex-column gap ">
+    <div class="avatar txt-xx-large center" style="background: white">
+      <img alt="Profile avatar" class="avatar" src="<%= @avatar_src %>" />
+    </div>
+
+        <div class="flex flex-column gap" style="--row-gap: calc(var(--block-space) / 3)">
+          <h1 class="txt-x-large txt-tight-lines margin-none"><%= @name %></h1>
+            <div><a href="mailto:<%= @email %>"><%= @email %></a></div>
+          <div><%= @bio %></div>
+        </div>
+
+          <div class="pad-inline-double margin-inline margin-block-start">
+            <form class="button_to" method="post" action="/rooms/directs?user_ids%5B%5D=<%= @id %>"><button class="btn btn--reversed full-width txt-large" type="submit">
+              <img aria-hidden="true" aria-label="Ping <%= @name %>" src="<%= Assets.path("messages.svg") %>" />
+</button><input type="hidden" name="authenticity_token" value="<%= @direct_token %>" /></form>          </div>
+
+            <hr class="margin-block-start borderless">
+
+            
+<%= @transfer %>
+
+
+          <div class="margin-block-start">
+              <form class="button_to" method="post" action="/users/<%= @id %>/ban"><button class="btn full-width" data-turbo-confirm="Are you sure you want to ban this user? This will log them out, delete their messages, and block their IP addresses." type="submit">
+    <img aria-hidden="true" aria-label="Ban <%= @name %>" src="<%= Assets.path("cancel.svg") %>" />
+    <span>Ban <%= @name %></span>
+</button><input type="hidden" name="authenticity_token" value="<%= @ban_token %>" /></form>
+          </div>
+  </div>
+</section>
+
+

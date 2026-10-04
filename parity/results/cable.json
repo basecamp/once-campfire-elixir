@@ -1,0 +1,4 @@
+{
+  "passed": true,
+  "scope": "protocol, authentication, room/Turbo authorization, typing, read, presence; message/boost broadcasts pending"
+}

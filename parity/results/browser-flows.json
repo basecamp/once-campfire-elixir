@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "browser": "Chrome/153.0.8010.52",
+  "scope": [
+    "login",
+    "create_room",
+    "composer",
+    "composer_file_upload",
+    "edit_room",
+    "profile",
+    "avatar_upload",
+    "account",
+    "logout"
+  ],
+  "method": "actual Chromium with isolated contexts, pinned frontend, Turbo/Stimulus form submissions and file input upload"
+}

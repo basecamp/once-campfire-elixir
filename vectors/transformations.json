@@ -1,0 +1,421 @@
+[
+  {
+    "transformations": {
+      "resize_to_limit": [
+        96,
+        80
+      ]
+    },
+    "fixture": "moon.jpg",
+    "format": "png",
+    "bytes": 4464,
+    "checksum": "x2sehwRTlbgoPU7cccexvg==",
+    "width": 80,
+    "height": 80
+  },
+  {
+    "transformations": {
+      "resize_to_fit": [
+        96,
+        80
+      ]
+    },
+    "fixture": "moon.jpg",
+    "format": "png",
+    "bytes": 4464,
+    "checksum": "x2sehwRTlbgoPU7cccexvg==",
+    "width": 80,
+    "height": 80
+  },
+  {
+    "transformations": {
+      "resize_to_fill": [
+        96,
+        80
+      ]
+    },
+    "fixture": "moon.jpg",
+    "format": "png",
+    "bytes": 5975,
+    "checksum": "8RA/q7lx4ryJ1wJdT8Q7MA==",
+    "width": 96,
+    "height": 80
+  },
+  {
+    "transformations": {
+      "resize_and_pad": [
+        96,
+        80
+      ]
+    },
+    "fixture": "moon.jpg",
+    "format": "png",
+    "bytes": 4568,
+    "checksum": "iN9SbCnixwTDXyQkOYtAQA==",
+    "width": 96,
+    "height": 80
+  },
+  {
+    "transformations": {
+      "resize_to_fit": [
+        2400,
+        1800
+      ]
+    },
+    "fixture": "moon.jpg",
+    "format": "png",
+    "bytes": 496319,
+    "checksum": "FgNsNNRVgFn7XXXIvjdjHw==",
+    "width": 1800,
+    "height": 1800
+  },
+  {
+    "transformations": {
+      "resize_to_limit": [
+        null,
+        80
+      ]
+    },
+    "fixture": "moon.jpg",
+    "format": "png",
+    "bytes": 4464,
+    "checksum": "x2sehwRTlbgoPU7cccexvg==",
+    "width": 80,
+    "height": 80
+  },
+  {
+    "transformations": {
+      "resize_to_fit": [
+        96,
+        null
+      ]
+    },
+    "fixture": "moon.jpg",
+    "format": "png",
+    "bytes": 6535,
+    "checksum": "I48AiAo3OHX/uO4p2GZmSw==",
+    "width": 96,
+    "height": 96
+  },
+  {
+    "transformations": {
+      "rotate": 90
+    },
+    "fixture": "moon.jpg",
+    "format": "png",
+    "bytes": 92873,
+    "checksum": "DlXS5zNlL4o22gV+NkgQRg==",
+    "width": 640,
+    "height": 640
+  },
+  {
+    "transformations": {
+      "rotate": 180
+    },
+    "fixture": "moon.jpg",
+    "format": "png",
+    "bytes": 82180,
+    "checksum": "wp7V2IkJohUZgtqvx4hxCw==",
+    "width": 640,
+    "height": 640
+  },
+  {
+    "transformations": {
+      "rotate": 270
+    },
+    "fixture": "moon.jpg",
+    "format": "png",
+    "bytes": 93001,
+    "checksum": "2ggDmegU20LvQPMmZCWGxA==",
+    "width": 640,
+    "height": 640
+  },
+  {
+    "transformations": {
+      "rotate": 17
+    },
+    "fixture": "moon.jpg",
+    "format": "png",
+    "bytes": 139193,
+    "checksum": "tjwl2uSeDbzWbz0MIYPxmg==",
+    "width": 799,
+    "height": 799
+  },
+  {
+    "transformations": {
+      "flip": "horizontal"
+    },
+    "fixture": "moon.jpg",
+    "format": "png",
+    "bytes": 81996,
+    "checksum": "n+bvvC7FBNexiSxDLvCsdQ==",
+    "width": 640,
+    "height": 640
+  },
+  {
+    "transformations": {
+      "flip": "vertical"
+    },
+    "fixture": "moon.jpg",
+    "format": "png",
+    "bytes": 82343,
+    "checksum": "rtXQbQh+7DGNkKJG3CbRHQ==",
+    "width": 640,
+    "height": 640
+  },
+  {
+    "transformations": {
+      "crop": [
+        12,
+        24,
+        96,
+        80
+      ]
+    },
+    "fixture": "moon.jpg",
+    "format": "png",
+    "bytes": 837,
+    "checksum": "rzLH4nBeYssMtXID1/JxOw==",
+    "width": 96,
+    "height": 80
+  },
+  {
+    "transformations": {
+      "resize": 0.25
+    },
+    "fixture": "moon.jpg",
+    "format": "png",
+    "bytes": 11453,
+    "checksum": "6MBrl1CBqSlHpTO6yyUu9g==",
+    "width": 160,
+    "height": 160
+  },
+  {
+    "transformations": {
+      "sharpen": {
+        "sigma": 1.2
+      }
+    },
+    "fixture": "moon.jpg",
+    "format": "png",
+    "bytes": 85579,
+    "checksum": "tjAEqQiAsOv20ej2ZKKqwQ==",
+    "width": 640,
+    "height": 640
+  },
+  {
+    "transformations": {
+      "gamma": {
+        "exponent": 1.6
+      }
+    },
+    "fixture": "moon.jpg",
+    "format": "png",
+    "bytes": 80934,
+    "checksum": "cATlTevhteMHmvQdSGXYZA==",
+    "width": 640,
+    "height": 640
+  },
+  {
+    "transformations": {
+      "flatten": {
+        "background": [
+          240,
+          245,
+          250
+        ]
+      }
+    },
+    "fixture": "moon.jpg",
+    "format": "png",
+    "error": "Vips::Error"
+  },
+  {
+    "transformations": {
+      "resize_to_fill": [
+        96,
+        80
+      ],
+      "rotate": 90
+    },
+    "fixture": "moon.jpg",
+    "format": "png",
+    "bytes": 6002,
+    "checksum": "cG9mztsJuNZU7PdbXeF2GA==",
+    "width": 80,
+    "height": 96
+  },
+  {
+    "transformations": {
+      "resize_to_fit": [
+        96,
+        80,
+        {
+          "sharpen": false
+        }
+      ]
+    },
+    "fixture": "moon.jpg",
+    "format": "png",
+    "bytes": 4295,
+    "checksum": "lMDR8Q2Ef6A3oJNojAjoBQ==",
+    "width": 80,
+    "height": 80
+  },
+  {
+    "transformations": {
+      "resize_to_cover": [
+        96,
+        80
+      ]
+    },
+    "fixture": "moon.jpg",
+    "format": "png",
+    "bytes": 6535,
+    "checksum": "I48AiAo3OHX/uO4p2GZmSw==",
+    "width": 96,
+    "height": 96
+  },
+  {
+    "transformations": {
+      "loader": {
+        "page": 0,
+        "autorot": false
+      }
+    },
+    "fixture": "moon.jpg",
+    "format": "png",
+    "bytes": 82024,
+    "checksum": "Zo6a7qgIia60VLsl21zkdQ==",
+    "width": 640,
+    "height": 640
+  },
+  {
+    "transformations": {
+      "loader": {
+        "unknown_fixture_option": true
+      }
+    },
+    "fixture": "moon.jpg",
+    "format": "png",
+    "bytes": 82024,
+    "checksum": "Zo6a7qgIia60VLsl21zkdQ==",
+    "width": 640,
+    "height": 640
+  },
+  {
+    "transformations": {
+      "saver": {
+        "compression": 1,
+        "strip": true
+      }
+    },
+    "fixture": "moon.jpg",
+    "format": "png",
+    "bytes": 113551,
+    "checksum": "1k9iPv2M4Q5Cqoa/D9NrjA==",
+    "width": 640,
+    "height": 640
+  },
+  {
+    "transformations": {
+      "saver": {
+        "quality": 20
+      }
+    },
+    "fixture": "moon.jpg",
+    "format": "png",
+    "bytes": 82024,
+    "checksum": "Zo6a7qgIia60VLsl21zkdQ==",
+    "width": 640,
+    "height": 640
+  },
+  {
+    "transformations": {
+      "saver": {
+        "unknown_fixture_option": true
+      }
+    },
+    "fixture": "moon.jpg",
+    "format": "png",
+    "bytes": 82024,
+    "checksum": "Zo6a7qgIia60VLsl21zkdQ==",
+    "width": 640,
+    "height": 640
+  },
+  {
+    "transformations": {
+      "convert": "jpg",
+      "saver": {
+        "quality": 33
+      }
+    },
+    "fixture": "moon.jpg",
+    "format": "png",
+    "bytes": 9208,
+    "checksum": "2HekK+j/nBTspw+r2WTYPg==",
+    "width": 640,
+    "height": 640
+  },
+  {
+    "transformations": {
+      "resize_and_pad": [
+        96,
+        96,
+        {
+          "background": [
+            240,
+            245,
+            250
+          ],
+          "extend": "background",
+          "gravity": "north-west",
+          "alpha": true
+        }
+      ]
+    },
+    "fixture": "moon.jpg",
+    "format": "png",
+    "bytes": 7026,
+    "checksum": "07yca6SAUcBTQ73PpiZOLg==",
+    "width": 96,
+    "height": 96
+  },
+  {
+    "transformations": {
+      "blur": 2
+    },
+    "fixture": "moon.jpg",
+    "format": "png",
+    "error": "Vips::Error"
+  },
+  {
+    "transformations": {
+      "combine_options": {
+        "resize": "96x80"
+      }
+    },
+    "fixture": "moon.jpg",
+    "format": "png",
+    "error": "ArgumentError"
+  },
+  {
+    "transformations": {
+      "nonexistent": true
+    },
+    "fixture": "moon.jpg",
+    "format": "png",
+    "error": "Vips::Error"
+  },
+  {
+    "transformations": {
+      "rotate": false
+    },
+    "fixture": "moon.jpg",
+    "format": "png",
+    "bytes": 82024,
+    "checksum": "Zo6a7qgIia60VLsl21zkdQ==",
+    "width": 640,
+    "height": 640
+  }
+]

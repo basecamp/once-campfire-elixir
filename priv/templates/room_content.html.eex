@@ -1,0 +1,50 @@
+      
+
+
+
+<div id="message-area" class="message-area" contents="true" data-controller="messages presence drop-target" data-action="turbo:before-stream-render@document-&gt;messages#beforeStreamRender keydown.up@document-&gt;messages#editMyLastMessage dragenter-&gt;drop-target#dragenter dragover-&gt;drop-target#dragover drop-&gt;drop-target#drop visibilitychange@document-&gt;presence#visibilityChanged" data-messages-first-of-day-class="message--first-of-day" data-messages-formatted-class="message--formatted" data-messages-me-class="message--me" data-messages-mentioned-class="message--mentioned" data-messages-threaded-class="message--threaded" data-messages-page-url-value="<%= @base %>/rooms/<%= @room_id %>/messages">
+  <script type="text/template" data-messages-target="template">
+  <div class="message message--me $messageClasses$"
+      id="message_$clientMessageId$"
+      data-format-message-target="message"
+      data-user-id="<%= @user_id %>"
+      data-message-timestamp="$messageTimestamp$"
+      data-messages-target="message">
+    <div class="message__day-separator"><time class="message__timestamp" datetime="$messageDatetime$" data-local-time-target="date"></time></div>
+
+    <figure class="avatar message__avatar">
+      <%= @user_avatar %>
+    </figure>
+
+    <div class="message__body">
+      <div class="message__body-content">
+        <div class="message__meta">
+          <h3 class="message__heading">
+            <span class="message__author"><strong><%= @user_name %></strong></span>
+            <span class="message__permalink"><time class="message__timestamp" datetime="$messageDatetime$" data-local-time-target="time"></time></span>
+          </h3>
+          <div class="message__actions">
+            <div class="position-relative">
+              <span class="btn message__action-btn message__options-btn">
+                <img class="colorize--black" aria-hidden="true" src="<%= Campfire.Assets.path("menu-dots-horizontal.svg") %>" />
+                <span class="for-screen-reader">Message options</span>
+              </span>
+            </div class="position-relative">
+          </div>
+        </div>
+        $body$
+      </div>
+    </div>
+  </div>
+</script>
+
+
+  <div id="messages_<%= @room_key %>" class="messages" data-controller="maintain-scroll refresh-room" data-action="turbo:before-stream-render@document-&gt;maintain-scroll#beforeStreamRender visibilitychange@document-&gt;refresh-room#visibilityChanged online@window-&gt;refresh-room#online" data-messages-target="messages" data-refresh-room-loaded-at-value="<%= @room_updated %>" data-refresh-room-url-value="<%= @base %>/rooms/<%= @room_id %>/refresh">
+<%= @invitation %>    
+<%= @messages %></div>
+  <turbo-cable-stream-source channel="RoomMessagesChannel" signed-stream-name="<%= @stream %>"></turbo-cable-stream-source>
+  <button class="message-area__return-to-latest btn" data-action="messages#returnToLatest" data-messages-target="latest" hidden="hidden"><img aria-hidden="true" src="<%= Campfire.Assets.path("arrow-down.svg") %>" width="20" height="20" /><span class="for-screen-reader">Jump to newest message</span></button>
+</div>
+
+
+

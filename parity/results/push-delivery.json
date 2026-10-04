@@ -1,0 +1,12 @@
+{
+  "passed": true,
+  "scope": [
+    "actual HTTPS delivery to controlled allowed-host public-IP fixture",
+    "201/404/410/500 delivery responses",
+    "expired-subscription cleanup",
+    "TLS failure cleanup",
+    "manual notification preserves invalid subscriptions",
+    "private-IP rejection",
+    "isolated namespace with no external network"
+  ]
+}

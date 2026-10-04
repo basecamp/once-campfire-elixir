@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "scope": [
+    "image/video/boost/shared embedded blob room deletion",
+    "all persisted fixture tables",
+    "real queued recursive purge",
+    "shared blobs survive",
+    "all remaining storage files owned by persisted blobs",
+    "SQLite integrity"
+  ]
+}

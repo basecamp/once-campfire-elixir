@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "scope": [
+    "admin/member viewers",
+    "self and other people",
+    "active/banned/deactivated people",
+    "active/deactivated bots",
+    "avatar URLs",
+    "transfer and ban controls",
+    "direct room form token submission",
+    "referrer navigation",
+    "HTML escaping",
+    "missing user/authentication",
+    "full and frame layout"
+  ]
+}

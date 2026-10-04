@@ -1,0 +1,2 @@
+HTTPS push payload, encryption, VAPID and delivery header parity passed
+HTTPS push delivery, payloads and subscription invalidation parity passed

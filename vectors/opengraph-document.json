@@ -1,0 +1,113 @@
+[
+  {
+    "html": "",
+    "attributes": {}
+  },
+  {
+    "html": "<meta property=\"og:title\" content=\"T\"><meta name=\"og:description\" content=\"Desc\">",
+    "attributes": {
+      "title": "T",
+      "description": "Desc"
+    }
+  },
+  {
+    "html": "<meta charset=\"utf-8\"><meta property=\"og:title\" content=\"日本 Ω emoji 😅\"><meta property=\"og:description\" content=\"<b>A &amp; B</b>\">",
+    "attributes": {
+      "title": "日本 Ω emoji 😅",
+      "description": "<b>A & B</b>"
+    }
+  },
+  {
+    "html": "<meta property=\"og:title\" content=\"日本 Ω emoji 😅\">",
+    "attributes": {
+      "title": "  emoji "
+    }
+  },
+  {
+    "html": "<meta property=\"og:title\" content=\"first\"><meta property=\"og:title\" content=\"last\">",
+    "attributes": {
+      "title": "last"
+    }
+  },
+  {
+    "html": "<meta name=\"og:title\" property=\"x\" content=\"name ignored\">",
+    "attributes": {}
+  },
+  {
+    "html": "<META PROPERTY=\"og:title\" CONTENT=\"Upper tag\"><meta property=\"OG:title\" content=\"ignored\">",
+    "attributes": {
+      "title": "Upper tag"
+    }
+  },
+  {
+    "html": "<meta property=\"og:url\" content=\"  https://example.com/  \"><meta property=\"og:image\" content=\"https://example.com/a.jpg\">",
+    "attributes": {
+      "url": "  https://example.com/  ",
+      "image": "https://example.com/a.jpg"
+    }
+  },
+  {
+    "html": "<meta property=\"og:title\" content=\"   \"><meta property=\"og:extra\" content=\"X\">",
+    "attributes": {}
+  },
+  {
+    "html": "<meta charset=\"UTF-8\"><meta property=\"og:title\" content=\"Ω ü\">",
+    "attributes": {
+      "title": "Ω ü"
+    }
+  },
+  {
+    "html": "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"><meta property=\"og:title\" content=\"Ω ü\">",
+    "attributes": {
+      "title": "Ω ü"
+    }
+  },
+  {
+    "html": "<meta charset=\"utf8\"><meta property=\"og:title\" content=\"Ω ü\">",
+    "attributes": {
+      "title": "Ω ü"
+    }
+  },
+  {
+    "html": "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf8\"><meta property=\"og:title\" content=\"Ω ü\">",
+    "attributes": {
+      "title": "Ω ü"
+    }
+  },
+  {
+    "html": "<meta charset=\"iso-8859-1\"><meta property=\"og:title\" content=\"Ω ü\">",
+    "attributes": {
+      "title": "Ω ü"
+    }
+  },
+  {
+    "html": "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\"><meta property=\"og:title\" content=\"Ω ü\">",
+    "attributes": {
+      "title": "Ω ü"
+    }
+  },
+  {
+    "html": "<meta charset=\"Windows-1252\"><meta property=\"og:title\" content=\"Ω ü\">",
+    "attributes": {
+      "title": "Ω ü"
+    }
+  },
+  {
+    "html": "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=Windows-1252\"><meta property=\"og:title\" content=\"Ω ü\">",
+    "attributes": {
+      "title": "Ω ü"
+    }
+  },
+  {
+    "html": "<meta charset=\"invalid\"><meta property=\"og:title\" content=\"Ω ü\">",
+    "attributes": {
+      "title": "Ω ü"
+    }
+  },
+  {
+    "html": "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=invalid\"><meta property=\"og:title\" content=\"Ω ü\">",
+    "attributes": {
+      "title": "Ω ü"
+    }
+  }
+]

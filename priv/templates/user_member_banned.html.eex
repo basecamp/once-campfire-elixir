@@ -1,0 +1,18 @@
+      
+
+<section class="panel txt-align-center">
+  <div class="flex flex-column gap banned">
+    <div class="avatar txt-xx-large center" style="background: white">
+      <img alt="Profile avatar" class="avatar" src="<%= @avatar_src %>" />
+    </div>
+
+        <div class="flex flex-column gap" style="--row-gap: calc(var(--block-space) / 3)">
+          <h1 class="txt-x-large txt-tight-lines margin-none"><%= @name %></h1>
+          <div><%= @bio %></div>
+        </div>
+
+
+  </div>
+</section>
+
+

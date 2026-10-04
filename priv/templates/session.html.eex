@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= @title %></title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, interactive-widget=resizes-content">
+    <meta name="view-transition" content="same-origin">
+    <meta name="color-scheme" content="light dark">
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="csrf-param" content="authenticity_token" />
+<meta name="csrf-token" content="<%= @meta_token %>" />
+    
+    
+    <meta name="action-cable-url" content="/cable">
+
+    <meta name="vapid-public-key" content="<%= @vapid %>">
+    <meta name="turbo-prefetch" content="true">
+
+    <link rel="manifest" href="/webmanifest.json">
+    <link rel="icon" href="/account/logo<%= if @account_version == "", do: "", else: "?v=" <> @account_version %>" type="image/png">
+    <link rel="apple-touch-icon" href="/account/logo<%= if @account_version == "", do: "", else: "?v=" <> @account_version %>">
+
+    <link rel="stylesheet" href="<%= Campfire.Assets.path("_reset.css") %>" data-turbo-track="reload" />
+<link rel="stylesheet" href="<%= Campfire.Assets.path("actiontext.css") %>" data-turbo-track="reload" />
+<link rel="stylesheet" href="<%= Campfire.Assets.path("animation.css") %>" data-turbo-track="reload" />
+<link rel="stylesheet" href="<%= Campfire.Assets.path("autocomplete.css") %>" data-turbo-track="reload" />
+<link rel="stylesheet" href="<%= Campfire.Assets.path("avatars.css") %>" data-turbo-track="reload" />
+<link rel="stylesheet" href="<%= Campfire.Assets.path("base.css") %>" data-turbo-track="reload" />
+<link rel="stylesheet" href="<%= Campfire.Assets.path("boosts.css") %>" data-turbo-track="reload" />
+<link rel="stylesheet" href="<%= Campfire.Assets.path("buttons.css") %>" data-turbo-track="reload" />
+<link rel="stylesheet" href="<%= Campfire.Assets.path("code.css") %>" data-turbo-track="reload" />
+<link rel="stylesheet" href="<%= Campfire.Assets.path("colorize.css") %>" data-turbo-track="reload" />
+<link rel="stylesheet" href="<%= Campfire.Assets.path("colors.css") %>" data-turbo-track="reload" />
+<link rel="stylesheet" href="<%= Campfire.Assets.path("composer.css") %>" data-turbo-track="reload" />
+<link rel="stylesheet" href="<%= Campfire.Assets.path("embeds.css") %>" data-turbo-track="reload" />
+<link rel="stylesheet" href="<%= Campfire.Assets.path("filters.css") %>" data-turbo-track="reload" />
+<link rel="stylesheet" href="<%= Campfire.Assets.path("flash.css") %>" data-turbo-track="reload" />
+<link rel="stylesheet" href="<%= Campfire.Assets.path("inputs.css") %>" data-turbo-track="reload" />
+<link rel="stylesheet" href="<%= Campfire.Assets.path("layout.css") %>" data-turbo-track="reload" />
+<link rel="stylesheet" href="<%= Campfire.Assets.path("lexxy-content.css") %>" data-turbo-track="reload" />
+<link rel="stylesheet" href="<%= Campfire.Assets.path("lexxy-editor.css") %>" data-turbo-track="reload" />
+<link rel="stylesheet" href="<%= Campfire.Assets.path("lexxy-variables.css") %>" data-turbo-track="reload" />
+<link rel="stylesheet" href="<%= Campfire.Assets.path("lexxy.css") %>" data-turbo-track="reload" />
+<link rel="stylesheet" href="<%= Campfire.Assets.path("lightbox.css") %>" data-turbo-track="reload" />
+<link rel="stylesheet" href="<%= Campfire.Assets.path("messages.css") %>" data-turbo-track="reload" />
+<link rel="stylesheet" href="<%= Campfire.Assets.path("nav.css") %>" data-turbo-track="reload" />
+<link rel="stylesheet" href="<%= Campfire.Assets.path("panels.css") %>" data-turbo-track="reload" />
+<link rel="stylesheet" href="<%= Campfire.Assets.path("separators.css") %>" data-turbo-track="reload" />
+<link rel="stylesheet" href="<%= Campfire.Assets.path("sidebar.css") %>" data-turbo-track="reload" />
+<link rel="stylesheet" href="<%= Campfire.Assets.path("signup.css") %>" data-turbo-track="reload" />
+<link rel="stylesheet" href="<%= Campfire.Assets.path("spinner.css") %>" data-turbo-track="reload" />
+<link rel="stylesheet" href="<%= Campfire.Assets.path("trix.css") %>" data-turbo-track="reload" />
+<link rel="stylesheet" href="<%= Campfire.Assets.path("utilities.css") %>" data-turbo-track="reload" />
+    <%= @custom_styles %>
+
+    <script type="importmap" data-turbo-track="reload">{
+  "imports": {
+    "application": "<%= Campfire.Assets.path("application.js") %>",
+    "@hotwired/stimulus": "<%= Campfire.Assets.path("stimulus.min.js") %>",
+    "@hotwired/stimulus-loading": "<%= Campfire.Assets.path("stimulus-loading.js") %>",
+    "@hotwired/turbo-rails": "<%= Campfire.Assets.path("turbo.js") %>",
+    "@rails/actioncable": "<%= Campfire.Assets.path("actioncable.esm.js") %>",
+    "@rails/request.js": "<%= Campfire.Assets.path("@rails--request.js") %>",
+    "lexxy": "<%= Campfire.Assets.path("lexxy.js") %>",
+    "highlight.js": "<%= Campfire.Assets.path("highlight.js/core.js") %>",
+    "initializers/autocomplete": "<%= Campfire.Assets.path("initializers/autocomplete.js") %>",
+    "initializers/current": "<%= Campfire.Assets.path("initializers/current.js") %>",
+    "initializers/highlight": "<%= Campfire.Assets.path("initializers/highlight.js") %>",
+    "initializers": "<%= Campfire.Assets.path("initializers/index.js") %>",
+    "initializers/rich_text": "<%= Campfire.Assets.path("initializers/rich_text.js") %>",
+    "lib/autocomplete/autocomplete_handler": "<%= Campfire.Assets.path("lib/autocomplete/autocomplete_handler.js") %>",
+    "lib/autocomplete/base_autocomplete_handler": "<%= Campfire.Assets.path("lib/autocomplete/base_autocomplete_handler.js") %>",
+    "lib/autocomplete/collection": "<%= Campfire.Assets.path("lib/autocomplete/collection.js") %>",
+    "lib/autocomplete/constants": "<%= Campfire.Assets.path("lib/autocomplete/constants.js") %>",
+    "lib/autocomplete/custom_elements/suggestion_option": "<%= Campfire.Assets.path("lib/autocomplete/custom_elements/suggestion_option.js") %>",
+    "lib/autocomplete/custom_elements/suggestion_select": "<%= Campfire.Assets.path("lib/autocomplete/custom_elements/suggestion_select.js") %>",
+    "lib/autocomplete/helpers": "<%= Campfire.Assets.path("lib/autocomplete/helpers.js") %>",
+    "lib/autocomplete/renderer": "<%= Campfire.Assets.path("lib/autocomplete/renderer.js") %>",
+    "lib/autocomplete/selection": "<%= Campfire.Assets.path("lib/autocomplete/selection.js") %>",
+    "lib/autocomplete/suggestion_context": "<%= Campfire.Assets.path("lib/autocomplete/suggestion_context.js") %>",
+    "lib/autocomplete/suggestion_controller": "<%= Campfire.Assets.path("lib/autocomplete/suggestion_controller.js") %>",
+    "lib/autocomplete/suggestion_results_controller": "<%= Campfire.Assets.path("lib/autocomplete/suggestion_results_controller.js") %>",
+    "lib/autocomplete/utils": "<%= Campfire.Assets.path("lib/autocomplete/utils.js") %>",
+    "lib/cookie": "<%= Campfire.Assets.path("lib/cookie.js") %>",
+    "lib/rich_text/campfire_extension": "<%= Campfire.Assets.path("lib/rich_text/campfire_extension.js") %>",
+    "lib/rich_text/cite_node": "<%= Campfire.Assets.path("lib/rich_text/cite_node.js") %>",
+    "controllers/application": "<%= Campfire.Assets.path("controllers/application.js") %>",
+    "controllers/auto_submit_controller": "<%= Campfire.Assets.path("controllers/auto_submit_controller.js") %>",
+    "controllers/autocomplete_controller": "<%= Campfire.Assets.path("controllers/autocomplete_controller.js") %>",
+    "controllers/badge_dot_controller": "<%= Campfire.Assets.path("controllers/badge_dot_controller.js") %>",
+    "controllers/boost_delete_controller": "<%= Campfire.Assets.path("controllers/boost_delete_controller.js") %>",
+    "controllers/composer_controller": "<%= Campfire.Assets.path("controllers/composer_controller.js") %>",
+    "controllers/copy_to_clipboard_controller": "<%= Campfire.Assets.path("controllers/copy_to_clipboard_controller.js") %>",
+    "controllers/drop_target_controller": "<%= Campfire.Assets.path("controllers/drop_target_controller.js") %>",
+    "controllers/element_removal_controller": "<%= Campfire.Assets.path("controllers/element_removal_controller.js") %>",
+    "controllers/filter_controller": "<%= Campfire.Assets.path("controllers/filter_controller.js") %>",
+    "controllers/form_controller": "<%= Campfire.Assets.path("controllers/form_controller.js") %>",
+    "controllers": "<%= Campfire.Assets.path("controllers/index.js") %>",
+    "controllers/lightbox_controller": "<%= Campfire.Assets.path("controllers/lightbox_controller.js") %>",
+    "controllers/local_time_controller": "<%= Campfire.Assets.path("controllers/local_time_controller.js") %>",
+    "controllers/maintain_scroll_controller": "<%= Campfire.Assets.path("controllers/maintain_scroll_controller.js") %>",
+    "controllers/messages_controller": "<%= Campfire.Assets.path("controllers/messages_controller.js") %>",
+    "controllers/notifications_controller": "<%= Campfire.Assets.path("controllers/notifications_controller.js") %>",
+    "controllers/popup_controller": "<%= Campfire.Assets.path("controllers/popup_controller.js") %>",
+    "controllers/presence_controller": "<%= Campfire.Assets.path("controllers/presence_controller.js") %>",
+    "controllers/pwa_install_controller": "<%= Campfire.Assets.path("controllers/pwa_install_controller.js") %>",
+    "controllers/read_rooms_controller": "<%= Campfire.Assets.path("controllers/read_rooms_controller.js") %>",
+    "controllers/refresh_room_controller": "<%= Campfire.Assets.path("controllers/refresh_room_controller.js") %>",
+    "controllers/reply_controller": "<%= Campfire.Assets.path("controllers/reply_controller.js") %>",
+    "controllers/rooms_list_controller": "<%= Campfire.Assets.path("controllers/rooms_list_controller.js") %>",
+    "controllers/scroll_into_view_controller": "<%= Campfire.Assets.path("controllers/scroll_into_view_controller.js") %>",
+    "controllers/search_results_controller": "<%= Campfire.Assets.path("controllers/search_results_controller.js") %>",
+    "controllers/sessions_controller": "<%= Campfire.Assets.path("controllers/sessions_controller.js") %>",
+    "controllers/soft_keyboard_controller": "<%= Campfire.Assets.path("controllers/soft_keyboard_controller.js") %>",
+    "controllers/sorted_list_controller": "<%= Campfire.Assets.path("controllers/sorted_list_controller.js") %>",
+    "controllers/sound_controller": "<%= Campfire.Assets.path("controllers/sound_controller.js") %>",
+    "controllers/toggle_class_controller": "<%= Campfire.Assets.path("controllers/toggle_class_controller.js") %>",
+    "controllers/turbo_frame_controller": "<%= Campfire.Assets.path("controllers/turbo_frame_controller.js") %>",
+    "controllers/turbo_streaming_controller": "<%= Campfire.Assets.path("controllers/turbo_streaming_controller.js") %>",
+    "controllers/typing_notifications_controller": "<%= Campfire.Assets.path("controllers/typing_notifications_controller.js") %>",
+    "controllers/unfurl_controller": "<%= Campfire.Assets.path("controllers/unfurl_controller.js") %>",
+    "controllers/upload_preview_controller": "<%= Campfire.Assets.path("controllers/upload_preview_controller.js") %>",
+    "controllers/web_share_controller": "<%= Campfire.Assets.path("controllers/web_share_controller.js") %>",
+    "helpers/dom_helpers": "<%= Campfire.Assets.path("helpers/dom_helpers.js") %>",
+    "helpers/navigator_helpers": "<%= Campfire.Assets.path("helpers/navigator_helpers.js") %>",
+    "helpers/string_helpers": "<%= Campfire.Assets.path("helpers/string_helpers.js") %>",
+    "helpers/timing_helpers": "<%= Campfire.Assets.path("helpers/timing_helpers.js") %>",
+    "helpers/turbo_helpers": "<%= Campfire.Assets.path("helpers/turbo_helpers.js") %>",
+    "models/client_message": "<%= Campfire.Assets.path("models/client_message.js") %>",
+    "models/file_uploader": "<%= Campfire.Assets.path("models/file_uploader.js") %>",
+    "models/message_formatter": "<%= Campfire.Assets.path("models/message_formatter.js") %>",
+    "models/message_paginator": "<%= Campfire.Assets.path("models/message_paginator.js") %>",
+    "models/scroll_manager": "<%= Campfire.Assets.path("models/scroll_manager.js") %>",
+    "models/typing_tracker": "<%= Campfire.Assets.path("models/typing_tracker.js") %>",
+    "languages/bash": "<%= Campfire.Assets.path("languages/bash.js") %>",
+    "languages/css": "<%= Campfire.Assets.path("languages/css.js") %>",
+    "languages/diff": "<%= Campfire.Assets.path("languages/diff.js") %>",
+    "languages/go": "<%= Campfire.Assets.path("languages/go.js") %>",
+    "languages/java": "<%= Campfire.Assets.path("languages/java.js") %>",
+    "languages/javascript": "<%= Campfire.Assets.path("languages/javascript.js") %>",
+    "languages/json": "<%= Campfire.Assets.path("languages/json.js") %>",
+    "languages/python": "<%= Campfire.Assets.path("languages/python.js") %>",
+    "languages/ruby": "<%= Campfire.Assets.path("languages/ruby.js") %>",
+    "languages/rust": "<%= Campfire.Assets.path("languages/rust.js") %>",
+    "languages/sql": "<%= Campfire.Assets.path("languages/sql.js") %>",
+    "languages/xml": "<%= Campfire.Assets.path("languages/xml.js") %>"
+  }
+}</script>
+<link rel="modulepreload" href="<%= Campfire.Assets.path("application.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("stimulus.min.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("stimulus-loading.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("turbo.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("actioncable.esm.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("@rails--request.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("lexxy.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("highlight.js/core.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("initializers/autocomplete.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("initializers/current.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("initializers/highlight.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("initializers/index.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("initializers/rich_text.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("lib/autocomplete/autocomplete_handler.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("lib/autocomplete/base_autocomplete_handler.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("lib/autocomplete/collection.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("lib/autocomplete/constants.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("lib/autocomplete/custom_elements/suggestion_option.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("lib/autocomplete/custom_elements/suggestion_select.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("lib/autocomplete/helpers.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("lib/autocomplete/renderer.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("lib/autocomplete/selection.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("lib/autocomplete/suggestion_context.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("lib/autocomplete/suggestion_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("lib/autocomplete/suggestion_results_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("lib/autocomplete/utils.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("lib/cookie.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("lib/rich_text/campfire_extension.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("lib/rich_text/cite_node.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/application.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/auto_submit_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/autocomplete_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/badge_dot_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/boost_delete_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/composer_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/copy_to_clipboard_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/drop_target_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/element_removal_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/filter_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/form_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/index.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/lightbox_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/local_time_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/maintain_scroll_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/messages_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/notifications_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/popup_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/presence_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/pwa_install_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/read_rooms_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/refresh_room_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/reply_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/rooms_list_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/scroll_into_view_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/search_results_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/sessions_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/soft_keyboard_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/sorted_list_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/sound_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/toggle_class_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/turbo_frame_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/turbo_streaming_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/typing_notifications_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/unfurl_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/upload_preview_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("controllers/web_share_controller.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("helpers/dom_helpers.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("helpers/navigator_helpers.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("helpers/string_helpers.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("helpers/timing_helpers.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("helpers/turbo_helpers.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("models/client_message.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("models/file_uploader.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("models/message_formatter.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("models/message_paginator.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("models/scroll_manager.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("models/typing_tracker.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("languages/bash.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("languages/css.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("languages/diff.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("languages/go.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("languages/java.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("languages/javascript.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("languages/json.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("languages/python.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("languages/ruby.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("languages/rust.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("languages/sql.js") %>">
+<link rel="modulepreload" href="<%= Campfire.Assets.path("languages/xml.js") %>">
+<script type="module">import "application"</script>
+
+    <%= @head %>
+  </head>
+
+  <body class="<%= @body_class %><%= if @account_has_logo, do: (if @body_class == "", do: "", else: " ") <> "account-has-logo", else: "" %>" data-controller="local-time lightbox">
+    <a href="#main-content" class="skip-navigation btn">Skip to main content</a>
+
+    <nav id="nav">
+      
+    </nav>
+
+<%= @flash %>    <main id="main-content">
+      
+<%= @content %>      <footer id="footer">
+        
+      </footer>
+    </main>
+
+    <aside id="sidebar" data-controller="toggle-class" data-toggle-class-toggle-class="open">
+      
+    </aside>
+
+    <dialog class="lightbox" aria-label="Image Viewer (Press escape to close)" data-lightbox-target="dialog" data-action="close->lightbox#reset">
+  <img src="" class="lightbox__image" data-lightbox-target="zoomedImage" />
+
+  <form method="dialog" class="lightbox__btn">
+    <button class="btn">
+      <img aria-hidden="true" src="<%= Campfire.Assets.path("remove.svg") %>" />
+      <span class="for-screen-reader">Close image viewer</span>
+    </button>
+  </form>
+
+  <a href="" class="lightbox__btn--download btn hide-in-ios-pwa" data-lightbox-target="download">
+    <img aria-hidden="true" src="<%= Campfire.Assets.path("download.svg") %>" />
+    <span class="for-screen-reader">Download file</span>
+  </a>
+
+  <button class="lightbox__btn--share btn"
+      data-controller="web-share"
+      data-action="web-share#share"
+      data-web-share-files-value=""
+      data-lightbox-target="share">
+    <img aria-hidden="true" src="<%= Campfire.Assets.path("share.svg") %>" />
+    <span class="for-screen-reader">Share file</span>
+  </button>
+</dialog>
+
+
+    <a href="https://once.com" id="app-logo" target="_blank" aria-label="Once software from 37signals home page">
+      <img alt="Campfire logo" width="256" height="216" src="<%= Campfire.Assets.path("campfire-icon.png") %>" />
+    </a>
+  </body>
+</html>

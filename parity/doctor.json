@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "kind": "migration-preflight",
+  "ready": false,
+  "checks": [
+    {
+      "check": "pinned, unchanged reference",
+      "passed": true
+    },
+    {
+      "check": "configured reference runner",
+      "passed": true
+    },
+    {
+      "check": "nonempty HTTP parity inventory",
+      "passed": true
+    },
+    {
+      "check": "rollback rehearsal configured",
+      "passed": false,
+      "reason": "configure a nonempty command array in migration.toml; no shell or runtime fallback is used"
+    },
+    {
+      "check": "contract evidence ledger",
+      "passed": false,
+      "reason": "sessions: implemented, not verified"
+    }
+  ],
+  "limits": "Preflight validates configuration and evidence links; verify executes gates. Neither authorizes deployment."
+}

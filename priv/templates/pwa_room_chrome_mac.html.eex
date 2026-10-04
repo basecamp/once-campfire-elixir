@@ -1,0 +1,41 @@
+              <details class="notifications-help" data-notifications-target="details">
+    <summary class="btn">
+      <img aria-hidden="true" src="<%= Assets.path("external/web.svg") %>" width="20" height="20" />
+      <strong>Check your <%= @browser %> settings</strong>
+      <img aria-hidden="true" class="disclosure" src="<%= Assets.path("disclosure.svg") %>" width="10" height="10" />
+    </summary>
+
+        <h2 class="txt-normal txt-medium margin-block-start">Turn on notifications for this website.</h2>
+        <ol>
+          <li>Click the <em><img alt="View site information" src="<%= Assets.path("external/sliders.svg") %>" width="20" height="20" /></em> icon in the address bar.</li>
+          <li>Click <em>Site Settings</em>.</li>
+          <li>Ensure notifications are <em>Allowed</em>.</li>
+        </ol>
+
+        <h2 class="txt-normal txt-medium margin-block-start">Turn on notifications for <%= @browser %>.</h2>
+        <ol>
+            <li>Click <em aria-label="the Apple menu"></em> in the top left.</li>
+            <li>Click <em>System Settings…</em>.</li>
+            <li>Click <em>Notifications</em>.</li>
+            <li>Click <em><%= @browser %></em>.</li>
+            <li>Click <em><img alt="the switch" src="<%= Assets.path("external/switch.svg") %>" width="22" height="22" /></em> to <em>Allow notifications</em>.</li>
+        </ol>
+  </details>
+
+            <details class="notifications-help hide-in-browser" data-notifications-target="details">
+  <summary class="btn">
+    <img aria-hidden="true" src="<%= Assets.path("external/gear.svg") %>" width="20" height="20" />
+    <strong>Check your <%= @os %> settings</strong>
+    <img aria-hidden="true" class="disclosure" src="<%= Assets.path("disclosure.svg") %>" width="10" height="10" />
+  </summary>
+
+      <ol>
+          <li>Click <em aria-label="the Apple menu"></em> in the top left.</li>
+          <li>Click <em>System Settings…</em>.</li>
+          <li>Click <em>Notifications</em>.</li>
+          <li>Click <em>Campfire</em>.</li>
+          <li>Click <em><img alt="the allow notifications switch" src="<%= Assets.path("external/switch.svg") %>" width="22" height="22" /></em> to <em>Allow notifications</em>.</li>
+      </ol>
+</details>
+
+            

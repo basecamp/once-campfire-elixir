@@ -1,0 +1,16 @@
+#!/bin/sh
+set -eu
+ROOT=$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)
+REVISION=$(docker image inspect campfire-reference:app --format '{{range .Config.Env}}{{println .}}{{end}}' | sed -n 's/^GIT_REVISION=//p')
+EXPECTED=$(git -C "$ROOT/reference" rev-parse HEAD)
+[ "$REVISION" = "$EXPECTED" ] || { echo "Reference image revision differs from pinned source" >&2; exit 1; }
+CONTAINER=$(docker create campfire-reference:app)
+trap 'docker rm "$CONTAINER" >/dev/null' EXIT
+mkdir -p "$ROOT/priv/static/assets"
+docker cp "$CONTAINER:/rails/public/assets/." "$ROOT/priv/static/assets/"
+
+mkdir -p "$ROOT/priv/public" "$ROOT/priv/pwa" "$ROOT/priv/images/logos"
+for file in robots.txt 404.html 422.html 500.html 502.html; do docker cp "$CONTAINER:/rails/public/$file" "$ROOT/priv/public/$file"; done
+cp "$ROOT/reference/app/views/pwa/manifest.json.erb" "$ROOT/reference/app/views/pwa/service_worker.js" "$ROOT/priv/pwa/"
+cp "$ROOT/reference/app/assets/images/logos/app-icon.png" "$ROOT/reference/app/assets/images/logos/app-icon-192.png" "$ROOT/priv/images/logos/"
+cp "$ROOT/reference/app/assets/images/default-bot-avatar.svg" "$ROOT/priv/images/"

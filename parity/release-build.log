@@ -1,0 +1,200 @@
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 904B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/campfire-elixir:toolchain
+#2 DONE 0.0s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 140B done
+#3 DONE 0.0s
+
+#4 [build 1/7] FROM docker.io/library/campfire-elixir:toolchain@sha256:d6ea3b465f6f0bb1ba425faed1ec1eb40d1a6dc4f0f63ecae4d9c7ca8b64b9a3
+#4 resolve docker.io/library/campfire-elixir:toolchain@sha256:d6ea3b465f6f0bb1ba425faed1ec1eb40d1a6dc4f0f63ecae4d9c7ca8b64b9a3 0.0s done
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 257.58kB 0.0s done
+#5 DONE 0.0s
+
+#6 [build 2/7] COPY mix.exs mix.lock ./
+#6 CACHED
+
+#7 [build 3/7] COPY deps ./deps
+#7 CACHED
+
+#8 [build 4/7] COPY lib ./lib
+#8 DONE 0.0s
+
+#9 [build 5/7] COPY priv ./priv
+#9 DONE 0.1s
+
+#10 [build 6/7] COPY vectors/message-etags.json vectors/mime-types.json vectors/route-actions.json vectors/image-etags.json vectors/sounds.json vectors/fragment-digests.json ./vectors/
+#10 DONE 0.0s
+
+#11 [build 7/7] RUN mix deps.compile && mix compile --warnings-as-errors && mix release
+#11 0.438 ==> floki
+#11 0.439 Compiling 2 files (.erl)
+#11 0.653 Compiling 30 files (.ex)
+#11 1.414 Generated floki app
+#11 1.440 ==> mime
+#11 1.440 Compiling 1 file (.ex)
+#11 1.488 Generated mime app
+#11 1.496 ==> nimble_options
+#11 1.496 Compiling 3 files (.ex)
+#11 1.652 Generated nimble_options app
+#11 1.662 ==> jason
+#11 1.662 Compiling 10 files (.ex)
+#11 2.241 Generated jason app
+#11 2.248 ==> comeonin
+#11 2.248 Compiling 3 files (.ex)
+#11 2.260 Generated comeonin app
+#11 2.267 ==> plug_crypto
+#11 2.267 Compiling 5 files (.ex)
+#11 2.311 Generated plug_crypto app
+#11 2.320 ==> qqr
+#11 2.320 Compiling 24 files (.ex)
+#11 2.544 Generated qqr app
+#11 2.563 ==> hpax
+#11 2.563 Compiling 4 files (.ex)
+#11 2.739 Generated hpax app
+#11 2.747 ==> elixir_make
+#11 2.747 Compiling 8 files (.ex)
+#11 2.794 Generated elixir_make app
+#11 2.803 ==> bcrypt_elixir
+#11 2.806 mkdir -p "/app/_build/prod/lib/bcrypt_elixir/priv"
+#11 2.809 cc -g -O3 -Wall -Wno-format-truncation -I"/usr/local/lib/erlang/erts-16.4.0.6/include" -Ic_src -fPIC -shared  c_src/bcrypt_nif.c c_src/blowfish.c -o "/app/_build/prod/lib/bcrypt_elixir/priv/bcrypt_nif.so"
+#11 3.013 Compiling 3 files (.ex)
+#11 3.030 Generated bcrypt_elixir app
+#11 3.199 ==> campfire
+#11 3.199 ===> Analyzing applications...
+#11 3.207 ===> Compiling telemetry
+#11 3.307 ==> redix
+#11 3.307 Compiling 17 files (.ex)
+#11 3.512      warning: CAStore.file_path/0 is undefined (module CAStore is not available or is yet to be defined). Make sure the module name is correct and has been specified in full (or that an alias has been defined)
+#11 3.512      │
+#11 3.512  426 │               [cacertfile: ca_store_mod.file_path()]
+#11 3.512      │                                         ~
+#11 3.512      │
+#11 3.512      └─ lib/redix/connector.ex:426:41: Redix.Connector.build_socket_opts/3
+#11 3.512 
+#11 3.513 Generated redix app
+#11 3.526 ==> db_connection
+#11 3.526 Compiling 18 files (.ex)
+#11 3.798 Generated db_connection app
+#11 3.815 ==> thousand_island
+#11 3.815 Compiling 18 files (.ex)
+#11 3.892 Generated thousand_island app
+#11 3.905 ==> plug
+#11 3.905 Compiling 1 file (.erl)
+#11 3.960 Compiling 42 files (.ex)
+#11 4.773 Generated plug app
+#11 4.796 ==> nimble_pool
+#11 4.796 Compiling 2 files (.ex)
+#11 4.896 Generated nimble_pool app
+#11 4.909 ==> fast_html
+#11 4.910 # Sadly, build components separately seems to sporadically fail
+#11 4.910 cd c_src/lexbor; \
+#11 4.910 	CFLAGS='-g -O2 -pedantic -Wcomment -Wextra -Wno-old-style-declaration -Wall' \
+#11 4.910 	CPPFLAGS='' \
+#11 4.910 	cmake -DLEXBOR_BUILD_SEPARATELY=OFF -DLEXBOR_BUILD_SHARED=OFF
+#11 4.929 CMake Warning:
+#11 4.929   No source or binary directory provided.  Both will be assumed to be the
+#11 4.929   same as the current working directory, but note that this warning will
+#11 4.929   become a fatal error in future CMake releases.
+#11 4.929 
+#11 4.929 
+#11 4.930 -- Project name: lexbor
+#11 4.936 -- Build without Threads
+#11 4.936 -- Lexbor version: 2.4.0
+#11 4.940 -- Append module: core (1.8.0)
+#11 4.941 -- Append module: css (1.2.0)
+#11 4.941 -- Append module: dom (1.7.0)
+#11 4.941 -- Append module: encoding (2.1.0)
+#11 4.941 -- Append module: html (2.5.0)
+#11 4.941 -- Append module: ns (1.2.0)
+#11 4.941 -- Append module: punycode (1.1.0)
+#11 4.941 -- Append module: selectors (0.3.0)
+#11 4.942 -- Append module: tag (1.3.0)
+#11 4.942 -- Append module: unicode (0.2.0)
+#11 4.942 -- Append module: url (0.2.0)
+#11 4.942 -- Append module: utils (0.3.0)
+#11 4.942 -- CFLAGS: -g -O2 -pedantic -Wcomment -Wextra -Wno-old-style-declaration -Wall -O2 -Wall -pedantic -pipe -std=c99 -fPIC
+#11 4.942 -- CXXFLAGS:  -O2 
+#11 4.971 -- Feature ASAN: disable
+#11 4.971 -- Feature Fuzzer: disable
+#11 4.974 -- Configuring done (0.0s)
+#11 4.985 -- Generating done (0.0s)
+#11 4.986 -- Build files have been written to: /app/deps/fast_html/c_src/lexbor
+#11 4.987 /usr/bin/make -C c_src/lexbor
+#11 4.990 make[1]: Entering directory '/app/deps/fast_html/c_src/lexbor'
+#11 5.058 [100%] Built target lexbor_static
+#11 5.064 make[1]: Leaving directory '/app/deps/fast_html/c_src/lexbor'
+#11 5.066 Compiling 4 files (.ex)
+#11 5.088 Generated fast_html app
+#11 5.096 ==> cc_precompiler
+#11 5.096 Compiling 3 files (.ex)
+#11 5.152 Generated cc_precompiler app
+#11 5.164 ==> exqlite
+#11 5.168  CC sqlite3_nif.o
+#11 5.407  LD sqlite3_nif.so
+#11 5.420 Compiling 12 files (.ex)
+#11 5.528 Generated exqlite app
+#11 5.539 ==> websock
+#11 5.539 Compiling 1 file (.ex)
+#11 5.547 Generated websock app
+#11 5.558 ==> bandit
+#11 5.558 Compiling 54 files (.ex)
+#11 5.877 Generated bandit app
+#11 6.199 Compiling 86 files (.ex)
+#11 7.097 Generated campfire app
+#11 7.437 * assembling campfire-0.1.0 on MIX_ENV=prod
+#11 7.437 * skipping runtime configuration (config/runtime.exs not found)
+#11 7.513 * skipping elixir.bat for windows (bin/elixir.bat not found in the Elixir installation)
+#11 7.513 * skipping iex.bat for windows (bin/iex.bat not found in the Elixir installation)
+#11 7.613 
+#11 7.613 Release created at _build/prod/rel/campfire
+#11 7.613 
+#11 7.613     # To start your system
+#11 7.613     _build/prod/rel/campfire/bin/campfire start
+#11 7.613 
+#11 7.613 Once the release is running:
+#11 7.613 
+#11 7.613     # To connect to it remotely
+#11 7.613     _build/prod/rel/campfire/bin/campfire remote
+#11 7.613 
+#11 7.613     # To stop it gracefully (you may also send SIGINT/SIGTERM)
+#11 7.613     _build/prod/rel/campfire/bin/campfire stop
+#11 7.613 
+#11 7.613 To list all commands:
+#11 7.613 
+#11 7.613     _build/prod/rel/campfire/bin/campfire
+#11 7.613 
+#11 DONE 7.8s
+
+#12 [stage-1 2/5] WORKDIR /campfire
+#12 CACHED
+
+#13 [stage-1 3/5] COPY --from=build /app/_build/prod/rel/campfire ./
+#13 DONE 0.1s
+
+#14 [stage-1 4/5] COPY --chmod=755 hooks /hooks
+#14 DONE 0.0s
+
+#15 [stage-1 5/5] RUN mkdir -p /rails/storage/db /rails/storage/files /rails/storage/backups && chown -R 1000:1000 /rails/storage
+#15 DONE 0.1s
+
+#16 exporting to image
+#16 exporting layers
+#16 exporting layers 1.1s done
+#16 exporting manifest sha256:3a2706dc311c26d07065d2ac81cf886cb7f5a3b29f7f53f02ef46090779472a5 done
+#16 exporting config sha256:6a8e6ab402b2a469ac017ca1b8ba300f6c3e3a7485bb320c6452f323a9c70993 done
+#16 exporting attestation manifest sha256:7a7d62968ae50cf066a28fe3453c81a736f925c1df5e5d6fcf9ac08651464627 done
+#16 exporting manifest list sha256:6de83355333611670c6744aab77d9bc62dc34794112b634242529f995df72db6 done
+#16 naming to docker.io/library/campfire-elixir:release done
+#16 unpacking to docker.io/library/campfire-elixir:release
+#16 unpacking to docker.io/library/campfire-elixir:release 0.4s done
+#16 DONE 1.5s
+a9fdf2baa22b3b4c32f96ce54130c72c5170f5796dd6a0e1f467795d436a56a2

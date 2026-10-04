@@ -1,0 +1,8 @@
+{
+  "foreign_keys": 1,
+  "journal_mode": "wal",
+  "synchronous": 1,
+  "cache_size": 2000,
+  "busy_timeout": 0,
+  "mmap_size": 134217728
+}

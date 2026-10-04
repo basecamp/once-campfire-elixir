@@ -1,0 +1,4 @@
+{
+  "passed": true,
+  "scope": "signup HTML, invalid invitation, CSRF, duplicate email, authenticated redirect, new password login, signed-blob and multipart avatars, generated WebP bytes, queued analysis, full tables"
+}

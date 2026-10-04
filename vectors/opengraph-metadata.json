@@ -1,0 +1,191 @@
+[
+  {
+    "html": "",
+    "url": "https://example.com/path?a=1&b=2",
+    "image_type": "image/png",
+    "valid": false,
+    "json": "{\"url\":\"https://example.com/path?a=1\\u0026b=2\",\"image\":null,\"context_for_validation\":{\"context\":null},\"errors\":{\"title\":[\"can't be blank\"],\"description\":[\"can't be blank\"]},\"title\":null,\"description\":null}"
+  },
+  {
+    "html": "<meta property=\"og:title\" content=\"T\"><meta name=\"og:description\" content=\"Desc\">",
+    "url": "https://example.com/path?a=1&b=2",
+    "image_type": "image/png",
+    "valid": true,
+    "json": "{\"title\":\"T\",\"description\":\"Desc\",\"url\":\"https://example.com/path?a=1\\u0026b=2\",\"image\":null,\"context_for_validation\":{\"context\":null},\"errors\":{}}"
+  },
+  {
+    "html": "<meta charset=\"utf-8\"><meta property=\"og:title\" content=\"日本 Ω emoji 😅\"><meta property=\"og:description\" content=\"<b>A &amp; B</b>\">",
+    "url": "https://example.com/path?a=1&b=2",
+    "image_type": "image/png",
+    "valid": true,
+    "json": "{\"title\":\"日本 Ω emoji 😅\",\"description\":\"A \\u0026amp; B\",\"url\":\"https://example.com/path?a=1\\u0026b=2\",\"image\":null,\"context_for_validation\":{\"context\":null},\"errors\":{}}"
+  },
+  {
+    "html": "<meta property=\"og:title\" content=\"日本 Ω emoji 😅\">",
+    "url": "https://example.com/path?a=1&b=2",
+    "image_type": "image/png",
+    "valid": false,
+    "json": "{\"title\":\"  emoji \",\"url\":\"https://example.com/path?a=1\\u0026b=2\",\"image\":null,\"context_for_validation\":{\"context\":null},\"errors\":{\"description\":[\"can't be blank\"]},\"description\":null}"
+  },
+  {
+    "html": "<meta property=\"og:title\" content=\"first\"><meta property=\"og:title\" content=\"last\">",
+    "url": "https://example.com/path?a=1&b=2",
+    "image_type": "image/png",
+    "valid": false,
+    "json": "{\"title\":\"last\",\"url\":\"https://example.com/path?a=1\\u0026b=2\",\"image\":null,\"context_for_validation\":{\"context\":null},\"errors\":{\"description\":[\"can't be blank\"]},\"description\":null}"
+  },
+  {
+    "html": "<meta name=\"og:title\" property=\"x\" content=\"name ignored\">",
+    "url": "https://example.com/path?a=1&b=2",
+    "image_type": "image/png",
+    "valid": false,
+    "json": "{\"url\":\"https://example.com/path?a=1\\u0026b=2\",\"image\":null,\"context_for_validation\":{\"context\":null},\"errors\":{\"title\":[\"can't be blank\"],\"description\":[\"can't be blank\"]},\"title\":null,\"description\":null}"
+  },
+  {
+    "html": "<META PROPERTY=\"og:title\" CONTENT=\"Upper tag\"><meta property=\"OG:title\" content=\"ignored\">",
+    "url": "https://example.com/path?a=1&b=2",
+    "image_type": "image/png",
+    "valid": false,
+    "json": "{\"title\":\"Upper tag\",\"url\":\"https://example.com/path?a=1\\u0026b=2\",\"image\":null,\"context_for_validation\":{\"context\":null},\"errors\":{\"description\":[\"can't be blank\"]},\"description\":null}"
+  },
+  {
+    "html": "<meta property=\"og:url\" content=\"  https://example.com/  \"><meta property=\"og:image\" content=\"https://example.com/a.jpg\">",
+    "url": "https://example.com/path?a=1&b=2",
+    "image_type": "image/png",
+    "valid": false,
+    "json": "{\"url\":\"https://example.com/path?a=1\\u0026b=2\",\"image\":\"https://example.com/a.jpg\",\"context_for_validation\":{\"context\":null},\"errors\":{\"title\":[\"can't be blank\"],\"description\":[\"can't be blank\"]},\"title\":null,\"description\":null}"
+  },
+  {
+    "html": "<meta property=\"og:title\" content=\"   \"><meta property=\"og:extra\" content=\"X\">",
+    "url": "https://example.com/path?a=1&b=2",
+    "image_type": "image/png",
+    "valid": false,
+    "json": "{\"url\":\"https://example.com/path?a=1\\u0026b=2\",\"image\":null,\"context_for_validation\":{\"context\":null},\"errors\":{\"title\":[\"can't be blank\"],\"description\":[\"can't be blank\"]},\"title\":null,\"description\":null}"
+  },
+  {
+    "html": "<meta charset=\"UTF-8\"><meta property=\"og:title\" content=\"Ω ü\">",
+    "url": "https://example.com/path?a=1&b=2",
+    "image_type": "image/png",
+    "valid": false,
+    "json": "{\"title\":\"Ω ü\",\"url\":\"https://example.com/path?a=1\\u0026b=2\",\"image\":null,\"context_for_validation\":{\"context\":null},\"errors\":{\"description\":[\"can't be blank\"]},\"description\":null}"
+  },
+  {
+    "html": "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"><meta property=\"og:title\" content=\"Ω ü\">",
+    "url": "https://example.com/path?a=1&b=2",
+    "image_type": "image/png",
+    "valid": false,
+    "json": "{\"title\":\"Ω ü\",\"url\":\"https://example.com/path?a=1\\u0026b=2\",\"image\":null,\"context_for_validation\":{\"context\":null},\"errors\":{\"description\":[\"can't be blank\"]},\"description\":null}"
+  },
+  {
+    "html": "<meta charset=\"utf8\"><meta property=\"og:title\" content=\"Ω ü\">",
+    "url": "https://example.com/path?a=1&b=2",
+    "image_type": "image/png",
+    "valid": false,
+    "json": "{\"title\":\"Ω ü\",\"url\":\"https://example.com/path?a=1\\u0026b=2\",\"image\":null,\"context_for_validation\":{\"context\":null},\"errors\":{\"description\":[\"can't be blank\"]},\"description\":null}"
+  },
+  {
+    "html": "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf8\"><meta property=\"og:title\" content=\"Ω ü\">",
+    "url": "https://example.com/path?a=1&b=2",
+    "image_type": "image/png",
+    "valid": false,
+    "json": "{\"title\":\"Ω ü\",\"url\":\"https://example.com/path?a=1\\u0026b=2\",\"image\":null,\"context_for_validation\":{\"context\":null},\"errors\":{\"description\":[\"can't be blank\"]},\"description\":null}"
+  },
+  {
+    "html": "<meta charset=\"iso-8859-1\"><meta property=\"og:title\" content=\"Ω ü\">",
+    "url": "https://example.com/path?a=1&b=2",
+    "image_type": "image/png",
+    "valid": false,
+    "json": "{\"title\":\"Ω ü\",\"url\":\"https://example.com/path?a=1\\u0026b=2\",\"image\":null,\"context_for_validation\":{\"context\":null},\"errors\":{\"description\":[\"can't be blank\"]},\"description\":null}"
+  },
+  {
+    "html": "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\"><meta property=\"og:title\" content=\"Ω ü\">",
+    "url": "https://example.com/path?a=1&b=2",
+    "image_type": "image/png",
+    "valid": false,
+    "json": "{\"title\":\"Ω ü\",\"url\":\"https://example.com/path?a=1\\u0026b=2\",\"image\":null,\"context_for_validation\":{\"context\":null},\"errors\":{\"description\":[\"can't be blank\"]},\"description\":null}"
+  },
+  {
+    "html": "<meta charset=\"Windows-1252\"><meta property=\"og:title\" content=\"Ω ü\">",
+    "url": "https://example.com/path?a=1&b=2",
+    "image_type": "image/png",
+    "valid": false,
+    "json": "{\"title\":\"Ω ü\",\"url\":\"https://example.com/path?a=1\\u0026b=2\",\"image\":null,\"context_for_validation\":{\"context\":null},\"errors\":{\"description\":[\"can't be blank\"]},\"description\":null}"
+  },
+  {
+    "html": "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=Windows-1252\"><meta property=\"og:title\" content=\"Ω ü\">",
+    "url": "https://example.com/path?a=1&b=2",
+    "image_type": "image/png",
+    "valid": false,
+    "json": "{\"title\":\"Ω ü\",\"url\":\"https://example.com/path?a=1\\u0026b=2\",\"image\":null,\"context_for_validation\":{\"context\":null},\"errors\":{\"description\":[\"can't be blank\"]},\"description\":null}"
+  },
+  {
+    "html": "<meta charset=\"invalid\"><meta property=\"og:title\" content=\"Ω ü\">",
+    "url": "https://example.com/path?a=1&b=2",
+    "image_type": "image/png",
+    "valid": false,
+    "json": "{\"title\":\"Ω ü\",\"url\":\"https://example.com/path?a=1\\u0026b=2\",\"image\":null,\"context_for_validation\":{\"context\":null},\"errors\":{\"description\":[\"can't be blank\"]},\"description\":null}"
+  },
+  {
+    "html": "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=invalid\"><meta property=\"og:title\" content=\"Ω ü\">",
+    "url": "https://example.com/path?a=1&b=2",
+    "image_type": "image/png",
+    "valid": false,
+    "json": "{\"title\":\"Ω ü\",\"url\":\"https://example.com/path?a=1\\u0026b=2\",\"image\":null,\"context_for_validation\":{\"context\":null},\"errors\":{\"description\":[\"can't be blank\"]},\"description\":null}"
+  },
+  {
+    "html": "<meta property=\"og:title\" content=\"T\"><meta property=\"og:description\" content=\"<b>A &amp; B</b>\">",
+    "url": "https://example.com",
+    "image_type": "image/png",
+    "valid": true,
+    "json": "{\"title\":\"T\",\"description\":\"A \\u0026amp; B\",\"url\":\"https://example.com\",\"image\":null,\"context_for_validation\":{\"context\":null},\"errors\":{}}"
+  },
+  {
+    "html": "<meta property=\"og:title\" content=\"T\"><meta property=\"og:description\" content=\"<b>A &amp; B</b>\">",
+    "url": "https://example.com",
+    "image_type": "IMAGE/JPEG",
+    "valid": true,
+    "json": "{\"title\":\"T\",\"description\":\"A \\u0026amp; B\",\"url\":\"https://example.com\",\"image\":null,\"context_for_validation\":{\"context\":null},\"errors\":{}}"
+  },
+  {
+    "html": "<meta property=\"og:title\" content=\"T\"><meta property=\"og:description\" content=\"<b>A &amp; B</b>\">",
+    "url": "https://example.com",
+    "image_type": "image/gif; charset=binary",
+    "valid": true,
+    "json": "{\"title\":\"T\",\"description\":\"A \\u0026amp; B\",\"url\":\"https://example.com\",\"image\":null,\"context_for_validation\":{\"context\":null},\"errors\":{}}"
+  },
+  {
+    "html": "<meta property=\"og:title\" content=\"T\"><meta property=\"og:description\" content=\"<b>A &amp; B</b>\">",
+    "url": "https://example.com",
+    "image_type": null,
+    "valid": true,
+    "json": "{\"title\":\"T\",\"description\":\"A \\u0026amp; B\",\"url\":\"https://example.com\",\"image\":null,\"context_for_validation\":{\"context\":null},\"errors\":{}}"
+  },
+  {
+    "html": "<meta charset=\"utf-8\"><meta property=\"og:title\" content=\"Ω &quot; title\"><meta property=\"og:description\" content=\"<script>Script</script><p>A &amp; B</p>\"><meta property=\"og:url\" content=\"javascript:alert(1)\"><meta property=\"og:image\" content=\"https://example.com/image.jpg\">",
+    "url": "https://example.com",
+    "image_type": "image/png",
+    "valid": true,
+    "json": "{\"title\":\"Ω \\\" title\",\"url\":\"https://example.com\",\"image\":\"https://example.com/image.jpg\",\"description\":\"ScriptA \\u0026amp; B\",\"context_for_validation\":{\"context\":null},\"errors\":{}}"
+  },
+  {
+    "html": "<meta charset=\"utf-8\"><meta property=\"og:title\" content=\"Ω &quot; title\"><meta property=\"og:description\" content=\"<script>Script</script><p>A &amp; B</p>\"><meta property=\"og:url\" content=\"javascript:alert(1)\"><meta property=\"og:image\" content=\"https://example.com/image.jpg\">",
+    "url": "https://example.com",
+    "image_type": "IMAGE/JPEG",
+    "valid": true,
+    "json": "{\"title\":\"Ω \\\" title\",\"url\":\"https://example.com\",\"image\":\"https://example.com/image.jpg\",\"description\":\"ScriptA \\u0026amp; B\",\"context_for_validation\":{\"context\":null},\"errors\":{}}"
+  },
+  {
+    "html": "<meta charset=\"utf-8\"><meta property=\"og:title\" content=\"Ω &quot; title\"><meta property=\"og:description\" content=\"<script>Script</script><p>A &amp; B</p>\"><meta property=\"og:url\" content=\"javascript:alert(1)\"><meta property=\"og:image\" content=\"https://example.com/image.jpg\">",
+    "url": "https://example.com",
+    "image_type": "image/gif; charset=binary",
+    "valid": true,
+    "json": "{\"title\":\"Ω \\\" title\",\"url\":\"https://example.com\",\"image\":null,\"description\":\"ScriptA \\u0026amp; B\",\"context_for_validation\":{\"context\":null},\"errors\":{}}"
+  },
+  {
+    "html": "<meta charset=\"utf-8\"><meta property=\"og:title\" content=\"Ω &quot; title\"><meta property=\"og:description\" content=\"<script>Script</script><p>A &amp; B</p>\"><meta property=\"og:url\" content=\"javascript:alert(1)\"><meta property=\"og:image\" content=\"https://example.com/image.jpg\">",
+    "url": "https://example.com",
+    "image_type": null,
+    "valid": true,
+    "json": "{\"title\":\"Ω \\\" title\",\"url\":\"https://example.com\",\"image\":null,\"description\":\"ScriptA \\u0026amp; B\",\"context_for_validation\":{\"context\":null},\"errors\":{}}"
+  }
+]

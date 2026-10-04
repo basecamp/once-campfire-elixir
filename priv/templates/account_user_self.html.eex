@@ -1,0 +1,4 @@
+    <a class="btn txt-small flex-item-no-shrink" target="_top" href="/users/me/profile">
+      <img aria-hidden="true" src="<%= Campfire.Assets.path("pencil.svg") %>" width="20" height="20" />
+      <span class="for-screen-reader">My settings</span>
+</a>

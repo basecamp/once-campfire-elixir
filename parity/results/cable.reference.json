@@ -1,0 +1,125 @@
+{
+  "unauthorized": {
+    "type": "disconnect",
+    "reason": "unauthorized",
+    "reconnect": false
+  },
+  "subscriptions": [
+    {
+      "params": {
+        "channel": "HeartbeatChannel"
+      },
+      "type": "confirm_subscription"
+    },
+    {
+      "params": {
+        "channel": "ReadRoomsChannel"
+      },
+      "type": "confirm_subscription"
+    },
+    {
+      "params": {
+        "channel": "UnreadRoomsChannel"
+      },
+      "type": "confirm_subscription"
+    },
+    {
+      "params": {
+        "channel": "RoomChannel",
+        "room_id": 486777696
+      },
+      "type": "confirm_subscription"
+    },
+    {
+      "params": {
+        "channel": "RoomChannel",
+        "room_id": -1
+      },
+      "type": "reject_subscription"
+    },
+    {
+      "params": {
+        "channel": "RoomMessagesChannel",
+        "signed_stream_name": "IloybGtPaTh2WTJGdGNHWnBjbVV2VW05dmJYTTZPa05zYjNObFpDODBPRFkzTnpjMk9UWTptZXNzYWdlcyI=--f98e18a32690d137064fc06219db7ca06e526194553c6b9d8855aaf69475d333"
+      },
+      "type": "confirm_subscription"
+    },
+    {
+      "params": {
+        "channel": "RoomMessagesChannel",
+        "signed_stream_name": "IloybGtPaTh2WTJGdGNHWnBjbVV2VW05dmJYTTZPa05zYjNObFpDODVPVGs6bWVzc2FnZXMi--8324ee2873adcd4954167c89f13f721ccae733a402ede6099fa474461cc7f945"
+      },
+      "type": "reject_subscription"
+    },
+    {
+      "params": {
+        "channel": "Turbo::StreamsChannel",
+        "signed_stream_name": "IloybGtPaTh2WTJGdGNHWnBjbVV2VW05dmJYTTZPa05zYjNObFpDODBPRFkzTnpjMk9UWTptZXNzYWdlcyI=--f98e18a32690d137064fc06219db7ca06e526194553c6b9d8855aaf69475d333"
+      },
+      "type": "reject_subscription"
+    }
+  ],
+  "typing": [
+    {
+      "identifier": "{\"channel\":\"TypingNotificationsChannel\",\"room_id\":486777696}",
+      "message": {
+        "action": "start",
+        "user": {
+          "id": 127326141,
+          "name": "David"
+        }
+      }
+    },
+    {
+      "identifier": "{\"channel\":\"TypingNotificationsChannel\",\"room_id\":486777696}",
+      "message": {
+        "action": "stop",
+        "user": {
+          "id": 127326141,
+          "name": "David"
+        }
+      }
+    }
+  ],
+  "read": {
+    "identifier": "{\"channel\":\"ReadRoomsChannel\"}",
+    "message": {
+      "room_id": 486777696
+    }
+  },
+  "presence": [
+    {
+      "id": 774341722,
+      "connected_at": "2026-03-02 16:00:00",
+      "connections": 1,
+      "created_at": "2026-01-04 16:06:00",
+      "involvement": "everything",
+      "room_id": 486777696,
+      "unread_at": null,
+      "updated_at": "2026-03-02 15:40:00",
+      "user_id": 127326141
+    },
+    {
+      "id": 774341722,
+      "connected_at": "2026-03-02 16:00:00",
+      "connections": 1,
+      "created_at": "2026-01-04 16:06:00",
+      "involvement": "everything",
+      "room_id": 486777696,
+      "unread_at": null,
+      "updated_at": "2026-03-02 16:00:00",
+      "user_id": 127326141
+    },
+    {
+      "id": 774341722,
+      "connected_at": null,
+      "connections": 0,
+      "created_at": "2026-01-04 16:06:00",
+      "involvement": "everything",
+      "room_id": 486777696,
+      "unread_at": null,
+      "updated_at": "2026-03-02 16:00:00",
+      "user_id": 127326141
+    }
+  ]
+}

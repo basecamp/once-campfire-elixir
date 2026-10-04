@@ -1,0 +1,4103 @@
+{
+  "version": 1,
+  "kind": "source-inventory",
+  "reference_sha": "90b330024dec3e757c79b6a7e6568f93da8e3148",
+  "tracked_changes": false,
+  "ruby_version": "3.4.10",
+  "rails_version": "8.2.0.alpha",
+  "database_adapters": [
+    "sqlite3"
+  ],
+  "database_encodings": [],
+  "counts": {
+    "assets": 200,
+    "channels": 10,
+    "controllers": 46,
+    "frontend": 70,
+    "helpers": 27,
+    "jobs": 4,
+    "lib": 14,
+    "models": 41,
+    "views": 89
+  },
+  "view_formats": {
+    ".erb": 80,
+    ".jbuilder": 8,
+    ".js": 1
+  },
+  "files": [
+    {
+      "path": "app/controllers/accounts/bots/keys_controller.rb",
+      "category": "controllers",
+      "bytes": 214,
+      "lines": 8,
+      "sha256": "e7dcee717b8742fb551b49fd1392992387d947ab3722b88ca865e6942f4f3f05"
+    },
+    {
+      "path": "app/controllers/accounts/bots_controller.rb",
+      "category": "controllers",
+      "bytes": 699,
+      "lines": 39,
+      "sha256": "f88c820c89559fd9383a2a4fa0455a14fe0cba65a0d48b63c105178ed979fa47"
+    },
+    {
+      "path": "app/controllers/accounts/custom_styles_controller.rb",
+      "category": "controllers",
+      "bytes": 415,
+      "lines": 20,
+      "sha256": "b1f1f58e1a9a1b4337973c0e590454f6ead9ce3948ed2f6227e63d5b81420f4f"
+    },
+    {
+      "path": "app/controllers/accounts/join_codes_controller.rb",
+      "category": "controllers",
+      "bytes": 192,
+      "lines": 8,
+      "sha256": "e88b9ae98ed1b0745c948d49d2d09c460f17f8c8dabed7fb97429de5fc999aab"
+    },
+    {
+      "path": "app/controllers/accounts/logos_controller.rb",
+      "category": "controllers",
+      "bytes": 1157,
+      "lines": 48,
+      "sha256": "be8e6b7935b4b0d0145e33d827f9139ef6f63e1c8982b207d8d874d7067f3bee"
+    },
+    {
+      "path": "app/controllers/accounts/users_controller.rb",
+      "category": "controllers",
+      "bytes": 627,
+      "lines": 26,
+      "sha256": "df57ad6a76e0ed2eca86f244bbe5983662df12c1359dbb607b081c7e34540bff"
+    },
+    {
+      "path": "app/controllers/accounts_controller.rb",
+      "category": "controllers",
+      "bytes": 760,
+      "lines": 32,
+      "sha256": "372d6ed546823cfb6ec4dbba391a576849b8fe58b580f56a35a50cf236124a4d"
+    },
+    {
+      "path": "app/controllers/application_controller.rb",
+      "category": "controllers",
+      "bytes": 263,
+      "lines": 4,
+      "sha256": "536738ba517e05d76a5cdc730fd43eef53216b5cc7225c57af1dfb92511cd961"
+    },
+    {
+      "path": "app/controllers/autocompletable/users_controller.rb",
+      "category": "controllers",
+      "bytes": 831,
+      "lines": 29,
+      "sha256": "d74a6393e6d3357067119a1519f5fec51933a10c309976873d61dfe40b705422"
+    },
+    {
+      "path": "app/controllers/concerns/active_storage_authentication.rb",
+      "category": "controllers",
+      "bytes": 231,
+      "lines": 9,
+      "sha256": "ae05d60f06a108963f848f33b0a4876de7aa31d2f13ce9d3d4d6b589f6f942e4"
+    },
+    {
+      "path": "app/controllers/concerns/allow_browser.rb",
+      "category": "controllers",
+      "bytes": 259,
+      "lines": 9,
+      "sha256": "a5192b9d6be857806a80754cf09a7445c4cd29483aa001286475da0164e53fe3"
+    },
+    {
+      "path": "app/controllers/concerns/authentication/session_lookup.rb",
+      "category": "controllers",
+      "bytes": 166,
+      "lines": 7,
+      "sha256": "972b95b4cbe74908848890ce791cdf6dbb891f8b4320b6aabd2db7d42310f580"
+    },
+    {
+      "path": "app/controllers/concerns/authentication.rb",
+      "category": "controllers",
+      "bytes": 2931,
+      "lines": 112,
+      "sha256": "8608d2cfe51ef299b5ac2d1a17f838871bc161ea087082d629d92b9e74b89fc9"
+    },
+    {
+      "path": "app/controllers/concerns/authorization.rb",
+      "category": "controllers",
+      "bytes": 131,
+      "lines": 6,
+      "sha256": "8feb9b720f9157c7e6ec393cf8be927e3a29a803337abe9dec8dca209194d7d7"
+    },
+    {
+      "path": "app/controllers/concerns/block_banned_requests.rb",
+      "category": "controllers",
+      "bytes": 319,
+      "lines": 16,
+      "sha256": "cfe140dc2778078bce216eaa7bf79bb44894f7ba5bfe1508ff8b6eb7196a298f"
+    },
+    {
+      "path": "app/controllers/concerns/raw_request_body.rb",
+      "category": "controllers",
+      "bytes": 202,
+      "lines": 12,
+      "sha256": "2934aa300163bf4e8621088cb63b2e51c25fa6ff3068d93c4916bf52f26c2d37"
+    },
+    {
+      "path": "app/controllers/concerns/room_scoped.rb",
+      "category": "controllers",
+      "bytes": 251,
+      "lines": 13,
+      "sha256": "383fa8db427f6f995daf967f8a18a01c766a20df25c0c8cf25d1755f2cbdd63d"
+    },
+    {
+      "path": "app/controllers/concerns/set_current_request.rb",
+      "category": "controllers",
+      "bytes": 261,
+      "lines": 13,
+      "sha256": "11528b95031781d1f41e9ef0a7853f177dccc4dd75a02cddafbae9b0d2bcab9e"
+    },
+    {
+      "path": "app/controllers/concerns/set_platform.rb",
+      "category": "controllers",
+      "bytes": 204,
+      "lines": 12,
+      "sha256": "811e5e3d5d579bfb09aac7c5a23d5aea87e057ddaaf7f5b9958a4803d14db56d"
+    },
+    {
+      "path": "app/controllers/concerns/tracked_room_visit.rb",
+      "category": "controllers",
+      "bytes": 380,
+      "lines": 20,
+      "sha256": "2ed96abc1f7908cec00eb470ab0d50b3be7ab55ffe1fb7c3d71f0ea149b451c9"
+    },
+    {
+      "path": "app/controllers/concerns/version_headers.rb",
+      "category": "controllers",
+      "bytes": 312,
+      "lines": 13,
+      "sha256": "da89af9ad4d3d2a5d860c668cc290090aec7db08dd51df32180acc0358852035"
+    },
+    {
+      "path": "app/controllers/first_runs_controller.rb",
+      "category": "controllers",
+      "bytes": 533,
+      "lines": 27,
+      "sha256": "bb8dbae31dbc2067013caa50a8919e650f5169233200b41bafdab2b72671387f"
+    },
+    {
+      "path": "app/controllers/messages/boosts/by_bots_controller.rb",
+      "category": "controllers",
+      "bytes": 835,
+      "lines": 39,
+      "sha256": "3a6569bc7ff9f1de516fbea5467f630ede82b42cb71e88d1b9ba6a91387f2643"
+    },
+    {
+      "path": "app/controllers/messages/boosts_controller.rb",
+      "category": "controllers",
+      "bytes": 1006,
+      "lines": 45,
+      "sha256": "ead9d6847cebabe92b7447176a71785d6988c274d535abc83fa6ea208d11b091"
+    },
+    {
+      "path": "app/controllers/messages/by_bots_controller.rb",
+      "category": "controllers",
+      "bytes": 1582,
+      "lines": 64,
+      "sha256": "513d12cacb3af4391762bb078c9ee8585fa1518a76a53a8c6bb48353f251fdf6"
+    },
+    {
+      "path": "app/controllers/messages_controller.rb",
+      "category": "controllers",
+      "bytes": 2102,
+      "lines": 86,
+      "sha256": "01006da771bdd44906325607134a7c0a7f4af4b1c806da20080a5f15cb9198ec"
+    },
+    {
+      "path": "app/controllers/pwa_controller.rb",
+      "category": "controllers",
+      "bytes": 313,
+      "lines": 12,
+      "sha256": "45cdcc902ff6a088580cb452d0aa5c9984396fecb88e661e83132c101891c3d4"
+    },
+    {
+      "path": "app/controllers/qr_code_controller.rb",
+      "category": "controllers",
+      "bytes": 331,
+      "lines": 11,
+      "sha256": "0105795f0deac4bc53cea051a0ca669a8e9c1d688feaebfe05180b35d7c109e1"
+    },
+    {
+      "path": "app/controllers/rooms/closeds_controller.rb",
+      "category": "controllers",
+      "bytes": 2279,
+      "lines": 81,
+      "sha256": "4ce175d1d7c3acf6f8364d20e9a644c716e821e6ba6d1a2d0c68f1c3400c9f8c"
+    },
+    {
+      "path": "app/controllers/rooms/directs_controller.rb",
+      "category": "controllers",
+      "bytes": 998,
+      "lines": 41,
+      "sha256": "c2d34783ac0664fa46379b1ef30881e4602ab0d1fdf01efaee7f85a26c8e02c1"
+    },
+    {
+      "path": "app/controllers/rooms/involvements_controller.rb",
+      "category": "controllers",
+      "bytes": 761,
+      "lines": 26,
+      "sha256": "915cd7e5583bee05c51e2867ed546169cab003351fad72281c28927a6de2d63a"
+    },
+    {
+      "path": "app/controllers/rooms/opens_controller.rb",
+      "category": "controllers",
+      "bytes": 1591,
+      "lines": 56,
+      "sha256": "f3e75e5c11c695e5f4ecb12e3938b255652bc016dd68be9950b97f54aa6d7302"
+    },
+    {
+      "path": "app/controllers/rooms/refreshes_controller.rb",
+      "category": "controllers",
+      "bytes": 453,
+      "lines": 15,
+      "sha256": "4a7f5f8b86381b263369a9fc7ada162ea263748736dbe0e74d5ebe6e537cbc57"
+    },
+    {
+      "path": "app/controllers/rooms_controller.rb",
+      "category": "controllers",
+      "bytes": 1619,
+      "lines": 63,
+      "sha256": "1ee78a0a0f12c6f39c89cff26a6b99b927ae90700f9736a65ccb9e9f95c0a09f"
+    },
+    {
+      "path": "app/controllers/searches_controller.rb",
+      "category": "controllers",
+      "bytes": 677,
+      "lines": 32,
+      "sha256": "4b15744bfa0fc66dbfdaa421968367df31fb56a6fbc5eee1d42e2a9c93991c5d"
+    },
+    {
+      "path": "app/controllers/sessions/transfers_controller.rb",
+      "category": "controllers",
+      "bytes": 308,
+      "lines": 15,
+      "sha256": "793c473b371a40f2df0c9490dcd58749c23d148ad6d6d62a64501c62e0aacf16"
+    },
+    {
+      "path": "app/controllers/sessions_controller.rb",
+      "category": "controllers",
+      "bytes": 1064,
+      "lines": 40,
+      "sha256": "5d334510b97e7aac8648df25eeae067d0f26968d7a0eca66e0f9396bbf38023c"
+    },
+    {
+      "path": "app/controllers/unfurl_links_controller.rb",
+      "category": "controllers",
+      "bytes": 289,
+      "lines": 16,
+      "sha256": "cf08392d0751712b1c7502fe4ffff7edc992906c1b6dee9d95bf1ed961a1a0cd"
+    },
+    {
+      "path": "app/controllers/users/avatars_controller.rb",
+      "category": "controllers",
+      "bytes": 1023,
+      "lines": 39,
+      "sha256": "ed6725736156f67316f9004c3f92408c5c9839dfffd9a363f170ef3526ff1363"
+    },
+    {
+      "path": "app/controllers/users/bans_controller.rb",
+      "category": "controllers",
+      "bytes": 314,
+      "lines": 19,
+      "sha256": "065ce89fdc869d80025c9d86645421035b9515307f2cf17990470a2db9c19993"
+    },
+    {
+      "path": "app/controllers/users/profiles_controller.rb",
+      "category": "controllers",
+      "bytes": 645,
+      "lines": 26,
+      "sha256": "d5d8937a21d5c50c12d1d594eff95db2152642af03958632a7d24716cf197351"
+    },
+    {
+      "path": "app/controllers/users/push_subscriptions/test_notifications_controller.rb",
+      "category": "controllers",
+      "bytes": 457,
+      "lines": 13,
+      "sha256": "81cb5a033c28fdca74a6304a9de27b771fe84551817444074826afb6c5f57fb3"
+    },
+    {
+      "path": "app/controllers/users/push_subscriptions_controller.rb",
+      "category": "controllers",
+      "bytes": 955,
+      "lines": 35,
+      "sha256": "1b757a1493acd3819e61729ee56e0b0aa364859d838b3d8d038172bc893c3aed"
+    },
+    {
+      "path": "app/controllers/users/sidebars_controller.rb",
+      "category": "controllers",
+      "bytes": 993,
+      "lines": 25,
+      "sha256": "e5382189b75361de4068f6dac1f55284fa45f3706feae08ec6bc7fbfb9199b41"
+    },
+    {
+      "path": "app/controllers/users_controller.rb",
+      "category": "controllers",
+      "bytes": 777,
+      "lines": 34,
+      "sha256": "1a9c9bf2db9087d101b8d5fe08a49b3505db7c8104c94ad242804e9f65359bf8"
+    },
+    {
+      "path": "app/controllers/welcome_controller.rb",
+      "category": "controllers",
+      "bytes": 176,
+      "lines": 9,
+      "sha256": "7ccfbfea51a7babfb98dd19332affec30a8c1aa6645f590de203866b9cafb4e9"
+    },
+    {
+      "path": "app/models/account/joinable.rb",
+      "category": "models",
+      "bytes": 316,
+      "lines": 16,
+      "sha256": "7644e89038acc1d83a396a0aad92aae35a9487a34f7fd1bc0dfcc07b0089e67a"
+    },
+    {
+      "path": "app/models/account.rb",
+      "category": "models",
+      "bytes": 409,
+      "lines": 14,
+      "sha256": "ac2c814c1577a1ef3a58504a1dd038a128272c4964deb346df9e33505b81e157"
+    },
+    {
+      "path": "app/models/application_platform.rb",
+      "category": "models",
+      "bytes": 1157,
+      "lines": 61,
+      "sha256": "537a74d3638950267fb01f4d383a52afd3bf702e90a79540d70e7feb39395f64"
+    },
+    {
+      "path": "app/models/application_record.rb",
+      "category": "models",
+      "bytes": 74,
+      "lines": 3,
+      "sha256": "12bf7d0eaefce4d50e0719991e19b48a36a7865aeb7ac745980584806155fdc1"
+    },
+    {
+      "path": "app/models/ban.rb",
+      "category": "models",
+      "bytes": 485,
+      "lines": 20,
+      "sha256": "11a6931053a52687aadd6d778352896b5cb889236c590a1aef62b610dc61b4c9"
+    },
+    {
+      "path": "app/models/boost.rb",
+      "category": "models",
+      "bytes": 188,
+      "lines": 6,
+      "sha256": "faf1b13d35f3ba0331c2bcdda6015c9f42c91f5171e8d78fbf0686ddb401545c"
+    },
+    {
+      "path": "app/models/concerns/.keep",
+      "category": "models",
+      "bytes": 0,
+      "lines": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "app/models/current.rb",
+      "category": "models",
+      "bytes": 312,
+      "lines": 17,
+      "sha256": "1a3c3eb8b3185462aab134329b914c906196cb4a3c1ddce6321c7b9ff7b0bae1"
+    },
+    {
+      "path": "app/models/first_run.rb",
+      "category": "models",
+      "bytes": 385,
+      "lines": 16,
+      "sha256": "2a5dedec5b41511536d71bf914377a24c1f3ba257b5a5d4b0c8203faa3541fff"
+    },
+    {
+      "path": "app/models/membership/connectable.rb",
+      "category": "models",
+      "bytes": 1253,
+      "lines": 51,
+      "sha256": "fc8fcf85e1ef3878c19469c66498a3621143412d16290997b0d4addd446c44a0"
+    },
+    {
+      "path": "app/models/membership.rb",
+      "category": "models",
+      "bytes": 655,
+      "lines": 24,
+      "sha256": "f7d9ebae093dcb2baf9bff117da724f7a2cfcaf084ecdd285cf62b2603802728"
+    },
+    {
+      "path": "app/models/message/attachment.rb",
+      "category": "models",
+      "bytes": 892,
+      "lines": 41,
+      "sha256": "e4b3b4276f304e98d2bec22287c8af4eb0383a67bbbac16809600413b4539904"
+    },
+    {
+      "path": "app/models/message/broadcasts.rb",
+      "category": "models",
+      "bytes": 608,
+      "lines": 19,
+      "sha256": "5c25542b65bb95401ed3816222e2a3d93a762e0d9f23b2f4b97cc0b9ab8f002e"
+    },
+    {
+      "path": "app/models/message/mentionee.rb",
+      "category": "models",
+      "bytes": 278,
+      "lines": 16,
+      "sha256": "c2f7266f398330d5aac4af0a7c6a59cdc17050fb058a5ee4dec7f4a6d067b0a3"
+    },
+    {
+      "path": "app/models/message/pagination.rb",
+      "category": "models",
+      "bytes": 844,
+      "lines": 29,
+      "sha256": "4f3ac04e729cbbe67acd4c544413790c68a7302f95367b28b29832b9261664a3"
+    },
+    {
+      "path": "app/models/message/searchable.rb",
+      "category": "models",
+      "bytes": 892,
+      "lines": 28,
+      "sha256": "05f36a3ba304689ca09be878b3291bcead9aa73000a40df4b3d137f99d427876"
+    },
+    {
+      "path": "app/models/message.rb",
+      "category": "models",
+      "bytes": 1168,
+      "lines": 44,
+      "sha256": "d8f7351664c4a85e76eced06d1bd539750758192dff89e56c9a263b1a71f460f"
+    },
+    {
+      "path": "app/models/opengraph/document.rb",
+      "category": "models",
+      "bytes": 818,
+      "lines": 27,
+      "sha256": "355bddb0e5d84c9e5036480ce27c1dc2c816ecd5b7ca01757097940954f861b8"
+    },
+    {
+      "path": "app/models/opengraph/fetch.rb",
+      "category": "models",
+      "bytes": 2452,
+      "lines": 79,
+      "sha256": "8758de7911d8ae5c1b4921b32cac6a6b4a354887470c9b1cebe4faae1749b384"
+    },
+    {
+      "path": "app/models/opengraph/location.rb",
+      "category": "models",
+      "bytes": 1475,
+      "lines": 52,
+      "sha256": "fd444af330a81e695ed22917517ec045a3c048ea21e4a85e4964b134661c3fe1"
+    },
+    {
+      "path": "app/models/opengraph/metadata/fetching.rb",
+      "category": "models",
+      "bytes": 2481,
+      "lines": 68,
+      "sha256": "7c8153f9c66e20b3294474933b8c7d2772e8297c69e6b50a7afe9a002da8d438"
+    },
+    {
+      "path": "app/models/opengraph/metadata.rb",
+      "category": "models",
+      "bytes": 686,
+      "lines": 27,
+      "sha256": "666923e18b192413309e6274c16ee1ca233055c2a86b2b9d9c214be3020d3888"
+    },
+    {
+      "path": "app/models/purchaser.rb",
+      "category": "models",
+      "bytes": 337,
+      "lines": 19,
+      "sha256": "75711fbcea956fd0046e00d69ee4fa180445026e5d731fdd4ec7664b79021fbd"
+    },
+    {
+      "path": "app/models/push/subscription.rb",
+      "category": "models",
+      "bytes": 1984,
+      "lines": 61,
+      "sha256": "6b2bb1bbc13988b6e6f40dc80153d7bfe348f0b8b9b91095cc6fb3cb98d34931"
+    },
+    {
+      "path": "app/models/push.rb",
+      "category": "models",
+      "bytes": 63,
+      "lines": 5,
+      "sha256": "c08d27984a9495eccc70ad09852b6ba00af7dc5bd88c52c6872a4fcf618c2de2"
+    },
+    {
+      "path": "app/models/room/message_pusher.rb",
+      "category": "models",
+      "bytes": 1829,
+      "lines": 65,
+      "sha256": "a239d6c4abb555bcffee391b31a6512bda9395a70105070cb94b3ff589661886"
+    },
+    {
+      "path": "app/models/room.rb",
+      "category": "models",
+      "bytes": 2257,
+      "lines": 86,
+      "sha256": "422c3c5fb67d1cfa194a4e6d28f34520a89b19496a47d01532dbc85dc76e952d"
+    },
+    {
+      "path": "app/models/rooms/closed.rb",
+      "category": "models",
+      "bytes": 128,
+      "lines": 3,
+      "sha256": "74abeac0d017f5316653b2cbd553e9c2bbab4c4f663c5160d376a945f7cda0ab"
+    },
+    {
+      "path": "app/models/rooms/direct.rb",
+      "category": "models",
+      "bytes": 720,
+      "lines": 22,
+      "sha256": "0f67ad572662e7dd4b6636f35ad470ee84dbbd94440622f4c4482f717268b4db"
+    },
+    {
+      "path": "app/models/rooms/open.rb",
+      "category": "models",
+      "bytes": 341,
+      "lines": 9,
+      "sha256": "1bd2e29b1072341dacb54c0f7216dba890cf0061cb50c43bbaf2324d98cb323d"
+    },
+    {
+      "path": "app/models/search.rb",
+      "category": "models",
+      "bytes": 365,
+      "lines": 18,
+      "sha256": "8b57994570579e07925b7fb183781dd23e2bcf6dcbf53625c44983c7b3b31f2e"
+    },
+    {
+      "path": "app/models/session.rb",
+      "category": "models",
+      "bytes": 473,
+      "lines": 19,
+      "sha256": "030b372dd294692280946880335a43f58f82a420d5589aa9d7dbb40519185ba2"
+    },
+    {
+      "path": "app/models/sound.rb",
+      "category": "models",
+      "bytes": 3874,
+      "lines": 89,
+      "sha256": "abccc9af7342c253fc03ad44a997c98dd43da13ce5d0220e280217ed9fc302d3"
+    },
+    {
+      "path": "app/models/user/avatar.rb",
+      "category": "models",
+      "bytes": 460,
+      "lines": 23,
+      "sha256": "7cf98e2c70fd1ef7bed912e4d1c8eb9ae3353712405c2cd1f70c4d535744400b"
+    },
+    {
+      "path": "app/models/user/bannable.rb",
+      "category": "models",
+      "bytes": 745,
+      "lines": 42,
+      "sha256": "cd4e8d9539b1da4aef7a414a642945d6e9812deb574c6730d19ca08c0efa58b7"
+    },
+    {
+      "path": "app/models/user/bot.rb",
+      "category": "models",
+      "bytes": 1432,
+      "lines": 68,
+      "sha256": "8cb4284d757297c2c1f8b09e225ecc28bef14ae6184caf583a2b6e86ecadebd7"
+    },
+    {
+      "path": "app/models/user/mentionable.rb",
+      "category": "models",
+      "bytes": 319,
+      "lines": 17,
+      "sha256": "947bd630fa5729c95a7b1b3e3f30e57d9d530f8c283ebac3c080e3d59af1551e"
+    },
+    {
+      "path": "app/models/user/role.rb",
+      "category": "models",
+      "bytes": 234,
+      "lines": 11,
+      "sha256": "2d9bd693207ef1c8dc08eef43a8bb0c77b5c909b770198a1a5834a39eaeecff6"
+    },
+    {
+      "path": "app/models/user/transferable.rb",
+      "category": "models",
+      "bytes": 315,
+      "lines": 15,
+      "sha256": "ca6f36c2b125f01a170ae8f45d1319dfe2581c54d72c343693e9815b19069a8f"
+    },
+    {
+      "path": "app/models/user.rb",
+      "category": "models",
+      "bytes": 1823,
+      "lines": 64,
+      "sha256": "898e428188d003741a1665492126ad23e78e6a9930445a02b999d6810bfb4aa7"
+    },
+    {
+      "path": "app/models/webhook.rb",
+      "category": "models",
+      "bytes": 2937,
+      "lines": 81,
+      "sha256": "357d796f9812dfe1a83f2f4e9bb285f89ded8f28dc00d7bfa7ae066b3694bce3"
+    },
+    {
+      "path": "app/views/accounts/_help_contact.html.erb",
+      "category": "views",
+      "bytes": 491,
+      "lines": 10,
+      "sha256": "7e1bd7da39ee8beebcc996f57221961aa11511525d62223837e199979393f689"
+    },
+    {
+      "path": "app/views/accounts/_invite.html.erb",
+      "category": "views",
+      "bytes": 1696,
+      "lines": 35,
+      "sha256": "1bcefa5504b5451e5ed9252793d269f07236a8ec7c739584c3eb1d32599f4105"
+    },
+    {
+      "path": "app/views/accounts/bots/_bot.html.erb",
+      "category": "views",
+      "bytes": 2532,
+      "lines": 56,
+      "sha256": "c90c0e04bb3fe1aa60ec0e625a3361b4bb733acf77cd3a4a4f4a43fe6a7af7a8"
+    },
+    {
+      "path": "app/views/accounts/bots/_form.html.erb",
+      "category": "views",
+      "bytes": 1564,
+      "lines": 32,
+      "sha256": "c7b3d5dd0e5a91138d7ea870519acf9e35962b28743cf1522fd835fc5924a11c"
+    },
+    {
+      "path": "app/views/accounts/bots/edit.html.erb",
+      "category": "views",
+      "bytes": 1415,
+      "lines": 29,
+      "sha256": "0ffc3f7cbbc0d16a4dfb0f6fae1c51a8df94d2b88fc6b55104b97f971d3811e7"
+    },
+    {
+      "path": "app/views/accounts/bots/index.html.erb",
+      "category": "views",
+      "bytes": 1125,
+      "lines": 30,
+      "sha256": "eb49dcfbc842b6a5899bf42c29233a36d95c73f20fbea1bd26ee7c6d64116f6d"
+    },
+    {
+      "path": "app/views/accounts/bots/new.html.erb",
+      "category": "views",
+      "bytes": 369,
+      "lines": 13,
+      "sha256": "1fb67e6cb0f2a35bbb89df063f0f6e2d662c91b1aa15cead2ebe16f2f58dfb32"
+    },
+    {
+      "path": "app/views/accounts/custom_styles/edit.html.erb",
+      "category": "views",
+      "bytes": 1645,
+      "lines": 36,
+      "sha256": "b8b51fc56b568454d99e4a739807e173ec8e74e1801d15f8400370662b38fd18"
+    },
+    {
+      "path": "app/views/accounts/edit.html.erb",
+      "category": "views",
+      "bytes": 5438,
+      "lines": 118,
+      "sha256": "5a98c2efd54111a06e67cc90d2f049eb42ed7e41a2794449462a2220f66cbdcf"
+    },
+    {
+      "path": "app/views/accounts/users/_next_page_container.html.erb",
+      "category": "views",
+      "bytes": 198,
+      "lines": 4,
+      "sha256": "6908dd62e4b90a3a61e23787d34cf98544c5a97a2251ac1d4163c4b2a8610540"
+    },
+    {
+      "path": "app/views/accounts/users/_user.html.erb",
+      "category": "views",
+      "bytes": 1862,
+      "lines": 37,
+      "sha256": "cb364f709b304a4c02fda798cc431ab6d1cd8cecbd277a7d69a4f096040e6b37"
+    },
+    {
+      "path": "app/views/accounts/users/index.turbo_stream.erb",
+      "category": "views",
+      "bytes": 282,
+      "lines": 5,
+      "sha256": "f76bdee3f1cc1802caa15ee65fa3b623700ab5ed17b6f404560435d0503c2317"
+    },
+    {
+      "path": "app/views/action_text/attachables/_opengraph_embed.html.erb",
+      "category": "views",
+      "bytes": 849,
+      "lines": 17,
+      "sha256": "5e951a7741ac1ff7376645480210fd1eae18c9811a3b6bfcd0f269b758fd794c"
+    },
+    {
+      "path": "app/views/autocompletable/users/_prompt_item.html.erb",
+      "category": "views",
+      "bytes": 401,
+      "lines": 11,
+      "sha256": "6affc876ab4d0ba6b4b0988d43f2a5b39b9c98048f2b2dab6552810148b3e746"
+    },
+    {
+      "path": "app/views/autocompletable/users/_user.json.jbuilder",
+      "category": "views",
+      "bytes": 134,
+      "lines": 4,
+      "sha256": "c1ddb8bda84c4b0d117719c58d85a827194477ce2c0134dca582ba9e6fd5faa6"
+    },
+    {
+      "path": "app/views/autocompletable/users/index.html.erb",
+      "category": "views",
+      "bytes": 97,
+      "lines": 1,
+      "sha256": "2199e0b62f1a703c033019e7808f5414aee28ccb8004b331be0220b26e99c1e3"
+    },
+    {
+      "path": "app/views/autocompletable/users/index.json.jbuilder",
+      "category": "views",
+      "bytes": 90,
+      "lines": 1,
+      "sha256": "e4633c52cbcd7a848ecb59b8933eaf72b1aa66cadad65cb315dfa8ebf9e02fb3"
+    },
+    {
+      "path": "app/views/first_runs/show.html.erb",
+      "category": "views",
+      "bytes": 2999,
+      "lines": 60,
+      "sha256": "4d3b135b2641eb61537677d2ed1ce6eef6bff62c7174a4503850825bc0acd339"
+    },
+    {
+      "path": "app/views/layouts/_lightbox.html.erb",
+      "category": "views",
+      "bytes": 987,
+      "lines": 24,
+      "sha256": "173443025b5d6a6c0561713d33afb27a6d1a81736d6451cd491ad790d37f274b"
+    },
+    {
+      "path": "app/views/layouts/action_text/contents/_content.html.erb",
+      "category": "views",
+      "bytes": 51,
+      "lines": 3,
+      "sha256": "f88591a5fd168307ed079d42ceb3421bf2e11b32edaff6f935bc2e0d9a986d2b"
+    },
+    {
+      "path": "app/views/layouts/application.html.erb",
+      "category": "views",
+      "bytes": 2673,
+      "lines": 70,
+      "sha256": "3131ec244b74edc3954fa469db6bfa3a37e738f0f46fd0c5a87c3630ac28e716"
+    },
+    {
+      "path": "app/views/layouts/mailer.html.erb",
+      "category": "views",
+      "bytes": 229,
+      "lines": 13,
+      "sha256": "b98faac075c83b69e9a6b8fbde96eb19f9801e38f42ab42a725501153c895acb"
+    },
+    {
+      "path": "app/views/layouts/mailer.text.erb",
+      "category": "views",
+      "bytes": 13,
+      "lines": 1,
+      "sha256": "51353f9de3a26d4b28f7db91152bf56d31cfa9e4bd3c834680772a63cd374698"
+    },
+    {
+      "path": "app/views/messages/_actions.html.erb",
+      "category": "views",
+      "bytes": 3892,
+      "lines": 58,
+      "sha256": "f7e374fda0e44cdd149497b266f9832f8196d2921bc5bb0c93680be26023251c"
+    },
+    {
+      "path": "app/views/messages/_message.html.erb",
+      "category": "views",
+      "bytes": 1813,
+      "lines": 34,
+      "sha256": "fd352fcc56d00398f8e32e74ed50079d666b3aefbc2e9664ba9da0ceff2ae749"
+    },
+    {
+      "path": "app/views/messages/_message.json.jbuilder",
+      "category": "views",
+      "bytes": 357,
+      "lines": 18,
+      "sha256": "60d59fede590a4320ef6ad43396f63728265b5b32b7496c51220610e8c99a4dc"
+    },
+    {
+      "path": "app/views/messages/_presentation.html.erb",
+      "category": "views",
+      "bytes": 159,
+      "lines": 3,
+      "sha256": "e35881b438c6f6aa778981642d8d6179b8f94e69d6871740ab4c194857430b7d"
+    },
+    {
+      "path": "app/views/messages/_template.html.erb",
+      "category": "views",
+      "bytes": 1477,
+      "lines": 34,
+      "sha256": "d29b3b905178449fc1047b967da563034ffb0e505b7ec5c2c0937c27886a4bfb"
+    },
+    {
+      "path": "app/views/messages/_unrenderable.html.erb",
+      "category": "views",
+      "bytes": 215,
+      "lines": 7,
+      "sha256": "342a8b3593582218953cd7286d26f1daa8a8a3bf8745f5c06c0cd7f1f37e080a"
+    },
+    {
+      "path": "app/views/messages/boosts/_boost.html.erb",
+      "category": "views",
+      "bytes": 1293,
+      "lines": 20,
+      "sha256": "c2da423ae9643443115c7f879dbae778e4d7a4176c469f126dfc04a98e70c735"
+    },
+    {
+      "path": "app/views/messages/boosts/_boost.json.jbuilder",
+      "category": "views",
+      "bytes": 278,
+      "lines": 12,
+      "sha256": "f8c8142f2b8699ae04cb78accbdca254d59516fb815127235e94893020ba7cf3"
+    },
+    {
+      "path": "app/views/messages/boosts/_boosts.html.erb",
+      "category": "views",
+      "bytes": 953,
+      "lines": 17,
+      "sha256": "b05082dabae99a46904ab896276d71c797b99fbc4fc3afcc0d0ee66ceef310c6"
+    },
+    {
+      "path": "app/views/messages/boosts/by_bots/show.json.jbuilder",
+      "category": "views",
+      "bytes": 53,
+      "lines": 1,
+      "sha256": "72fd31eeea7cc5972345a6e01dbd918bdd0f4dcb9dd8caf350aede0d76cc6054"
+    },
+    {
+      "path": "app/views/messages/boosts/index.html.erb",
+      "category": "views",
+      "bytes": 58,
+      "lines": 1,
+      "sha256": "4844214514e8d5c35a482d054b754b6dc21fcf985d2c230f7c87cfa1fd4b5add"
+    },
+    {
+      "path": "app/views/messages/boosts/new.html.erb",
+      "category": "views",
+      "bytes": 1544,
+      "lines": 26,
+      "sha256": "163f85b14050840236d40261ecccbd3860c9fe9c3f03b82b01b2c2a2bff2dade"
+    },
+    {
+      "path": "app/views/messages/by_bots/index.json.jbuilder",
+      "category": "views",
+      "bytes": 65,
+      "lines": 1,
+      "sha256": "139f39a904250663f7ec3fc12f9d4f5577e652db6c1dd037ea4f27293ea2e0a3"
+    },
+    {
+      "path": "app/views/messages/by_bots/show.json.jbuilder",
+      "category": "views",
+      "bytes": 52,
+      "lines": 1,
+      "sha256": "8953f65dd2a62734825c7ce496309b67b75d32724a9447c58f05059cbff01ddb"
+    },
+    {
+      "path": "app/views/messages/create.turbo_stream.erb",
+      "category": "views",
+      "bytes": 70,
+      "lines": 1,
+      "sha256": "e57fcd107081177660aa1dbfd0992679d5b9edc41458e7e5d6c86af78cef803b"
+    },
+    {
+      "path": "app/views/messages/destroy.turbo_stream.erb",
+      "category": "views",
+      "bytes": 36,
+      "lines": 1,
+      "sha256": "c1a149aabebd18cf6c31a7a9e6379b6f6ef67cd304ce9c1398b365f329a76a84"
+    },
+    {
+      "path": "app/views/messages/edit.html.erb",
+      "category": "views",
+      "bytes": 3430,
+      "lines": 59,
+      "sha256": "23c3fdd6b6ee5b8ed352eb4dc3c9151e74e9993b5e399f7f1e425be7c96de503"
+    },
+    {
+      "path": "app/views/messages/index.html.erb",
+      "category": "views",
+      "bytes": 79,
+      "lines": 1,
+      "sha256": "d7e2ba0e8a527f3b58d80ec030def0b672f67364cc500aacac5d109cf7ff1201"
+    },
+    {
+      "path": "app/views/messages/room_not_found.html.erb",
+      "category": "views",
+      "bytes": 258,
+      "lines": 5,
+      "sha256": "cfe85683b5b25070be4607dbd749c3a3736f4b931d222c9bd9011312d5464fdc"
+    },
+    {
+      "path": "app/views/messages/show.html.erb",
+      "category": "views",
+      "bytes": 23,
+      "lines": 1,
+      "sha256": "81cd7c8f877d115d307e32f321577ef54656a3e974472fc8b8332bac4c473c51"
+    },
+    {
+      "path": "app/views/pwa/_browser_settings.html.erb",
+      "category": "views",
+      "bytes": 6301,
+      "lines": 104,
+      "sha256": "b043869620bebfc928e1ad2423abba7e80511fe2d5ecfe6ae0dcbf1a07003fc6"
+    },
+    {
+      "path": "app/views/pwa/_install_instructions.html.erb",
+      "category": "views",
+      "bytes": 2410,
+      "lines": 48,
+      "sha256": "04cd9ba0b32360ed1f897cd29986ecd3010cc68069a09349a2512c875e3e618d"
+    },
+    {
+      "path": "app/views/pwa/_system_settings.html.erb",
+      "category": "views",
+      "bytes": 3520,
+      "lines": 62,
+      "sha256": "8ac7c7b339e4d66c82d6457505ed2ef374ea0827a485b67a8352a5a3f6f3227b"
+    },
+    {
+      "path": "app/views/pwa/manifest.json.erb",
+      "category": "views",
+      "bytes": 1828,
+      "lines": 62,
+      "sha256": "29ce9c453baa819a65e12e00a1ecd145c03a65bc1df82ea433e5b1eeaee6e286"
+    },
+    {
+      "path": "app/views/pwa/service_worker.js",
+      "category": "views",
+      "bytes": 870,
+      "lines": 30,
+      "sha256": "26694d89aeba03969b5ff8ef07d36c85be3d7d3952da4b656d44809596e44fa0"
+    },
+    {
+      "path": "app/views/rooms/closeds/_form.html.erb",
+      "category": "views",
+      "bytes": 1782,
+      "lines": 40,
+      "sha256": "b3f00ae9f3659df0b361b3148fa75b9f8390f870827e73882a3960a516b3caca"
+    },
+    {
+      "path": "app/views/rooms/closeds/_user.html.erb",
+      "category": "views",
+      "bytes": 1003,
+      "lines": 24,
+      "sha256": "1e0319164c2a08175eda3d71a6cde9c1285208be590e835f486e4cbbc044757b"
+    },
+    {
+      "path": "app/views/rooms/closeds/edit.html.erb",
+      "category": "views",
+      "bytes": 257,
+      "lines": 4,
+      "sha256": "794ba7b6851c8e1de202e868dd4dc561325c9d587238b37759bc7a13edcd74cd"
+    },
+    {
+      "path": "app/views/rooms/closeds/new.html.erb",
+      "category": "views",
+      "bytes": 190,
+      "lines": 3,
+      "sha256": "7bb78a7edcbc1b307afe950ae3ea46b3c18d7e17577e690716189c193fba1ac8"
+    },
+    {
+      "path": "app/views/rooms/directs/edit.html.erb",
+      "category": "views",
+      "bytes": 1072,
+      "lines": 28,
+      "sha256": "42dc07ebe2c50ae065e822dfa3313fa9b8f63ffe281e6f77fdbb34a527ddd2c0"
+    },
+    {
+      "path": "app/views/rooms/directs/new.html.erb",
+      "category": "views",
+      "bytes": 1768,
+      "lines": 31,
+      "sha256": "871aa4426c62958984ff2832913a81c4b1e03b564a836a2660fa8c284f0bb55d"
+    },
+    {
+      "path": "app/views/rooms/involvements/_bell.html.erb",
+      "category": "views",
+      "bytes": 2065,
+      "lines": 38,
+      "sha256": "c2de65e01910da4643d80b0508f68dae3c5cd2154469e049d5459a3d5528327e"
+    },
+    {
+      "path": "app/views/rooms/involvements/show.html.erb",
+      "category": "views",
+      "bytes": 116,
+      "lines": 3,
+      "sha256": "64fbb78962ab5d048d6ea0c161b46f012bcbe72caf48a6a3f26548cb10e4c084"
+    },
+    {
+      "path": "app/views/rooms/layouts/_edit.html.erb",
+      "category": "views",
+      "bytes": 454,
+      "lines": 17,
+      "sha256": "c04bd9bdc97025f15d9ec8561c5b340b43dcc23146dfb92975d8190f056b3071"
+    },
+    {
+      "path": "app/views/rooms/layouts/_form.html.erb",
+      "category": "views",
+      "bytes": 919,
+      "lines": 26,
+      "sha256": "06128e55ec3e31bf76682301bdcbda8d766e39d33c9783562c19830fa03a3ec4"
+    },
+    {
+      "path": "app/views/rooms/layouts/_new.html.erb",
+      "category": "views",
+      "bytes": 320,
+      "lines": 11,
+      "sha256": "2f299a62bda9c2ea091e009eaba8e4496a3741042723b87645a448b54bef8980"
+    },
+    {
+      "path": "app/views/rooms/opens/_form.html.erb",
+      "category": "views",
+      "bytes": 1450,
+      "lines": 34,
+      "sha256": "03ae8882c4b8e4229c192c917570a356bbaa18c6730615db0c576abfcf348134"
+    },
+    {
+      "path": "app/views/rooms/opens/_user.html.erb",
+      "category": "views",
+      "bytes": 562,
+      "lines": 15,
+      "sha256": "536d5c585240a2ae6ac63384d22e3870385d947aa3ad1be0a40de9894dba4220"
+    },
+    {
+      "path": "app/views/rooms/opens/edit.html.erb",
+      "category": "views",
+      "bytes": 193,
+      "lines": 3,
+      "sha256": "698262076353267bfedf3774f8096af4e564355a57019df6d3442cdd4f62b885"
+    },
+    {
+      "path": "app/views/rooms/opens/new.html.erb",
+      "category": "views",
+      "bytes": 159,
+      "lines": 3,
+      "sha256": "d76605de9996aac9df42cd506499e5941c5642e945fe6b1ce980a03859bb55bc"
+    },
+    {
+      "path": "app/views/rooms/refreshes/show.turbo_stream.erb",
+      "category": "views",
+      "bytes": 330,
+      "lines": 7,
+      "sha256": "ba19c46d4fe60264f6f100015fa30d944f8b5dd98725f15503d5db3e3167074b"
+    },
+    {
+      "path": "app/views/rooms/show/_composer.html.erb",
+      "category": "views",
+      "bytes": 3622,
+      "lines": 63,
+      "sha256": "2ef4f0011c42b08925195231e45359f61b5968b764fe4de388f7dcd3a13a2174"
+    },
+    {
+      "path": "app/views/rooms/show/_invitation.html.erb",
+      "category": "views",
+      "bytes": 732,
+      "lines": 19,
+      "sha256": "1dd56687fdfb376a9792c085b5f1f39aa1b5138ab370b96050934fcefbc1e7c0"
+    },
+    {
+      "path": "app/views/rooms/show/_nav.html.erb",
+      "category": "views",
+      "bytes": 678,
+      "lines": 20,
+      "sha256": "a7d5d3e5ef58b4b5922924f59b46fc3ae1e3aa5c2d314486728240919a6ba93b"
+    },
+    {
+      "path": "app/views/rooms/show.html.erb",
+      "category": "views",
+      "bytes": 766,
+      "lines": 24,
+      "sha256": "640bb80fe4ca963fc224c3d24ba1d0e5f8a35078592184db7e992838e92f0c4c"
+    },
+    {
+      "path": "app/views/searches/index.html.erb",
+      "category": "views",
+      "bytes": 4005,
+      "lines": 88,
+      "sha256": "a706c5fe1f5c50de8f8081dc5cddfb2e4b25a3ed8cdcbd9a2e98f139d439a7db"
+    },
+    {
+      "path": "app/views/sessions/incompatible_browser.html.erb",
+      "category": "views",
+      "bytes": 1119,
+      "lines": 27,
+      "sha256": "18aca798bcaa6b04270bdf84ebd5bc978fd44c468ee190cf12a11c35b7254cd8"
+    },
+    {
+      "path": "app/views/sessions/new.html.erb",
+      "category": "views",
+      "bytes": 1801,
+      "lines": 37,
+      "sha256": "0dfd41ccce6df9a2265d0627825533968c0943183fbdc4660f2ca3057bdcf9d0"
+    },
+    {
+      "path": "app/views/sessions/transfers/show.html.erb",
+      "category": "views",
+      "bytes": 42,
+      "lines": 1,
+      "sha256": "68e3aa1e62edf77e44f9f92d4e7d2d1fbad29987f438f7470fb6f2c8f0dccd9d"
+    },
+    {
+      "path": "app/views/users/_ban_button.html.erb",
+      "category": "views",
+      "bytes": 755,
+      "lines": 15,
+      "sha256": "89523c53041be26131ef6096b063215ec6d031bd66f140f1d14924f330c64f4f"
+    },
+    {
+      "path": "app/views/users/_mention.html.erb",
+      "category": "views",
+      "bytes": 290,
+      "lines": 4,
+      "sha256": "2ec4e47e8940560ea5361b7048ef95c52c620031ad7351ec3a79524a1aefe15b"
+    },
+    {
+      "path": "app/views/users/_user.json.jbuilder",
+      "category": "views",
+      "bytes": 104,
+      "lines": 5,
+      "sha256": "48630552ecc55f7f19a2c11152cfd77418d30036839d0cf2bbe10562f01d8b11"
+    },
+    {
+      "path": "app/views/users/autocompletables/_template.html.erb",
+      "category": "views",
+      "bytes": 697,
+      "lines": 11,
+      "sha256": "0c2a2786bf24a1c8dcebba4c17f9d8446dba2d4e3024aeeb482005f5d36cef20"
+    },
+    {
+      "path": "app/views/users/avatars/show.svg.erb",
+      "category": "views",
+      "bytes": 768,
+      "lines": 22,
+      "sha256": "44cac07bcd6361e59908a4a2d305240f28b3953712939d7b9e57ee188da39493"
+    },
+    {
+      "path": "app/views/users/new.html.erb",
+      "category": "views",
+      "bytes": 3415,
+      "lines": 74,
+      "sha256": "f8cbd0c897d2fe6ad65558e9eefa0ae499ad02842e4b60c8baf2921fe68adf2d"
+    },
+    {
+      "path": "app/views/users/profiles/_membership.html.erb",
+      "category": "views",
+      "bytes": 516,
+      "lines": 13,
+      "sha256": "bee1bbd8930e3bd1085d170c720b8180d4ea98d430cf071ec6419e6ab853ee0e"
+    },
+    {
+      "path": "app/views/users/profiles/_transfer.html.erb",
+      "category": "views",
+      "bytes": 1959,
+      "lines": 40,
+      "sha256": "2e63817502f8c49197e94a47f753a88c785604bdce3d6d34731553dfe764f4a0"
+    },
+    {
+      "path": "app/views/users/profiles/show.html.erb",
+      "category": "views",
+      "bytes": 5154,
+      "lines": 118,
+      "sha256": "d8663673c2f789aa6d435af8e303864b6e1f24684e8a4c771c87d5f05281a221"
+    },
+    {
+      "path": "app/views/users/push_subscriptions/_push_subscription.html.erb",
+      "category": "views",
+      "bytes": 1034,
+      "lines": 22,
+      "sha256": "6782ce47285ea4ecdfb56d28506209879d1c9f3a8e58ff5d0a21852eb22f0260"
+    },
+    {
+      "path": "app/views/users/push_subscriptions/index.html.erb",
+      "category": "views",
+      "bytes": 589,
+      "lines": 16,
+      "sha256": "c5e4d06d40504cb8835423cec1981253b34ec11b68964f05fbf7c9949e2e02bf"
+    },
+    {
+      "path": "app/views/users/show.html.erb",
+      "category": "views",
+      "bytes": 2464,
+      "lines": 69,
+      "sha256": "3f09e1ffeb848da5b8db1b00a9fc9291a1a65c8f58cdeac833c2d2cf4bc7b708"
+    },
+    {
+      "path": "app/views/users/sidebars/rooms/_direct.html.erb",
+      "category": "views",
+      "bytes": 1308,
+      "lines": 31,
+      "sha256": "5fec2e6544796db547361d994664fd7c7e68c5a9d5ec528bbcf1fa364adcf7ae"
+    },
+    {
+      "path": "app/views/users/sidebars/rooms/_direct_placeholder.html.erb",
+      "category": "views",
+      "bytes": 502,
+      "lines": 12,
+      "sha256": "bcc62b58a80d27923b033182b9cb0a4d2a3493f712fa09d09baba21f752a57b4"
+    },
+    {
+      "path": "app/views/users/sidebars/rooms/_shared.html.erb",
+      "category": "views",
+      "bytes": 287,
+      "lines": 5,
+      "sha256": "f2fec0f82f7cf230de8e682e8aa95e5b3c544f11afaace4d2cd88ef60b3c1765"
+    },
+    {
+      "path": "app/views/users/sidebars/show.html.erb",
+      "category": "views",
+      "bytes": 3206,
+      "lines": 63,
+      "sha256": "a530fa27b264dcd51d4c1a400da6eb370648bf9350979a8b9d42a7395a5da9e0"
+    },
+    {
+      "path": "app/views/welcome/show.html.erb",
+      "category": "views",
+      "bytes": 481,
+      "lines": 13,
+      "sha256": "79c210b6225ee1ad33c3e502c0374dde6f380ebd41f3d31e55a9dfe390b6a6c7"
+    },
+    {
+      "path": "app/helpers/accounts_helper.rb",
+      "category": "helpers",
+      "bytes": 188,
+      "lines": 5,
+      "sha256": "4036277a090b99668a78a0d2ccd0652f69c25c3bfef7c78c1d34f8664c55205f"
+    },
+    {
+      "path": "app/helpers/application_helper.rb",
+      "category": "helpers",
+      "bytes": 1176,
+      "lines": 46,
+      "sha256": "e1cc00e3dc9530c4c32173bc7ba44c3736d4e649ae5e09ca666ea650c78c8551"
+    },
+    {
+      "path": "app/helpers/broadcasts_helper.rb",
+      "category": "helpers",
+      "bytes": 306,
+      "lines": 13,
+      "sha256": "9de5ec7aef229f6e746fbf199ec28500197971395c1b922220a6cdc34459f1d4"
+    },
+    {
+      "path": "app/helpers/cable_helper.rb",
+      "category": "helpers",
+      "bytes": 211,
+      "lines": 7,
+      "sha256": "57364474ede5795ff0030a3d8302289d372e56ed40a85a4ae0fd2e45d420e853"
+    },
+    {
+      "path": "app/helpers/clipboard_helper.rb",
+      "category": "helpers",
+      "bytes": 286,
+      "lines": 8,
+      "sha256": "94cfd3811a7a821d9e88920aa7d08c8a877a8bdfeb5d0692336364c652ce8b22"
+    },
+    {
+      "path": "app/helpers/content_filters/remove_solo_unfurled_link_text.rb",
+      "category": "helpers",
+      "bytes": 1534,
+      "lines": 58,
+      "sha256": "cb28983d41bd82c0e772a6783a153a52b4045d68066d70b0ad80e2186949e06c"
+    },
+    {
+      "path": "app/helpers/content_filters/sanitize_attributes.rb",
+      "category": "helpers",
+      "bytes": 1750,
+      "lines": 47,
+      "sha256": "8952df47b5b039b6e14cb92d59fd7b54126cb0d217fca1ce7d2919776f9f4097"
+    },
+    {
+      "path": "app/helpers/content_filters/sanitize_tags.rb",
+      "category": "helpers",
+      "bytes": 596,
+      "lines": 18,
+      "sha256": "1c6a19cf12581485af00a29716d9426340c61cd5295a7ad5ee42e70413b455f5"
+    },
+    {
+      "path": "app/helpers/content_filters.rb",
+      "category": "helpers",
+      "bytes": 743,
+      "lines": 13,
+      "sha256": "dab47619782ca0205fd70a2662d81fa1a9f6af05af149b44fe126e449830a421"
+    },
+    {
+      "path": "app/helpers/drop_target_helper.rb",
+      "category": "helpers",
+      "bytes": 153,
+      "lines": 5,
+      "sha256": "123007082cc09026562a7af7c8c948be378e5eb292b6c0cf988d30831991659c"
+    },
+    {
+      "path": "app/helpers/emoji_helper.rb",
+      "category": "helpers",
+      "bytes": 269,
+      "lines": 12,
+      "sha256": "38e42c2ccedc58a40003557e6028a9a3f4eadd15292e2d2a7057562c32b509e9"
+    },
+    {
+      "path": "app/helpers/forms_helper.rb",
+      "category": "helpers",
+      "bytes": 224,
+      "lines": 8,
+      "sha256": "f16c1688c2f9903bc5c7b08b823faccc13b701b0b381e59d3bd55193e6e8be67"
+    },
+    {
+      "path": "app/helpers/messages/attachment_presentation.rb",
+      "category": "helpers",
+      "bytes": 3686,
+      "lines": 107,
+      "sha256": "7dc62251330052320c75db09fa8f5a81b8046e49d4d52a3282bc0779cab7ae9a"
+    },
+    {
+      "path": "app/helpers/messages_helper.rb",
+      "category": "helpers",
+      "bytes": 4421,
+      "lines": 115,
+      "sha256": "0b9d35a27d5eb58443fb167bcf5ad2acee32dfcdfe3044fb3eb8774d43c20115"
+    },
+    {
+      "path": "app/helpers/qr_code_helper.rb",
+      "category": "helpers",
+      "bytes": 255,
+      "lines": 8,
+      "sha256": "978a684b7763eb14b5dcb452b1d5adaeef3b83d99f5f5deffe0ef983a1c1dd53"
+    },
+    {
+      "path": "app/helpers/rich_text_helper.rb",
+      "category": "helpers",
+      "bytes": 1369,
+      "lines": 33,
+      "sha256": "e0ae65f37334e8840861a688292b466867dd2e9810233eeea0a3981a3caf1935"
+    },
+    {
+      "path": "app/helpers/rooms/involvements_helper.rb",
+      "category": "helpers",
+      "bytes": 1587,
+      "lines": 36,
+      "sha256": "e09d79e2651123fc48bde8aac4fe6d33ace57e4a5dc5c9426db8820542f250d3"
+    },
+    {
+      "path": "app/helpers/rooms_helper.rb",
+      "category": "helpers",
+      "bytes": 2928,
+      "lines": 84,
+      "sha256": "62015b4da5067f0ee5839f350bd1ff03ef49ee1da0f33d8388ad633d0edc2bca"
+    },
+    {
+      "path": "app/helpers/searches_helper.rb",
+      "category": "helpers",
+      "bytes": 448,
+      "lines": 12,
+      "sha256": "0b01034c19bb49f9573da196d71b89fc23725c14a37988774dba6e51f6969f3a"
+    },
+    {
+      "path": "app/helpers/time_helper.rb",
+      "category": "helpers",
+      "bytes": 181,
+      "lines": 5,
+      "sha256": "29c25bca3c547913105c569a4714608c11b4ec67831d5947d0046f3d44158754"
+    },
+    {
+      "path": "app/helpers/translations_helper.rb",
+      "category": "helpers",
+      "bytes": 8788,
+      "lines": 38,
+      "sha256": "00e63828633000116e7c654e8b50e35c3e5c8b04775184fd380bc0ff6b4e5779"
+    },
+    {
+      "path": "app/helpers/users/avatars_helper.rb",
+      "category": "helpers",
+      "bytes": 578,
+      "lines": 18,
+      "sha256": "5136457947ea462fd2f1b03dc8daecb97bee400256b4f568e962a3b1283c5972"
+    },
+    {
+      "path": "app/helpers/users/filter_helper.rb",
+      "category": "helpers",
+      "bytes": 529,
+      "lines": 10,
+      "sha256": "5ddd2bd358da12e5a3777079f77cb936f76390b23b9619fc7a7f0b1b0ed63303"
+    },
+    {
+      "path": "app/helpers/users/profiles_helper.rb",
+      "category": "helpers",
+      "bytes": 749,
+      "lines": 25,
+      "sha256": "672eb09f91df899136ec74dbf3cd49395302d47c87d5552f9607ef4e2c5362d1"
+    },
+    {
+      "path": "app/helpers/users/sidebar_helper.rb",
+      "category": "helpers",
+      "bytes": 494,
+      "lines": 10,
+      "sha256": "932b530e1ecbaa723bb324d8ec480cb8853c34d7728ac4b467db54e3825a2642"
+    },
+    {
+      "path": "app/helpers/users_helper.rb",
+      "category": "helpers",
+      "bytes": 216,
+      "lines": 7,
+      "sha256": "e9345b44daf16a5139a5a062b785ab315073d6300cf0004e0e2312cabe6c4094"
+    },
+    {
+      "path": "app/helpers/version_helper.rb",
+      "category": "helpers",
+      "bytes": 126,
+      "lines": 5,
+      "sha256": "8b0232a173c3b118824efc4afc19e82e95c3c3817f4e05feff2138bd703ff4c1"
+    },
+    {
+      "path": "app/jobs/application_job.rb",
+      "category": "jobs",
+      "bytes": 269,
+      "lines": 7,
+      "sha256": "d51e125007521b0f59765422cf3cf949b59b2054cdac6567a95b4a7aeaf1d722"
+    },
+    {
+      "path": "app/jobs/bot/webhook_job.rb",
+      "category": "jobs",
+      "bytes": 110,
+      "lines": 5,
+      "sha256": "e1a53555548cc0c68292617b37c9f7a4eda1d39d7dc155c04abb33558cda6cb8"
+    },
+    {
+      "path": "app/jobs/remove_banned_content_job.rb",
+      "category": "jobs",
+      "bytes": 107,
+      "lines": 5,
+      "sha256": "3e91ddea2f52728bc4563c495b0bbdc330777c77de5c185be0ac1965ee911700"
+    },
+    {
+      "path": "app/jobs/room/push_message_job.rb",
+      "category": "jobs",
+      "bytes": 133,
+      "lines": 5,
+      "sha256": "0ab3dae8f0482b123b7812e46c8d6532889ad73e7fc23f91b815d901abc11b9b"
+    },
+    {
+      "path": "app/channels/application_cable/channel.rb",
+      "category": "channels",
+      "bytes": 79,
+      "lines": 4,
+      "sha256": "38d579eae4970bc9bb298cc8d4bfb0e4d6390d94e5d4e3068be6c8479c5551ed"
+    },
+    {
+      "path": "app/channels/application_cable/connection.rb",
+      "category": "channels",
+      "bytes": 433,
+      "lines": 20,
+      "sha256": "a935dff6495fbf3b78c9c154120f57c3edaa93beb3866d65487a83a54a7a7b2c"
+    },
+    {
+      "path": "app/channels/concerns/room_streams_are_authorized.rb",
+      "category": "channels",
+      "bytes": 494,
+      "lines": 13,
+      "sha256": "b8d5c7a6038e74c1771bf2650190d9e6d7bb7853147d4d4f8290275236e5533e"
+    },
+    {
+      "path": "app/channels/heartbeat_channel.rb",
+      "category": "channels",
+      "bytes": 55,
+      "lines": 2,
+      "sha256": "9ee7e66ebc24e677739c819a49e74edeb9e4b4ea0c9adc19a6e71c14a40eff96"
+    },
+    {
+      "path": "app/channels/presence_channel.rb",
+      "category": "channels",
+      "bytes": 557,
+      "lines": 27,
+      "sha256": "112a20695d80915ac566a13183c12530214960c033a4833111cdbf8dcbb6499e"
+    },
+    {
+      "path": "app/channels/read_rooms_channel.rb",
+      "category": "channels",
+      "bytes": 126,
+      "lines": 5,
+      "sha256": "54fa7e3ebb33f2eec985e37906d4729dea66e643563bb195fdca6e0a8c74c268"
+    },
+    {
+      "path": "app/channels/room_channel.rb",
+      "category": "channels",
+      "bytes": 243,
+      "lines": 14,
+      "sha256": "ae1760ebfd35774f20cd574b24855b89e342cbb1ab8d12356e2fe550a0a296c6"
+    },
+    {
+      "path": "app/channels/room_messages_channel.rb",
+      "category": "channels",
+      "bytes": 1978,
+      "lines": 55,
+      "sha256": "8d2215755666d0855ea8afebf13f9160ae2856651ef289e0327a2e2d0d5ebf2d"
+    },
+    {
+      "path": "app/channels/typing_notifications_channel.rb",
+      "category": "channels",
+      "bytes": 326,
+      "lines": 14,
+      "sha256": "ce268da760dc5c560e46fd7643e874a3bc6cfff1c9d8798cd1b9799336ec6695"
+    },
+    {
+      "path": "app/channels/unread_rooms_channel.rb",
+      "category": "channels",
+      "bytes": 439,
+      "lines": 12,
+      "sha256": "e4458d89b1408c2cb0696985900e774dc19eda079acbeaf921a0b454459093db"
+    },
+    {
+      "path": "lib/assets/.keep",
+      "category": "lib",
+      "bytes": 0,
+      "lines": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "lib/rails_ext/action_text_allowed_tags.rb",
+      "category": "lib",
+      "bytes": 652,
+      "lines": 11,
+      "sha256": "7cf5206f4b2154640d253feb4388ebed3462d56cc422f43151e9252e750c853e"
+    },
+    {
+      "path": "lib/rails_ext/action_text_attachables.rb",
+      "category": "lib",
+      "bytes": 1820,
+      "lines": 43,
+      "sha256": "16e2ee47254edf94017d924c9b9aa3152323c565bebece655d73cab210918525"
+    },
+    {
+      "path": "lib/rails_ext/actiontext_opengraph_embeds.rb",
+      "category": "lib",
+      "bytes": 3793,
+      "lines": 108,
+      "sha256": "a48a337a765fddc7f046296a16f5e9525fd461b386bc4fb0b7304491b6fbb51e"
+    },
+    {
+      "path": "lib/rails_ext/filter.rb",
+      "category": "lib",
+      "bytes": 448,
+      "lines": 24,
+      "sha256": "37bf800fa6da83ffdc8de75d220fb5437745259a4b9bf86d4828af81cba89207"
+    },
+    {
+      "path": "lib/rails_ext/filters.rb",
+      "category": "lib",
+      "bytes": 231,
+      "lines": 12,
+      "sha256": "bf3b06b389dcfef101e3e1d2234884408cb13084686341369317222facc3888c"
+    },
+    {
+      "path": "lib/rails_ext/log_scrubbing_formatter.rb",
+      "category": "lib",
+      "bytes": 565,
+      "lines": 16,
+      "sha256": "5a53cf7b6c44ee777c588ff5d4979515da684ff5c6e0d5e361a9a56dbb163692"
+    },
+    {
+      "path": "lib/rails_ext/string.rb",
+      "category": "lib",
+      "bytes": 122,
+      "lines": 5,
+      "sha256": "e3e1cbc7b63c707130c66715294a04bd18dca561108346f474504ba21074f2d4"
+    },
+    {
+      "path": "lib/restricted_http/private_network_guard.rb",
+      "category": "lib",
+      "bytes": 1178,
+      "lines": 29,
+      "sha256": "8e910f4f1505ac2cf1a9d895a4060c950d7f583b58128dabe53603a581d291cf"
+    },
+    {
+      "path": "lib/tasks/.keep",
+      "category": "lib",
+      "bytes": 0,
+      "lines": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "lib/tasks/generate.rake",
+      "category": "lib",
+      "bytes": 287,
+      "lines": 13,
+      "sha256": "c720abc894efb0449ba151bf89c13f7a5562057c356b014c362ce0d3f2b1b81b"
+    },
+    {
+      "path": "lib/tasks/resque.rake",
+      "category": "lib",
+      "bytes": 269,
+      "lines": 12,
+      "sha256": "23c10d07a5600c3d4b1c8a903a29faa076b54f25a5a283088002b97b444ef031"
+    },
+    {
+      "path": "lib/web_push/notification.rb",
+      "category": "lib",
+      "bytes": 1055,
+      "lines": 31,
+      "sha256": "ccc94cafe5f59f4c7f6471137cf2fa4f2f42f41f257f2386b8d84c67bd1f5c0f"
+    },
+    {
+      "path": "lib/web_push/pool.rb",
+      "category": "lib",
+      "bytes": 1898,
+      "lines": 56,
+      "sha256": "9691d75a1956f7e5d81e035ff81b6e3d42bdc2dd94935eaf1e3a79016afff437"
+    },
+    {
+      "path": "app/javascript/application.js",
+      "category": "frontend",
+      "bytes": 179,
+      "lines": 4,
+      "sha256": "d06091d31ab4566b7bacb1b4ac8234cabf56f0bc24cc2ee8c62f1670dc4956dc"
+    },
+    {
+      "path": "app/javascript/controllers/application.js",
+      "category": "frontend",
+      "bytes": 171,
+      "lines": 8,
+      "sha256": "57ed3a84b152c7d201dcfd8c76880378d85fd99f8c98962f58a6b2147458c8df"
+    },
+    {
+      "path": "app/javascript/controllers/auto_submit_controller.js",
+      "category": "frontend",
+      "bytes": 144,
+      "lines": 7,
+      "sha256": "b0277cd1444e83b4352d452b0bb0bbb00943632749f2b95cb022381c80d10dda"
+    },
+    {
+      "path": "app/javascript/controllers/autocomplete_controller.js",
+      "category": "frontend",
+      "bytes": 1083,
+      "lines": 48,
+      "sha256": "545de75fdb2b3322ab68a223d766d0d3449b3cbd16609326335c71327a39ae7b"
+    },
+    {
+      "path": "app/javascript/controllers/badge_dot_controller.js",
+      "category": "frontend",
+      "bytes": 710,
+      "lines": 31,
+      "sha256": "3213e859423ac2e478fcc709607359a87f13b97019e99fbb46947b0aa784ad44"
+    },
+    {
+      "path": "app/javascript/controllers/boost_delete_controller.js",
+      "category": "frontend",
+      "bytes": 803,
+      "lines": 33,
+      "sha256": "e71eee0f4d2f2281ae41f65ebbbb428c38e59e41a2259d780c0e5088cbd6dfb6"
+    },
+    {
+      "path": "app/javascript/controllers/composer_controller.js",
+      "category": "frontend",
+      "bytes": 5999,
+      "lines": 217,
+      "sha256": "41098cd7821da84dabe37562e01da31d515adf56d68d9d4ad54623f1be8847d0"
+    },
+    {
+      "path": "app/javascript/controllers/copy_to_clipboard_controller.js",
+      "category": "frontend",
+      "bytes": 521,
+      "lines": 25,
+      "sha256": "14e22e5f1989e79650e06b7bf543e4fc7800b07890215422584f3b51356075fd"
+    },
+    {
+      "path": "app/javascript/controllers/drop_target_controller.js",
+      "category": "frontend",
+      "bytes": 362,
+      "lines": 17,
+      "sha256": "751d63181b360392c5b773d6e26e93fa961c0a386b16e39abe592ae031b133ab"
+    },
+    {
+      "path": "app/javascript/controllers/element_removal_controller.js",
+      "category": "frontend",
+      "bytes": 136,
+      "lines": 7,
+      "sha256": "b19c974c8f58f25945dff55e000a5e6726a1784bd56c366727a6705fea36af22"
+    },
+    {
+      "path": "app/javascript/controllers/filter_controller.js",
+      "category": "frontend",
+      "bytes": 1015,
+      "lines": 46,
+      "sha256": "a2d33336d422e167baa2717d89980930c3bc64db3917f3a9d2c7293d2ef614c9"
+    },
+    {
+      "path": "app/javascript/controllers/form_controller.js",
+      "category": "frontend",
+      "bytes": 286,
+      "lines": 17,
+      "sha256": "b07ecdc7da09decffdc75db63d54ad85ff65ebe2bf34284a1e98dacea81f2945"
+    },
+    {
+      "path": "app/javascript/controllers/index.js",
+      "category": "frontend",
+      "bytes": 178,
+      "lines": 4,
+      "sha256": "e0fea5ddf6d71e3395bf18d01c1c4d9152c67bd5e094c9c0f969452798e20651"
+    },
+    {
+      "path": "app/javascript/controllers/lightbox_controller.js",
+      "category": "frontend",
+      "bytes": 649,
+      "lines": 24,
+      "sha256": "8fead2ec99698c186257870f4de4dbd35afc28f2353144da81fa10a2768de9a6"
+    },
+    {
+      "path": "app/javascript/controllers/local_time_controller.js",
+      "category": "frontend",
+      "bytes": 902,
+      "lines": 29,
+      "sha256": "1659b8fd756f75c4caf17742338e034dc9a14b5b71a8d9e5cd94053b9f3825c6"
+    },
+    {
+      "path": "app/javascript/controllers/maintain_scroll_controller.js",
+      "category": "frontend",
+      "bytes": 915,
+      "lines": 32,
+      "sha256": "d020584b23670024db9ff4cc8107f458c5aa539a99c8a00d033d9d29370bf299"
+    },
+    {
+      "path": "app/javascript/controllers/messages_controller.js",
+      "category": "frontend",
+      "bytes": 5129,
+      "lines": 190,
+      "sha256": "9a6f2fd5b70feb702fa81ee4b467a8be495c84a6439e31c8846356b341cedb30"
+    },
+    {
+      "path": "app/javascript/controllers/notifications_controller.js",
+      "category": "frontend",
+      "bytes": 4963,
+      "lines": 165,
+      "sha256": "b728a31bb6983ca7bef91262e185ed41fb05962f7a721ae6968c00129f2a5fb6"
+    },
+    {
+      "path": "app/javascript/controllers/popup_controller.js",
+      "category": "frontend",
+      "bytes": 837,
+      "lines": 37,
+      "sha256": "542fadacf313ef3783c4d97056a54c72d932a46143e126ace53c2b4bd33956a1"
+    },
+    {
+      "path": "app/javascript/controllers/presence_controller.js",
+      "category": "frontend",
+      "bytes": 2026,
+      "lines": 83,
+      "sha256": "bceeb3d55a1bbb934adb5e1eb1def8354fc0cbb42e231822745d3b580e537712"
+    },
+    {
+      "path": "app/javascript/controllers/pwa_install_controller.js",
+      "category": "frontend",
+      "bytes": 854,
+      "lines": 35,
+      "sha256": "65a547ba6fc26448aa9a1866110fb4c02c36f2ba7693a824c15681c8b50abfdb"
+    },
+    {
+      "path": "app/javascript/controllers/read_rooms_controller.js",
+      "category": "frontend",
+      "bytes": 573,
+      "lines": 22,
+      "sha256": "81b2ba832f6435b89f94bccce9bbc5b69ccb56245f50b0a1ac8b85f01e96c53b"
+    },
+    {
+      "path": "app/javascript/controllers/refresh_room_controller.js",
+      "category": "frontend",
+      "bytes": 2035,
+      "lines": 75,
+      "sha256": "ad861ff9b4133d59a38800401b87cd6b9fd2dd0b73bc1d3b71f4cb3fbb8e5ce9"
+    },
+    {
+      "path": "app/javascript/controllers/reply_controller.js",
+      "category": "frontend",
+      "bytes": 1562,
+      "lines": 48,
+      "sha256": "2f2136e7d97cac0b3bb935825cfa10a0bb1829b0fa372a5e0a1fc91993a01400"
+    },
+    {
+      "path": "app/javascript/controllers/rooms_list_controller.js",
+      "category": "frontend",
+      "bytes": 1565,
+      "lines": 65,
+      "sha256": "a9148a7a494d2d9f8429dfd1c11c5e6168fee1ff482a249b596ea363ea744efc"
+    },
+    {
+      "path": "app/javascript/controllers/scroll_into_view_controller.js",
+      "category": "frontend",
+      "bytes": 263,
+      "lines": 9,
+      "sha256": "45cb8e9a990c3cf5b7be4c2621fd0e5f11fcdd941b79f5d22e04b3147e067982"
+    },
+    {
+      "path": "app/javascript/controllers/search_results_controller.js",
+      "category": "frontend",
+      "bytes": 680,
+      "lines": 26,
+      "sha256": "c1db92ae9c15ac2faf5db647805aebd7749ee886a6eed9ccfe172ddcdb65319f"
+    },
+    {
+      "path": "app/javascript/controllers/sessions_controller.js",
+      "category": "frontend",
+      "bytes": 701,
+      "lines": 25,
+      "sha256": "207aed6b599a1a5734205d698914c8f8aa88bb133a6f151beec5f8fb13fa3d8a"
+    },
+    {
+      "path": "app/javascript/controllers/soft_keyboard_controller.js",
+      "category": "frontend",
+      "bytes": 915,
+      "lines": 33,
+      "sha256": "07e33c240ccc14eff92578985c32d09b300938a79dae14518308590e19ae35ca"
+    },
+    {
+      "path": "app/javascript/controllers/sorted_list_controller.js",
+      "category": "frontend",
+      "bytes": 1026,
+      "lines": 36,
+      "sha256": "04977729d5cdd6a154685754276455a0102bceb2082790388a2698a594398220"
+    },
+    {
+      "path": "app/javascript/controllers/sound_controller.js",
+      "category": "frontend",
+      "bytes": 205,
+      "lines": 10,
+      "sha256": "58e6d35dbd938a7104a4f68d8ce85436ef5bf29e52882f327c9d030f8cfbb9f5"
+    },
+    {
+      "path": "app/javascript/controllers/toggle_class_controller.js",
+      "category": "frontend",
+      "bytes": 195,
+      "lines": 9,
+      "sha256": "ad3d5e003e885725a611bbd0d86b1ec7a848c59639e6a01e24a963566297cd71"
+    },
+    {
+      "path": "app/javascript/controllers/turbo_frame_controller.js",
+      "category": "frontend",
+      "bytes": 355,
+      "lines": 16,
+      "sha256": "420954e8c60e2b981173e2a252ad22f32a76e4f7b04d9c7d42278dbe872456d8"
+    },
+    {
+      "path": "app/javascript/controllers/turbo_streaming_controller.js",
+      "category": "frontend",
+      "bytes": 372,
+      "lines": 11,
+      "sha256": "6f8e9c21d17fb3373ca1e8eedd337484ae749ecafa5ac3bb0544e50807dfe6c8"
+    },
+    {
+      "path": "app/javascript/controllers/typing_notifications_controller.js",
+      "category": "frontend",
+      "bytes": 1402,
+      "lines": 59,
+      "sha256": "d68b9a05ac6a8d7fe4826f08e7221031aff03f6d73f7f306541f1bcaa7d4f87d"
+    },
+    {
+      "path": "app/javascript/controllers/unfurl_controller.js",
+      "category": "frontend",
+      "bytes": 2515,
+      "lines": 84,
+      "sha256": "935079df4ec1b8adfe3ac5df322f92d9b54118e956ef6c516d9250a871e6dde5"
+    },
+    {
+      "path": "app/javascript/controllers/upload_preview_controller.js",
+      "category": "frontend",
+      "bytes": 384,
+      "lines": 14,
+      "sha256": "1c0a6a33fb87785117b4cbced02ff303f17e01c19f67e78bc373cbb003e085ef"
+    },
+    {
+      "path": "app/javascript/controllers/web_share_controller.js",
+      "category": "frontend",
+      "bytes": 902,
+      "lines": 36,
+      "sha256": "4ec2b613b9f548b633273a29653aa3c3b04c19e9c5e4b5992dc4c47f37a170a1"
+    },
+    {
+      "path": "app/javascript/helpers/dom_helpers.js",
+      "category": "frontend",
+      "bytes": 1321,
+      "lines": 59,
+      "sha256": "3fde21e9c7b0063d1fe16797f77ab24444e85ced698cd46258e3f608c4eed0f6"
+    },
+    {
+      "path": "app/javascript/helpers/navigator_helpers.js",
+      "category": "frontend",
+      "bytes": 102,
+      "lines": 3,
+      "sha256": "181fb149dbb471b5416925aebe9c7168d3c5bd32be754ecdb8597ca1439fc377"
+    },
+    {
+      "path": "app/javascript/helpers/string_helpers.js",
+      "category": "frontend",
+      "bytes": 422,
+      "lines": 13,
+      "sha256": "23ebd4974a615d3d98c1f2fca0b5b5098d62494bdbf787038f23d00dfe550823"
+    },
+    {
+      "path": "app/javascript/helpers/timing_helpers.js",
+      "category": "frontend",
+      "bytes": 855,
+      "lines": 39,
+      "sha256": "689a3a3091b767a94b16140aa2b5d599b68ea27614f6eaf0d9c6179b1d8c7706"
+    },
+    {
+      "path": "app/javascript/helpers/turbo_helpers.js",
+      "category": "frontend",
+      "bytes": 110,
+      "lines": 3,
+      "sha256": "12e46144a7e3148e864ea02ed254daee88b71ad5734d7d936072c4cb72af9326"
+    },
+    {
+      "path": "app/javascript/initializers/autocomplete.js",
+      "category": "frontend",
+      "bytes": 315,
+      "lines": 5,
+      "sha256": "918447494118e771f449a8adcca94a2a78520e8d962bf522e0b3f74e5628f8c4"
+    },
+    {
+      "path": "app/javascript/initializers/current.js",
+      "category": "frontend",
+      "bytes": 587,
+      "lines": 23,
+      "sha256": "4d090ecd3f73978bd3e84cead83ec241e62f7922e95fbf10a8f18440b1b3dfbe"
+    },
+    {
+      "path": "app/javascript/initializers/highlight.js",
+      "category": "frontend",
+      "bytes": 906,
+      "lines": 29,
+      "sha256": "4fd86024e5a333dcc197cfadec46507edbbffb46da2f4abce43d4fa6b7d1e47b"
+    },
+    {
+      "path": "app/javascript/initializers/index.js",
+      "category": "frontend",
+      "bytes": 129,
+      "lines": 4,
+      "sha256": "9b96c2ae37849092157f3c950ab225ab8b7a5a1ce341f9d47cdeda1bada7e665"
+    },
+    {
+      "path": "app/javascript/initializers/rich_text.js",
+      "category": "frontend",
+      "bytes": 630,
+      "lines": 19,
+      "sha256": "5e0c975eb65ca3342c5317212b50dd3571ac80c2aac7a646b433123c5c698ae5"
+    },
+    {
+      "path": "app/javascript/lib/autocomplete/autocomplete_handler.js",
+      "category": "frontend",
+      "bytes": 1174,
+      "lines": 46,
+      "sha256": "188fb63f451ca6b314aa0e2471e0a4850bee2267cdc8531a683de63c04d21b8f"
+    },
+    {
+      "path": "app/javascript/lib/autocomplete/base_autocomplete_handler.js",
+      "category": "frontend",
+      "bytes": 3311,
+      "lines": 128,
+      "sha256": "81e34d36e1449fc1c69bb59646e9fa8d24b2544e6775907a04584a2b8d278ebb"
+    },
+    {
+      "path": "app/javascript/lib/autocomplete/collection.js",
+      "category": "frontend",
+      "bytes": 4204,
+      "lines": 134,
+      "sha256": "d4b01558aadfe8fa98c526b18a7152bef6fa50d2cead7cc7cdedcf2bec62bf7a"
+    },
+    {
+      "path": "app/javascript/lib/autocomplete/constants.js",
+      "category": "frontend",
+      "bytes": 1352,
+      "lines": 1,
+      "sha256": "3e9b08d6e9663161bb09ecf2381d4472707f693fd968aa17f1c7735fed7e74da"
+    },
+    {
+      "path": "app/javascript/lib/autocomplete/custom_elements/suggestion_option.js",
+      "category": "frontend",
+      "bytes": 1177,
+      "lines": 59,
+      "sha256": "841d6fd05f1f841069a9030c66f250cef4f06fc2bcb55bd102c2c02a35578d05"
+    },
+    {
+      "path": "app/javascript/lib/autocomplete/custom_elements/suggestion_select.js",
+      "category": "frontend",
+      "bytes": 1061,
+      "lines": 44,
+      "sha256": "9ea588254307e20a0d862dcf684fb829b1a895031bc69146e1be4c2d12d0188e"
+    },
+    {
+      "path": "app/javascript/lib/autocomplete/helpers.js",
+      "category": "frontend",
+      "bytes": 2747,
+      "lines": 103,
+      "sha256": "6a1107041f77dc3954891e462198586b908346f8feb51a735e6a342587fb66b8"
+    },
+    {
+      "path": "app/javascript/lib/autocomplete/renderer.js",
+      "category": "frontend",
+      "bytes": 1662,
+      "lines": 40,
+      "sha256": "f9483d27d05236883aae17f6f2904eb87756ac677430abc1aa6eb89c8d458e1c"
+    },
+    {
+      "path": "app/javascript/lib/autocomplete/selection.js",
+      "category": "frontend",
+      "bytes": 2198,
+      "lines": 82,
+      "sha256": "dfa69a6c3cdd2b064001271f7186f647bbdcae177e6b630ce80625e5d704c577"
+    },
+    {
+      "path": "app/javascript/lib/autocomplete/suggestion_context.js",
+      "category": "frontend",
+      "bytes": 1526,
+      "lines": 59,
+      "sha256": "b916f11a26e0286256936abfac619b29d63d6b9ee4a4f06cedd41bd17e555c3b"
+    },
+    {
+      "path": "app/javascript/lib/autocomplete/suggestion_controller.js",
+      "category": "frontend",
+      "bytes": 9016,
+      "lines": 349,
+      "sha256": "bc1344d6ea78ad85be603080a6b0076a831605a433d293afc023b354b2103e53"
+    },
+    {
+      "path": "app/javascript/lib/autocomplete/suggestion_results_controller.js",
+      "category": "frontend",
+      "bytes": 6257,
+      "lines": 208,
+      "sha256": "9cda34fe1fa39e004a1a5de63af3539e441ff9b3c940fb2d88ba4903227571fd"
+    },
+    {
+      "path": "app/javascript/lib/autocomplete/utils.js",
+      "category": "frontend",
+      "bytes": 944,
+      "lines": 33,
+      "sha256": "e204ac06cea44f677cfe15271370a4f815e1adb48cef5a7503eccb8ac08265a8"
+    },
+    {
+      "path": "app/javascript/lib/cookie.js",
+      "category": "frontend",
+      "bytes": 663,
+      "lines": 19,
+      "sha256": "1ad3cfe0203fcc349a491de6b533396fb5088535f1e468d553a5ea52cbf44998"
+    },
+    {
+      "path": "app/javascript/lib/rich_text/campfire_extension.js",
+      "category": "frontend",
+      "bytes": 612,
+      "lines": 24,
+      "sha256": "54614caa3eeeb97bd369641c5a689f9e80698438ae98aa3a26f818eebb0d4faa"
+    },
+    {
+      "path": "app/javascript/lib/rich_text/cite_node.js",
+      "category": "frontend",
+      "bytes": 711,
+      "lines": 39,
+      "sha256": "c3c29c9bce26a8a011cf827e3ef374eceb659b426777fc6e9082ae44fbe5e61a"
+    },
+    {
+      "path": "app/javascript/models/client_message.js",
+      "category": "frontend",
+      "bytes": 2794,
+      "lines": 102,
+      "sha256": "ff4541ef5badb2827388acbe1545636b6cdb287c5d7f7cdfeb63f70a7e2341ee"
+    },
+    {
+      "path": "app/javascript/models/file_uploader.js",
+      "category": "frontend",
+      "bytes": 1219,
+      "lines": 41,
+      "sha256": "55ec774e029f54b9611b48b4859c1f1f535c40f46399c9eb2b30c2643226239d"
+    },
+    {
+      "path": "app/javascript/models/message_formatter.js",
+      "category": "frontend",
+      "bytes": 3194,
+      "lines": 109,
+      "sha256": "9b6f390fa38ed2b24f026047d4afd36bd2c33b94645f55657ea5eef1a5b2aa78"
+    },
+    {
+      "path": "app/javascript/models/message_paginator.js",
+      "category": "frontend",
+      "bytes": 5001,
+      "lines": 196,
+      "sha256": "a7c2340623bb49986d820d42c24b79d9dbcecdd74c92cfdae58b6552cdd45fa7"
+    },
+    {
+      "path": "app/javascript/models/scroll_manager.js",
+      "category": "frontend",
+      "bytes": 1378,
+      "lines": 57,
+      "sha256": "2ce305d108413660359a39b563f340abf649106252c6e32db354665eda8130f3"
+    },
+    {
+      "path": "app/javascript/models/typing_tracker.js",
+      "category": "frontend",
+      "bytes": 911,
+      "lines": 42,
+      "sha256": "463994a9f012a0619b7eadcf360a7e0ba747a58e157fc27b5601e60f0f51e17e"
+    },
+    {
+      "path": "app/assets/images/.keep",
+      "category": "assets",
+      "bytes": 0,
+      "lines": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "app/assets/images/add.svg",
+      "category": "assets",
+      "bytes": 312,
+      "lines": 1,
+      "sha256": "c2432767c10fa24794ff0242addab3ddf810662e15ed837ed805394b2a131b74"
+    },
+    {
+      "path": "app/assets/images/alert.svg",
+      "category": "assets",
+      "bytes": 373,
+      "lines": 1,
+      "sha256": "dc6971bdb81eb6d9b8af85681db5457cc0d740506782a5f72f20c0a7519c236c"
+    },
+    {
+      "path": "app/assets/images/arrow-down.svg",
+      "category": "assets",
+      "bytes": 412,
+      "lines": 1,
+      "sha256": "aee7221f66896718af4dc7004b78c650b31a08b79d0bccacb6f7d7baec68b495"
+    },
+    {
+      "path": "app/assets/images/arrow-left.svg",
+      "category": "assets",
+      "bytes": 362,
+      "lines": 1,
+      "sha256": "b2d77964ac8c40f68cd8d41ea02498d8edd16874b18af9d55c25f456509c22b1"
+    },
+    {
+      "path": "app/assets/images/arrow-right.svg",
+      "category": "assets",
+      "bytes": 357,
+      "lines": 1,
+      "sha256": "dec2474c2245d348d8e14725a5e324c0ca30d9c876d453531e6fc73cdf07313f"
+    },
+    {
+      "path": "app/assets/images/arrow-up.svg",
+      "category": "assets",
+      "bytes": 382,
+      "lines": 1,
+      "sha256": "ae5cd51a256a68b98c77197801a35b016c3c4dfbaa3bba9a8c63a9275493498f"
+    },
+    {
+      "path": "app/assets/images/art.svg",
+      "category": "assets",
+      "bytes": 760,
+      "lines": 1,
+      "sha256": "dfb0711d60654690b051bbc25c816e7286cc30ec067a7086d16d9403fcff7895"
+    },
+    {
+      "path": "app/assets/images/attachment.svg",
+      "category": "assets",
+      "bytes": 442,
+      "lines": 1,
+      "sha256": "6c335caae0526aa93498d5454f6bc5622f0c2db3de94fa82693b8b3b63c44b67"
+    },
+    {
+      "path": "app/assets/images/bio.svg",
+      "category": "assets",
+      "bytes": 607,
+      "lines": 1,
+      "sha256": "ca3327ece84be5320f581bcc09beee4a5bc4ab2a48be49f821977c35316f2917"
+    },
+    {
+      "path": "app/assets/images/boost.svg",
+      "category": "assets",
+      "bytes": 848,
+      "lines": 1,
+      "sha256": "b6acc9cbbfc16e25c905d8d9d89908e5d6c14669a20f30372f28d0acb4c3f098"
+    },
+    {
+      "path": "app/assets/images/bot.svg",
+      "category": "assets",
+      "bytes": 580,
+      "lines": 1,
+      "sha256": "9fa12187fcaf69fea291b809d18e48e9c5f3f9155b4c44804a93fa597ab46dee"
+    },
+    {
+      "path": "app/assets/images/broom.svg",
+      "category": "assets",
+      "bytes": 1450,
+      "lines": 1,
+      "sha256": "914bef6ff78cc29967f4da07995839805aee4d9b79047df59a5d8fb54db39cef"
+    },
+    {
+      "path": "app/assets/images/browsers/android.svg",
+      "category": "assets",
+      "bytes": 1429,
+      "lines": 1,
+      "sha256": "2bb1a2c9b9ae4d36f62ea53811554636cf3c5b74d9845e1dbacca0ce62dc7880"
+    },
+    {
+      "path": "app/assets/images/browsers/chrome.svg",
+      "category": "assets",
+      "bytes": 1429,
+      "lines": 1,
+      "sha256": "2bb1a2c9b9ae4d36f62ea53811554636cf3c5b74d9845e1dbacca0ce62dc7880"
+    },
+    {
+      "path": "app/assets/images/browsers/edge.svg",
+      "category": "assets",
+      "bytes": 31741,
+      "lines": 1,
+      "sha256": "019c61ed30c4c26e44f458af9f2151bae06f7d5432969b4806661c4ea7d37490"
+    },
+    {
+      "path": "app/assets/images/browsers/firefox.svg",
+      "category": "assets",
+      "bytes": 10401,
+      "lines": 1,
+      "sha256": "e0cf83025fcc91475362f6bd3f64b4290cd8f976cb910951e9a69d71a037283b"
+    },
+    {
+      "path": "app/assets/images/browsers/opera.svg",
+      "category": "assets",
+      "bytes": 1661,
+      "lines": 1,
+      "sha256": "a4c95d23e431c96db544d7acdcf6e25ffd98d1f30f5fe23669ca65f75e054526"
+    },
+    {
+      "path": "app/assets/images/browsers/safari.svg",
+      "category": "assets",
+      "bytes": 16096,
+      "lines": 1,
+      "sha256": "23b78b04e9892e64cddc3d47c0c99169382f50ac3d86a1e852d81e9638ddd7f2"
+    },
+    {
+      "path": "app/assets/images/camera.svg",
+      "category": "assets",
+      "bytes": 662,
+      "lines": 1,
+      "sha256": "9c37e8dc9e900ab683d1721705dffac106d110101de63dd98ef3a164ab1bdd74"
+    },
+    {
+      "path": "app/assets/images/campfire-icon.png",
+      "category": "assets",
+      "bytes": 110270,
+      "lines": 859,
+      "sha256": "f91df2931f8939035a6448928d43ea04a50d1f75d14dac9329b6ee363dcbbd69"
+    },
+    {
+      "path": "app/assets/images/cancel.svg",
+      "category": "assets",
+      "bytes": 309,
+      "lines": 1,
+      "sha256": "8f798011ab283690f84f945a4ccf90926c805d46f50f81dab10ee3f40d54f141"
+    },
+    {
+      "path": "app/assets/images/check.svg",
+      "category": "assets",
+      "bytes": 268,
+      "lines": 1,
+      "sha256": "9000e4bb232fcc4fd38f7ea4b3e4cdcee326e62eec98c5374998a9d25f7588d2"
+    },
+    {
+      "path": "app/assets/images/common-file-text.svg",
+      "category": "assets",
+      "bytes": 344,
+      "lines": 1,
+      "sha256": "614509095ce703fce92653d7cfe92141c599c8749ec1628ccc4a8ac7412d1274"
+    },
+    {
+      "path": "app/assets/images/copy-paste.svg",
+      "category": "assets",
+      "bytes": 1299,
+      "lines": 1,
+      "sha256": "9af55f0262e5eeee0a593fb7d31f28cf646a53c32099842ce9f11eda017daf5d"
+    },
+    {
+      "path": "app/assets/images/crown.svg",
+      "category": "assets",
+      "bytes": 446,
+      "lines": 1,
+      "sha256": "849864419bae0da36ba763d5828335c4c314d17cb3b424c3fafe4569aa5eb790"
+    },
+    {
+      "path": "app/assets/images/default-avatar.svg",
+      "category": "assets",
+      "bytes": 464,
+      "lines": 1,
+      "sha256": "14d1cd05fe94fe1c87978f97520ca95256247153065dc9503c0fad46019ae374"
+    },
+    {
+      "path": "app/assets/images/default-bot-avatar.svg",
+      "category": "assets",
+      "bytes": 884,
+      "lines": 1,
+      "sha256": "aefe43e21cd8423e5b29ee6e3088db788090bc715f52863eaddc0efdb92c9062"
+    },
+    {
+      "path": "app/assets/images/disclosure.svg",
+      "category": "assets",
+      "bytes": 340,
+      "lines": 1,
+      "sha256": "9df71db55e0ff95b9b47f27aa09f9ff3ebc5a686f1052bb31b91ef1265653040"
+    },
+    {
+      "path": "app/assets/images/download.svg",
+      "category": "assets",
+      "bytes": 562,
+      "lines": 1,
+      "sha256": "be2396eed9103cf486e9290fac6a78abe58841c2a5e4e9d57745e9b32856408c"
+    },
+    {
+      "path": "app/assets/images/email.svg",
+      "category": "assets",
+      "bytes": 439,
+      "lines": 1,
+      "sha256": "2bc3ffe9645cbd54a8a2672d9a179fd363c337e2ea1162e1475e1c8ecd441fb4"
+    },
+    {
+      "path": "app/assets/images/everyone.svg",
+      "category": "assets",
+      "bytes": 720,
+      "lines": 1,
+      "sha256": "12cae105dbcc9e5544a3e9eec90eacb58443a1df338c637dcfc930b73fdbde60"
+    },
+    {
+      "path": "app/assets/images/external/gear.svg",
+      "category": "assets",
+      "bytes": 5467,
+      "lines": 1,
+      "sha256": "4623c01aca5f621671d14d8623669d9417284af6debf933f323181a724cb12cc"
+    },
+    {
+      "path": "app/assets/images/external/install-edge.svg",
+      "category": "assets",
+      "bytes": 965,
+      "lines": 1,
+      "sha256": "08673ca2a7695286a40ab388bc48f09919e830427a7e1c93f5faf1c71cc64040"
+    },
+    {
+      "path": "app/assets/images/external/install.svg",
+      "category": "assets",
+      "bytes": 785,
+      "lines": 1,
+      "sha256": "5bff50b526a431f9e0284de550f86a8f4f4c7f59b0ccbd6329c97bb44f743d2f"
+    },
+    {
+      "path": "app/assets/images/external/share.svg",
+      "category": "assets",
+      "bytes": 200,
+      "lines": 1,
+      "sha256": "28ae5d5ad16a1981f8595651a083ac18aa964a98014d150d284870abd328d121"
+    },
+    {
+      "path": "app/assets/images/external/sliders.svg",
+      "category": "assets",
+      "bytes": 403,
+      "lines": 1,
+      "sha256": "db187b689b91625ee664c9339363ee02b455635aa8001b6701ee3f33b7330968"
+    },
+    {
+      "path": "app/assets/images/external/switch.svg",
+      "category": "assets",
+      "bytes": 278,
+      "lines": 1,
+      "sha256": "c301949700b984ca3a6c0835a684ea8e5ce513de71eab983c9cb31d1191596cc"
+    },
+    {
+      "path": "app/assets/images/external/web.svg",
+      "category": "assets",
+      "bytes": 859,
+      "lines": 1,
+      "sha256": "3a527a8c732949c4e6637948fc805eeceef09098b602ae2662d7cc8522e77d07"
+    },
+    {
+      "path": "app/assets/images/globe.svg",
+      "category": "assets",
+      "bytes": 450,
+      "lines": 1,
+      "sha256": "c21bfd87ef23d495b58edda204cb8b23a2c8be626c26ef4450838804d4e02e0c"
+    },
+    {
+      "path": "app/assets/images/help-circle.svg",
+      "category": "assets",
+      "bytes": 298,
+      "lines": 1,
+      "sha256": "9ba094d5a7a4b545551f6d98b4cf2f23ac010fb5b2369e9063cbd12352384a77"
+    },
+    {
+      "path": "app/assets/images/help.svg",
+      "category": "assets",
+      "bytes": 384,
+      "lines": 1,
+      "sha256": "2fe519ea3cf5a67402b2e4c50f251edc1e8953eb066cbb3b873f36d34b0fe220"
+    },
+    {
+      "path": "app/assets/images/key.svg",
+      "category": "assets",
+      "bytes": 439,
+      "lines": 1,
+      "sha256": "3f433cb84f94ebada8d7ab2fffa8041d0680aed1565cef6ec97bd51379165913"
+    },
+    {
+      "path": "app/assets/images/lanyard.svg",
+      "category": "assets",
+      "bytes": 1896,
+      "lines": 1,
+      "sha256": "7ce2380d09cb01a3b74b0a3530c7835ecde29b5d4bf7726158d430ec1d5c3015"
+    },
+    {
+      "path": "app/assets/images/laptop.svg",
+      "category": "assets",
+      "bytes": 670,
+      "lines": 1,
+      "sha256": "72ab5e2f7d8630cc44c07bd82a50d7e4a59cea5b9c422e7af07829b6e9c6d431"
+    },
+    {
+      "path": "app/assets/images/lifebuoy.svg",
+      "category": "assets",
+      "bytes": 515,
+      "lines": 1,
+      "sha256": "189066e3da784dd6e1d6dc7451602edf2ed9e54bbdc9bee4f5f75652971e84f7"
+    },
+    {
+      "path": "app/assets/images/link.svg",
+      "category": "assets",
+      "bytes": 674,
+      "lines": 1,
+      "sha256": "ecfe610d727b6feb467388c0b9bd0363b5de3d6eb9adf7c826cc3dae373d8976"
+    },
+    {
+      "path": "app/assets/images/lock.svg",
+      "category": "assets",
+      "bytes": 365,
+      "lines": 1,
+      "sha256": "6d7365c22c5ba65fd641a91dc4db0d54f467feaa94c58e721b178713d4d4976b"
+    },
+    {
+      "path": "app/assets/images/login-keys.svg",
+      "category": "assets",
+      "bytes": 841,
+      "lines": 1,
+      "sha256": "b84bd5c1c64b8ee0ac5bdcda1b1b3c7a5cd6c674f3a6d80e56fd8cb3739e4d68"
+    },
+    {
+      "path": "app/assets/images/logos/app-icon-192.png",
+      "category": "assets",
+      "bytes": 61306,
+      "lines": 460,
+      "sha256": "a84c80d117bd5a79430c74283e40f6bed6784055287a20a125e620aa710bf85c"
+    },
+    {
+      "path": "app/assets/images/logos/app-icon.png",
+      "category": "assets",
+      "bytes": 405666,
+      "lines": 2971,
+      "sha256": "f486fb65a608013dd6cbb193d9f8ce0d4fb4516e4806098874751877ab988c4e"
+    },
+    {
+      "path": "app/assets/images/logout.svg",
+      "category": "assets",
+      "bytes": 594,
+      "lines": 1,
+      "sha256": "d1ad9c469740e7ec9e603c1ffa6719683e3ad31215273afcb435e3a784eec944"
+    },
+    {
+      "path": "app/assets/images/menu-dots-horizontal.svg",
+      "category": "assets",
+      "bytes": 173,
+      "lines": 1,
+      "sha256": "87517bc026c54f8d9469161f3ccdfb36790af91fb45b68d7fedaab8f2ac99af3"
+    },
+    {
+      "path": "app/assets/images/menu-dots-vertical.svg",
+      "category": "assets",
+      "bytes": 173,
+      "lines": 1,
+      "sha256": "1f539171d73366d411d08e51e9a72f59acc5e93876ff0d994e9a149679b63065"
+    },
+    {
+      "path": "app/assets/images/menu.svg",
+      "category": "assets",
+      "bytes": 221,
+      "lines": 1,
+      "sha256": "1cb54b1e95f99e7ce0e39fa28cef70e9763f50ca2f7e0ad1b3450d1f4f845a3a"
+    },
+    {
+      "path": "app/assets/images/messages-add.svg",
+      "category": "assets",
+      "bytes": 688,
+      "lines": 1,
+      "sha256": "4e9af4fcebd39defecec784ce6d0bea65cd5f164f9fa5af06efa33b24ae6dbf0"
+    },
+    {
+      "path": "app/assets/images/messages-empty.svg",
+      "category": "assets",
+      "bytes": 1544,
+      "lines": 1,
+      "sha256": "527451cef62372d5ab8084715056ee8d2b7d36caf5ff1fe99ef12048c93021b2"
+    },
+    {
+      "path": "app/assets/images/messages-outlined.svg",
+      "category": "assets",
+      "bytes": 491,
+      "lines": 1,
+      "sha256": "3aa35582961c89e8908b35fc416e261c3c0c26245d04e45dc753be6157f43249"
+    },
+    {
+      "path": "app/assets/images/messages.svg",
+      "category": "assets",
+      "bytes": 269,
+      "lines": 1,
+      "sha256": "4233b28ff5463d3bc94e8ee978f43e2e1f9bc4da80a22b4fa101fd05e121ab5a"
+    },
+    {
+      "path": "app/assets/images/minus.svg",
+      "category": "assets",
+      "bytes": 230,
+      "lines": 1,
+      "sha256": "d85b074a9e53c06963a4799e74dd4b20b89542a8e7f2c7def5657cca9b199ac4"
+    },
+    {
+      "path": "app/assets/images/mobile-phone.svg",
+      "category": "assets",
+      "bytes": 287,
+      "lines": 1,
+      "sha256": "7a9c3713ddf155ae5319c5916662123b3e7b5d85bba62284a82d98714b55cb58"
+    },
+    {
+      "path": "app/assets/images/notification-bell-alert.svg",
+      "category": "assets",
+      "bytes": 1125,
+      "lines": 1,
+      "sha256": "90f3c0df58a267bed47226785804b0439d3058c201a1996deca70f2474b4dabc"
+    },
+    {
+      "path": "app/assets/images/notification-bell-everything.svg",
+      "category": "assets",
+      "bytes": 416,
+      "lines": 1,
+      "sha256": "98af59ccafa6d6babf6cba0aaa6d5014167f6a188238c203263895771c57c317"
+    },
+    {
+      "path": "app/assets/images/notification-bell-invisible.svg",
+      "category": "assets",
+      "bytes": 593,
+      "lines": 1,
+      "sha256": "4de95bda9740ee13da994138e86116d251ffeb0b989570e1ca4eba113df5f7b0"
+    },
+    {
+      "path": "app/assets/images/notification-bell-loading.svg",
+      "category": "assets",
+      "bytes": 506,
+      "lines": 1,
+      "sha256": "befaa6df6728613345ffbb3c6f6c793fbbf1a0f11cae0d508d2c7518288ce0cd"
+    },
+    {
+      "path": "app/assets/images/notification-bell-mentions.svg",
+      "category": "assets",
+      "bytes": 873,
+      "lines": 1,
+      "sha256": "37befe8b594c0b31fae7c2f96f0ab4272dacca2ff02d76fa88fe521eac6fe9a0"
+    },
+    {
+      "path": "app/assets/images/notification-bell-nothing.svg",
+      "category": "assets",
+      "bytes": 557,
+      "lines": 1,
+      "sha256": "d4738476a4e6a583c776e6ff0528078ec88c33a4fb51a1210a63579d93dece8f"
+    },
+    {
+      "path": "app/assets/images/office.svg",
+      "category": "assets",
+      "bytes": 777,
+      "lines": 1,
+      "sha256": "3ae440bb6a9aba1e34f43c4437db7a89f0cf8b780958ae1741f0650d9e5e0b19"
+    },
+    {
+      "path": "app/assets/images/password.svg",
+      "category": "assets",
+      "bytes": 2355,
+      "lines": 1,
+      "sha256": "84f6d63a1d2e776f7331273c74ec4f7a347f107b1295cb5071c69bb495d6dc34"
+    },
+    {
+      "path": "app/assets/images/pencil.svg",
+      "category": "assets",
+      "bytes": 662,
+      "lines": 1,
+      "sha256": "0756aec7b96a26ea432ab8f545cd2a411556b39a0cc829ecb7f4fbd21c1a8eb2"
+    },
+    {
+      "path": "app/assets/images/person-add.svg",
+      "category": "assets",
+      "bytes": 729,
+      "lines": 1,
+      "sha256": "e38b220c0f7629f676920a339506b430ef4971c5c768aad86abbb390f317f307"
+    },
+    {
+      "path": "app/assets/images/person.svg",
+      "category": "assets",
+      "bytes": 377,
+      "lines": 1,
+      "sha256": "48ac49f6bc4440a0f8888578e8af68f7b4fa3f7b62484a80888d5a473e02b306"
+    },
+    {
+      "path": "app/assets/images/qr-code.svg",
+      "category": "assets",
+      "bytes": 413,
+      "lines": 1,
+      "sha256": "2f594522b4b31538a2555794578b5e97f543a9978115079e3d6cf878504da306"
+    },
+    {
+      "path": "app/assets/images/refresh.svg",
+      "category": "assets",
+      "bytes": 692,
+      "lines": 1,
+      "sha256": "475e0ce21b139e73b7fc5e94d3cd1bb521d6171d8b7100e636dfd2719033518a"
+    },
+    {
+      "path": "app/assets/images/remove-circle.svg",
+      "category": "assets",
+      "bytes": 401,
+      "lines": 1,
+      "sha256": "7e343bfb850123f5281f0ac4548282057ada490bb88a0172bfbb032d6d364ba5"
+    },
+    {
+      "path": "app/assets/images/remove.svg",
+      "category": "assets",
+      "bytes": 497,
+      "lines": 1,
+      "sha256": "4f1c47b86ede7ab641dc667e13775fa953bb257ad050f309397aea0f0164f5d5"
+    },
+    {
+      "path": "app/assets/images/reply.svg",
+      "category": "assets",
+      "bytes": 385,
+      "lines": 1,
+      "sha256": "dae8faaf2c6d661fb6e5d670aa00c1ea7ae21ff563b4c1ab4ae3483b69f7be04"
+    },
+    {
+      "path": "app/assets/images/screenshots/android-chat.png",
+      "category": "assets",
+      "bytes": 245661,
+      "lines": 2112,
+      "sha256": "cffb170593cacc0c9e924a4af6a06a5c936e2be06e1f9c1c160c6bff9534a688"
+    },
+    {
+      "path": "app/assets/images/screenshots/android-dark-mode.png",
+      "category": "assets",
+      "bytes": 183716,
+      "lines": 1708,
+      "sha256": "b8b6db9e6f4626412983cef3e883de58bba4c693a4a570ad8e0dcdefb154e51b"
+    },
+    {
+      "path": "app/assets/images/screenshots/android-sidebar.png",
+      "category": "assets",
+      "bytes": 283755,
+      "lines": 2513,
+      "sha256": "a8ae76656d6e91267ae1fd5cafaf05302df4776180819d171d7bd1cc4e07c57b"
+    },
+    {
+      "path": "app/assets/images/search.svg",
+      "category": "assets",
+      "bytes": 265,
+      "lines": 1,
+      "sha256": "b9d32a32d57bb98052344413080c033f88f916e3e93ddb246c971d8448e92d7a"
+    },
+    {
+      "path": "app/assets/images/settings.svg",
+      "category": "assets",
+      "bytes": 2402,
+      "lines": 1,
+      "sha256": "97e110330545f2d4408f99e55405bdf54d4da3ad9118efab5dbe18b6e3638b4b"
+    },
+    {
+      "path": "app/assets/images/share.svg",
+      "category": "assets",
+      "bytes": 522,
+      "lines": 1,
+      "sha256": "2947c481e2deb79d132d2ae66ae4ee65a9e2b30b6e005e719d88ebf788fe245d"
+    },
+    {
+      "path": "app/assets/images/sounds/56k.gif",
+      "category": "assets",
+      "bytes": 6378,
+      "lines": 80,
+      "sha256": "19860097add890e4e446801f1c51873a44bc91a874cae0c2769381ecc1483ac5"
+    },
+    {
+      "path": "app/assets/images/sounds/56k.webp",
+      "category": "assets",
+      "bytes": 5672,
+      "lines": 40,
+      "sha256": "62ab7ed0b956fb53a360dda72ea0000e1d36a17e1356b37d6930d0d6b507b755"
+    },
+    {
+      "path": "app/assets/images/sounds/clowntown.gif",
+      "category": "assets",
+      "bytes": 20500,
+      "lines": 232,
+      "sha256": "0ab9f4d44751e1692e7d2bdb29ab9c2294f107e600b8370561d5d716c5528dee"
+    },
+    {
+      "path": "app/assets/images/sounds/clowntown.webp",
+      "category": "assets",
+      "bytes": 5386,
+      "lines": 34,
+      "sha256": "de7a3314e8c02defdb26fae6f7c00076dbe8f1936fc15719f15a17c386fad0d5"
+    },
+    {
+      "path": "app/assets/images/sounds/curb.gif",
+      "category": "assets",
+      "bytes": 358354,
+      "lines": 3575,
+      "sha256": "9d7d0528af54d17855bf70d2d4caf0e96937c68ef522e3a16816dc62b73e5da0"
+    },
+    {
+      "path": "app/assets/images/sounds/curb.webp",
+      "category": "assets",
+      "bytes": 138564,
+      "lines": 1018,
+      "sha256": "f63eae06f137eb7926b1c547c496efe810f1e5de8cd45b46c46b9648e69176ce"
+    },
+    {
+      "path": "app/assets/images/sounds/dangerzone.png",
+      "category": "assets",
+      "bytes": 3556,
+      "lines": 24,
+      "sha256": "7a0ea0c1f0ddec52e718836104f747ed4aa1ea44377879f7e6d0284408eb8348"
+    },
+    {
+      "path": "app/assets/images/sounds/dangerzone.webp",
+      "category": "assets",
+      "bytes": 2886,
+      "lines": 27,
+      "sha256": "b30d02c0395076462afef0b7daef9e48bfd61496e219170b8021a141d4bb2b03"
+    },
+    {
+      "path": "app/assets/images/sounds/donotwant.gif",
+      "category": "assets",
+      "bytes": 176659,
+      "lines": 1648,
+      "sha256": "6ba2c15748e69670ff119f09302f16bc1c42b0ec9df2fec8a3f87c9a0dcc0ff4"
+    },
+    {
+      "path": "app/assets/images/sounds/donotwant.webp",
+      "category": "assets",
+      "bytes": 144828,
+      "lines": 1104,
+      "sha256": "4881703b69fc17c87a4026053a02a3561ebc7f0c42a30b36d86c1110255f6e62"
+    },
+    {
+      "path": "app/assets/images/sounds/drama.webp",
+      "category": "assets",
+      "bytes": 588,
+      "lines": 7,
+      "sha256": "8431b85ddd4cc9b49614a1148b7aa3c0e33d5faed359cb3d33c2949893ac02ab"
+    },
+    {
+      "path": "app/assets/images/sounds/greatjob.png",
+      "category": "assets",
+      "bytes": 1023,
+      "lines": 12,
+      "sha256": "bf4af7b0c43ddd8982d5dc56c0f07307eab80167ca5ef77ebe32b5817db91aeb"
+    },
+    {
+      "path": "app/assets/images/sounds/greatjob.webp",
+      "category": "assets",
+      "bytes": 748,
+      "lines": 11,
+      "sha256": "d65ddebd31f6675c0142886ff4fa16a16ffe759cb24849933af084569b497a72"
+    },
+    {
+      "path": "app/assets/images/sounds/loggins.webp",
+      "category": "assets",
+      "bytes": 2116,
+      "lines": 13,
+      "sha256": "c02fa390a55f525a875760b8ac9d100b5d9fac04f8a0f366f94b9d366403e440"
+    },
+    {
+      "path": "app/assets/images/sounds/nyan.gif",
+      "category": "assets",
+      "bytes": 2483,
+      "lines": 58,
+      "sha256": "e20d21627621876e5c3efda1a881e29d229a32c3565738ae00300105a71915ef"
+    },
+    {
+      "path": "app/assets/images/sounds/nyan.webp",
+      "category": "assets",
+      "bytes": 2674,
+      "lines": 24,
+      "sha256": "732ecc7e76e6ab01d4c5ed748142b1a15047e47fa0c51dcc09eb0551e6d4e0a2"
+    },
+    {
+      "path": "app/assets/images/sounds/pushit.gif",
+      "category": "assets",
+      "bytes": 893,
+      "lines": 4,
+      "sha256": "0a9870762efeeb710adb0fc25ef2d517c85693f7fe4f289c7b971ff889ef9cc6"
+    },
+    {
+      "path": "app/assets/images/sounds/pushit.webp",
+      "category": "assets",
+      "bytes": 878,
+      "lines": 7,
+      "sha256": "c56fee9519340a196b0f71e6dc1b18bd9974b4cbbcf991c7a82be9b8e5b58782"
+    },
+    {
+      "path": "app/assets/images/sounds/rumble.gif",
+      "category": "assets",
+      "bytes": 63846,
+      "lines": 540,
+      "sha256": "82211e8461dd597a147e4d2265b68bb4716c31f8ba6302af8a416a704117953d"
+    },
+    {
+      "path": "app/assets/images/sounds/rumble.webp",
+      "category": "assets",
+      "bytes": 42818,
+      "lines": 319,
+      "sha256": "f4671edd83274ce30353a0668e2c9e651dec183ef974da8e168c787fdd0aea22"
+    },
+    {
+      "path": "app/assets/images/sounds/top.gif",
+      "category": "assets",
+      "bytes": 42063,
+      "lines": 382,
+      "sha256": "8330dde187d5f91af6eae76ee790e317ea9e7fd9f4b120734ce78cd453899d25"
+    },
+    {
+      "path": "app/assets/images/sounds/top.webp",
+      "category": "assets",
+      "bytes": 3930,
+      "lines": 33,
+      "sha256": "53767892b3513b6da26eae278a48007e1d6dde6ecc7397f88e5cea63e6c5a216"
+    },
+    {
+      "path": "app/assets/images/sounds/what.gif",
+      "category": "assets",
+      "bytes": 444210,
+      "lines": 4052,
+      "sha256": "0c53e70e9377393473a3b7d2c36afb675a37075c4cd19d90538e837fc1b98dd9"
+    },
+    {
+      "path": "app/assets/images/sounds/what.webp",
+      "category": "assets",
+      "bytes": 324188,
+      "lines": 2580,
+      "sha256": "6f39a9aa680750b6a84f4b862a9b20d70285c6b8f729f5144af4fe3d9a6ab3ec"
+    },
+    {
+      "path": "app/assets/images/sounds/yay.png",
+      "category": "assets",
+      "bytes": 2792,
+      "lines": 29,
+      "sha256": "fbd205c769a518cf6d80d6616f09c2f994b384780de40f7201cd9dad3d1a2bae"
+    },
+    {
+      "path": "app/assets/images/sounds/yay.webp",
+      "category": "assets",
+      "bytes": 2174,
+      "lines": 14,
+      "sha256": "d1c150d2506442a5501ecd29775ed4817b5f2c7efdde08ab437189d2dde8a0f7"
+    },
+    {
+      "path": "app/assets/images/sounds/yeah.gif",
+      "category": "assets",
+      "bytes": 8515,
+      "lines": 93,
+      "sha256": "fa25eb29c382731a5ede9822048a699dbfc1047fde0aba7a885d16e3c8673d21"
+    },
+    {
+      "path": "app/assets/images/sounds/yeah.webp",
+      "category": "assets",
+      "bytes": 7962,
+      "lines": 61,
+      "sha256": "a754c785d295a028fe4b119e384ad9f0929f705baae41a68a8afe1229943fcae"
+    },
+    {
+      "path": "app/assets/images/text-options.svg",
+      "category": "assets",
+      "bytes": 318,
+      "lines": 1,
+      "sha256": "c8929694132253ae390509b1b273e6a2efccdee2c5da338a059273642064ef0c"
+    },
+    {
+      "path": "app/assets/images/transfer.svg",
+      "category": "assets",
+      "bytes": 499,
+      "lines": 1,
+      "sha256": "f9231f2ed2e7ad3672dd03654f3e3c2bbedc627994dfd99b8e4bf2cef80dca39"
+    },
+    {
+      "path": "app/assets/images/trash.svg",
+      "category": "assets",
+      "bytes": 535,
+      "lines": 1,
+      "sha256": "95a9bc7f96789903cfdd375846dd5545de7336407b699fcaf8ea234e1a8f3a97"
+    },
+    {
+      "path": "app/assets/images/web.svg",
+      "category": "assets",
+      "bytes": 764,
+      "lines": 1,
+      "sha256": "43c2ac14c270709f4e504d3a19aa53ad1c1a37806d5d032a112ebbb3b7931aa9"
+    },
+    {
+      "path": "app/assets/sounds/56k.mp3",
+      "category": "assets",
+      "bytes": 133677,
+      "lines": 1301,
+      "sha256": "2de12caf37f95c65ce8df06866aa4c232c25afccfbf91652278e0923cb2134b9"
+    },
+    {
+      "path": "app/assets/sounds/ballmer.mp3",
+      "category": "assets",
+      "bytes": 107561,
+      "lines": 699,
+      "sha256": "68907c927ec32cc71b599409376a270722d996fbb999bd6e65eec4d3d4089790"
+    },
+    {
+      "path": "app/assets/sounds/bell.mp3",
+      "category": "assets",
+      "bytes": 41318,
+      "lines": 284,
+      "sha256": "7c8550761c6cb873349695ae867ecd83d413e4b8f12e251d2ae2847f2b86a008"
+    },
+    {
+      "path": "app/assets/sounds/bezos.mp3",
+      "category": "assets",
+      "bytes": 30817,
+      "lines": 329,
+      "sha256": "097ccaababcd186ff25310dfbf5c0082f763336173a2e3b0daaf4faaaa9e1019"
+    },
+    {
+      "path": "app/assets/sounds/bueller.mp3",
+      "category": "assets",
+      "bytes": 97482,
+      "lines": 839,
+      "sha256": "08f7ba7bba6767ea1d828a75a7c56e3a574a03404828dbba0a24b74849790d23"
+    },
+    {
+      "path": "app/assets/sounds/butts.mp3",
+      "category": "assets",
+      "bytes": 51734,
+      "lines": 393,
+      "sha256": "daed8306dc2518de5a3a5603bc2eb81e0dc79796f744f1fdc6593ba48eaffb29"
+    },
+    {
+      "path": "app/assets/sounds/clowntown.mp3",
+      "category": "assets",
+      "bytes": 251492,
+      "lines": 2018,
+      "sha256": "2d84d7c88069002d4d7b433642210be924c47bb5d29959cd35511f1823d2b58a"
+    },
+    {
+      "path": "app/assets/sounds/cottoneyejoe.mp3",
+      "category": "assets",
+      "bytes": 454367,
+      "lines": 3107,
+      "sha256": "d114b14c535c6832c2eca3e6692a234e673eaa1ceaf291f1a6f2714e60aa0b29"
+    },
+    {
+      "path": "app/assets/sounds/crickets.mp3",
+      "category": "assets",
+      "bytes": 43399,
+      "lines": 316,
+      "sha256": "2f379f2ef93dc63cda6c1eecaa98b79b9e42865eb0a4251bccc4169c11060c37"
+    },
+    {
+      "path": "app/assets/sounds/curb.mp3",
+      "category": "assets",
+      "bytes": 191096,
+      "lines": 1408,
+      "sha256": "e34d44e82c04467c5bbcf969303d469594336d3d09966a3c90906b43fc88eb8b"
+    },
+    {
+      "path": "app/assets/sounds/dadgummit.mp3",
+      "category": "assets",
+      "bytes": 46849,
+      "lines": 427,
+      "sha256": "f395704d78a4993c663a804b6ef9c78e4617ce50090027b7e6560dd8fa595058"
+    },
+    {
+      "path": "app/assets/sounds/dangerzone.mp3",
+      "category": "assets",
+      "bytes": 209038,
+      "lines": 1481,
+      "sha256": "138e8e4ecd9542bdadf35b991ad17d864bea2ac14ed50652445570f9e61598fe"
+    },
+    {
+      "path": "app/assets/sounds/danielsan.mp3",
+      "category": "assets",
+      "bytes": 110957,
+      "lines": 767,
+      "sha256": "5e4224f7f222dfd4337b9e2082d50e47370c0b004286a2e83fe45707920c5c89"
+    },
+    {
+      "path": "app/assets/sounds/deeper.mp3",
+      "category": "assets",
+      "bytes": 53900,
+      "lines": 454,
+      "sha256": "8755e725ca06ccc15c46487529cd228efa69442bd46dd34484f355204c63b031"
+    },
+    {
+      "path": "app/assets/sounds/donotwant.mp3",
+      "category": "assets",
+      "bytes": 97379,
+      "lines": 901,
+      "sha256": "3eebc23941a143a861b850a20904db15bececc2e831e23ca3027930e9b3fab7e"
+    },
+    {
+      "path": "app/assets/sounds/drama.mp3",
+      "category": "assets",
+      "bytes": 46176,
+      "lines": 377,
+      "sha256": "5aebe10e318f84fa67c5edd3fc74332bbaa8ed9a7266076f091d51700923578e"
+    },
+    {
+      "path": "app/assets/sounds/flawless.mp3",
+      "category": "assets",
+      "bytes": 131364,
+      "lines": 941,
+      "sha256": "393eb8b87bbf3aaf3a6572473d6fc180d8195300df9edb6ae513830e9226cb41"
+    },
+    {
+      "path": "app/assets/sounds/glados.mp3",
+      "category": "assets",
+      "bytes": 13115,
+      "lines": 115,
+      "sha256": "637ff4e800496cc3f587ddfc57baf5766c52db1175832cd13cb84f52d2183a3b"
+    },
+    {
+      "path": "app/assets/sounds/gogogo.mp3",
+      "category": "assets",
+      "bytes": 21315,
+      "lines": 204,
+      "sha256": "2364d29d3fdc08d5096061c262a6808254ab9554e303126e2971cf538bc8372c"
+    },
+    {
+      "path": "app/assets/sounds/greatjob.mp3",
+      "category": "assets",
+      "bytes": 26164,
+      "lines": 220,
+      "sha256": "0f24d85a0f9e9afb134fcc37554f3160ad1709914cf834b1a9c4590c8e45514a"
+    },
+    {
+      "path": "app/assets/sounds/greyjoy.mp3",
+      "category": "assets",
+      "bytes": 54833,
+      "lines": 445,
+      "sha256": "293ecfe4d2eaf11071e499c42baeb841ab41238543ceac833b2e694602a964d8"
+    },
+    {
+      "path": "app/assets/sounds/guarantee.mp3",
+      "category": "assets",
+      "bytes": 49533,
+      "lines": 375,
+      "sha256": "463cbe6053bf36f41fc7fc15feee3400270185a9602b5be5efe21820b2b65a4c"
+    },
+    {
+      "path": "app/assets/sounds/heygirl.mp3",
+      "category": "assets",
+      "bytes": 47005,
+      "lines": 351,
+      "sha256": "4f3c96e80a64635fd12a928b193d3421b2f599e679549982e1e640503ff1acc4"
+    },
+    {
+      "path": "app/assets/sounds/honk.mp3",
+      "category": "assets",
+      "bytes": 19374,
+      "lines": 68,
+      "sha256": "be25c915d99b5baebb1cadda978d37faaf2c398034e50d35163abd6be6eb4e89"
+    },
+    {
+      "path": "app/assets/sounds/horn.mp3",
+      "category": "assets",
+      "bytes": 113327,
+      "lines": 683,
+      "sha256": "f52d01a31b71995ff0f256e028fd9302981d0d894651ac444f5d5740f62e9bf6"
+    },
+    {
+      "path": "app/assets/sounds/horror.mp3",
+      "category": "assets",
+      "bytes": 152033,
+      "lines": 1189,
+      "sha256": "906da599cc429904fbbaf9808ce6b2dca0e17467326e87b56f5525deb99c32cf"
+    },
+    {
+      "path": "app/assets/sounds/incoming.mp3",
+      "category": "assets",
+      "bytes": 13731,
+      "lines": 129,
+      "sha256": "dccedadaf8224d590ad042df660539981e9860a026d0ba132410be64edaafbe5"
+    },
+    {
+      "path": "app/assets/sounds/inconceivable.mp3",
+      "category": "assets",
+      "bytes": 22770,
+      "lines": 181,
+      "sha256": "3a804cb5fe4733b8512c010019c5abd64c63061aaf71b5af38662ef2da40ee63"
+    },
+    {
+      "path": "app/assets/sounds/letitgo.mp3",
+      "category": "assets",
+      "bytes": 169043,
+      "lines": 1246,
+      "sha256": "524deb42d6d80d79a30098b572aef65f765a7f48442c77dcaa846ab73f64943f"
+    },
+    {
+      "path": "app/assets/sounds/live.mp3",
+      "category": "assets",
+      "bytes": 30026,
+      "lines": 251,
+      "sha256": "0327b6f155ab3a1cf3f63957d3ddfbcc9c77e8ed1816396381f985819e007943"
+    },
+    {
+      "path": "app/assets/sounds/loggins.mp3",
+      "category": "assets",
+      "bytes": 220875,
+      "lines": 1626,
+      "sha256": "e5d32f93cd61c8fac1d8f120739f9c7901d583d983fc57be3506386bd306a01f"
+    },
+    {
+      "path": "app/assets/sounds/makeitso.mp3",
+      "category": "assets",
+      "bytes": 14684,
+      "lines": 164,
+      "sha256": "cf19ccb00ba766e995f7898463aae39de3080007c1bf41eb70db55054d945c24"
+    },
+    {
+      "path": "app/assets/sounds/mario_coin.mp3",
+      "category": "assets",
+      "bytes": 12110,
+      "lines": 104,
+      "sha256": "0b262afe097bc5626071d8e0b82724f82f6f8f9ef523299202f0a6c0dafe67ee"
+    },
+    {
+      "path": "app/assets/sounds/maybe.mp3",
+      "category": "assets",
+      "bytes": 123904,
+      "lines": 984,
+      "sha256": "808b84786456750db64fc6dfa5406e964765ad98dbce6f3652825f604ac32afc"
+    },
+    {
+      "path": "app/assets/sounds/noooo.mp3",
+      "category": "assets",
+      "bytes": 91404,
+      "lines": 764,
+      "sha256": "6e1f39fae9f114a833693c4ca834db2798e0a30747de0e39cf13cc2f455f2161"
+    },
+    {
+      "path": "app/assets/sounds/nyan.mp3",
+      "category": "assets",
+      "bytes": 172115,
+      "lines": 1210,
+      "sha256": "02d346d5d2cb916d5a079c9373fce801ec66df53a2566a7a4cc9bb77222575ae"
+    },
+    {
+      "path": "app/assets/sounds/ohmy.mp3",
+      "category": "assets",
+      "bytes": 60472,
+      "lines": 439,
+      "sha256": "b48a4227f83e299d47f23de14ae9dcfab10f3868158ecaae7c2c486c1a22a25d"
+    },
+    {
+      "path": "app/assets/sounds/ohyeah.mp3",
+      "category": "assets",
+      "bytes": 59860,
+      "lines": 460,
+      "sha256": "e497c03543888b5075d3f0e832acc1d3339549a87634987b21197eac44850f48"
+    },
+    {
+      "path": "app/assets/sounds/pushit.mp3",
+      "category": "assets",
+      "bytes": 156045,
+      "lines": 1211,
+      "sha256": "1e099a266dbf628eaddd3dad759273299debcee16479d8d7f2560a685abbcc32"
+    },
+    {
+      "path": "app/assets/sounds/rimshot.mp3",
+      "category": "assets",
+      "bytes": 17859,
+      "lines": 141,
+      "sha256": "3dfc708d49dfa2444a61dc178fa1eed482f147b028c67d0d8f94ba10e5ea2bbf"
+    },
+    {
+      "path": "app/assets/sounds/rollout.mp3",
+      "category": "assets",
+      "bytes": 97482,
+      "lines": 785,
+      "sha256": "3277678e301cac225d382513cc04a8c9075f1d85dbd95e47816b0f39af35357c"
+    },
+    {
+      "path": "app/assets/sounds/rumble.mp3",
+      "category": "assets",
+      "bytes": 308038,
+      "lines": 2268,
+      "sha256": "de7b7ba90f6dab34b390f4c45157f1f3c45ba3ae5a9eb82c63f7d35f16d93748"
+    },
+    {
+      "path": "app/assets/sounds/sax.mp3",
+      "category": "assets",
+      "bytes": 182193,
+      "lines": 1233,
+      "sha256": "9ee2c08c05d265f608f883ee214b0049ff0ec962c0db95e53f1467737d517765"
+    },
+    {
+      "path": "app/assets/sounds/secret.mp3",
+      "category": "assets",
+      "bytes": 25669,
+      "lines": 229,
+      "sha256": "c2b31e22f7aac1dca492c18e68ddd4653167409f69246f293c274acc3545a704"
+    },
+    {
+      "path": "app/assets/sounds/sexyback.mp3",
+      "category": "assets",
+      "bytes": 135427,
+      "lines": 1174,
+      "sha256": "9053f17be9987435b010e51425614d2493bc2e97756872d785e1e84bc0ada70a"
+    },
+    {
+      "path": "app/assets/sounds/story.mp3",
+      "category": "assets",
+      "bytes": 45050,
+      "lines": 401,
+      "sha256": "705b0ce43b8d801fb1fd6577a2d7e15b2d03ae2834a70690556a28b89a9d4e73"
+    },
+    {
+      "path": "app/assets/sounds/tada.mp3",
+      "category": "assets",
+      "bytes": 64096,
+      "lines": 483,
+      "sha256": "024dfccb5565600d705b71833ebcc2fdc1a7eae16c2f93f025e962bc6fdd5296"
+    },
+    {
+      "path": "app/assets/sounds/tmyk.mp3",
+      "category": "assets",
+      "bytes": 52171,
+      "lines": 497,
+      "sha256": "85cab9b9d9ef6cf98b2b96bef1d41b05b75835ea8e05882a2a5d2beac5eb5e4c"
+    },
+    {
+      "path": "app/assets/sounds/totes.mp3",
+      "category": "assets",
+      "bytes": 39117,
+      "lines": 357,
+      "sha256": "8548005a21f26256c9c0b8cfb30be760f97c1d1fb8e1a9b28d689a14ff52734b"
+    },
+    {
+      "path": "app/assets/sounds/trololo.mp3",
+      "category": "assets",
+      "bytes": 343499,
+      "lines": 3263,
+      "sha256": "6aec372c8726b15a221290416d8335ce2d96994a8dba22fe5c9d0dfeec18624e"
+    },
+    {
+      "path": "app/assets/sounds/trombone.mp3",
+      "category": "assets",
+      "bytes": 64956,
+      "lines": 234,
+      "sha256": "448b61c1cbbe212d6ee74927f976d51cff7e849eadc88cf115c9cb31eb49fc54"
+    },
+    {
+      "path": "app/assets/sounds/unix.mp3",
+      "category": "assets",
+      "bytes": 47304,
+      "lines": 401,
+      "sha256": "d6a7a853919aacc1df65006f584666f3c0041b27cdde89f23b5e6ec523b22f84"
+    },
+    {
+      "path": "app/assets/sounds/vuvuzela.mp3",
+      "category": "assets",
+      "bytes": 56239,
+      "lines": 400,
+      "sha256": "4250e803d192637d77eaafa0995dac8b6f95f5f4577a8f87b08aa02553820b68"
+    },
+    {
+      "path": "app/assets/sounds/what.mp3",
+      "category": "assets",
+      "bytes": 129351,
+      "lines": 1124,
+      "sha256": "70d0314adcdda431e77438a0a8c37ad499995a189041116a45c40c651d880c77"
+    },
+    {
+      "path": "app/assets/sounds/whoomp.mp3",
+      "category": "assets",
+      "bytes": 125832,
+      "lines": 974,
+      "sha256": "5443c723ebd42623fbda85ff2a1201e0d39e8a9b2ff07f9a101e12cad641b3e6"
+    },
+    {
+      "path": "app/assets/sounds/wups.mp3",
+      "category": "assets",
+      "bytes": 18252,
+      "lines": 163,
+      "sha256": "89c0d03e84b245465b5cd9d38795de988736184e102e3a312a07f4f5e870b409"
+    },
+    {
+      "path": "app/assets/sounds/yay.mp3",
+      "category": "assets",
+      "bytes": 12728,
+      "lines": 71,
+      "sha256": "e575442d89c9d6d62009ace006e6611c5cba9a15b070150b42403e3a32091dde"
+    },
+    {
+      "path": "app/assets/sounds/yeah.mp3",
+      "category": "assets",
+      "bytes": 214682,
+      "lines": 1556,
+      "sha256": "8a29c1ed07c7d89e7ca39c3d433e320f05e53d0400225c7e89ac3043e1d32080"
+    },
+    {
+      "path": "app/assets/sounds/yodel.mp3",
+      "category": "assets",
+      "bytes": 656123,
+      "lines": 5668,
+      "sha256": "c63ffb94b5cdcc22227f42495748a91b646cb2b7bbb508c8e574853263d31184"
+    },
+    {
+      "path": "app/assets/stylesheets/_reset.css",
+      "category": "assets",
+      "bytes": 1218,
+      "lines": 84,
+      "sha256": "506e23f429d9d56fc5716e4dbe135c35dd0f017c6883290d58fab02ece4a141c"
+    },
+    {
+      "path": "app/assets/stylesheets/actiontext.css",
+      "category": "assets",
+      "bytes": 6212,
+      "lines": 215,
+      "sha256": "50c73097191a00d22a7b3790c765bf8de60a4d987a3696dceb08cf3affddc2d9"
+    },
+    {
+      "path": "app/assets/stylesheets/animation.css",
+      "category": "assets",
+      "bytes": 1859,
+      "lines": 71,
+      "sha256": "cf0129dc6ad0a300db39ee2c0cb53ae1433df4ebe75504ac0cbc3835fd0c48f6"
+    },
+    {
+      "path": "app/assets/stylesheets/autocomplete.css",
+      "category": "assets",
+      "bytes": 3184,
+      "lines": 157,
+      "sha256": "b3f3b43b6a0f84d84f8b6f80a6907d664cdf8c956a416463cc430d7177f029c8"
+    },
+    {
+      "path": "app/assets/stylesheets/avatars.css",
+      "category": "assets",
+      "bytes": 2031,
+      "lines": 109,
+      "sha256": "c4977a7af2f30882d5283f1f52afec4bb77236ca56a25b395b0aa57917d0498e"
+    },
+    {
+      "path": "app/assets/stylesheets/base.css",
+      "category": "assets",
+      "bytes": 5997,
+      "lines": 267,
+      "sha256": "3549c3b35d5eb0caed728465dd5da3e4506a5b88c59160b2932845807be9b5a9"
+    },
+    {
+      "path": "app/assets/stylesheets/boosts.css",
+      "category": "assets",
+      "bytes": 1982,
+      "lines": 106,
+      "sha256": "a8b88ce8ea02175740c5e1cbba10af95c16709a92eccb93fadbcfea3e918b271"
+    },
+    {
+      "path": "app/assets/stylesheets/buttons.css",
+      "category": "assets",
+      "bytes": 3918,
+      "lines": 207,
+      "sha256": "8011afc67bf4e481b86d5b965c84369d74b553b7f74dfb15ff0b4bf9370a05aa"
+    },
+    {
+      "path": "app/assets/stylesheets/code.css",
+      "category": "assets",
+      "bytes": 2774,
+      "lines": 136,
+      "sha256": "60b1f8d2975406a37e36dd487f24bc953d1975128895311788a5da798a6e8025"
+    },
+    {
+      "path": "app/assets/stylesheets/colorize.css",
+      "category": "assets",
+      "bytes": 229,
+      "lines": 15,
+      "sha256": "abc8f4b4c5be0612ba774907bbace4a44893136b1d3de372a69b8943c1c9bf32"
+    },
+    {
+      "path": "app/assets/stylesheets/colors.css",
+      "category": "assets",
+      "bytes": 1439,
+      "lines": 44,
+      "sha256": "b5372f9e2dc0a214477aa2f73aa4cd41bc4109c7ec85a2c869be47b6aba68988"
+    },
+    {
+      "path": "app/assets/stylesheets/composer.css",
+      "category": "assets",
+      "bytes": 4113,
+      "lines": 195,
+      "sha256": "ef7a958f03988aa660e96dc3897dcf7db9d212405b08c71395de0362a6fb0df4"
+    },
+    {
+      "path": "app/assets/stylesheets/embeds.css",
+      "category": "assets",
+      "bytes": 1627,
+      "lines": 78,
+      "sha256": "adf3c6c3025c79c63200d0ebb6c16fb5003f56be597d7a7c06c54352fda3b1f0"
+    },
+    {
+      "path": "app/assets/stylesheets/filters.css",
+      "category": "assets",
+      "bytes": 79,
+      "lines": 7,
+      "sha256": "fdb39742b0cdd5b0ac0a81068b337b2053953b81f4bde79f774b7f2974fc781a"
+    },
+    {
+      "path": "app/assets/stylesheets/flash.css",
+      "category": "assets",
+      "bytes": 463,
+      "lines": 23,
+      "sha256": "7f1c5a81ffd7cabad2bf71200a48a3317e6897bab8c755c641656ede62635d23"
+    },
+    {
+      "path": "app/assets/stylesheets/inputs.css",
+      "category": "assets",
+      "bytes": 4140,
+      "lines": 196,
+      "sha256": "6e4a0f2b60aa4801d95c515fc2fd40f41d0e70aa81f2d331ec896a26899e43a8"
+    },
+    {
+      "path": "app/assets/stylesheets/layout.css",
+      "category": "assets",
+      "bytes": 1896,
+      "lines": 105,
+      "sha256": "3bf3ffb5c2fca38c2fa7220a04e87526e6cd68be2e507ab61fab6b5452abe30b"
+    },
+    {
+      "path": "app/assets/stylesheets/lightbox.css",
+      "category": "assets",
+      "bytes": 837,
+      "lines": 46,
+      "sha256": "86db07de95cd3659e488d31f7811f2fccff69537dd7e919c3c78ce878bf458a5"
+    },
+    {
+      "path": "app/assets/stylesheets/messages.css",
+      "category": "assets",
+      "bytes": 11905,
+      "lines": 595,
+      "sha256": "6699be7c9c3f6e25902859d76f88492989811a5a135300a241407888f11067b5"
+    },
+    {
+      "path": "app/assets/stylesheets/nav.css",
+      "category": "assets",
+      "bytes": 1315,
+      "lines": 61,
+      "sha256": "5d873853a0b508590f78eee7570d18070a46a1f3fbc813e1266204261feb4767"
+    },
+    {
+      "path": "app/assets/stylesheets/panels.css",
+      "category": "assets",
+      "bytes": 959,
+      "lines": 34,
+      "sha256": "34e106cb2d657b01d34dff7d4778cd5c6843d66fb50630fd1d6edcc21aa7dff3"
+    },
+    {
+      "path": "app/assets/stylesheets/separators.css",
+      "category": "assets",
+      "bytes": 176,
+      "lines": 6,
+      "sha256": "c8671de9be019d64b5a604063570f7cbc8b688f79bc26cd5e80f4cb7a7d9072d"
+    },
+    {
+      "path": "app/assets/stylesheets/sidebar.css",
+      "category": "assets",
+      "bytes": 7016,
+      "lines": 339,
+      "sha256": "224d9873f52937fc481916fdf91f36354e0cfd952f550b4ba98cb0d596925cb3"
+    },
+    {
+      "path": "app/assets/stylesheets/signup.css",
+      "category": "assets",
+      "bytes": 1394,
+      "lines": 59,
+      "sha256": "a8fac55100dedda50a0212bf0ba30160b2e38edfe3bb46fa4f5a940207e8ee71"
+    },
+    {
+      "path": "app/assets/stylesheets/spinner.css",
+      "category": "assets",
+      "bytes": 532,
+      "lines": 20,
+      "sha256": "d7b45ae7a885708f72c9323d525acda30866f3f3caafc079d2111a7bd376ec51"
+    },
+    {
+      "path": "app/assets/stylesheets/utilities.css",
+      "category": "assets",
+      "bytes": 6670,
+      "lines": 203,
+      "sha256": "c7c9bb4c6117b59ced40887bd88c84c3edc8a339a824716eb3786122ce305d81"
+    }
+  ],
+  "review_hints": [
+    {
+      "kind": "controller_filters",
+      "path": "app/controllers/accounts/bots/keys_controller.rb",
+      "line": 2
+    },
+    {
+      "kind": "controller_filters",
+      "path": "app/controllers/accounts/bots_controller.rb",
+      "line": 2
+    },
+    {
+      "kind": "controller_filters",
+      "path": "app/controllers/accounts/bots_controller.rb",
+      "line": 3
+    },
+    {
+      "kind": "controller_filters",
+      "path": "app/controllers/accounts/custom_styles_controller.rb",
+      "line": 2
+    },
+    {
+      "kind": "controller_filters",
+      "path": "app/controllers/accounts/join_codes_controller.rb",
+      "line": 2
+    },
+    {
+      "kind": "storage",
+      "path": "app/controllers/accounts/logos_controller.rb",
+      "line": 2
+    },
+    {
+      "kind": "controller_filters",
+      "path": "app/controllers/accounts/logos_controller.rb",
+      "line": 5
+    },
+    {
+      "kind": "storage",
+      "path": "app/controllers/accounts/logos_controller.rb",
+      "line": 12
+    },
+    {
+      "kind": "controller_filters",
+      "path": "app/controllers/accounts/users_controller.rb",
+      "line": 2
+    },
+    {
+      "kind": "controller_filters",
+      "path": "app/controllers/accounts_controller.rb",
+      "line": 2
+    },
+    {
+      "kind": "controller_filters",
+      "path": "app/controllers/accounts_controller.rb",
+      "line": 3
+    },
+    {
+      "kind": "sessions",
+      "path": "app/controllers/concerns/authentication/session_lookup.rb",
+      "line": 3
+    },
+    {
+      "kind": "controller_filters",
+      "path": "app/controllers/concerns/authentication.rb",
+      "line": 6
+    },
+    {
+      "kind": "controller_filters",
+      "path": "app/controllers/concerns/authentication.rb",
+      "line": 7
+    },
+    {
+      "kind": "controller_filters",
+      "path": "app/controllers/concerns/authentication.rb",
+      "line": 15
+    },
+    {
+      "kind": "controller_filters",
+      "path": "app/controllers/concerns/authentication.rb",
+      "line": 19
+    },
+    {
+      "kind": "controller_filters",
+      "path": "app/controllers/concerns/authentication.rb",
+      "line": 23
+    },
+    {
+      "kind": "controller_filters",
+      "path": "app/controllers/concerns/authentication.rb",
+      "line": 24
+    },
+    {
+      "kind": "sessions",
+      "path": "app/controllers/concerns/authentication.rb",
+      "line": 38
+    },
+    {
+      "kind": "sessions",
+      "path": "app/controllers/concerns/authentication.rb",
+      "line": 39
+    },
+    {
+      "kind": "sessions",
+      "path": "app/controllers/concerns/authentication.rb",
+      "line": 51
+    },
+    {
+      "kind": "sessions",
+      "path": "app/controllers/concerns/authentication.rb",
+      "line": 60
+    },
+    {
+      "kind": "sessions",
+      "path": "app/controllers/concerns/authentication.rb",
+      "line": 61
+    },
+    {
+      "kind": "sessions",
+      "path": "app/controllers/concerns/authentication.rb",
+      "line": 65
+    },
+    {
+      "kind": "sessions",
+      "path": "app/controllers/concerns/authentication.rb",
+      "line": 66
+    },
+    {
+      "kind": "sessions",
+      "path": "app/controllers/concerns/authentication.rb",
+      "line": 67
+    },
+    {
+      "kind": "sessions",
+      "path": "app/controllers/concerns/authentication.rb",
+      "line": 71
+    },
+    {
+      "kind": "sessions",
+      "path": "app/controllers/concerns/authentication.rb",
+      "line": 83
+    },
+    {
+      "kind": "sessions",
+      "path": "app/controllers/concerns/authentication.rb",
+      "line": 84
+    },
+    {
+      "kind": "sessions",
+      "path": "app/controllers/concerns/authentication.rb",
+      "line": 85
+    },
+    {
+      "kind": "sessions",
+      "path": "app/controllers/concerns/authentication.rb",
+      "line": 86
+    },
+    {
+      "kind": "sessions",
+      "path": "app/controllers/concerns/authentication.rb",
+      "line": 90
+    },
+    {
+      "kind": "sessions",
+      "path": "app/controllers/concerns/authentication.rb",
+      "line": 93
+    },
+    {
+      "kind": "sessions",
+      "path": "app/controllers/concerns/authentication.rb",
+      "line": 94
+    },
+    {
+      "kind": "sessions",
+      "path": "app/controllers/concerns/authentication.rb",
+      "line": 98
+    },
+    {
+      "kind": "controller_filters",
+      "path": "app/controllers/concerns/block_banned_requests.rb",
+      "line": 5
+    },
+    {
+      "kind": "controller_filters",
+      "path": "app/controllers/concerns/room_scoped.rb",
+      "line": 5
+    },
+    {
+      "kind": "controller_filters",
+      "path": "app/controllers/concerns/set_current_request.rb",
+      "line": 5
+    },
+    {
+      "kind": "sessions",
+      "path": "app/controllers/concerns/tracked_room_visit.rb",
+      "line": 9
+    },
+    {
+      "kind": "sessions",
+      "path": "app/controllers/concerns/tracked_room_visit.rb",
+      "line": 13
+    },
+    {
+      "kind": "controller_filters",
+      "path": "app/controllers/concerns/version_headers.rb",
+      "line": 5
+    },
+    {
+      "kind": "controller_filters",
+      "path": "app/controllers/first_runs_controller.rb",
+      "line": 4
+    },
+    {
+      "kind": "controller_filters",
+      "path": "app/controllers/messages/boosts/by_bots_controller.rb",
+      "line": 6
+    },
+    {
+      "kind": "controller_filters",
+      "path": "app/controllers/messages/boosts_controller.rb",
+      "line": 2
+    },
+    {
+      "kind": "controller_filters",
+      "path": "app/controllers/messages/boosts_controller.rb",
+      "line": 3
+    },
+    {
+      "kind": "controller_filters",
+      "path": "app/controllers/messages/by_bots_controller.rb",
+      "line": 6
+    },
+    {
+      "kind": "controller_filters",
+      "path": "app/controllers/messages/by_bots_controller.rb",
+      "line": 7
+    },
+    {
+      "kind": "controller_filters",
+      "path": "app/controllers/messages/by_bots_controller.rb",
+      "line": 8
+    },
+    {
+      "kind": "controller_filters",
+      "path": "app/controllers/messages/by_bots_controller.rb",
+      "line": 9
+    },
+    {
+      "kind": "storage",
+      "path": "app/controllers/messages_controller.rb",
+      "line": 2
+    },
+    {
+      "kind": "controller_filters",
+      "path": "app/controllers/messages_controller.rb",
+      "line": 4
+    },
+    {
+      "kind": "controller_filters",
+      "path": "app/controllers/messages_controller.rb",
+      "line": 5
+    },
+    {
+      "kind": "controller_filters",
+      "path": "app/controllers/messages_controller.rb",
+      "line": 6
+    },
+    {
+      "kind": "controller_filters",
+      "path": "app/controllers/rooms/closeds_controller.rb",
+      "line": 2
+    },
+    {
+      "kind": "controller_filters",
+      "path": "app/controllers/rooms/closeds_controller.rb",
+      "line": 3
+    },
+    {
+      "kind": "controller_filters",
+      "path": "app/controllers/rooms/closeds_controller.rb",
+      "line": 4
+    },
+    {
+      "kind": "controller_filters",
+      "path": "app/controllers/rooms/closeds_controller.rb",
+      "line": 5
+    },
+    {
+      "kind": "controller_filters",
+      "path": "app/controllers/rooms/closeds_controller.rb",
+      "line": 6
+    },
+    {
+      "kind": "controller_filters",
+      "path": "app/controllers/rooms/directs_controller.rb",
+      "line": 2
+    },
+    {
+      "kind": "controller_filters",
+      "path": "app/controllers/rooms/opens_controller.rb",
+      "line": 2
+    },
+    {
+      "kind": "controller_filters",
+      "path": "app/controllers/rooms/opens_controller.rb",
+      "line": 3
+    },
+    {
+      "kind": "controller_filters",
+      "path": "app/controllers/rooms/opens_controller.rb",
+      "line": 4
+    },
+    {
+      "kind": "controller_filters",
+      "path": "app/controllers/rooms/opens_controller.rb",
+      "line": 5
+    },
+    {
+      "kind": "controller_filters",
+      "path": "app/controllers/rooms/opens_controller.rb",
+      "line": 6
+    },
+    {
+      "kind": "controller_filters",
+      "path": "app/controllers/rooms/refreshes_controller.rb",
+      "line": 4
+    },
+    {
+      "kind": "controller_filters",
+      "path": "app/controllers/rooms_controller.rb",
+      "line": 2
+    },
+    {
+      "kind": "controller_filters",
+      "path": "app/controllers/rooms_controller.rb",
+      "line": 3
+    },
+    {
+      "kind": "controller_filters",
+      "path": "app/controllers/rooms_controller.rb",
+      "line": 4
+    },
+    {
+      "kind": "controller_filters",
+      "path": "app/controllers/searches_controller.rb",
+      "line": 2
+    },
+    {
+      "kind": "controller_filters",
+      "path": "app/controllers/sessions_controller.rb",
+      "line": 5
+    },
+    {
+      "kind": "storage",
+      "path": "app/controllers/users/avatars_controller.rb",
+      "line": 2
+    },
+    {
+      "kind": "sessions",
+      "path": "app/controllers/users/avatars_controller.rb",
+      "line": 4
+    },
+    {
+      "kind": "storage",
+      "path": "app/controllers/users/avatars_controller.rb",
+      "line": 29
+    },
+    {
+      "kind": "controller_filters",
+      "path": "app/controllers/users/bans_controller.rb",
+      "line": 2
+    },
+    {
+      "kind": "controller_filters",
+      "path": "app/controllers/users/bans_controller.rb",
+      "line": 3
+    },
+    {
+      "kind": "controller_filters",
+      "path": "app/controllers/users/profiles_controller.rb",
+      "line": 2
+    },
+    {
+      "kind": "controller_filters",
+      "path": "app/controllers/users/push_subscriptions/test_notifications_controller.rb",
+      "line": 2
+    },
+    {
+      "kind": "external_work",
+      "path": "app/controllers/users/push_subscriptions/test_notifications_controller.rb",
+      "line": 5
+    },
+    {
+      "kind": "controller_filters",
+      "path": "app/controllers/users/push_subscriptions_controller.rb",
+      "line": 2
+    },
+    {
+      "kind": "controller_filters",
+      "path": "app/controllers/users_controller.rb",
+      "line": 4
+    },
+    {
+      "kind": "controller_filters",
+      "path": "app/controllers/users_controller.rb",
+      "line": 5
+    },
+    {
+      "kind": "callbacks",
+      "path": "app/models/account/joinable.rb",
+      "line": 5
+    },
+    {
+      "kind": "storage",
+      "path": "app/models/account.rb",
+      "line": 4
+    },
+    {
+      "kind": "sessions",
+      "path": "app/models/current.rb",
+      "line": 2
+    },
+    {
+      "kind": "sessions",
+      "path": "app/models/current.rb",
+      "line": 6
+    },
+    {
+      "kind": "sessions",
+      "path": "app/models/current.rb",
+      "line": 10
+    },
+    {
+      "kind": "storage",
+      "path": "app/models/message/attachment.rb",
+      "line": 8
+    },
+    {
+      "kind": "callbacks",
+      "path": "app/models/message.rb",
+      "line": 11
+    },
+    {
+      "kind": "callbacks",
+      "path": "app/models/opengraph/metadata.rb",
+      "line": 11
+    },
+    {
+      "kind": "transactions",
+      "path": "app/models/room.rb",
+      "line": 13
+    },
+    {
+      "kind": "transactions",
+      "path": "app/models/room.rb",
+      "line": 36
+    },
+    {
+      "kind": "external_work",
+      "path": "app/models/room.rb",
+      "line": 84
+    },
+    {
+      "kind": "callbacks",
+      "path": "app/models/search.rb",
+      "line": 4
+    },
+    {
+      "kind": "callbacks",
+      "path": "app/models/session.rb",
+      "line": 8
+    },
+    {
+      "kind": "storage",
+      "path": "app/models/user/avatar.rb",
+      "line": 5
+    },
+    {
+      "kind": "transactions",
+      "path": "app/models/user/bannable.rb",
+      "line": 5
+    },
+    {
+      "kind": "transactions",
+      "path": "app/models/user/bannable.rb",
+      "line": 13
+    },
+    {
+      "kind": "external_work",
+      "path": "app/models/user/bannable.rb",
+      "line": 20
+    },
+    {
+      "kind": "transactions",
+      "path": "app/models/user/bot.rb",
+      "line": 31
+    },
+    {
+      "kind": "external_work",
+      "path": "app/models/user/bot.rb",
+      "line": 52
+    },
+    {
+      "kind": "external_work",
+      "path": "app/models/user/bot.rb",
+      "line": 56
+    },
+    {
+      "kind": "transactions",
+      "path": "app/models/user.rb",
+      "line": 36
+    },
+    {
+      "kind": "external_work",
+      "path": "app/models/webhook.rb",
+      "line": 9
+    },
+    {
+      "kind": "storage",
+      "path": "app/models/webhook.rb",
+      "line": 67
+    },
+    {
+      "kind": "sessions",
+      "path": "lib/rails_ext/actiontext_opengraph_embeds.rb",
+      "line": 51
+    },
+    {
+      "kind": "external_work",
+      "path": "lib/web_push/notification.rb",
+      "line": 7
+    },
+    {
+      "kind": "external_work",
+      "path": "lib/web_push/pool.rb",
+      "line": 14
+    },
+    {
+      "kind": "external_work",
+      "path": "lib/web_push/pool.rb",
+      "line": 25
+    },
+    {
+      "kind": "external_work",
+      "path": "lib/web_push/pool.rb",
+      "line": 31
+    },
+    {
+      "kind": "external_work",
+      "path": "lib/web_push/pool.rb",
+      "line": 33
+    },
+    {
+      "kind": "external_work",
+      "path": "lib/web_push/pool.rb",
+      "line": 38
+    },
+    {
+      "kind": "external_work",
+      "path": "lib/web_push/pool.rb",
+      "line": 39
+    }
+  ],
+  "limits": [
+    "Static hints are not runtime behavior or route coverage.",
+    "Database ERB, environment overrides, engines and loaded gems need a running oracle."
+  ]
+}

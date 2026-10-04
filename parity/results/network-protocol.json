@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "scope": [
+    "plain",
+    "gzip",
+    "deflate",
+    "chunked",
+    "informational",
+    "repeated_headers",
+    "folded_headers",
+    "bodyless_204",
+    "bodyless_304",
+    "truncated_length",
+    "invalid_chunk",
+    "timeout"
+  ],
+  "failure_comparison": "runtime-specific exception classes retained; failures compared by disposition",
+  "differences": []
+}

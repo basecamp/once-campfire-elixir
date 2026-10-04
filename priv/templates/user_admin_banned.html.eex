@@ -1,0 +1,25 @@
+      
+
+<section class="panel txt-align-center">
+  <div class="flex flex-column gap banned">
+    <div class="avatar txt-xx-large center" style="background: white">
+      <img alt="Profile avatar" class="avatar" src="<%= @avatar_src %>" />
+    </div>
+
+        <div class="flex flex-column gap" style="--row-gap: calc(var(--block-space) / 3)">
+          <h1 class="txt-x-large txt-tight-lines margin-none"><%= @name %></h1>
+            <div><a href="mailto:<%= @email %>"><%= @email %></a></div>
+          <div><%= @bio %></div>
+        </div>
+
+
+          <div class="margin-block-start">
+              <form class="button_to" method="post" action="/users/<%= @id %>/ban"><input type="hidden" name="_method" value="delete" /><button class="btn btn--negative full-width" data-turbo-confirm="Are you sure you want to remove the ban on this user?" type="submit">
+    <img aria-hidden="true" aria-label="Remove Ban <%= @name %>" src="<%= Assets.path("cancel.svg") %>" />
+    <span>Remove ban</span>
+</button><input type="hidden" name="authenticity_token" value="<%= @ban_token %>" /></form>
+          </div>
+  </div>
+</section>
+
+

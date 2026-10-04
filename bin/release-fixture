@@ -1,0 +1,31 @@
+#!/usr/bin/env python3
+"""Start or rebuild only the owned, disposable production fixture release."""
+import base64,hashlib,json,os,shutil,sqlite3,subprocess,time,urllib.request
+from pathlib import Path
+ROOT=Path(__file__).resolve().parents[1]
+subprocess.run(['docker','build','-t','campfire-elixir:release','.'],cwd=ROOT,check=True)
+subprocess.run(['docker','rm','-f','campfire-elixir-release'],capture_output=True)
+folder=ROOT/'var/release';folder.mkdir(parents=True,exist_ok=True)
+for suffix in ['', '-wal','-shm']:(folder/('production.sqlite3'+suffix)).unlink(missing_ok=True)
+files=folder/'files'
+if files.exists():shutil.rmtree(files)
+files.mkdir()
+fixture=json.loads((ROOT/'test/fixtures/seed.json').read_text())
+with sqlite3.connect(folder/'production.sqlite3') as db:
+ db.executescript(';\n'.join(fixture['schema'])+';')
+ for table,rows in fixture['tables'].items():
+  for row in rows:
+   names=','.join('"'+name+'"' for name in row)
+   db.execute(f'INSERT INTO "{table}" ({names}) VALUES ({",".join("?" for _ in row)})',list(row.values()))
+for blob in fixture['tables']['active_storage_blobs']:
+ key=blob['key'];data=(ROOT/'test/fixtures/storage'/key).read_bytes()
+ assert len(data)==blob['byte_size'] and base64.b64encode(hashlib.md5(data).digest()).decode()==blob['checksum']
+ target=files/key[:2]/key[2:4]/key;target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(data)
+subprocess.run(['docker','run','-d','--name','campfire-elixir-release','--network','host','--user',f'{os.getuid()}:{os.getgid()}','--env-file',str(ROOT/'parity/reference.env'),'-e','REDIS_URL=redis://127.0.0.1:47079/0','-e','CAMPFIRE_WORKER=0','-e','DATABASE_PATH=/data/production.sqlite3','-e','STORAGE_PATH=/data/files','-e','HTTP_PORT=47072','-e','TARGET_PORT=47075','-e','CAMPFIRE_CLOCK=2026-03-02T16:00:00Z','-v',f'{ROOT}/var/release:/data','campfire-elixir:release'],check=True)
+for _ in range(120):
+ try:
+  with urllib.request.urlopen('http://127.0.0.1:47072/up',timeout=1) as r:
+   if r.status==200:break
+ except OSError:pass
+ time.sleep(.25)
+else:raise SystemExit('Release fixture failed readiness')

@@ -1,0 +1,6 @@
+        <div class="flex-item-justify-end">
+    <a class="btn flex-item-justify-end" href="/session/new">
+      <img aria-hidden="true" src="<%= Campfire.Assets.path("login-keys.svg") %>" />
+      <span class="for-screen-reader">Sign in</span>
+</a>  </div>
+

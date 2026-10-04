@@ -1,0 +1,974 @@
+{
+  "PATCH /account.html missing": {
+    "status": 400,
+    "type": "text/html; charset=UTF-8",
+    "body": ""
+  },
+  "PATCH /account.html blank": {
+    "status": 400,
+    "type": "text/html; charset=UTF-8",
+    "body": ""
+  },
+  "PATCH /account.html space": {
+    "status": 400,
+    "type": "text/html; charset=UTF-8",
+    "body": ""
+  },
+  "PATCH /account.html array": {
+    "status": 500,
+    "type": "text/html; charset=UTF-8",
+    "body": "<!DOCTYPE html>\n<html>\n  <head>\n    <title>Something went wrong (500)</title>\n    <meta charset=\"UTF-8\">\n    <style>\n      *,\n      *::before,\n      *::after {\n        box-sizing: border-box;\n      }\n\n      body {\n        --lch-black: 0% 0 0;\n        --lch-gray: 75% 0.005 96;\n        --lch-white: 100% 0 0;\n\n        --color-border: oklch(var(--lch-gray));\n        --color-bg: oklch(var(--lch-white));\n        --color-text: oklch(var(--lch-black));\n\n        --btn-size: 2.65em;\n\n        background-color: var(--color-bg);\n        block-size: 100dvh;\n        color: var(--color-text);\n        display: grid;\n        margin: 0;\n        padding: 0;\n        place-items: center;\n        font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\";\n\n        @media (prefers-color-scheme: dark) {\n          --lch-black: 100% 0 0;\n          --lch-gray: 44.95% 0 0;\n          --lch-white: 0% 0 0;\n        }\n      }\n\n      svg {\n        fill: var(--color-text);\n\n        @media (prefers-color-scheme: dark) {\n          fill: var(--color-text);\n        }\n      }\n\n      .error {\n        align-items: center;\n        display: flex;\n        flex-direction: column;\n        gap: 2em;\n        justify-content: start;\n        margin-block-end: 15dvh;\n      }\n\n      .error__img {\n        aspect-ratio: 1;\n        background-color: var(--color-text);\n        block-size: auto;\n        border-radius: 50%;\n        display: grid;\n        place-items: center;\n        inline-size: 30dvh;\n\n        svg {\n          fill: var(--color-bg);\n          grid-area: 1/1;\n          max-inline-size: 66%;\n\n          @media (prefers-color-scheme: dark) {\n            fill: var(--color-bg);\n          }\n        }\n      }\n\n      .buttons {\n        display: flex;\n        flex-direction: row;\n        gap: 1em;\n        justify-content: center;\n      }\n\n      .btn {\n        align-items: center;\n        aspect-ratio: 1;\n        background-color: var(--color-bg);\n        block-size: var(--btn-size);\n        border-radius: 50%;\n        border: 1px solid var(--color-border);\n        color: var(--color-text);\n        cursor: pointer;\n        display: grid;\n        font-weight: 600;\n        font-size: 1.4rem;\n        gap: 0.5em;\n        inline-size: var(--btn-size);\n        justify-content: center;\n        padding: 0;\n        place-items: center;\n        text-align: center;\n\n        svg {\n          -webkit-touch-callout: none;\n          grid-area: 1/1;\n          inline-size: 1.3em;\n          max-inline-size: unset;\n          user-select: none;\n        }\n      }\n\n      .for-screen-reader {\n        clip-path: inset(50%);\n        height: 1px;\n        width: 1px;\n        overflow: hidden;\n        position: absolute;\n        white-space: nowrap;\n      }\n    </style>\n  </head>\n\n  <body>\n    <div class=\"error\">\n      <div class=\"error__img\">\n        <svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" aria-label=\"Server error\">\n          <title>server-warning</title>\n          <path\n            d=\"M2.5,6h17A2.5,2.5,0,0,0,22,3.5v-1A2.5,2.5,0,0,0,19.5,0H2.5A2.5,2.5,0,0,0,0,2.5v1A2.5,2.5,0,0,0,2.5,6ZM3.635,3A1.115,1.115,0,1,1,4.749,4.114,1.114,1.114,0,0,1,3.635,3ZM7.5,3A1.115,1.115,0,1,1,8.614,4.114,1.115,1.115,0,0,1,7.5,3Z\" />\n          <path\n            d=\"M14.892,11.574a2.952,2.952,0,0,1,3.339-1.486,3.061,3.061,0,0,1,1.934,1.59l.26.495a.5.5,0,0,0,.765.154A2.468,2.468,0,0,0,22,10.5v-1A2.5,2.5,0,0,0,19.5,7H2.5A2.5,2.5,0,0,0,0,9.5v1A2.5,2.5,0,0,0,2.5,13H13.842a.5.5,0,0,0,.442-.268ZM9.729,10A1.115,1.115,0,1,1,8.614,8.885,1.115,1.115,0,0,1,9.729,10ZM5.864,10A1.115,1.115,0,1,1,4.749,8.885,1.115,1.115,0,0,1,5.864,10Z\" />\n          <path\n            d=\"M2.5,20h7.67a.5.5,0,0,0,.442-.268l2.624-5A.5.5,0,0,0,12.792,14H2.5A2.5,2.5,0,0,0,0,16.5v1A2.5,2.5,0,0,0,2.5,20Zm1.136-3a1.115,1.115,0,1,1,1.114,1.115A1.114,1.114,0,0,1,3.635,17ZM7.5,17a1.115,1.115,0,1,1,1.115,1.115A1.115,1.115,0,0,1,7.5,17Z\" />\n          <path\n            d=\"M11.165,21.905a1.429,1.429,0,0,0,.048,1.408A1.453,1.453,0,0,0,12.446,24H22.558a1.455,1.455,0,0,0,1.232-.687,1.429,1.429,0,0,0,.048-1.408l-5.055-9.634a1.45,1.45,0,0,0-2.562,0ZM17.5,14.75a.75.75,0,0,1,.75.75v3a.75.75,0,0,1-1.5,0v-3A.75.75,0,0,1,17.5,14.75Zm1,6.5a1,1,0,1,1-1-1A1,1,0,0,1,18.5,21.25Z\" />\n        </svg>\n      </div>\n      <a href=\"/\" class=\"btn\" autofocus=\"true\">\n        <svg viewBox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\">\n          <path\n            d=\"m21.864 9.5h-11.607a.25.25 0 0 1 -.174-.43l3.864-3.721a2.609 2.609 0 0 0 -.075-3.682 2.612 2.612 0 0 0 -3.68-.077l-9.792 9.699a1 1 0 0 0 -.008 1.411l9.625 9.724a2.66 2.66 0 0 0 3.755-3.757l-3.729-3.733a.25.25 0 0 1 .177-.427h11.673c1.556 0 2-1.675 2-2.51a2.28 2.28 0 0 0 -2.029-2.497z\" />\n        </svg>\n        <span class=\"for-screen-reader\">Go back</span>\n      </a>\n    </div>\n  </body>\n</html>\n"
+  },
+  "PATCH /account.html scalar": {
+    "status": 500,
+    "type": "text/html; charset=UTF-8",
+    "body": "<!DOCTYPE html>\n<html>\n  <head>\n    <title>Something went wrong (500)</title>\n    <meta charset=\"UTF-8\">\n    <style>\n      *,\n      *::before,\n      *::after {\n        box-sizing: border-box;\n      }\n\n      body {\n        --lch-black: 0% 0 0;\n        --lch-gray: 75% 0.005 96;\n        --lch-white: 100% 0 0;\n\n        --color-border: oklch(var(--lch-gray));\n        --color-bg: oklch(var(--lch-white));\n        --color-text: oklch(var(--lch-black));\n\n        --btn-size: 2.65em;\n\n        background-color: var(--color-bg);\n        block-size: 100dvh;\n        color: var(--color-text);\n        display: grid;\n        margin: 0;\n        padding: 0;\n        place-items: center;\n        font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\";\n\n        @media (prefers-color-scheme: dark) {\n          --lch-black: 100% 0 0;\n          --lch-gray: 44.95% 0 0;\n          --lch-white: 0% 0 0;\n        }\n      }\n\n      svg {\n        fill: var(--color-text);\n\n        @media (prefers-color-scheme: dark) {\n          fill: var(--color-text);\n        }\n      }\n\n      .error {\n        align-items: center;\n        display: flex;\n        flex-direction: column;\n        gap: 2em;\n        justify-content: start;\n        margin-block-end: 15dvh;\n      }\n\n      .error__img {\n        aspect-ratio: 1;\n        background-color: var(--color-text);\n        block-size: auto;\n        border-radius: 50%;\n        display: grid;\n        place-items: center;\n        inline-size: 30dvh;\n\n        svg {\n          fill: var(--color-bg);\n          grid-area: 1/1;\n          max-inline-size: 66%;\n\n          @media (prefers-color-scheme: dark) {\n            fill: var(--color-bg);\n          }\n        }\n      }\n\n      .buttons {\n        display: flex;\n        flex-direction: row;\n        gap: 1em;\n        justify-content: center;\n      }\n\n      .btn {\n        align-items: center;\n        aspect-ratio: 1;\n        background-color: var(--color-bg);\n        block-size: var(--btn-size);\n        border-radius: 50%;\n        border: 1px solid var(--color-border);\n        color: var(--color-text);\n        cursor: pointer;\n        display: grid;\n        font-weight: 600;\n        font-size: 1.4rem;\n        gap: 0.5em;\n        inline-size: var(--btn-size);\n        justify-content: center;\n        padding: 0;\n        place-items: center;\n        text-align: center;\n\n        svg {\n          -webkit-touch-callout: none;\n          grid-area: 1/1;\n          inline-size: 1.3em;\n          max-inline-size: unset;\n          user-select: none;\n        }\n      }\n\n      .for-screen-reader {\n        clip-path: inset(50%);\n        height: 1px;\n        width: 1px;\n        overflow: hidden;\n        position: absolute;\n        white-space: nowrap;\n      }\n    </style>\n  </head>\n\n  <body>\n    <div class=\"error\">\n      <div class=\"error__img\">\n        <svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" aria-label=\"Server error\">\n          <title>server-warning</title>\n          <path\n            d=\"M2.5,6h17A2.5,2.5,0,0,0,22,3.5v-1A2.5,2.5,0,0,0,19.5,0H2.5A2.5,2.5,0,0,0,0,2.5v1A2.5,2.5,0,0,0,2.5,6ZM3.635,3A1.115,1.115,0,1,1,4.749,4.114,1.114,1.114,0,0,1,3.635,3ZM7.5,3A1.115,1.115,0,1,1,8.614,4.114,1.115,1.115,0,0,1,7.5,3Z\" />\n          <path\n            d=\"M14.892,11.574a2.952,2.952,0,0,1,3.339-1.486,3.061,3.061,0,0,1,1.934,1.59l.26.495a.5.5,0,0,0,.765.154A2.468,2.468,0,0,0,22,10.5v-1A2.5,2.5,0,0,0,19.5,7H2.5A2.5,2.5,0,0,0,0,9.5v1A2.5,2.5,0,0,0,2.5,13H13.842a.5.5,0,0,0,.442-.268ZM9.729,10A1.115,1.115,0,1,1,8.614,8.885,1.115,1.115,0,0,1,9.729,10ZM5.864,10A1.115,1.115,0,1,1,4.749,8.885,1.115,1.115,0,0,1,5.864,10Z\" />\n          <path\n            d=\"M2.5,20h7.67a.5.5,0,0,0,.442-.268l2.624-5A.5.5,0,0,0,12.792,14H2.5A2.5,2.5,0,0,0,0,16.5v1A2.5,2.5,0,0,0,2.5,20Zm1.136-3a1.115,1.115,0,1,1,1.114,1.115A1.114,1.114,0,0,1,3.635,17ZM7.5,17a1.115,1.115,0,1,1,1.115,1.115A1.115,1.115,0,0,1,7.5,17Z\" />\n          <path\n            d=\"M11.165,21.905a1.429,1.429,0,0,0,.048,1.408A1.453,1.453,0,0,0,12.446,24H22.558a1.455,1.455,0,0,0,1.232-.687,1.429,1.429,0,0,0,.048-1.408l-5.055-9.634a1.45,1.45,0,0,0-2.562,0ZM17.5,14.75a.75.75,0,0,1,.75.75v3a.75.75,0,0,1-1.5,0v-3A.75.75,0,0,1,17.5,14.75Zm1,6.5a1,1,0,1,1-1-1A1,1,0,0,1,18.5,21.25Z\" />\n        </svg>\n      </div>\n      <a href=\"/\" class=\"btn\" autofocus=\"true\">\n        <svg viewBox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\">\n          <path\n            d=\"m21.864 9.5h-11.607a.25.25 0 0 1 -.174-.43l3.864-3.721a2.609 2.609 0 0 0 -.075-3.682 2.612 2.612 0 0 0 -3.68-.077l-9.792 9.699a1 1 0 0 0 -.008 1.411l9.625 9.724a2.66 2.66 0 0 0 3.755-3.757l-3.729-3.733a.25.25 0 0 1 .177-.427h11.673c1.556 0 2-1.675 2-2.51a2.28 2.28 0 0 0 -2.029-2.497z\" />\n        </svg>\n        <span class=\"for-screen-reader\">Go back</span>\n      </a>\n    </div>\n  </body>\n</html>\n"
+  },
+  "PATCH /account.json missing": {
+    "status": 400,
+    "type": "application/json; charset=UTF-8",
+    "body": {
+      "status": 400,
+      "error": "Bad Request"
+    }
+  },
+  "PATCH /account.json blank": {
+    "status": 400,
+    "type": "application/json; charset=UTF-8",
+    "body": {
+      "status": 400,
+      "error": "Bad Request"
+    }
+  },
+  "PATCH /account.json space": {
+    "status": 400,
+    "type": "application/json; charset=UTF-8",
+    "body": {
+      "status": 400,
+      "error": "Bad Request"
+    }
+  },
+  "PATCH /account.json array": {
+    "status": 500,
+    "type": "application/json; charset=UTF-8",
+    "body": {
+      "status": 500,
+      "error": "Internal Server Error"
+    }
+  },
+  "PATCH /account.json scalar": {
+    "status": 500,
+    "type": "application/json; charset=UTF-8",
+    "body": {
+      "status": 500,
+      "error": "Internal Server Error"
+    }
+  },
+  "PATCH /account.xml missing": {
+    "status": 400,
+    "type": "application/xml; charset=UTF-8",
+    "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<hash>\n  <status type=\"integer\">400</status>\n  <error>Bad Request</error>\n</hash>\n"
+  },
+  "PATCH /account.xml blank": {
+    "status": 400,
+    "type": "application/xml; charset=UTF-8",
+    "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<hash>\n  <status type=\"integer\">400</status>\n  <error>Bad Request</error>\n</hash>\n"
+  },
+  "PATCH /account.xml space": {
+    "status": 400,
+    "type": "application/xml; charset=UTF-8",
+    "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<hash>\n  <status type=\"integer\">400</status>\n  <error>Bad Request</error>\n</hash>\n"
+  },
+  "PATCH /account.xml array": {
+    "status": 500,
+    "type": "application/xml; charset=UTF-8",
+    "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<hash>\n  <status type=\"integer\">500</status>\n  <error>Internal Server Error</error>\n</hash>\n"
+  },
+  "PATCH /account.xml scalar": {
+    "status": 500,
+    "type": "application/xml; charset=UTF-8",
+    "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<hash>\n  <status type=\"integer\">500</status>\n  <error>Internal Server Error</error>\n</hash>\n"
+  },
+  "PATCH /account/custom_styles.html missing": {
+    "status": 400,
+    "type": "text/html; charset=UTF-8",
+    "body": ""
+  },
+  "PATCH /account/custom_styles.html blank": {
+    "status": 400,
+    "type": "text/html; charset=UTF-8",
+    "body": ""
+  },
+  "PATCH /account/custom_styles.html space": {
+    "status": 400,
+    "type": "text/html; charset=UTF-8",
+    "body": ""
+  },
+  "PATCH /account/custom_styles.html array": {
+    "status": 500,
+    "type": "text/html; charset=UTF-8",
+    "body": "<!DOCTYPE html>\n<html>\n  <head>\n    <title>Something went wrong (500)</title>\n    <meta charset=\"UTF-8\">\n    <style>\n      *,\n      *::before,\n      *::after {\n        box-sizing: border-box;\n      }\n\n      body {\n        --lch-black: 0% 0 0;\n        --lch-gray: 75% 0.005 96;\n        --lch-white: 100% 0 0;\n\n        --color-border: oklch(var(--lch-gray));\n        --color-bg: oklch(var(--lch-white));\n        --color-text: oklch(var(--lch-black));\n\n        --btn-size: 2.65em;\n\n        background-color: var(--color-bg);\n        block-size: 100dvh;\n        color: var(--color-text);\n        display: grid;\n        margin: 0;\n        padding: 0;\n        place-items: center;\n        font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\";\n\n        @media (prefers-color-scheme: dark) {\n          --lch-black: 100% 0 0;\n          --lch-gray: 44.95% 0 0;\n          --lch-white: 0% 0 0;\n        }\n      }\n\n      svg {\n        fill: var(--color-text);\n\n        @media (prefers-color-scheme: dark) {\n          fill: var(--color-text);\n        }\n      }\n\n      .error {\n        align-items: center;\n        display: flex;\n        flex-direction: column;\n        gap: 2em;\n        justify-content: start;\n        margin-block-end: 15dvh;\n      }\n\n      .error__img {\n        aspect-ratio: 1;\n        background-color: var(--color-text);\n        block-size: auto;\n        border-radius: 50%;\n        display: grid;\n        place-items: center;\n        inline-size: 30dvh;\n\n        svg {\n          fill: var(--color-bg);\n          grid-area: 1/1;\n          max-inline-size: 66%;\n\n          @media (prefers-color-scheme: dark) {\n            fill: var(--color-bg);\n          }\n        }\n      }\n\n      .buttons {\n        display: flex;\n        flex-direction: row;\n        gap: 1em;\n        justify-content: center;\n      }\n\n      .btn {\n        align-items: center;\n        aspect-ratio: 1;\n        background-color: var(--color-bg);\n        block-size: var(--btn-size);\n        border-radius: 50%;\n        border: 1px solid var(--color-border);\n        color: var(--color-text);\n        cursor: pointer;\n        display: grid;\n        font-weight: 600;\n        font-size: 1.4rem;\n        gap: 0.5em;\n        inline-size: var(--btn-size);\n        justify-content: center;\n        padding: 0;\n        place-items: center;\n        text-align: center;\n\n        svg {\n          -webkit-touch-callout: none;\n          grid-area: 1/1;\n          inline-size: 1.3em;\n          max-inline-size: unset;\n          user-select: none;\n        }\n      }\n\n      .for-screen-reader {\n        clip-path: inset(50%);\n        height: 1px;\n        width: 1px;\n        overflow: hidden;\n        position: absolute;\n        white-space: nowrap;\n      }\n    </style>\n  </head>\n\n  <body>\n    <div class=\"error\">\n      <div class=\"error__img\">\n        <svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" aria-label=\"Server error\">\n          <title>server-warning</title>\n          <path\n            d=\"M2.5,6h17A2.5,2.5,0,0,0,22,3.5v-1A2.5,2.5,0,0,0,19.5,0H2.5A2.5,2.5,0,0,0,0,2.5v1A2.5,2.5,0,0,0,2.5,6ZM3.635,3A1.115,1.115,0,1,1,4.749,4.114,1.114,1.114,0,0,1,3.635,3ZM7.5,3A1.115,1.115,0,1,1,8.614,4.114,1.115,1.115,0,0,1,7.5,3Z\" />\n          <path\n            d=\"M14.892,11.574a2.952,2.952,0,0,1,3.339-1.486,3.061,3.061,0,0,1,1.934,1.59l.26.495a.5.5,0,0,0,.765.154A2.468,2.468,0,0,0,22,10.5v-1A2.5,2.5,0,0,0,19.5,7H2.5A2.5,2.5,0,0,0,0,9.5v1A2.5,2.5,0,0,0,2.5,13H13.842a.5.5,0,0,0,.442-.268ZM9.729,10A1.115,1.115,0,1,1,8.614,8.885,1.115,1.115,0,0,1,9.729,10ZM5.864,10A1.115,1.115,0,1,1,4.749,8.885,1.115,1.115,0,0,1,5.864,10Z\" />\n          <path\n            d=\"M2.5,20h7.67a.5.5,0,0,0,.442-.268l2.624-5A.5.5,0,0,0,12.792,14H2.5A2.5,2.5,0,0,0,0,16.5v1A2.5,2.5,0,0,0,2.5,20Zm1.136-3a1.115,1.115,0,1,1,1.114,1.115A1.114,1.114,0,0,1,3.635,17ZM7.5,17a1.115,1.115,0,1,1,1.115,1.115A1.115,1.115,0,0,1,7.5,17Z\" />\n          <path\n            d=\"M11.165,21.905a1.429,1.429,0,0,0,.048,1.408A1.453,1.453,0,0,0,12.446,24H22.558a1.455,1.455,0,0,0,1.232-.687,1.429,1.429,0,0,0,.048-1.408l-5.055-9.634a1.45,1.45,0,0,0-2.562,0ZM17.5,14.75a.75.75,0,0,1,.75.75v3a.75.75,0,0,1-1.5,0v-3A.75.75,0,0,1,17.5,14.75Zm1,6.5a1,1,0,1,1-1-1A1,1,0,0,1,18.5,21.25Z\" />\n        </svg>\n      </div>\n      <a href=\"/\" class=\"btn\" autofocus=\"true\">\n        <svg viewBox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\">\n          <path\n            d=\"m21.864 9.5h-11.607a.25.25 0 0 1 -.174-.43l3.864-3.721a2.609 2.609 0 0 0 -.075-3.682 2.612 2.612 0 0 0 -3.68-.077l-9.792 9.699a1 1 0 0 0 -.008 1.411l9.625 9.724a2.66 2.66 0 0 0 3.755-3.757l-3.729-3.733a.25.25 0 0 1 .177-.427h11.673c1.556 0 2-1.675 2-2.51a2.28 2.28 0 0 0 -2.029-2.497z\" />\n        </svg>\n        <span class=\"for-screen-reader\">Go back</span>\n      </a>\n    </div>\n  </body>\n</html>\n"
+  },
+  "PATCH /account/custom_styles.html scalar": {
+    "status": 500,
+    "type": "text/html; charset=UTF-8",
+    "body": "<!DOCTYPE html>\n<html>\n  <head>\n    <title>Something went wrong (500)</title>\n    <meta charset=\"UTF-8\">\n    <style>\n      *,\n      *::before,\n      *::after {\n        box-sizing: border-box;\n      }\n\n      body {\n        --lch-black: 0% 0 0;\n        --lch-gray: 75% 0.005 96;\n        --lch-white: 100% 0 0;\n\n        --color-border: oklch(var(--lch-gray));\n        --color-bg: oklch(var(--lch-white));\n        --color-text: oklch(var(--lch-black));\n\n        --btn-size: 2.65em;\n\n        background-color: var(--color-bg);\n        block-size: 100dvh;\n        color: var(--color-text);\n        display: grid;\n        margin: 0;\n        padding: 0;\n        place-items: center;\n        font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\";\n\n        @media (prefers-color-scheme: dark) {\n          --lch-black: 100% 0 0;\n          --lch-gray: 44.95% 0 0;\n          --lch-white: 0% 0 0;\n        }\n      }\n\n      svg {\n        fill: var(--color-text);\n\n        @media (prefers-color-scheme: dark) {\n          fill: var(--color-text);\n        }\n      }\n\n      .error {\n        align-items: center;\n        display: flex;\n        flex-direction: column;\n        gap: 2em;\n        justify-content: start;\n        margin-block-end: 15dvh;\n      }\n\n      .error__img {\n        aspect-ratio: 1;\n        background-color: var(--color-text);\n        block-size: auto;\n        border-radius: 50%;\n        display: grid;\n        place-items: center;\n        inline-size: 30dvh;\n\n        svg {\n          fill: var(--color-bg);\n          grid-area: 1/1;\n          max-inline-size: 66%;\n\n          @media (prefers-color-scheme: dark) {\n            fill: var(--color-bg);\n          }\n        }\n      }\n\n      .buttons {\n        display: flex;\n        flex-direction: row;\n        gap: 1em;\n        justify-content: center;\n      }\n\n      .btn {\n        align-items: center;\n        aspect-ratio: 1;\n        background-color: var(--color-bg);\n        block-size: var(--btn-size);\n        border-radius: 50%;\n        border: 1px solid var(--color-border);\n        color: var(--color-text);\n        cursor: pointer;\n        display: grid;\n        font-weight: 600;\n        font-size: 1.4rem;\n        gap: 0.5em;\n        inline-size: var(--btn-size);\n        justify-content: center;\n        padding: 0;\n        place-items: center;\n        text-align: center;\n\n        svg {\n          -webkit-touch-callout: none;\n          grid-area: 1/1;\n          inline-size: 1.3em;\n          max-inline-size: unset;\n          user-select: none;\n        }\n      }\n\n      .for-screen-reader {\n        clip-path: inset(50%);\n        height: 1px;\n        width: 1px;\n        overflow: hidden;\n        position: absolute;\n        white-space: nowrap;\n      }\n    </style>\n  </head>\n\n  <body>\n    <div class=\"error\">\n      <div class=\"error__img\">\n        <svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" aria-label=\"Server error\">\n          <title>server-warning</title>\n          <path\n            d=\"M2.5,6h17A2.5,2.5,0,0,0,22,3.5v-1A2.5,2.5,0,0,0,19.5,0H2.5A2.5,2.5,0,0,0,0,2.5v1A2.5,2.5,0,0,0,2.5,6ZM3.635,3A1.115,1.115,0,1,1,4.749,4.114,1.114,1.114,0,0,1,3.635,3ZM7.5,3A1.115,1.115,0,1,1,8.614,4.114,1.115,1.115,0,0,1,7.5,3Z\" />\n          <path\n            d=\"M14.892,11.574a2.952,2.952,0,0,1,3.339-1.486,3.061,3.061,0,0,1,1.934,1.59l.26.495a.5.5,0,0,0,.765.154A2.468,2.468,0,0,0,22,10.5v-1A2.5,2.5,0,0,0,19.5,7H2.5A2.5,2.5,0,0,0,0,9.5v1A2.5,2.5,0,0,0,2.5,13H13.842a.5.5,0,0,0,.442-.268ZM9.729,10A1.115,1.115,0,1,1,8.614,8.885,1.115,1.115,0,0,1,9.729,10ZM5.864,10A1.115,1.115,0,1,1,4.749,8.885,1.115,1.115,0,0,1,5.864,10Z\" />\n          <path\n            d=\"M2.5,20h7.67a.5.5,0,0,0,.442-.268l2.624-5A.5.5,0,0,0,12.792,14H2.5A2.5,2.5,0,0,0,0,16.5v1A2.5,2.5,0,0,0,2.5,20Zm1.136-3a1.115,1.115,0,1,1,1.114,1.115A1.114,1.114,0,0,1,3.635,17ZM7.5,17a1.115,1.115,0,1,1,1.115,1.115A1.115,1.115,0,0,1,7.5,17Z\" />\n          <path\n            d=\"M11.165,21.905a1.429,1.429,0,0,0,.048,1.408A1.453,1.453,0,0,0,12.446,24H22.558a1.455,1.455,0,0,0,1.232-.687,1.429,1.429,0,0,0,.048-1.408l-5.055-9.634a1.45,1.45,0,0,0-2.562,0ZM17.5,14.75a.75.75,0,0,1,.75.75v3a.75.75,0,0,1-1.5,0v-3A.75.75,0,0,1,17.5,14.75Zm1,6.5a1,1,0,1,1-1-1A1,1,0,0,1,18.5,21.25Z\" />\n        </svg>\n      </div>\n      <a href=\"/\" class=\"btn\" autofocus=\"true\">\n        <svg viewBox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\">\n          <path\n            d=\"m21.864 9.5h-11.607a.25.25 0 0 1 -.174-.43l3.864-3.721a2.609 2.609 0 0 0 -.075-3.682 2.612 2.612 0 0 0 -3.68-.077l-9.792 9.699a1 1 0 0 0 -.008 1.411l9.625 9.724a2.66 2.66 0 0 0 3.755-3.757l-3.729-3.733a.25.25 0 0 1 .177-.427h11.673c1.556 0 2-1.675 2-2.51a2.28 2.28 0 0 0 -2.029-2.497z\" />\n        </svg>\n        <span class=\"for-screen-reader\">Go back</span>\n      </a>\n    </div>\n  </body>\n</html>\n"
+  },
+  "PATCH /account/custom_styles.json missing": {
+    "status": 400,
+    "type": "application/json; charset=UTF-8",
+    "body": {
+      "status": 400,
+      "error": "Bad Request"
+    }
+  },
+  "PATCH /account/custom_styles.json blank": {
+    "status": 400,
+    "type": "application/json; charset=UTF-8",
+    "body": {
+      "status": 400,
+      "error": "Bad Request"
+    }
+  },
+  "PATCH /account/custom_styles.json space": {
+    "status": 400,
+    "type": "application/json; charset=UTF-8",
+    "body": {
+      "status": 400,
+      "error": "Bad Request"
+    }
+  },
+  "PATCH /account/custom_styles.json array": {
+    "status": 500,
+    "type": "application/json; charset=UTF-8",
+    "body": {
+      "status": 500,
+      "error": "Internal Server Error"
+    }
+  },
+  "PATCH /account/custom_styles.json scalar": {
+    "status": 500,
+    "type": "application/json; charset=UTF-8",
+    "body": {
+      "status": 500,
+      "error": "Internal Server Error"
+    }
+  },
+  "PATCH /account/custom_styles.xml missing": {
+    "status": 400,
+    "type": "application/xml; charset=UTF-8",
+    "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<hash>\n  <status type=\"integer\">400</status>\n  <error>Bad Request</error>\n</hash>\n"
+  },
+  "PATCH /account/custom_styles.xml blank": {
+    "status": 400,
+    "type": "application/xml; charset=UTF-8",
+    "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<hash>\n  <status type=\"integer\">400</status>\n  <error>Bad Request</error>\n</hash>\n"
+  },
+  "PATCH /account/custom_styles.xml space": {
+    "status": 400,
+    "type": "application/xml; charset=UTF-8",
+    "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<hash>\n  <status type=\"integer\">400</status>\n  <error>Bad Request</error>\n</hash>\n"
+  },
+  "PATCH /account/custom_styles.xml array": {
+    "status": 500,
+    "type": "application/xml; charset=UTF-8",
+    "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<hash>\n  <status type=\"integer\">500</status>\n  <error>Internal Server Error</error>\n</hash>\n"
+  },
+  "PATCH /account/custom_styles.xml scalar": {
+    "status": 500,
+    "type": "application/xml; charset=UTF-8",
+    "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<hash>\n  <status type=\"integer\">500</status>\n  <error>Internal Server Error</error>\n</hash>\n"
+  },
+  "PATCH /users/me/profile.html missing": {
+    "status": 400,
+    "type": "text/html; charset=UTF-8",
+    "body": ""
+  },
+  "PATCH /users/me/profile.html blank": {
+    "status": 400,
+    "type": "text/html; charset=UTF-8",
+    "body": ""
+  },
+  "PATCH /users/me/profile.html space": {
+    "status": 400,
+    "type": "text/html; charset=UTF-8",
+    "body": ""
+  },
+  "PATCH /users/me/profile.html array": {
+    "status": 500,
+    "type": "text/html; charset=UTF-8",
+    "body": "<!DOCTYPE html>\n<html>\n  <head>\n    <title>Something went wrong (500)</title>\n    <meta charset=\"UTF-8\">\n    <style>\n      *,\n      *::before,\n      *::after {\n        box-sizing: border-box;\n      }\n\n      body {\n        --lch-black: 0% 0 0;\n        --lch-gray: 75% 0.005 96;\n        --lch-white: 100% 0 0;\n\n        --color-border: oklch(var(--lch-gray));\n        --color-bg: oklch(var(--lch-white));\n        --color-text: oklch(var(--lch-black));\n\n        --btn-size: 2.65em;\n\n        background-color: var(--color-bg);\n        block-size: 100dvh;\n        color: var(--color-text);\n        display: grid;\n        margin: 0;\n        padding: 0;\n        place-items: center;\n        font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\";\n\n        @media (prefers-color-scheme: dark) {\n          --lch-black: 100% 0 0;\n          --lch-gray: 44.95% 0 0;\n          --lch-white: 0% 0 0;\n        }\n      }\n\n      svg {\n        fill: var(--color-text);\n\n        @media (prefers-color-scheme: dark) {\n          fill: var(--color-text);\n        }\n      }\n\n      .error {\n        align-items: center;\n        display: flex;\n        flex-direction: column;\n        gap: 2em;\n        justify-content: start;\n        margin-block-end: 15dvh;\n      }\n\n      .error__img {\n        aspect-ratio: 1;\n        background-color: var(--color-text);\n        block-size: auto;\n        border-radius: 50%;\n        display: grid;\n        place-items: center;\n        inline-size: 30dvh;\n\n        svg {\n          fill: var(--color-bg);\n          grid-area: 1/1;\n          max-inline-size: 66%;\n\n          @media (prefers-color-scheme: dark) {\n            fill: var(--color-bg);\n          }\n        }\n      }\n\n      .buttons {\n        display: flex;\n        flex-direction: row;\n        gap: 1em;\n        justify-content: center;\n      }\n\n      .btn {\n        align-items: center;\n        aspect-ratio: 1;\n        background-color: var(--color-bg);\n        block-size: var(--btn-size);\n        border-radius: 50%;\n        border: 1px solid var(--color-border);\n        color: var(--color-text);\n        cursor: pointer;\n        display: grid;\n        font-weight: 600;\n        font-size: 1.4rem;\n        gap: 0.5em;\n        inline-size: var(--btn-size);\n        justify-content: center;\n        padding: 0;\n        place-items: center;\n        text-align: center;\n\n        svg {\n          -webkit-touch-callout: none;\n          grid-area: 1/1;\n          inline-size: 1.3em;\n          max-inline-size: unset;\n          user-select: none;\n        }\n      }\n\n      .for-screen-reader {\n        clip-path: inset(50%);\n        height: 1px;\n        width: 1px;\n        overflow: hidden;\n        position: absolute;\n        white-space: nowrap;\n      }\n    </style>\n  </head>\n\n  <body>\n    <div class=\"error\">\n      <div class=\"error__img\">\n        <svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" aria-label=\"Server error\">\n          <title>server-warning</title>\n          <path\n            d=\"M2.5,6h17A2.5,2.5,0,0,0,22,3.5v-1A2.5,2.5,0,0,0,19.5,0H2.5A2.5,2.5,0,0,0,0,2.5v1A2.5,2.5,0,0,0,2.5,6ZM3.635,3A1.115,1.115,0,1,1,4.749,4.114,1.114,1.114,0,0,1,3.635,3ZM7.5,3A1.115,1.115,0,1,1,8.614,4.114,1.115,1.115,0,0,1,7.5,3Z\" />\n          <path\n            d=\"M14.892,11.574a2.952,2.952,0,0,1,3.339-1.486,3.061,3.061,0,0,1,1.934,1.59l.26.495a.5.5,0,0,0,.765.154A2.468,2.468,0,0,0,22,10.5v-1A2.5,2.5,0,0,0,19.5,7H2.5A2.5,2.5,0,0,0,0,9.5v1A2.5,2.5,0,0,0,2.5,13H13.842a.5.5,0,0,0,.442-.268ZM9.729,10A1.115,1.115,0,1,1,8.614,8.885,1.115,1.115,0,0,1,9.729,10ZM5.864,10A1.115,1.115,0,1,1,4.749,8.885,1.115,1.115,0,0,1,5.864,10Z\" />\n          <path\n            d=\"M2.5,20h7.67a.5.5,0,0,0,.442-.268l2.624-5A.5.5,0,0,0,12.792,14H2.5A2.5,2.5,0,0,0,0,16.5v1A2.5,2.5,0,0,0,2.5,20Zm1.136-3a1.115,1.115,0,1,1,1.114,1.115A1.114,1.114,0,0,1,3.635,17ZM7.5,17a1.115,1.115,0,1,1,1.115,1.115A1.115,1.115,0,0,1,7.5,17Z\" />\n          <path\n            d=\"M11.165,21.905a1.429,1.429,0,0,0,.048,1.408A1.453,1.453,0,0,0,12.446,24H22.558a1.455,1.455,0,0,0,1.232-.687,1.429,1.429,0,0,0,.048-1.408l-5.055-9.634a1.45,1.45,0,0,0-2.562,0ZM17.5,14.75a.75.75,0,0,1,.75.75v3a.75.75,0,0,1-1.5,0v-3A.75.75,0,0,1,17.5,14.75Zm1,6.5a1,1,0,1,1-1-1A1,1,0,0,1,18.5,21.25Z\" />\n        </svg>\n      </div>\n      <a href=\"/\" class=\"btn\" autofocus=\"true\">\n        <svg viewBox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\">\n          <path\n            d=\"m21.864 9.5h-11.607a.25.25 0 0 1 -.174-.43l3.864-3.721a2.609 2.609 0 0 0 -.075-3.682 2.612 2.612 0 0 0 -3.68-.077l-9.792 9.699a1 1 0 0 0 -.008 1.411l9.625 9.724a2.66 2.66 0 0 0 3.755-3.757l-3.729-3.733a.25.25 0 0 1 .177-.427h11.673c1.556 0 2-1.675 2-2.51a2.28 2.28 0 0 0 -2.029-2.497z\" />\n        </svg>\n        <span class=\"for-screen-reader\">Go back</span>\n      </a>\n    </div>\n  </body>\n</html>\n"
+  },
+  "PATCH /users/me/profile.html scalar": {
+    "status": 500,
+    "type": "text/html; charset=UTF-8",
+    "body": "<!DOCTYPE html>\n<html>\n  <head>\n    <title>Something went wrong (500)</title>\n    <meta charset=\"UTF-8\">\n    <style>\n      *,\n      *::before,\n      *::after {\n        box-sizing: border-box;\n      }\n\n      body {\n        --lch-black: 0% 0 0;\n        --lch-gray: 75% 0.005 96;\n        --lch-white: 100% 0 0;\n\n        --color-border: oklch(var(--lch-gray));\n        --color-bg: oklch(var(--lch-white));\n        --color-text: oklch(var(--lch-black));\n\n        --btn-size: 2.65em;\n\n        background-color: var(--color-bg);\n        block-size: 100dvh;\n        color: var(--color-text);\n        display: grid;\n        margin: 0;\n        padding: 0;\n        place-items: center;\n        font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\";\n\n        @media (prefers-color-scheme: dark) {\n          --lch-black: 100% 0 0;\n          --lch-gray: 44.95% 0 0;\n          --lch-white: 0% 0 0;\n        }\n      }\n\n      svg {\n        fill: var(--color-text);\n\n        @media (prefers-color-scheme: dark) {\n          fill: var(--color-text);\n        }\n      }\n\n      .error {\n        align-items: center;\n        display: flex;\n        flex-direction: column;\n        gap: 2em;\n        justify-content: start;\n        margin-block-end: 15dvh;\n      }\n\n      .error__img {\n        aspect-ratio: 1;\n        background-color: var(--color-text);\n        block-size: auto;\n        border-radius: 50%;\n        display: grid;\n        place-items: center;\n        inline-size: 30dvh;\n\n        svg {\n          fill: var(--color-bg);\n          grid-area: 1/1;\n          max-inline-size: 66%;\n\n          @media (prefers-color-scheme: dark) {\n            fill: var(--color-bg);\n          }\n        }\n      }\n\n      .buttons {\n        display: flex;\n        flex-direction: row;\n        gap: 1em;\n        justify-content: center;\n      }\n\n      .btn {\n        align-items: center;\n        aspect-ratio: 1;\n        background-color: var(--color-bg);\n        block-size: var(--btn-size);\n        border-radius: 50%;\n        border: 1px solid var(--color-border);\n        color: var(--color-text);\n        cursor: pointer;\n        display: grid;\n        font-weight: 600;\n        font-size: 1.4rem;\n        gap: 0.5em;\n        inline-size: var(--btn-size);\n        justify-content: center;\n        padding: 0;\n        place-items: center;\n        text-align: center;\n\n        svg {\n          -webkit-touch-callout: none;\n          grid-area: 1/1;\n          inline-size: 1.3em;\n          max-inline-size: unset;\n          user-select: none;\n        }\n      }\n\n      .for-screen-reader {\n        clip-path: inset(50%);\n        height: 1px;\n        width: 1px;\n        overflow: hidden;\n        position: absolute;\n        white-space: nowrap;\n      }\n    </style>\n  </head>\n\n  <body>\n    <div class=\"error\">\n      <div class=\"error__img\">\n        <svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" aria-label=\"Server error\">\n          <title>server-warning</title>\n          <path\n            d=\"M2.5,6h17A2.5,2.5,0,0,0,22,3.5v-1A2.5,2.5,0,0,0,19.5,0H2.5A2.5,2.5,0,0,0,0,2.5v1A2.5,2.5,0,0,0,2.5,6ZM3.635,3A1.115,1.115,0,1,1,4.749,4.114,1.114,1.114,0,0,1,3.635,3ZM7.5,3A1.115,1.115,0,1,1,8.614,4.114,1.115,1.115,0,0,1,7.5,3Z\" />\n          <path\n            d=\"M14.892,11.574a2.952,2.952,0,0,1,3.339-1.486,3.061,3.061,0,0,1,1.934,1.59l.26.495a.5.5,0,0,0,.765.154A2.468,2.468,0,0,0,22,10.5v-1A2.5,2.5,0,0,0,19.5,7H2.5A2.5,2.5,0,0,0,0,9.5v1A2.5,2.5,0,0,0,2.5,13H13.842a.5.5,0,0,0,.442-.268ZM9.729,10A1.115,1.115,0,1,1,8.614,8.885,1.115,1.115,0,0,1,9.729,10ZM5.864,10A1.115,1.115,0,1,1,4.749,8.885,1.115,1.115,0,0,1,5.864,10Z\" />\n          <path\n            d=\"M2.5,20h7.67a.5.5,0,0,0,.442-.268l2.624-5A.5.5,0,0,0,12.792,14H2.5A2.5,2.5,0,0,0,0,16.5v1A2.5,2.5,0,0,0,2.5,20Zm1.136-3a1.115,1.115,0,1,1,1.114,1.115A1.114,1.114,0,0,1,3.635,17ZM7.5,17a1.115,1.115,0,1,1,1.115,1.115A1.115,1.115,0,0,1,7.5,17Z\" />\n          <path\n            d=\"M11.165,21.905a1.429,1.429,0,0,0,.048,1.408A1.453,1.453,0,0,0,12.446,24H22.558a1.455,1.455,0,0,0,1.232-.687,1.429,1.429,0,0,0,.048-1.408l-5.055-9.634a1.45,1.45,0,0,0-2.562,0ZM17.5,14.75a.75.75,0,0,1,.75.75v3a.75.75,0,0,1-1.5,0v-3A.75.75,0,0,1,17.5,14.75Zm1,6.5a1,1,0,1,1-1-1A1,1,0,0,1,18.5,21.25Z\" />\n        </svg>\n      </div>\n      <a href=\"/\" class=\"btn\" autofocus=\"true\">\n        <svg viewBox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\">\n          <path\n            d=\"m21.864 9.5h-11.607a.25.25 0 0 1 -.174-.43l3.864-3.721a2.609 2.609 0 0 0 -.075-3.682 2.612 2.612 0 0 0 -3.68-.077l-9.792 9.699a1 1 0 0 0 -.008 1.411l9.625 9.724a2.66 2.66 0 0 0 3.755-3.757l-3.729-3.733a.25.25 0 0 1 .177-.427h11.673c1.556 0 2-1.675 2-2.51a2.28 2.28 0 0 0 -2.029-2.497z\" />\n        </svg>\n        <span class=\"for-screen-reader\">Go back</span>\n      </a>\n    </div>\n  </body>\n</html>\n"
+  },
+  "PATCH /users/me/profile.json missing": {
+    "status": 400,
+    "type": "application/json; charset=UTF-8",
+    "body": {
+      "status": 400,
+      "error": "Bad Request"
+    }
+  },
+  "PATCH /users/me/profile.json blank": {
+    "status": 400,
+    "type": "application/json; charset=UTF-8",
+    "body": {
+      "status": 400,
+      "error": "Bad Request"
+    }
+  },
+  "PATCH /users/me/profile.json space": {
+    "status": 400,
+    "type": "application/json; charset=UTF-8",
+    "body": {
+      "status": 400,
+      "error": "Bad Request"
+    }
+  },
+  "PATCH /users/me/profile.json array": {
+    "status": 500,
+    "type": "application/json; charset=UTF-8",
+    "body": {
+      "status": 500,
+      "error": "Internal Server Error"
+    }
+  },
+  "PATCH /users/me/profile.json scalar": {
+    "status": 500,
+    "type": "application/json; charset=UTF-8",
+    "body": {
+      "status": 500,
+      "error": "Internal Server Error"
+    }
+  },
+  "PATCH /users/me/profile.xml missing": {
+    "status": 400,
+    "type": "application/xml; charset=UTF-8",
+    "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<hash>\n  <status type=\"integer\">400</status>\n  <error>Bad Request</error>\n</hash>\n"
+  },
+  "PATCH /users/me/profile.xml blank": {
+    "status": 400,
+    "type": "application/xml; charset=UTF-8",
+    "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<hash>\n  <status type=\"integer\">400</status>\n  <error>Bad Request</error>\n</hash>\n"
+  },
+  "PATCH /users/me/profile.xml space": {
+    "status": 400,
+    "type": "application/xml; charset=UTF-8",
+    "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<hash>\n  <status type=\"integer\">400</status>\n  <error>Bad Request</error>\n</hash>\n"
+  },
+  "PATCH /users/me/profile.xml array": {
+    "status": 500,
+    "type": "application/xml; charset=UTF-8",
+    "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<hash>\n  <status type=\"integer\">500</status>\n  <error>Internal Server Error</error>\n</hash>\n"
+  },
+  "PATCH /users/me/profile.xml scalar": {
+    "status": 500,
+    "type": "application/xml; charset=UTF-8",
+    "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<hash>\n  <status type=\"integer\">500</status>\n  <error>Internal Server Error</error>\n</hash>\n"
+  },
+  "PATCH /account/users/127326141.html missing": {
+    "status": 400,
+    "type": "text/html; charset=UTF-8",
+    "body": ""
+  },
+  "PATCH /account/users/127326141.html blank": {
+    "status": 400,
+    "type": "text/html; charset=UTF-8",
+    "body": ""
+  },
+  "PATCH /account/users/127326141.html space": {
+    "status": 400,
+    "type": "text/html; charset=UTF-8",
+    "body": ""
+  },
+  "PATCH /account/users/127326141.html array": {
+    "status": 500,
+    "type": "text/html; charset=UTF-8",
+    "body": "<!DOCTYPE html>\n<html>\n  <head>\n    <title>Something went wrong (500)</title>\n    <meta charset=\"UTF-8\">\n    <style>\n      *,\n      *::before,\n      *::after {\n        box-sizing: border-box;\n      }\n\n      body {\n        --lch-black: 0% 0 0;\n        --lch-gray: 75% 0.005 96;\n        --lch-white: 100% 0 0;\n\n        --color-border: oklch(var(--lch-gray));\n        --color-bg: oklch(var(--lch-white));\n        --color-text: oklch(var(--lch-black));\n\n        --btn-size: 2.65em;\n\n        background-color: var(--color-bg);\n        block-size: 100dvh;\n        color: var(--color-text);\n        display: grid;\n        margin: 0;\n        padding: 0;\n        place-items: center;\n        font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\";\n\n        @media (prefers-color-scheme: dark) {\n          --lch-black: 100% 0 0;\n          --lch-gray: 44.95% 0 0;\n          --lch-white: 0% 0 0;\n        }\n      }\n\n      svg {\n        fill: var(--color-text);\n\n        @media (prefers-color-scheme: dark) {\n          fill: var(--color-text);\n        }\n      }\n\n      .error {\n        align-items: center;\n        display: flex;\n        flex-direction: column;\n        gap: 2em;\n        justify-content: start;\n        margin-block-end: 15dvh;\n      }\n\n      .error__img {\n        aspect-ratio: 1;\n        background-color: var(--color-text);\n        block-size: auto;\n        border-radius: 50%;\n        display: grid;\n        place-items: center;\n        inline-size: 30dvh;\n\n        svg {\n          fill: var(--color-bg);\n          grid-area: 1/1;\n          max-inline-size: 66%;\n\n          @media (prefers-color-scheme: dark) {\n            fill: var(--color-bg);\n          }\n        }\n      }\n\n      .buttons {\n        display: flex;\n        flex-direction: row;\n        gap: 1em;\n        justify-content: center;\n      }\n\n      .btn {\n        align-items: center;\n        aspect-ratio: 1;\n        background-color: var(--color-bg);\n        block-size: var(--btn-size);\n        border-radius: 50%;\n        border: 1px solid var(--color-border);\n        color: var(--color-text);\n        cursor: pointer;\n        display: grid;\n        font-weight: 600;\n        font-size: 1.4rem;\n        gap: 0.5em;\n        inline-size: var(--btn-size);\n        justify-content: center;\n        padding: 0;\n        place-items: center;\n        text-align: center;\n\n        svg {\n          -webkit-touch-callout: none;\n          grid-area: 1/1;\n          inline-size: 1.3em;\n          max-inline-size: unset;\n          user-select: none;\n        }\n      }\n\n      .for-screen-reader {\n        clip-path: inset(50%);\n        height: 1px;\n        width: 1px;\n        overflow: hidden;\n        position: absolute;\n        white-space: nowrap;\n      }\n    </style>\n  </head>\n\n  <body>\n    <div class=\"error\">\n      <div class=\"error__img\">\n        <svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" aria-label=\"Server error\">\n          <title>server-warning</title>\n          <path\n            d=\"M2.5,6h17A2.5,2.5,0,0,0,22,3.5v-1A2.5,2.5,0,0,0,19.5,0H2.5A2.5,2.5,0,0,0,0,2.5v1A2.5,2.5,0,0,0,2.5,6ZM3.635,3A1.115,1.115,0,1,1,4.749,4.114,1.114,1.114,0,0,1,3.635,3ZM7.5,3A1.115,1.115,0,1,1,8.614,4.114,1.115,1.115,0,0,1,7.5,3Z\" />\n          <path\n            d=\"M14.892,11.574a2.952,2.952,0,0,1,3.339-1.486,3.061,3.061,0,0,1,1.934,1.59l.26.495a.5.5,0,0,0,.765.154A2.468,2.468,0,0,0,22,10.5v-1A2.5,2.5,0,0,0,19.5,7H2.5A2.5,2.5,0,0,0,0,9.5v1A2.5,2.5,0,0,0,2.5,13H13.842a.5.5,0,0,0,.442-.268ZM9.729,10A1.115,1.115,0,1,1,8.614,8.885,1.115,1.115,0,0,1,9.729,10ZM5.864,10A1.115,1.115,0,1,1,4.749,8.885,1.115,1.115,0,0,1,5.864,10Z\" />\n          <path\n            d=\"M2.5,20h7.67a.5.5,0,0,0,.442-.268l2.624-5A.5.5,0,0,0,12.792,14H2.5A2.5,2.5,0,0,0,0,16.5v1A2.5,2.5,0,0,0,2.5,20Zm1.136-3a1.115,1.115,0,1,1,1.114,1.115A1.114,1.114,0,0,1,3.635,17ZM7.5,17a1.115,1.115,0,1,1,1.115,1.115A1.115,1.115,0,0,1,7.5,17Z\" />\n          <path\n            d=\"M11.165,21.905a1.429,1.429,0,0,0,.048,1.408A1.453,1.453,0,0,0,12.446,24H22.558a1.455,1.455,0,0,0,1.232-.687,1.429,1.429,0,0,0,.048-1.408l-5.055-9.634a1.45,1.45,0,0,0-2.562,0ZM17.5,14.75a.75.75,0,0,1,.75.75v3a.75.75,0,0,1-1.5,0v-3A.75.75,0,0,1,17.5,14.75Zm1,6.5a1,1,0,1,1-1-1A1,1,0,0,1,18.5,21.25Z\" />\n        </svg>\n      </div>\n      <a href=\"/\" class=\"btn\" autofocus=\"true\">\n        <svg viewBox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\">\n          <path\n            d=\"m21.864 9.5h-11.607a.25.25 0 0 1 -.174-.43l3.864-3.721a2.609 2.609 0 0 0 -.075-3.682 2.612 2.612 0 0 0 -3.68-.077l-9.792 9.699a1 1 0 0 0 -.008 1.411l9.625 9.724a2.66 2.66 0 0 0 3.755-3.757l-3.729-3.733a.25.25 0 0 1 .177-.427h11.673c1.556 0 2-1.675 2-2.51a2.28 2.28 0 0 0 -2.029-2.497z\" />\n        </svg>\n        <span class=\"for-screen-reader\">Go back</span>\n      </a>\n    </div>\n  </body>\n</html>\n"
+  },
+  "PATCH /account/users/127326141.html scalar": {
+    "status": 500,
+    "type": "text/html; charset=UTF-8",
+    "body": "<!DOCTYPE html>\n<html>\n  <head>\n    <title>Something went wrong (500)</title>\n    <meta charset=\"UTF-8\">\n    <style>\n      *,\n      *::before,\n      *::after {\n        box-sizing: border-box;\n      }\n\n      body {\n        --lch-black: 0% 0 0;\n        --lch-gray: 75% 0.005 96;\n        --lch-white: 100% 0 0;\n\n        --color-border: oklch(var(--lch-gray));\n        --color-bg: oklch(var(--lch-white));\n        --color-text: oklch(var(--lch-black));\n\n        --btn-size: 2.65em;\n\n        background-color: var(--color-bg);\n        block-size: 100dvh;\n        color: var(--color-text);\n        display: grid;\n        margin: 0;\n        padding: 0;\n        place-items: center;\n        font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\";\n\n        @media (prefers-color-scheme: dark) {\n          --lch-black: 100% 0 0;\n          --lch-gray: 44.95% 0 0;\n          --lch-white: 0% 0 0;\n        }\n      }\n\n      svg {\n        fill: var(--color-text);\n\n        @media (prefers-color-scheme: dark) {\n          fill: var(--color-text);\n        }\n      }\n\n      .error {\n        align-items: center;\n        display: flex;\n        flex-direction: column;\n        gap: 2em;\n        justify-content: start;\n        margin-block-end: 15dvh;\n      }\n\n      .error__img {\n        aspect-ratio: 1;\n        background-color: var(--color-text);\n        block-size: auto;\n        border-radius: 50%;\n        display: grid;\n        place-items: center;\n        inline-size: 30dvh;\n\n        svg {\n          fill: var(--color-bg);\n          grid-area: 1/1;\n          max-inline-size: 66%;\n\n          @media (prefers-color-scheme: dark) {\n            fill: var(--color-bg);\n          }\n        }\n      }\n\n      .buttons {\n        display: flex;\n        flex-direction: row;\n        gap: 1em;\n        justify-content: center;\n      }\n\n      .btn {\n        align-items: center;\n        aspect-ratio: 1;\n        background-color: var(--color-bg);\n        block-size: var(--btn-size);\n        border-radius: 50%;\n        border: 1px solid var(--color-border);\n        color: var(--color-text);\n        cursor: pointer;\n        display: grid;\n        font-weight: 600;\n        font-size: 1.4rem;\n        gap: 0.5em;\n        inline-size: var(--btn-size);\n        justify-content: center;\n        padding: 0;\n        place-items: center;\n        text-align: center;\n\n        svg {\n          -webkit-touch-callout: none;\n          grid-area: 1/1;\n          inline-size: 1.3em;\n          max-inline-size: unset;\n          user-select: none;\n        }\n      }\n\n      .for-screen-reader {\n        clip-path: inset(50%);\n        height: 1px;\n        width: 1px;\n        overflow: hidden;\n        position: absolute;\n        white-space: nowrap;\n      }\n    </style>\n  </head>\n\n  <body>\n    <div class=\"error\">\n      <div class=\"error__img\">\n        <svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" aria-label=\"Server error\">\n          <title>server-warning</title>\n          <path\n            d=\"M2.5,6h17A2.5,2.5,0,0,0,22,3.5v-1A2.5,2.5,0,0,0,19.5,0H2.5A2.5,2.5,0,0,0,0,2.5v1A2.5,2.5,0,0,0,2.5,6ZM3.635,3A1.115,1.115,0,1,1,4.749,4.114,1.114,1.114,0,0,1,3.635,3ZM7.5,3A1.115,1.115,0,1,1,8.614,4.114,1.115,1.115,0,0,1,7.5,3Z\" />\n          <path\n            d=\"M14.892,11.574a2.952,2.952,0,0,1,3.339-1.486,3.061,3.061,0,0,1,1.934,1.59l.26.495a.5.5,0,0,0,.765.154A2.468,2.468,0,0,0,22,10.5v-1A2.5,2.5,0,0,0,19.5,7H2.5A2.5,2.5,0,0,0,0,9.5v1A2.5,2.5,0,0,0,2.5,13H13.842a.5.5,0,0,0,.442-.268ZM9.729,10A1.115,1.115,0,1,1,8.614,8.885,1.115,1.115,0,0,1,9.729,10ZM5.864,10A1.115,1.115,0,1,1,4.749,8.885,1.115,1.115,0,0,1,5.864,10Z\" />\n          <path\n            d=\"M2.5,20h7.67a.5.5,0,0,0,.442-.268l2.624-5A.5.5,0,0,0,12.792,14H2.5A2.5,2.5,0,0,0,0,16.5v1A2.5,2.5,0,0,0,2.5,20Zm1.136-3a1.115,1.115,0,1,1,1.114,1.115A1.114,1.114,0,0,1,3.635,17ZM7.5,17a1.115,1.115,0,1,1,1.115,1.115A1.115,1.115,0,0,1,7.5,17Z\" />\n          <path\n            d=\"M11.165,21.905a1.429,1.429,0,0,0,.048,1.408A1.453,1.453,0,0,0,12.446,24H22.558a1.455,1.455,0,0,0,1.232-.687,1.429,1.429,0,0,0,.048-1.408l-5.055-9.634a1.45,1.45,0,0,0-2.562,0ZM17.5,14.75a.75.75,0,0,1,.75.75v3a.75.75,0,0,1-1.5,0v-3A.75.75,0,0,1,17.5,14.75Zm1,6.5a1,1,0,1,1-1-1A1,1,0,0,1,18.5,21.25Z\" />\n        </svg>\n      </div>\n      <a href=\"/\" class=\"btn\" autofocus=\"true\">\n        <svg viewBox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\">\n          <path\n            d=\"m21.864 9.5h-11.607a.25.25 0 0 1 -.174-.43l3.864-3.721a2.609 2.609 0 0 0 -.075-3.682 2.612 2.612 0 0 0 -3.68-.077l-9.792 9.699a1 1 0 0 0 -.008 1.411l9.625 9.724a2.66 2.66 0 0 0 3.755-3.757l-3.729-3.733a.25.25 0 0 1 .177-.427h11.673c1.556 0 2-1.675 2-2.51a2.28 2.28 0 0 0 -2.029-2.497z\" />\n        </svg>\n        <span class=\"for-screen-reader\">Go back</span>\n      </a>\n    </div>\n  </body>\n</html>\n"
+  },
+  "PATCH /account/users/127326141.json missing": {
+    "status": 400,
+    "type": "application/json; charset=UTF-8",
+    "body": {
+      "status": 400,
+      "error": "Bad Request"
+    }
+  },
+  "PATCH /account/users/127326141.json blank": {
+    "status": 400,
+    "type": "application/json; charset=UTF-8",
+    "body": {
+      "status": 400,
+      "error": "Bad Request"
+    }
+  },
+  "PATCH /account/users/127326141.json space": {
+    "status": 400,
+    "type": "application/json; charset=UTF-8",
+    "body": {
+      "status": 400,
+      "error": "Bad Request"
+    }
+  },
+  "PATCH /account/users/127326141.json array": {
+    "status": 500,
+    "type": "application/json; charset=UTF-8",
+    "body": {
+      "status": 500,
+      "error": "Internal Server Error"
+    }
+  },
+  "PATCH /account/users/127326141.json scalar": {
+    "status": 500,
+    "type": "application/json; charset=UTF-8",
+    "body": {
+      "status": 500,
+      "error": "Internal Server Error"
+    }
+  },
+  "PATCH /account/users/127326141.xml missing": {
+    "status": 400,
+    "type": "application/xml; charset=UTF-8",
+    "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<hash>\n  <status type=\"integer\">400</status>\n  <error>Bad Request</error>\n</hash>\n"
+  },
+  "PATCH /account/users/127326141.xml blank": {
+    "status": 400,
+    "type": "application/xml; charset=UTF-8",
+    "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<hash>\n  <status type=\"integer\">400</status>\n  <error>Bad Request</error>\n</hash>\n"
+  },
+  "PATCH /account/users/127326141.xml space": {
+    "status": 400,
+    "type": "application/xml; charset=UTF-8",
+    "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<hash>\n  <status type=\"integer\">400</status>\n  <error>Bad Request</error>\n</hash>\n"
+  },
+  "PATCH /account/users/127326141.xml array": {
+    "status": 500,
+    "type": "application/xml; charset=UTF-8",
+    "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<hash>\n  <status type=\"integer\">500</status>\n  <error>Internal Server Error</error>\n</hash>\n"
+  },
+  "PATCH /account/users/127326141.xml scalar": {
+    "status": 500,
+    "type": "application/xml; charset=UTF-8",
+    "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<hash>\n  <status type=\"integer\">500</status>\n  <error>Internal Server Error</error>\n</hash>\n"
+  },
+  "POST /account/bots.html missing": {
+    "status": 400,
+    "type": "text/html; charset=UTF-8",
+    "body": ""
+  },
+  "POST /account/bots.html blank": {
+    "status": 400,
+    "type": "text/html; charset=UTF-8",
+    "body": ""
+  },
+  "POST /account/bots.html space": {
+    "status": 400,
+    "type": "text/html; charset=UTF-8",
+    "body": ""
+  },
+  "POST /account/bots.html array": {
+    "status": 500,
+    "type": "text/html; charset=UTF-8",
+    "body": "<!DOCTYPE html>\n<html>\n  <head>\n    <title>Something went wrong (500)</title>\n    <meta charset=\"UTF-8\">\n    <style>\n      *,\n      *::before,\n      *::after {\n        box-sizing: border-box;\n      }\n\n      body {\n        --lch-black: 0% 0 0;\n        --lch-gray: 75% 0.005 96;\n        --lch-white: 100% 0 0;\n\n        --color-border: oklch(var(--lch-gray));\n        --color-bg: oklch(var(--lch-white));\n        --color-text: oklch(var(--lch-black));\n\n        --btn-size: 2.65em;\n\n        background-color: var(--color-bg);\n        block-size: 100dvh;\n        color: var(--color-text);\n        display: grid;\n        margin: 0;\n        padding: 0;\n        place-items: center;\n        font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\";\n\n        @media (prefers-color-scheme: dark) {\n          --lch-black: 100% 0 0;\n          --lch-gray: 44.95% 0 0;\n          --lch-white: 0% 0 0;\n        }\n      }\n\n      svg {\n        fill: var(--color-text);\n\n        @media (prefers-color-scheme: dark) {\n          fill: var(--color-text);\n        }\n      }\n\n      .error {\n        align-items: center;\n        display: flex;\n        flex-direction: column;\n        gap: 2em;\n        justify-content: start;\n        margin-block-end: 15dvh;\n      }\n\n      .error__img {\n        aspect-ratio: 1;\n        background-color: var(--color-text);\n        block-size: auto;\n        border-radius: 50%;\n        display: grid;\n        place-items: center;\n        inline-size: 30dvh;\n\n        svg {\n          fill: var(--color-bg);\n          grid-area: 1/1;\n          max-inline-size: 66%;\n\n          @media (prefers-color-scheme: dark) {\n            fill: var(--color-bg);\n          }\n        }\n      }\n\n      .buttons {\n        display: flex;\n        flex-direction: row;\n        gap: 1em;\n        justify-content: center;\n      }\n\n      .btn {\n        align-items: center;\n        aspect-ratio: 1;\n        background-color: var(--color-bg);\n        block-size: var(--btn-size);\n        border-radius: 50%;\n        border: 1px solid var(--color-border);\n        color: var(--color-text);\n        cursor: pointer;\n        display: grid;\n        font-weight: 600;\n        font-size: 1.4rem;\n        gap: 0.5em;\n        inline-size: var(--btn-size);\n        justify-content: center;\n        padding: 0;\n        place-items: center;\n        text-align: center;\n\n        svg {\n          -webkit-touch-callout: none;\n          grid-area: 1/1;\n          inline-size: 1.3em;\n          max-inline-size: unset;\n          user-select: none;\n        }\n      }\n\n      .for-screen-reader {\n        clip-path: inset(50%);\n        height: 1px;\n        width: 1px;\n        overflow: hidden;\n        position: absolute;\n        white-space: nowrap;\n      }\n    </style>\n  </head>\n\n  <body>\n    <div class=\"error\">\n      <div class=\"error__img\">\n        <svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" aria-label=\"Server error\">\n          <title>server-warning</title>\n          <path\n            d=\"M2.5,6h17A2.5,2.5,0,0,0,22,3.5v-1A2.5,2.5,0,0,0,19.5,0H2.5A2.5,2.5,0,0,0,0,2.5v1A2.5,2.5,0,0,0,2.5,6ZM3.635,3A1.115,1.115,0,1,1,4.749,4.114,1.114,1.114,0,0,1,3.635,3ZM7.5,3A1.115,1.115,0,1,1,8.614,4.114,1.115,1.115,0,0,1,7.5,3Z\" />\n          <path\n            d=\"M14.892,11.574a2.952,2.952,0,0,1,3.339-1.486,3.061,3.061,0,0,1,1.934,1.59l.26.495a.5.5,0,0,0,.765.154A2.468,2.468,0,0,0,22,10.5v-1A2.5,2.5,0,0,0,19.5,7H2.5A2.5,2.5,0,0,0,0,9.5v1A2.5,2.5,0,0,0,2.5,13H13.842a.5.5,0,0,0,.442-.268ZM9.729,10A1.115,1.115,0,1,1,8.614,8.885,1.115,1.115,0,0,1,9.729,10ZM5.864,10A1.115,1.115,0,1,1,4.749,8.885,1.115,1.115,0,0,1,5.864,10Z\" />\n          <path\n            d=\"M2.5,20h7.67a.5.5,0,0,0,.442-.268l2.624-5A.5.5,0,0,0,12.792,14H2.5A2.5,2.5,0,0,0,0,16.5v1A2.5,2.5,0,0,0,2.5,20Zm1.136-3a1.115,1.115,0,1,1,1.114,1.115A1.114,1.114,0,0,1,3.635,17ZM7.5,17a1.115,1.115,0,1,1,1.115,1.115A1.115,1.115,0,0,1,7.5,17Z\" />\n          <path\n            d=\"M11.165,21.905a1.429,1.429,0,0,0,.048,1.408A1.453,1.453,0,0,0,12.446,24H22.558a1.455,1.455,0,0,0,1.232-.687,1.429,1.429,0,0,0,.048-1.408l-5.055-9.634a1.45,1.45,0,0,0-2.562,0ZM17.5,14.75a.75.75,0,0,1,.75.75v3a.75.75,0,0,1-1.5,0v-3A.75.75,0,0,1,17.5,14.75Zm1,6.5a1,1,0,1,1-1-1A1,1,0,0,1,18.5,21.25Z\" />\n        </svg>\n      </div>\n      <a href=\"/\" class=\"btn\" autofocus=\"true\">\n        <svg viewBox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\">\n          <path\n            d=\"m21.864 9.5h-11.607a.25.25 0 0 1 -.174-.43l3.864-3.721a2.609 2.609 0 0 0 -.075-3.682 2.612 2.612 0 0 0 -3.68-.077l-9.792 9.699a1 1 0 0 0 -.008 1.411l9.625 9.724a2.66 2.66 0 0 0 3.755-3.757l-3.729-3.733a.25.25 0 0 1 .177-.427h11.673c1.556 0 2-1.675 2-2.51a2.28 2.28 0 0 0 -2.029-2.497z\" />\n        </svg>\n        <span class=\"for-screen-reader\">Go back</span>\n      </a>\n    </div>\n  </body>\n</html>\n"
+  },
+  "POST /account/bots.html scalar": {
+    "status": 500,
+    "type": "text/html; charset=UTF-8",
+    "body": "<!DOCTYPE html>\n<html>\n  <head>\n    <title>Something went wrong (500)</title>\n    <meta charset=\"UTF-8\">\n    <style>\n      *,\n      *::before,\n      *::after {\n        box-sizing: border-box;\n      }\n\n      body {\n        --lch-black: 0% 0 0;\n        --lch-gray: 75% 0.005 96;\n        --lch-white: 100% 0 0;\n\n        --color-border: oklch(var(--lch-gray));\n        --color-bg: oklch(var(--lch-white));\n        --color-text: oklch(var(--lch-black));\n\n        --btn-size: 2.65em;\n\n        background-color: var(--color-bg);\n        block-size: 100dvh;\n        color: var(--color-text);\n        display: grid;\n        margin: 0;\n        padding: 0;\n        place-items: center;\n        font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\";\n\n        @media (prefers-color-scheme: dark) {\n          --lch-black: 100% 0 0;\n          --lch-gray: 44.95% 0 0;\n          --lch-white: 0% 0 0;\n        }\n      }\n\n      svg {\n        fill: var(--color-text);\n\n        @media (prefers-color-scheme: dark) {\n          fill: var(--color-text);\n        }\n      }\n\n      .error {\n        align-items: center;\n        display: flex;\n        flex-direction: column;\n        gap: 2em;\n        justify-content: start;\n        margin-block-end: 15dvh;\n      }\n\n      .error__img {\n        aspect-ratio: 1;\n        background-color: var(--color-text);\n        block-size: auto;\n        border-radius: 50%;\n        display: grid;\n        place-items: center;\n        inline-size: 30dvh;\n\n        svg {\n          fill: var(--color-bg);\n          grid-area: 1/1;\n          max-inline-size: 66%;\n\n          @media (prefers-color-scheme: dark) {\n            fill: var(--color-bg);\n          }\n        }\n      }\n\n      .buttons {\n        display: flex;\n        flex-direction: row;\n        gap: 1em;\n        justify-content: center;\n      }\n\n      .btn {\n        align-items: center;\n        aspect-ratio: 1;\n        background-color: var(--color-bg);\n        block-size: var(--btn-size);\n        border-radius: 50%;\n        border: 1px solid var(--color-border);\n        color: var(--color-text);\n        cursor: pointer;\n        display: grid;\n        font-weight: 600;\n        font-size: 1.4rem;\n        gap: 0.5em;\n        inline-size: var(--btn-size);\n        justify-content: center;\n        padding: 0;\n        place-items: center;\n        text-align: center;\n\n        svg {\n          -webkit-touch-callout: none;\n          grid-area: 1/1;\n          inline-size: 1.3em;\n          max-inline-size: unset;\n          user-select: none;\n        }\n      }\n\n      .for-screen-reader {\n        clip-path: inset(50%);\n        height: 1px;\n        width: 1px;\n        overflow: hidden;\n        position: absolute;\n        white-space: nowrap;\n      }\n    </style>\n  </head>\n\n  <body>\n    <div class=\"error\">\n      <div class=\"error__img\">\n        <svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" aria-label=\"Server error\">\n          <title>server-warning</title>\n          <path\n            d=\"M2.5,6h17A2.5,2.5,0,0,0,22,3.5v-1A2.5,2.5,0,0,0,19.5,0H2.5A2.5,2.5,0,0,0,0,2.5v1A2.5,2.5,0,0,0,2.5,6ZM3.635,3A1.115,1.115,0,1,1,4.749,4.114,1.114,1.114,0,0,1,3.635,3ZM7.5,3A1.115,1.115,0,1,1,8.614,4.114,1.115,1.115,0,0,1,7.5,3Z\" />\n          <path\n            d=\"M14.892,11.574a2.952,2.952,0,0,1,3.339-1.486,3.061,3.061,0,0,1,1.934,1.59l.26.495a.5.5,0,0,0,.765.154A2.468,2.468,0,0,0,22,10.5v-1A2.5,2.5,0,0,0,19.5,7H2.5A2.5,2.5,0,0,0,0,9.5v1A2.5,2.5,0,0,0,2.5,13H13.842a.5.5,0,0,0,.442-.268ZM9.729,10A1.115,1.115,0,1,1,8.614,8.885,1.115,1.115,0,0,1,9.729,10ZM5.864,10A1.115,1.115,0,1,1,4.749,8.885,1.115,1.115,0,0,1,5.864,10Z\" />\n          <path\n            d=\"M2.5,20h7.67a.5.5,0,0,0,.442-.268l2.624-5A.5.5,0,0,0,12.792,14H2.5A2.5,2.5,0,0,0,0,16.5v1A2.5,2.5,0,0,0,2.5,20Zm1.136-3a1.115,1.115,0,1,1,1.114,1.115A1.114,1.114,0,0,1,3.635,17ZM7.5,17a1.115,1.115,0,1,1,1.115,1.115A1.115,1.115,0,0,1,7.5,17Z\" />\n          <path\n            d=\"M11.165,21.905a1.429,1.429,0,0,0,.048,1.408A1.453,1.453,0,0,0,12.446,24H22.558a1.455,1.455,0,0,0,1.232-.687,1.429,1.429,0,0,0,.048-1.408l-5.055-9.634a1.45,1.45,0,0,0-2.562,0ZM17.5,14.75a.75.75,0,0,1,.75.75v3a.75.75,0,0,1-1.5,0v-3A.75.75,0,0,1,17.5,14.75Zm1,6.5a1,1,0,1,1-1-1A1,1,0,0,1,18.5,21.25Z\" />\n        </svg>\n      </div>\n      <a href=\"/\" class=\"btn\" autofocus=\"true\">\n        <svg viewBox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\">\n          <path\n            d=\"m21.864 9.5h-11.607a.25.25 0 0 1 -.174-.43l3.864-3.721a2.609 2.609 0 0 0 -.075-3.682 2.612 2.612 0 0 0 -3.68-.077l-9.792 9.699a1 1 0 0 0 -.008 1.411l9.625 9.724a2.66 2.66 0 0 0 3.755-3.757l-3.729-3.733a.25.25 0 0 1 .177-.427h11.673c1.556 0 2-1.675 2-2.51a2.28 2.28 0 0 0 -2.029-2.497z\" />\n        </svg>\n        <span class=\"for-screen-reader\">Go back</span>\n      </a>\n    </div>\n  </body>\n</html>\n"
+  },
+  "POST /account/bots.json missing": {
+    "status": 400,
+    "type": "application/json; charset=UTF-8",
+    "body": {
+      "status": 400,
+      "error": "Bad Request"
+    }
+  },
+  "POST /account/bots.json blank": {
+    "status": 400,
+    "type": "application/json; charset=UTF-8",
+    "body": {
+      "status": 400,
+      "error": "Bad Request"
+    }
+  },
+  "POST /account/bots.json space": {
+    "status": 400,
+    "type": "application/json; charset=UTF-8",
+    "body": {
+      "status": 400,
+      "error": "Bad Request"
+    }
+  },
+  "POST /account/bots.json array": {
+    "status": 500,
+    "type": "application/json; charset=UTF-8",
+    "body": {
+      "status": 500,
+      "error": "Internal Server Error"
+    }
+  },
+  "POST /account/bots.json scalar": {
+    "status": 500,
+    "type": "application/json; charset=UTF-8",
+    "body": {
+      "status": 500,
+      "error": "Internal Server Error"
+    }
+  },
+  "POST /account/bots.xml missing": {
+    "status": 400,
+    "type": "application/xml; charset=UTF-8",
+    "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<hash>\n  <status type=\"integer\">400</status>\n  <error>Bad Request</error>\n</hash>\n"
+  },
+  "POST /account/bots.xml blank": {
+    "status": 400,
+    "type": "application/xml; charset=UTF-8",
+    "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<hash>\n  <status type=\"integer\">400</status>\n  <error>Bad Request</error>\n</hash>\n"
+  },
+  "POST /account/bots.xml space": {
+    "status": 400,
+    "type": "application/xml; charset=UTF-8",
+    "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<hash>\n  <status type=\"integer\">400</status>\n  <error>Bad Request</error>\n</hash>\n"
+  },
+  "POST /account/bots.xml array": {
+    "status": 500,
+    "type": "application/xml; charset=UTF-8",
+    "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<hash>\n  <status type=\"integer\">500</status>\n  <error>Internal Server Error</error>\n</hash>\n"
+  },
+  "POST /account/bots.xml scalar": {
+    "status": 500,
+    "type": "application/xml; charset=UTF-8",
+    "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<hash>\n  <status type=\"integer\">500</status>\n  <error>Internal Server Error</error>\n</hash>\n"
+  },
+  "POST /rooms/opens.html missing": {
+    "status": 400,
+    "type": "text/html; charset=UTF-8",
+    "body": ""
+  },
+  "POST /rooms/opens.html blank": {
+    "status": 400,
+    "type": "text/html; charset=UTF-8",
+    "body": ""
+  },
+  "POST /rooms/opens.html space": {
+    "status": 400,
+    "type": "text/html; charset=UTF-8",
+    "body": ""
+  },
+  "POST /rooms/opens.html array": {
+    "status": 500,
+    "type": "text/html; charset=UTF-8",
+    "body": "<!DOCTYPE html>\n<html>\n  <head>\n    <title>Something went wrong (500)</title>\n    <meta charset=\"UTF-8\">\n    <style>\n      *,\n      *::before,\n      *::after {\n        box-sizing: border-box;\n      }\n\n      body {\n        --lch-black: 0% 0 0;\n        --lch-gray: 75% 0.005 96;\n        --lch-white: 100% 0 0;\n\n        --color-border: oklch(var(--lch-gray));\n        --color-bg: oklch(var(--lch-white));\n        --color-text: oklch(var(--lch-black));\n\n        --btn-size: 2.65em;\n\n        background-color: var(--color-bg);\n        block-size: 100dvh;\n        color: var(--color-text);\n        display: grid;\n        margin: 0;\n        padding: 0;\n        place-items: center;\n        font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\";\n\n        @media (prefers-color-scheme: dark) {\n          --lch-black: 100% 0 0;\n          --lch-gray: 44.95% 0 0;\n          --lch-white: 0% 0 0;\n        }\n      }\n\n      svg {\n        fill: var(--color-text);\n\n        @media (prefers-color-scheme: dark) {\n          fill: var(--color-text);\n        }\n      }\n\n      .error {\n        align-items: center;\n        display: flex;\n        flex-direction: column;\n        gap: 2em;\n        justify-content: start;\n        margin-block-end: 15dvh;\n      }\n\n      .error__img {\n        aspect-ratio: 1;\n        background-color: var(--color-text);\n        block-size: auto;\n        border-radius: 50%;\n        display: grid;\n        place-items: center;\n        inline-size: 30dvh;\n\n        svg {\n          fill: var(--color-bg);\n          grid-area: 1/1;\n          max-inline-size: 66%;\n\n          @media (prefers-color-scheme: dark) {\n            fill: var(--color-bg);\n          }\n        }\n      }\n\n      .buttons {\n        display: flex;\n        flex-direction: row;\n        gap: 1em;\n        justify-content: center;\n      }\n\n      .btn {\n        align-items: center;\n        aspect-ratio: 1;\n        background-color: var(--color-bg);\n        block-size: var(--btn-size);\n        border-radius: 50%;\n        border: 1px solid var(--color-border);\n        color: var(--color-text);\n        cursor: pointer;\n        display: grid;\n        font-weight: 600;\n        font-size: 1.4rem;\n        gap: 0.5em;\n        inline-size: var(--btn-size);\n        justify-content: center;\n        padding: 0;\n        place-items: center;\n        text-align: center;\n\n        svg {\n          -webkit-touch-callout: none;\n          grid-area: 1/1;\n          inline-size: 1.3em;\n          max-inline-size: unset;\n          user-select: none;\n        }\n      }\n\n      .for-screen-reader {\n        clip-path: inset(50%);\n        height: 1px;\n        width: 1px;\n        overflow: hidden;\n        position: absolute;\n        white-space: nowrap;\n      }\n    </style>\n  </head>\n\n  <body>\n    <div class=\"error\">\n      <div class=\"error__img\">\n        <svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" aria-label=\"Server error\">\n          <title>server-warning</title>\n          <path\n            d=\"M2.5,6h17A2.5,2.5,0,0,0,22,3.5v-1A2.5,2.5,0,0,0,19.5,0H2.5A2.5,2.5,0,0,0,0,2.5v1A2.5,2.5,0,0,0,2.5,6ZM3.635,3A1.115,1.115,0,1,1,4.749,4.114,1.114,1.114,0,0,1,3.635,3ZM7.5,3A1.115,1.115,0,1,1,8.614,4.114,1.115,1.115,0,0,1,7.5,3Z\" />\n          <path\n            d=\"M14.892,11.574a2.952,2.952,0,0,1,3.339-1.486,3.061,3.061,0,0,1,1.934,1.59l.26.495a.5.5,0,0,0,.765.154A2.468,2.468,0,0,0,22,10.5v-1A2.5,2.5,0,0,0,19.5,7H2.5A2.5,2.5,0,0,0,0,9.5v1A2.5,2.5,0,0,0,2.5,13H13.842a.5.5,0,0,0,.442-.268ZM9.729,10A1.115,1.115,0,1,1,8.614,8.885,1.115,1.115,0,0,1,9.729,10ZM5.864,10A1.115,1.115,0,1,1,4.749,8.885,1.115,1.115,0,0,1,5.864,10Z\" />\n          <path\n            d=\"M2.5,20h7.67a.5.5,0,0,0,.442-.268l2.624-5A.5.5,0,0,0,12.792,14H2.5A2.5,2.5,0,0,0,0,16.5v1A2.5,2.5,0,0,0,2.5,20Zm1.136-3a1.115,1.115,0,1,1,1.114,1.115A1.114,1.114,0,0,1,3.635,17ZM7.5,17a1.115,1.115,0,1,1,1.115,1.115A1.115,1.115,0,0,1,7.5,17Z\" />\n          <path\n            d=\"M11.165,21.905a1.429,1.429,0,0,0,.048,1.408A1.453,1.453,0,0,0,12.446,24H22.558a1.455,1.455,0,0,0,1.232-.687,1.429,1.429,0,0,0,.048-1.408l-5.055-9.634a1.45,1.45,0,0,0-2.562,0ZM17.5,14.75a.75.75,0,0,1,.75.75v3a.75.75,0,0,1-1.5,0v-3A.75.75,0,0,1,17.5,14.75Zm1,6.5a1,1,0,1,1-1-1A1,1,0,0,1,18.5,21.25Z\" />\n        </svg>\n      </div>\n      <a href=\"/\" class=\"btn\" autofocus=\"true\">\n        <svg viewBox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\">\n          <path\n            d=\"m21.864 9.5h-11.607a.25.25 0 0 1 -.174-.43l3.864-3.721a2.609 2.609 0 0 0 -.075-3.682 2.612 2.612 0 0 0 -3.68-.077l-9.792 9.699a1 1 0 0 0 -.008 1.411l9.625 9.724a2.66 2.66 0 0 0 3.755-3.757l-3.729-3.733a.25.25 0 0 1 .177-.427h11.673c1.556 0 2-1.675 2-2.51a2.28 2.28 0 0 0 -2.029-2.497z\" />\n        </svg>\n        <span class=\"for-screen-reader\">Go back</span>\n      </a>\n    </div>\n  </body>\n</html>\n"
+  },
+  "POST /rooms/opens.html scalar": {
+    "status": 500,
+    "type": "text/html; charset=UTF-8",
+    "body": "<!DOCTYPE html>\n<html>\n  <head>\n    <title>Something went wrong (500)</title>\n    <meta charset=\"UTF-8\">\n    <style>\n      *,\n      *::before,\n      *::after {\n        box-sizing: border-box;\n      }\n\n      body {\n        --lch-black: 0% 0 0;\n        --lch-gray: 75% 0.005 96;\n        --lch-white: 100% 0 0;\n\n        --color-border: oklch(var(--lch-gray));\n        --color-bg: oklch(var(--lch-white));\n        --color-text: oklch(var(--lch-black));\n\n        --btn-size: 2.65em;\n\n        background-color: var(--color-bg);\n        block-size: 100dvh;\n        color: var(--color-text);\n        display: grid;\n        margin: 0;\n        padding: 0;\n        place-items: center;\n        font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\";\n\n        @media (prefers-color-scheme: dark) {\n          --lch-black: 100% 0 0;\n          --lch-gray: 44.95% 0 0;\n          --lch-white: 0% 0 0;\n        }\n      }\n\n      svg {\n        fill: var(--color-text);\n\n        @media (prefers-color-scheme: dark) {\n          fill: var(--color-text);\n        }\n      }\n\n      .error {\n        align-items: center;\n        display: flex;\n        flex-direction: column;\n        gap: 2em;\n        justify-content: start;\n        margin-block-end: 15dvh;\n      }\n\n      .error__img {\n        aspect-ratio: 1;\n        background-color: var(--color-text);\n        block-size: auto;\n        border-radius: 50%;\n        display: grid;\n        place-items: center;\n        inline-size: 30dvh;\n\n        svg {\n          fill: var(--color-bg);\n          grid-area: 1/1;\n          max-inline-size: 66%;\n\n          @media (prefers-color-scheme: dark) {\n            fill: var(--color-bg);\n          }\n        }\n      }\n\n      .buttons {\n        display: flex;\n        flex-direction: row;\n        gap: 1em;\n        justify-content: center;\n      }\n\n      .btn {\n        align-items: center;\n        aspect-ratio: 1;\n        background-color: var(--color-bg);\n        block-size: var(--btn-size);\n        border-radius: 50%;\n        border: 1px solid var(--color-border);\n        color: var(--color-text);\n        cursor: pointer;\n        display: grid;\n        font-weight: 600;\n        font-size: 1.4rem;\n        gap: 0.5em;\n        inline-size: var(--btn-size);\n        justify-content: center;\n        padding: 0;\n        place-items: center;\n        text-align: center;\n\n        svg {\n          -webkit-touch-callout: none;\n          grid-area: 1/1;\n          inline-size: 1.3em;\n          max-inline-size: unset;\n          user-select: none;\n        }\n      }\n\n      .for-screen-reader {\n        clip-path: inset(50%);\n        height: 1px;\n        width: 1px;\n        overflow: hidden;\n        position: absolute;\n        white-space: nowrap;\n      }\n    </style>\n  </head>\n\n  <body>\n    <div class=\"error\">\n      <div class=\"error__img\">\n        <svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" aria-label=\"Server error\">\n          <title>server-warning</title>\n          <path\n            d=\"M2.5,6h17A2.5,2.5,0,0,0,22,3.5v-1A2.5,2.5,0,0,0,19.5,0H2.5A2.5,2.5,0,0,0,0,2.5v1A2.5,2.5,0,0,0,2.5,6ZM3.635,3A1.115,1.115,0,1,1,4.749,4.114,1.114,1.114,0,0,1,3.635,3ZM7.5,3A1.115,1.115,0,1,1,8.614,4.114,1.115,1.115,0,0,1,7.5,3Z\" />\n          <path\n            d=\"M14.892,11.574a2.952,2.952,0,0,1,3.339-1.486,3.061,3.061,0,0,1,1.934,1.59l.26.495a.5.5,0,0,0,.765.154A2.468,2.468,0,0,0,22,10.5v-1A2.5,2.5,0,0,0,19.5,7H2.5A2.5,2.5,0,0,0,0,9.5v1A2.5,2.5,0,0,0,2.5,13H13.842a.5.5,0,0,0,.442-.268ZM9.729,10A1.115,1.115,0,1,1,8.614,8.885,1.115,1.115,0,0,1,9.729,10ZM5.864,10A1.115,1.115,0,1,1,4.749,8.885,1.115,1.115,0,0,1,5.864,10Z\" />\n          <path\n            d=\"M2.5,20h7.67a.5.5,0,0,0,.442-.268l2.624-5A.5.5,0,0,0,12.792,14H2.5A2.5,2.5,0,0,0,0,16.5v1A2.5,2.5,0,0,0,2.5,20Zm1.136-3a1.115,1.115,0,1,1,1.114,1.115A1.114,1.114,0,0,1,3.635,17ZM7.5,17a1.115,1.115,0,1,1,1.115,1.115A1.115,1.115,0,0,1,7.5,17Z\" />\n          <path\n            d=\"M11.165,21.905a1.429,1.429,0,0,0,.048,1.408A1.453,1.453,0,0,0,12.446,24H22.558a1.455,1.455,0,0,0,1.232-.687,1.429,1.429,0,0,0,.048-1.408l-5.055-9.634a1.45,1.45,0,0,0-2.562,0ZM17.5,14.75a.75.75,0,0,1,.75.75v3a.75.75,0,0,1-1.5,0v-3A.75.75,0,0,1,17.5,14.75Zm1,6.5a1,1,0,1,1-1-1A1,1,0,0,1,18.5,21.25Z\" />\n        </svg>\n      </div>\n      <a href=\"/\" class=\"btn\" autofocus=\"true\">\n        <svg viewBox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\">\n          <path\n            d=\"m21.864 9.5h-11.607a.25.25 0 0 1 -.174-.43l3.864-3.721a2.609 2.609 0 0 0 -.075-3.682 2.612 2.612 0 0 0 -3.68-.077l-9.792 9.699a1 1 0 0 0 -.008 1.411l9.625 9.724a2.66 2.66 0 0 0 3.755-3.757l-3.729-3.733a.25.25 0 0 1 .177-.427h11.673c1.556 0 2-1.675 2-2.51a2.28 2.28 0 0 0 -2.029-2.497z\" />\n        </svg>\n        <span class=\"for-screen-reader\">Go back</span>\n      </a>\n    </div>\n  </body>\n</html>\n"
+  },
+  "POST /rooms/opens.json missing": {
+    "status": 400,
+    "type": "application/json; charset=UTF-8",
+    "body": {
+      "status": 400,
+      "error": "Bad Request"
+    }
+  },
+  "POST /rooms/opens.json blank": {
+    "status": 400,
+    "type": "application/json; charset=UTF-8",
+    "body": {
+      "status": 400,
+      "error": "Bad Request"
+    }
+  },
+  "POST /rooms/opens.json space": {
+    "status": 400,
+    "type": "application/json; charset=UTF-8",
+    "body": {
+      "status": 400,
+      "error": "Bad Request"
+    }
+  },
+  "POST /rooms/opens.json array": {
+    "status": 500,
+    "type": "application/json; charset=UTF-8",
+    "body": {
+      "status": 500,
+      "error": "Internal Server Error"
+    }
+  },
+  "POST /rooms/opens.json scalar": {
+    "status": 500,
+    "type": "application/json; charset=UTF-8",
+    "body": {
+      "status": 500,
+      "error": "Internal Server Error"
+    }
+  },
+  "POST /rooms/opens.xml missing": {
+    "status": 400,
+    "type": "application/xml; charset=UTF-8",
+    "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<hash>\n  <status type=\"integer\">400</status>\n  <error>Bad Request</error>\n</hash>\n"
+  },
+  "POST /rooms/opens.xml blank": {
+    "status": 400,
+    "type": "application/xml; charset=UTF-8",
+    "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<hash>\n  <status type=\"integer\">400</status>\n  <error>Bad Request</error>\n</hash>\n"
+  },
+  "POST /rooms/opens.xml space": {
+    "status": 400,
+    "type": "application/xml; charset=UTF-8",
+    "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<hash>\n  <status type=\"integer\">400</status>\n  <error>Bad Request</error>\n</hash>\n"
+  },
+  "POST /rooms/opens.xml array": {
+    "status": 500,
+    "type": "application/xml; charset=UTF-8",
+    "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<hash>\n  <status type=\"integer\">500</status>\n  <error>Internal Server Error</error>\n</hash>\n"
+  },
+  "POST /rooms/opens.xml scalar": {
+    "status": 500,
+    "type": "application/xml; charset=UTF-8",
+    "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<hash>\n  <status type=\"integer\">500</status>\n  <error>Internal Server Error</error>\n</hash>\n"
+  },
+  "POST /rooms/closeds.html missing": {
+    "status": 400,
+    "type": "text/html; charset=UTF-8",
+    "body": ""
+  },
+  "POST /rooms/closeds.html blank": {
+    "status": 400,
+    "type": "text/html; charset=UTF-8",
+    "body": ""
+  },
+  "POST /rooms/closeds.html space": {
+    "status": 400,
+    "type": "text/html; charset=UTF-8",
+    "body": ""
+  },
+  "POST /rooms/closeds.html array": {
+    "status": 500,
+    "type": "text/html; charset=UTF-8",
+    "body": "<!DOCTYPE html>\n<html>\n  <head>\n    <title>Something went wrong (500)</title>\n    <meta charset=\"UTF-8\">\n    <style>\n      *,\n      *::before,\n      *::after {\n        box-sizing: border-box;\n      }\n\n      body {\n        --lch-black: 0% 0 0;\n        --lch-gray: 75% 0.005 96;\n        --lch-white: 100% 0 0;\n\n        --color-border: oklch(var(--lch-gray));\n        --color-bg: oklch(var(--lch-white));\n        --color-text: oklch(var(--lch-black));\n\n        --btn-size: 2.65em;\n\n        background-color: var(--color-bg);\n        block-size: 100dvh;\n        color: var(--color-text);\n        display: grid;\n        margin: 0;\n        padding: 0;\n        place-items: center;\n        font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\";\n\n        @media (prefers-color-scheme: dark) {\n          --lch-black: 100% 0 0;\n          --lch-gray: 44.95% 0 0;\n          --lch-white: 0% 0 0;\n        }\n      }\n\n      svg {\n        fill: var(--color-text);\n\n        @media (prefers-color-scheme: dark) {\n          fill: var(--color-text);\n        }\n      }\n\n      .error {\n        align-items: center;\n        display: flex;\n        flex-direction: column;\n        gap: 2em;\n        justify-content: start;\n        margin-block-end: 15dvh;\n      }\n\n      .error__img {\n        aspect-ratio: 1;\n        background-color: var(--color-text);\n        block-size: auto;\n        border-radius: 50%;\n        display: grid;\n        place-items: center;\n        inline-size: 30dvh;\n\n        svg {\n          fill: var(--color-bg);\n          grid-area: 1/1;\n          max-inline-size: 66%;\n\n          @media (prefers-color-scheme: dark) {\n            fill: var(--color-bg);\n          }\n        }\n      }\n\n      .buttons {\n        display: flex;\n        flex-direction: row;\n        gap: 1em;\n        justify-content: center;\n      }\n\n      .btn {\n        align-items: center;\n        aspect-ratio: 1;\n        background-color: var(--color-bg);\n        block-size: var(--btn-size);\n        border-radius: 50%;\n        border: 1px solid var(--color-border);\n        color: var(--color-text);\n        cursor: pointer;\n        display: grid;\n        font-weight: 600;\n        font-size: 1.4rem;\n        gap: 0.5em;\n        inline-size: var(--btn-size);\n        justify-content: center;\n        padding: 0;\n        place-items: center;\n        text-align: center;\n\n        svg {\n          -webkit-touch-callout: none;\n          grid-area: 1/1;\n          inline-size: 1.3em;\n          max-inline-size: unset;\n          user-select: none;\n        }\n      }\n\n      .for-screen-reader {\n        clip-path: inset(50%);\n        height: 1px;\n        width: 1px;\n        overflow: hidden;\n        position: absolute;\n        white-space: nowrap;\n      }\n    </style>\n  </head>\n\n  <body>\n    <div class=\"error\">\n      <div class=\"error__img\">\n        <svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" aria-label=\"Server error\">\n          <title>server-warning</title>\n          <path\n            d=\"M2.5,6h17A2.5,2.5,0,0,0,22,3.5v-1A2.5,2.5,0,0,0,19.5,0H2.5A2.5,2.5,0,0,0,0,2.5v1A2.5,2.5,0,0,0,2.5,6ZM3.635,3A1.115,1.115,0,1,1,4.749,4.114,1.114,1.114,0,0,1,3.635,3ZM7.5,3A1.115,1.115,0,1,1,8.614,4.114,1.115,1.115,0,0,1,7.5,3Z\" />\n          <path\n            d=\"M14.892,11.574a2.952,2.952,0,0,1,3.339-1.486,3.061,3.061,0,0,1,1.934,1.59l.26.495a.5.5,0,0,0,.765.154A2.468,2.468,0,0,0,22,10.5v-1A2.5,2.5,0,0,0,19.5,7H2.5A2.5,2.5,0,0,0,0,9.5v1A2.5,2.5,0,0,0,2.5,13H13.842a.5.5,0,0,0,.442-.268ZM9.729,10A1.115,1.115,0,1,1,8.614,8.885,1.115,1.115,0,0,1,9.729,10ZM5.864,10A1.115,1.115,0,1,1,4.749,8.885,1.115,1.115,0,0,1,5.864,10Z\" />\n          <path\n            d=\"M2.5,20h7.67a.5.5,0,0,0,.442-.268l2.624-5A.5.5,0,0,0,12.792,14H2.5A2.5,2.5,0,0,0,0,16.5v1A2.5,2.5,0,0,0,2.5,20Zm1.136-3a1.115,1.115,0,1,1,1.114,1.115A1.114,1.114,0,0,1,3.635,17ZM7.5,17a1.115,1.115,0,1,1,1.115,1.115A1.115,1.115,0,0,1,7.5,17Z\" />\n          <path\n            d=\"M11.165,21.905a1.429,1.429,0,0,0,.048,1.408A1.453,1.453,0,0,0,12.446,24H22.558a1.455,1.455,0,0,0,1.232-.687,1.429,1.429,0,0,0,.048-1.408l-5.055-9.634a1.45,1.45,0,0,0-2.562,0ZM17.5,14.75a.75.75,0,0,1,.75.75v3a.75.75,0,0,1-1.5,0v-3A.75.75,0,0,1,17.5,14.75Zm1,6.5a1,1,0,1,1-1-1A1,1,0,0,1,18.5,21.25Z\" />\n        </svg>\n      </div>\n      <a href=\"/\" class=\"btn\" autofocus=\"true\">\n        <svg viewBox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\">\n          <path\n            d=\"m21.864 9.5h-11.607a.25.25 0 0 1 -.174-.43l3.864-3.721a2.609 2.609 0 0 0 -.075-3.682 2.612 2.612 0 0 0 -3.68-.077l-9.792 9.699a1 1 0 0 0 -.008 1.411l9.625 9.724a2.66 2.66 0 0 0 3.755-3.757l-3.729-3.733a.25.25 0 0 1 .177-.427h11.673c1.556 0 2-1.675 2-2.51a2.28 2.28 0 0 0 -2.029-2.497z\" />\n        </svg>\n        <span class=\"for-screen-reader\">Go back</span>\n      </a>\n    </div>\n  </body>\n</html>\n"
+  },
+  "POST /rooms/closeds.html scalar": {
+    "status": 500,
+    "type": "text/html; charset=UTF-8",
+    "body": "<!DOCTYPE html>\n<html>\n  <head>\n    <title>Something went wrong (500)</title>\n    <meta charset=\"UTF-8\">\n    <style>\n      *,\n      *::before,\n      *::after {\n        box-sizing: border-box;\n      }\n\n      body {\n        --lch-black: 0% 0 0;\n        --lch-gray: 75% 0.005 96;\n        --lch-white: 100% 0 0;\n\n        --color-border: oklch(var(--lch-gray));\n        --color-bg: oklch(var(--lch-white));\n        --color-text: oklch(var(--lch-black));\n\n        --btn-size: 2.65em;\n\n        background-color: var(--color-bg);\n        block-size: 100dvh;\n        color: var(--color-text);\n        display: grid;\n        margin: 0;\n        padding: 0;\n        place-items: center;\n        font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\";\n\n        @media (prefers-color-scheme: dark) {\n          --lch-black: 100% 0 0;\n          --lch-gray: 44.95% 0 0;\n          --lch-white: 0% 0 0;\n        }\n      }\n\n      svg {\n        fill: var(--color-text);\n\n        @media (prefers-color-scheme: dark) {\n          fill: var(--color-text);\n        }\n      }\n\n      .error {\n        align-items: center;\n        display: flex;\n        flex-direction: column;\n        gap: 2em;\n        justify-content: start;\n        margin-block-end: 15dvh;\n      }\n\n      .error__img {\n        aspect-ratio: 1;\n        background-color: var(--color-text);\n        block-size: auto;\n        border-radius: 50%;\n        display: grid;\n        place-items: center;\n        inline-size: 30dvh;\n\n        svg {\n          fill: var(--color-bg);\n          grid-area: 1/1;\n          max-inline-size: 66%;\n\n          @media (prefers-color-scheme: dark) {\n            fill: var(--color-bg);\n          }\n        }\n      }\n\n      .buttons {\n        display: flex;\n        flex-direction: row;\n        gap: 1em;\n        justify-content: center;\n      }\n\n      .btn {\n        align-items: center;\n        aspect-ratio: 1;\n        background-color: var(--color-bg);\n        block-size: var(--btn-size);\n        border-radius: 50%;\n        border: 1px solid var(--color-border);\n        color: var(--color-text);\n        cursor: pointer;\n        display: grid;\n        font-weight: 600;\n        font-size: 1.4rem;\n        gap: 0.5em;\n        inline-size: var(--btn-size);\n        justify-content: center;\n        padding: 0;\n        place-items: center;\n        text-align: center;\n\n        svg {\n          -webkit-touch-callout: none;\n          grid-area: 1/1;\n          inline-size: 1.3em;\n          max-inline-size: unset;\n          user-select: none;\n        }\n      }\n\n      .for-screen-reader {\n        clip-path: inset(50%);\n        height: 1px;\n        width: 1px;\n        overflow: hidden;\n        position: absolute;\n        white-space: nowrap;\n      }\n    </style>\n  </head>\n\n  <body>\n    <div class=\"error\">\n      <div class=\"error__img\">\n        <svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" aria-label=\"Server error\">\n          <title>server-warning</title>\n          <path\n            d=\"M2.5,6h17A2.5,2.5,0,0,0,22,3.5v-1A2.5,2.5,0,0,0,19.5,0H2.5A2.5,2.5,0,0,0,0,2.5v1A2.5,2.5,0,0,0,2.5,6ZM3.635,3A1.115,1.115,0,1,1,4.749,4.114,1.114,1.114,0,0,1,3.635,3ZM7.5,3A1.115,1.115,0,1,1,8.614,4.114,1.115,1.115,0,0,1,7.5,3Z\" />\n          <path\n            d=\"M14.892,11.574a2.952,2.952,0,0,1,3.339-1.486,3.061,3.061,0,0,1,1.934,1.59l.26.495a.5.5,0,0,0,.765.154A2.468,2.468,0,0,0,22,10.5v-1A2.5,2.5,0,0,0,19.5,7H2.5A2.5,2.5,0,0,0,0,9.5v1A2.5,2.5,0,0,0,2.5,13H13.842a.5.5,0,0,0,.442-.268ZM9.729,10A1.115,1.115,0,1,1,8.614,8.885,1.115,1.115,0,0,1,9.729,10ZM5.864,10A1.115,1.115,0,1,1,4.749,8.885,1.115,1.115,0,0,1,5.864,10Z\" />\n          <path\n            d=\"M2.5,20h7.67a.5.5,0,0,0,.442-.268l2.624-5A.5.5,0,0,0,12.792,14H2.5A2.5,2.5,0,0,0,0,16.5v1A2.5,2.5,0,0,0,2.5,20Zm1.136-3a1.115,1.115,0,1,1,1.114,1.115A1.114,1.114,0,0,1,3.635,17ZM7.5,17a1.115,1.115,0,1,1,1.115,1.115A1.115,1.115,0,0,1,7.5,17Z\" />\n          <path\n            d=\"M11.165,21.905a1.429,1.429,0,0,0,.048,1.408A1.453,1.453,0,0,0,12.446,24H22.558a1.455,1.455,0,0,0,1.232-.687,1.429,1.429,0,0,0,.048-1.408l-5.055-9.634a1.45,1.45,0,0,0-2.562,0ZM17.5,14.75a.75.75,0,0,1,.75.75v3a.75.75,0,0,1-1.5,0v-3A.75.75,0,0,1,17.5,14.75Zm1,6.5a1,1,0,1,1-1-1A1,1,0,0,1,18.5,21.25Z\" />\n        </svg>\n      </div>\n      <a href=\"/\" class=\"btn\" autofocus=\"true\">\n        <svg viewBox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\">\n          <path\n            d=\"m21.864 9.5h-11.607a.25.25 0 0 1 -.174-.43l3.864-3.721a2.609 2.609 0 0 0 -.075-3.682 2.612 2.612 0 0 0 -3.68-.077l-9.792 9.699a1 1 0 0 0 -.008 1.411l9.625 9.724a2.66 2.66 0 0 0 3.755-3.757l-3.729-3.733a.25.25 0 0 1 .177-.427h11.673c1.556 0 2-1.675 2-2.51a2.28 2.28 0 0 0 -2.029-2.497z\" />\n        </svg>\n        <span class=\"for-screen-reader\">Go back</span>\n      </a>\n    </div>\n  </body>\n</html>\n"
+  },
+  "POST /rooms/closeds.json missing": {
+    "status": 400,
+    "type": "application/json; charset=UTF-8",
+    "body": {
+      "status": 400,
+      "error": "Bad Request"
+    }
+  },
+  "POST /rooms/closeds.json blank": {
+    "status": 400,
+    "type": "application/json; charset=UTF-8",
+    "body": {
+      "status": 400,
+      "error": "Bad Request"
+    }
+  },
+  "POST /rooms/closeds.json space": {
+    "status": 400,
+    "type": "application/json; charset=UTF-8",
+    "body": {
+      "status": 400,
+      "error": "Bad Request"
+    }
+  },
+  "POST /rooms/closeds.json array": {
+    "status": 500,
+    "type": "application/json; charset=UTF-8",
+    "body": {
+      "status": 500,
+      "error": "Internal Server Error"
+    }
+  },
+  "POST /rooms/closeds.json scalar": {
+    "status": 500,
+    "type": "application/json; charset=UTF-8",
+    "body": {
+      "status": 500,
+      "error": "Internal Server Error"
+    }
+  },
+  "POST /rooms/closeds.xml missing": {
+    "status": 400,
+    "type": "application/xml; charset=UTF-8",
+    "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<hash>\n  <status type=\"integer\">400</status>\n  <error>Bad Request</error>\n</hash>\n"
+  },
+  "POST /rooms/closeds.xml blank": {
+    "status": 400,
+    "type": "application/xml; charset=UTF-8",
+    "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<hash>\n  <status type=\"integer\">400</status>\n  <error>Bad Request</error>\n</hash>\n"
+  },
+  "POST /rooms/closeds.xml space": {
+    "status": 400,
+    "type": "application/xml; charset=UTF-8",
+    "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<hash>\n  <status type=\"integer\">400</status>\n  <error>Bad Request</error>\n</hash>\n"
+  },
+  "POST /rooms/closeds.xml array": {
+    "status": 500,
+    "type": "application/xml; charset=UTF-8",
+    "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<hash>\n  <status type=\"integer\">500</status>\n  <error>Internal Server Error</error>\n</hash>\n"
+  },
+  "POST /rooms/closeds.xml scalar": {
+    "status": 500,
+    "type": "application/xml; charset=UTF-8",
+    "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<hash>\n  <status type=\"integer\">500</status>\n  <error>Internal Server Error</error>\n</hash>\n"
+  },
+  "POST /rooms/486777696/messages.html missing": {
+    "status": 400,
+    "type": "text/html; charset=UTF-8",
+    "body": ""
+  },
+  "POST /rooms/486777696/messages.html blank": {
+    "status": 400,
+    "type": "text/html; charset=UTF-8",
+    "body": ""
+  },
+  "POST /rooms/486777696/messages.html space": {
+    "status": 400,
+    "type": "text/html; charset=UTF-8",
+    "body": ""
+  },
+  "POST /rooms/486777696/messages.html array": {
+    "status": 500,
+    "type": "text/html; charset=UTF-8",
+    "body": "<!DOCTYPE html>\n<html>\n  <head>\n    <title>Something went wrong (500)</title>\n    <meta charset=\"UTF-8\">\n    <style>\n      *,\n      *::before,\n      *::after {\n        box-sizing: border-box;\n      }\n\n      body {\n        --lch-black: 0% 0 0;\n        --lch-gray: 75% 0.005 96;\n        --lch-white: 100% 0 0;\n\n        --color-border: oklch(var(--lch-gray));\n        --color-bg: oklch(var(--lch-white));\n        --color-text: oklch(var(--lch-black));\n\n        --btn-size: 2.65em;\n\n        background-color: var(--color-bg);\n        block-size: 100dvh;\n        color: var(--color-text);\n        display: grid;\n        margin: 0;\n        padding: 0;\n        place-items: center;\n        font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\";\n\n        @media (prefers-color-scheme: dark) {\n          --lch-black: 100% 0 0;\n          --lch-gray: 44.95% 0 0;\n          --lch-white: 0% 0 0;\n        }\n      }\n\n      svg {\n        fill: var(--color-text);\n\n        @media (prefers-color-scheme: dark) {\n          fill: var(--color-text);\n        }\n      }\n\n      .error {\n        align-items: center;\n        display: flex;\n        flex-direction: column;\n        gap: 2em;\n        justify-content: start;\n        margin-block-end: 15dvh;\n      }\n\n      .error__img {\n        aspect-ratio: 1;\n        background-color: var(--color-text);\n        block-size: auto;\n        border-radius: 50%;\n        display: grid;\n        place-items: center;\n        inline-size: 30dvh;\n\n        svg {\n          fill: var(--color-bg);\n          grid-area: 1/1;\n          max-inline-size: 66%;\n\n          @media (prefers-color-scheme: dark) {\n            fill: var(--color-bg);\n          }\n        }\n      }\n\n      .buttons {\n        display: flex;\n        flex-direction: row;\n        gap: 1em;\n        justify-content: center;\n      }\n\n      .btn {\n        align-items: center;\n        aspect-ratio: 1;\n        background-color: var(--color-bg);\n        block-size: var(--btn-size);\n        border-radius: 50%;\n        border: 1px solid var(--color-border);\n        color: var(--color-text);\n        cursor: pointer;\n        display: grid;\n        font-weight: 600;\n        font-size: 1.4rem;\n        gap: 0.5em;\n        inline-size: var(--btn-size);\n        justify-content: center;\n        padding: 0;\n        place-items: center;\n        text-align: center;\n\n        svg {\n          -webkit-touch-callout: none;\n          grid-area: 1/1;\n          inline-size: 1.3em;\n          max-inline-size: unset;\n          user-select: none;\n        }\n      }\n\n      .for-screen-reader {\n        clip-path: inset(50%);\n        height: 1px;\n        width: 1px;\n        overflow: hidden;\n        position: absolute;\n        white-space: nowrap;\n      }\n    </style>\n  </head>\n\n  <body>\n    <div class=\"error\">\n      <div class=\"error__img\">\n        <svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" aria-label=\"Server error\">\n          <title>server-warning</title>\n          <path\n            d=\"M2.5,6h17A2.5,2.5,0,0,0,22,3.5v-1A2.5,2.5,0,0,0,19.5,0H2.5A2.5,2.5,0,0,0,0,2.5v1A2.5,2.5,0,0,0,2.5,6ZM3.635,3A1.115,1.115,0,1,1,4.749,4.114,1.114,1.114,0,0,1,3.635,3ZM7.5,3A1.115,1.115,0,1,1,8.614,4.114,1.115,1.115,0,0,1,7.5,3Z\" />\n          <path\n            d=\"M14.892,11.574a2.952,2.952,0,0,1,3.339-1.486,3.061,3.061,0,0,1,1.934,1.59l.26.495a.5.5,0,0,0,.765.154A2.468,2.468,0,0,0,22,10.5v-1A2.5,2.5,0,0,0,19.5,7H2.5A2.5,2.5,0,0,0,0,9.5v1A2.5,2.5,0,0,0,2.5,13H13.842a.5.5,0,0,0,.442-.268ZM9.729,10A1.115,1.115,0,1,1,8.614,8.885,1.115,1.115,0,0,1,9.729,10ZM5.864,10A1.115,1.115,0,1,1,4.749,8.885,1.115,1.115,0,0,1,5.864,10Z\" />\n          <path\n            d=\"M2.5,20h7.67a.5.5,0,0,0,.442-.268l2.624-5A.5.5,0,0,0,12.792,14H2.5A2.5,2.5,0,0,0,0,16.5v1A2.5,2.5,0,0,0,2.5,20Zm1.136-3a1.115,1.115,0,1,1,1.114,1.115A1.114,1.114,0,0,1,3.635,17ZM7.5,17a1.115,1.115,0,1,1,1.115,1.115A1.115,1.115,0,0,1,7.5,17Z\" />\n          <path\n            d=\"M11.165,21.905a1.429,1.429,0,0,0,.048,1.408A1.453,1.453,0,0,0,12.446,24H22.558a1.455,1.455,0,0,0,1.232-.687,1.429,1.429,0,0,0,.048-1.408l-5.055-9.634a1.45,1.45,0,0,0-2.562,0ZM17.5,14.75a.75.75,0,0,1,.75.75v3a.75.75,0,0,1-1.5,0v-3A.75.75,0,0,1,17.5,14.75Zm1,6.5a1,1,0,1,1-1-1A1,1,0,0,1,18.5,21.25Z\" />\n        </svg>\n      </div>\n      <a href=\"/\" class=\"btn\" autofocus=\"true\">\n        <svg viewBox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\">\n          <path\n            d=\"m21.864 9.5h-11.607a.25.25 0 0 1 -.174-.43l3.864-3.721a2.609 2.609 0 0 0 -.075-3.682 2.612 2.612 0 0 0 -3.68-.077l-9.792 9.699a1 1 0 0 0 -.008 1.411l9.625 9.724a2.66 2.66 0 0 0 3.755-3.757l-3.729-3.733a.25.25 0 0 1 .177-.427h11.673c1.556 0 2-1.675 2-2.51a2.28 2.28 0 0 0 -2.029-2.497z\" />\n        </svg>\n        <span class=\"for-screen-reader\">Go back</span>\n      </a>\n    </div>\n  </body>\n</html>\n"
+  },
+  "POST /rooms/486777696/messages.html scalar": {
+    "status": 500,
+    "type": "text/html; charset=UTF-8",
+    "body": "<!DOCTYPE html>\n<html>\n  <head>\n    <title>Something went wrong (500)</title>\n    <meta charset=\"UTF-8\">\n    <style>\n      *,\n      *::before,\n      *::after {\n        box-sizing: border-box;\n      }\n\n      body {\n        --lch-black: 0% 0 0;\n        --lch-gray: 75% 0.005 96;\n        --lch-white: 100% 0 0;\n\n        --color-border: oklch(var(--lch-gray));\n        --color-bg: oklch(var(--lch-white));\n        --color-text: oklch(var(--lch-black));\n\n        --btn-size: 2.65em;\n\n        background-color: var(--color-bg);\n        block-size: 100dvh;\n        color: var(--color-text);\n        display: grid;\n        margin: 0;\n        padding: 0;\n        place-items: center;\n        font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\";\n\n        @media (prefers-color-scheme: dark) {\n          --lch-black: 100% 0 0;\n          --lch-gray: 44.95% 0 0;\n          --lch-white: 0% 0 0;\n        }\n      }\n\n      svg {\n        fill: var(--color-text);\n\n        @media (prefers-color-scheme: dark) {\n          fill: var(--color-text);\n        }\n      }\n\n      .error {\n        align-items: center;\n        display: flex;\n        flex-direction: column;\n        gap: 2em;\n        justify-content: start;\n        margin-block-end: 15dvh;\n      }\n\n      .error__img {\n        aspect-ratio: 1;\n        background-color: var(--color-text);\n        block-size: auto;\n        border-radius: 50%;\n        display: grid;\n        place-items: center;\n        inline-size: 30dvh;\n\n        svg {\n          fill: var(--color-bg);\n          grid-area: 1/1;\n          max-inline-size: 66%;\n\n          @media (prefers-color-scheme: dark) {\n            fill: var(--color-bg);\n          }\n        }\n      }\n\n      .buttons {\n        display: flex;\n        flex-direction: row;\n        gap: 1em;\n        justify-content: center;\n      }\n\n      .btn {\n        align-items: center;\n        aspect-ratio: 1;\n        background-color: var(--color-bg);\n        block-size: var(--btn-size);\n        border-radius: 50%;\n        border: 1px solid var(--color-border);\n        color: var(--color-text);\n        cursor: pointer;\n        display: grid;\n        font-weight: 600;\n        font-size: 1.4rem;\n        gap: 0.5em;\n        inline-size: var(--btn-size);\n        justify-content: center;\n        padding: 0;\n        place-items: center;\n        text-align: center;\n\n        svg {\n          -webkit-touch-callout: none;\n          grid-area: 1/1;\n          inline-size: 1.3em;\n          max-inline-size: unset;\n          user-select: none;\n        }\n      }\n\n      .for-screen-reader {\n        clip-path: inset(50%);\n        height: 1px;\n        width: 1px;\n        overflow: hidden;\n        position: absolute;\n        white-space: nowrap;\n      }\n    </style>\n  </head>\n\n  <body>\n    <div class=\"error\">\n      <div class=\"error__img\">\n        <svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" aria-label=\"Server error\">\n          <title>server-warning</title>\n          <path\n            d=\"M2.5,6h17A2.5,2.5,0,0,0,22,3.5v-1A2.5,2.5,0,0,0,19.5,0H2.5A2.5,2.5,0,0,0,0,2.5v1A2.5,2.5,0,0,0,2.5,6ZM3.635,3A1.115,1.115,0,1,1,4.749,4.114,1.114,1.114,0,0,1,3.635,3ZM7.5,3A1.115,1.115,0,1,1,8.614,4.114,1.115,1.115,0,0,1,7.5,3Z\" />\n          <path\n            d=\"M14.892,11.574a2.952,2.952,0,0,1,3.339-1.486,3.061,3.061,0,0,1,1.934,1.59l.26.495a.5.5,0,0,0,.765.154A2.468,2.468,0,0,0,22,10.5v-1A2.5,2.5,0,0,0,19.5,7H2.5A2.5,2.5,0,0,0,0,9.5v1A2.5,2.5,0,0,0,2.5,13H13.842a.5.5,0,0,0,.442-.268ZM9.729,10A1.115,1.115,0,1,1,8.614,8.885,1.115,1.115,0,0,1,9.729,10ZM5.864,10A1.115,1.115,0,1,1,4.749,8.885,1.115,1.115,0,0,1,5.864,10Z\" />\n          <path\n            d=\"M2.5,20h7.67a.5.5,0,0,0,.442-.268l2.624-5A.5.5,0,0,0,12.792,14H2.5A2.5,2.5,0,0,0,0,16.5v1A2.5,2.5,0,0,0,2.5,20Zm1.136-3a1.115,1.115,0,1,1,1.114,1.115A1.114,1.114,0,0,1,3.635,17ZM7.5,17a1.115,1.115,0,1,1,1.115,1.115A1.115,1.115,0,0,1,7.5,17Z\" />\n          <path\n            d=\"M11.165,21.905a1.429,1.429,0,0,0,.048,1.408A1.453,1.453,0,0,0,12.446,24H22.558a1.455,1.455,0,0,0,1.232-.687,1.429,1.429,0,0,0,.048-1.408l-5.055-9.634a1.45,1.45,0,0,0-2.562,0ZM17.5,14.75a.75.75,0,0,1,.75.75v3a.75.75,0,0,1-1.5,0v-3A.75.75,0,0,1,17.5,14.75Zm1,6.5a1,1,0,1,1-1-1A1,1,0,0,1,18.5,21.25Z\" />\n        </svg>\n      </div>\n      <a href=\"/\" class=\"btn\" autofocus=\"true\">\n        <svg viewBox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\">\n          <path\n            d=\"m21.864 9.5h-11.607a.25.25 0 0 1 -.174-.43l3.864-3.721a2.609 2.609 0 0 0 -.075-3.682 2.612 2.612 0 0 0 -3.68-.077l-9.792 9.699a1 1 0 0 0 -.008 1.411l9.625 9.724a2.66 2.66 0 0 0 3.755-3.757l-3.729-3.733a.25.25 0 0 1 .177-.427h11.673c1.556 0 2-1.675 2-2.51a2.28 2.28 0 0 0 -2.029-2.497z\" />\n        </svg>\n        <span class=\"for-screen-reader\">Go back</span>\n      </a>\n    </div>\n  </body>\n</html>\n"
+  },
+  "POST /rooms/486777696/messages.json missing": {
+    "status": 400,
+    "type": "application/json; charset=UTF-8",
+    "body": {
+      "status": 400,
+      "error": "Bad Request"
+    }
+  },
+  "POST /rooms/486777696/messages.json blank": {
+    "status": 400,
+    "type": "application/json; charset=UTF-8",
+    "body": {
+      "status": 400,
+      "error": "Bad Request"
+    }
+  },
+  "POST /rooms/486777696/messages.json space": {
+    "status": 400,
+    "type": "application/json; charset=UTF-8",
+    "body": {
+      "status": 400,
+      "error": "Bad Request"
+    }
+  },
+  "POST /rooms/486777696/messages.json array": {
+    "status": 500,
+    "type": "application/json; charset=UTF-8",
+    "body": {
+      "status": 500,
+      "error": "Internal Server Error"
+    }
+  },
+  "POST /rooms/486777696/messages.json scalar": {
+    "status": 500,
+    "type": "application/json; charset=UTF-8",
+    "body": {
+      "status": 500,
+      "error": "Internal Server Error"
+    }
+  },
+  "POST /rooms/486777696/messages.xml missing": {
+    "status": 400,
+    "type": "application/xml; charset=UTF-8",
+    "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<hash>\n  <status type=\"integer\">400</status>\n  <error>Bad Request</error>\n</hash>\n"
+  },
+  "POST /rooms/486777696/messages.xml blank": {
+    "status": 400,
+    "type": "application/xml; charset=UTF-8",
+    "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<hash>\n  <status type=\"integer\">400</status>\n  <error>Bad Request</error>\n</hash>\n"
+  },
+  "POST /rooms/486777696/messages.xml space": {
+    "status": 400,
+    "type": "application/xml; charset=UTF-8",
+    "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<hash>\n  <status type=\"integer\">400</status>\n  <error>Bad Request</error>\n</hash>\n"
+  },
+  "POST /rooms/486777696/messages.xml array": {
+    "status": 500,
+    "type": "application/xml; charset=UTF-8",
+    "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<hash>\n  <status type=\"integer\">500</status>\n  <error>Internal Server Error</error>\n</hash>\n"
+  },
+  "POST /rooms/486777696/messages.xml scalar": {
+    "status": 500,
+    "type": "application/xml; charset=UTF-8",
+    "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<hash>\n  <status type=\"integer\">500</status>\n  <error>Internal Server Error</error>\n</hash>\n"
+  },
+  "PATCH /rooms/486777696/messages/933434530.html missing": {
+    "status": 400,
+    "type": "text/html; charset=UTF-8",
+    "body": ""
+  },
+  "PATCH /rooms/486777696/messages/933434530.html blank": {
+    "status": 400,
+    "type": "text/html; charset=UTF-8",
+    "body": ""
+  },
+  "PATCH /rooms/486777696/messages/933434530.html space": {
+    "status": 400,
+    "type": "text/html; charset=UTF-8",
+    "body": ""
+  },
+  "PATCH /rooms/486777696/messages/933434530.html array": {
+    "status": 500,
+    "type": "text/html; charset=UTF-8",
+    "body": "<!DOCTYPE html>\n<html>\n  <head>\n    <title>Something went wrong (500)</title>\n    <meta charset=\"UTF-8\">\n    <style>\n      *,\n      *::before,\n      *::after {\n        box-sizing: border-box;\n      }\n\n      body {\n        --lch-black: 0% 0 0;\n        --lch-gray: 75% 0.005 96;\n        --lch-white: 100% 0 0;\n\n        --color-border: oklch(var(--lch-gray));\n        --color-bg: oklch(var(--lch-white));\n        --color-text: oklch(var(--lch-black));\n\n        --btn-size: 2.65em;\n\n        background-color: var(--color-bg);\n        block-size: 100dvh;\n        color: var(--color-text);\n        display: grid;\n        margin: 0;\n        padding: 0;\n        place-items: center;\n        font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\";\n\n        @media (prefers-color-scheme: dark) {\n          --lch-black: 100% 0 0;\n          --lch-gray: 44.95% 0 0;\n          --lch-white: 0% 0 0;\n        }\n      }\n\n      svg {\n        fill: var(--color-text);\n\n        @media (prefers-color-scheme: dark) {\n          fill: var(--color-text);\n        }\n      }\n\n      .error {\n        align-items: center;\n        display: flex;\n        flex-direction: column;\n        gap: 2em;\n        justify-content: start;\n        margin-block-end: 15dvh;\n      }\n\n      .error__img {\n        aspect-ratio: 1;\n        background-color: var(--color-text);\n        block-size: auto;\n        border-radius: 50%;\n        display: grid;\n        place-items: center;\n        inline-size: 30dvh;\n\n        svg {\n          fill: var(--color-bg);\n          grid-area: 1/1;\n          max-inline-size: 66%;\n\n          @media (prefers-color-scheme: dark) {\n            fill: var(--color-bg);\n          }\n        }\n      }\n\n      .buttons {\n        display: flex;\n        flex-direction: row;\n        gap: 1em;\n        justify-content: center;\n      }\n\n      .btn {\n        align-items: center;\n        aspect-ratio: 1;\n        background-color: var(--color-bg);\n        block-size: var(--btn-size);\n        border-radius: 50%;\n        border: 1px solid var(--color-border);\n        color: var(--color-text);\n        cursor: pointer;\n        display: grid;\n        font-weight: 600;\n        font-size: 1.4rem;\n        gap: 0.5em;\n        inline-size: var(--btn-size);\n        justify-content: center;\n        padding: 0;\n        place-items: center;\n        text-align: center;\n\n        svg {\n          -webkit-touch-callout: none;\n          grid-area: 1/1;\n          inline-size: 1.3em;\n          max-inline-size: unset;\n          user-select: none;\n        }\n      }\n\n      .for-screen-reader {\n        clip-path: inset(50%);\n        height: 1px;\n        width: 1px;\n        overflow: hidden;\n        position: absolute;\n        white-space: nowrap;\n      }\n    </style>\n  </head>\n\n  <body>\n    <div class=\"error\">\n      <div class=\"error__img\">\n        <svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" aria-label=\"Server error\">\n          <title>server-warning</title>\n          <path\n            d=\"M2.5,6h17A2.5,2.5,0,0,0,22,3.5v-1A2.5,2.5,0,0,0,19.5,0H2.5A2.5,2.5,0,0,0,0,2.5v1A2.5,2.5,0,0,0,2.5,6ZM3.635,3A1.115,1.115,0,1,1,4.749,4.114,1.114,1.114,0,0,1,3.635,3ZM7.5,3A1.115,1.115,0,1,1,8.614,4.114,1.115,1.115,0,0,1,7.5,3Z\" />\n          <path\n            d=\"M14.892,11.574a2.952,2.952,0,0,1,3.339-1.486,3.061,3.061,0,0,1,1.934,1.59l.26.495a.5.5,0,0,0,.765.154A2.468,2.468,0,0,0,22,10.5v-1A2.5,2.5,0,0,0,19.5,7H2.5A2.5,2.5,0,0,0,0,9.5v1A2.5,2.5,0,0,0,2.5,13H13.842a.5.5,0,0,0,.442-.268ZM9.729,10A1.115,1.115,0,1,1,8.614,8.885,1.115,1.115,0,0,1,9.729,10ZM5.864,10A1.115,1.115,0,1,1,4.749,8.885,1.115,1.115,0,0,1,5.864,10Z\" />\n          <path\n            d=\"M2.5,20h7.67a.5.5,0,0,0,.442-.268l2.624-5A.5.5,0,0,0,12.792,14H2.5A2.5,2.5,0,0,0,0,16.5v1A2.5,2.5,0,0,0,2.5,20Zm1.136-3a1.115,1.115,0,1,1,1.114,1.115A1.114,1.114,0,0,1,3.635,17ZM7.5,17a1.115,1.115,0,1,1,1.115,1.115A1.115,1.115,0,0,1,7.5,17Z\" />\n          <path\n            d=\"M11.165,21.905a1.429,1.429,0,0,0,.048,1.408A1.453,1.453,0,0,0,12.446,24H22.558a1.455,1.455,0,0,0,1.232-.687,1.429,1.429,0,0,0,.048-1.408l-5.055-9.634a1.45,1.45,0,0,0-2.562,0ZM17.5,14.75a.75.75,0,0,1,.75.75v3a.75.75,0,0,1-1.5,0v-3A.75.75,0,0,1,17.5,14.75Zm1,6.5a1,1,0,1,1-1-1A1,1,0,0,1,18.5,21.25Z\" />\n        </svg>\n      </div>\n      <a href=\"/\" class=\"btn\" autofocus=\"true\">\n        <svg viewBox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\">\n          <path\n            d=\"m21.864 9.5h-11.607a.25.25 0 0 1 -.174-.43l3.864-3.721a2.609 2.609 0 0 0 -.075-3.682 2.612 2.612 0 0 0 -3.68-.077l-9.792 9.699a1 1 0 0 0 -.008 1.411l9.625 9.724a2.66 2.66 0 0 0 3.755-3.757l-3.729-3.733a.25.25 0 0 1 .177-.427h11.673c1.556 0 2-1.675 2-2.51a2.28 2.28 0 0 0 -2.029-2.497z\" />\n        </svg>\n        <span class=\"for-screen-reader\">Go back</span>\n      </a>\n    </div>\n  </body>\n</html>\n"
+  },
+  "PATCH /rooms/486777696/messages/933434530.html scalar": {
+    "status": 500,
+    "type": "text/html; charset=UTF-8",
+    "body": "<!DOCTYPE html>\n<html>\n  <head>\n    <title>Something went wrong (500)</title>\n    <meta charset=\"UTF-8\">\n    <style>\n      *,\n      *::before,\n      *::after {\n        box-sizing: border-box;\n      }\n\n      body {\n        --lch-black: 0% 0 0;\n        --lch-gray: 75% 0.005 96;\n        --lch-white: 100% 0 0;\n\n        --color-border: oklch(var(--lch-gray));\n        --color-bg: oklch(var(--lch-white));\n        --color-text: oklch(var(--lch-black));\n\n        --btn-size: 2.65em;\n\n        background-color: var(--color-bg);\n        block-size: 100dvh;\n        color: var(--color-text);\n        display: grid;\n        margin: 0;\n        padding: 0;\n        place-items: center;\n        font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\";\n\n        @media (prefers-color-scheme: dark) {\n          --lch-black: 100% 0 0;\n          --lch-gray: 44.95% 0 0;\n          --lch-white: 0% 0 0;\n        }\n      }\n\n      svg {\n        fill: var(--color-text);\n\n        @media (prefers-color-scheme: dark) {\n          fill: var(--color-text);\n        }\n      }\n\n      .error {\n        align-items: center;\n        display: flex;\n        flex-direction: column;\n        gap: 2em;\n        justify-content: start;\n        margin-block-end: 15dvh;\n      }\n\n      .error__img {\n        aspect-ratio: 1;\n        background-color: var(--color-text);\n        block-size: auto;\n        border-radius: 50%;\n        display: grid;\n        place-items: center;\n        inline-size: 30dvh;\n\n        svg {\n          fill: var(--color-bg);\n          grid-area: 1/1;\n          max-inline-size: 66%;\n\n          @media (prefers-color-scheme: dark) {\n            fill: var(--color-bg);\n          }\n        }\n      }\n\n      .buttons {\n        display: flex;\n        flex-direction: row;\n        gap: 1em;\n        justify-content: center;\n      }\n\n      .btn {\n        align-items: center;\n        aspect-ratio: 1;\n        background-color: var(--color-bg);\n        block-size: var(--btn-size);\n        border-radius: 50%;\n        border: 1px solid var(--color-border);\n        color: var(--color-text);\n        cursor: pointer;\n        display: grid;\n        font-weight: 600;\n        font-size: 1.4rem;\n        gap: 0.5em;\n        inline-size: var(--btn-size);\n        justify-content: center;\n        padding: 0;\n        place-items: center;\n        text-align: center;\n\n        svg {\n          -webkit-touch-callout: none;\n          grid-area: 1/1;\n          inline-size: 1.3em;\n          max-inline-size: unset;\n          user-select: none;\n        }\n      }\n\n      .for-screen-reader {\n        clip-path: inset(50%);\n        height: 1px;\n        width: 1px;\n        overflow: hidden;\n        position: absolute;\n        white-space: nowrap;\n      }\n    </style>\n  </head>\n\n  <body>\n    <div class=\"error\">\n      <div class=\"error__img\">\n        <svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" aria-label=\"Server error\">\n          <title>server-warning</title>\n          <path\n            d=\"M2.5,6h17A2.5,2.5,0,0,0,22,3.5v-1A2.5,2.5,0,0,0,19.5,0H2.5A2.5,2.5,0,0,0,0,2.5v1A2.5,2.5,0,0,0,2.5,6ZM3.635,3A1.115,1.115,0,1,1,4.749,4.114,1.114,1.114,0,0,1,3.635,3ZM7.5,3A1.115,1.115,0,1,1,8.614,4.114,1.115,1.115,0,0,1,7.5,3Z\" />\n          <path\n            d=\"M14.892,11.574a2.952,2.952,0,0,1,3.339-1.486,3.061,3.061,0,0,1,1.934,1.59l.26.495a.5.5,0,0,0,.765.154A2.468,2.468,0,0,0,22,10.5v-1A2.5,2.5,0,0,0,19.5,7H2.5A2.5,2.5,0,0,0,0,9.5v1A2.5,2.5,0,0,0,2.5,13H13.842a.5.5,0,0,0,.442-.268ZM9.729,10A1.115,1.115,0,1,1,8.614,8.885,1.115,1.115,0,0,1,9.729,10ZM5.864,10A1.115,1.115,0,1,1,4.749,8.885,1.115,1.115,0,0,1,5.864,10Z\" />\n          <path\n            d=\"M2.5,20h7.67a.5.5,0,0,0,.442-.268l2.624-5A.5.5,0,0,0,12.792,14H2.5A2.5,2.5,0,0,0,0,16.5v1A2.5,2.5,0,0,0,2.5,20Zm1.136-3a1.115,1.115,0,1,1,1.114,1.115A1.114,1.114,0,0,1,3.635,17ZM7.5,17a1.115,1.115,0,1,1,1.115,1.115A1.115,1.115,0,0,1,7.5,17Z\" />\n          <path\n            d=\"M11.165,21.905a1.429,1.429,0,0,0,.048,1.408A1.453,1.453,0,0,0,12.446,24H22.558a1.455,1.455,0,0,0,1.232-.687,1.429,1.429,0,0,0,.048-1.408l-5.055-9.634a1.45,1.45,0,0,0-2.562,0ZM17.5,14.75a.75.75,0,0,1,.75.75v3a.75.75,0,0,1-1.5,0v-3A.75.75,0,0,1,17.5,14.75Zm1,6.5a1,1,0,1,1-1-1A1,1,0,0,1,18.5,21.25Z\" />\n        </svg>\n      </div>\n      <a href=\"/\" class=\"btn\" autofocus=\"true\">\n        <svg viewBox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\">\n          <path\n            d=\"m21.864 9.5h-11.607a.25.25 0 0 1 -.174-.43l3.864-3.721a2.609 2.609 0 0 0 -.075-3.682 2.612 2.612 0 0 0 -3.68-.077l-9.792 9.699a1 1 0 0 0 -.008 1.411l9.625 9.724a2.66 2.66 0 0 0 3.755-3.757l-3.729-3.733a.25.25 0 0 1 .177-.427h11.673c1.556 0 2-1.675 2-2.51a2.28 2.28 0 0 0 -2.029-2.497z\" />\n        </svg>\n        <span class=\"for-screen-reader\">Go back</span>\n      </a>\n    </div>\n  </body>\n</html>\n"
+  },
+  "PATCH /rooms/486777696/messages/933434530.json missing": {
+    "status": 400,
+    "type": "application/json; charset=UTF-8",
+    "body": {
+      "status": 400,
+      "error": "Bad Request"
+    }
+  },
+  "PATCH /rooms/486777696/messages/933434530.json blank": {
+    "status": 400,
+    "type": "application/json; charset=UTF-8",
+    "body": {
+      "status": 400,
+      "error": "Bad Request"
+    }
+  },
+  "PATCH /rooms/486777696/messages/933434530.json space": {
+    "status": 400,
+    "type": "application/json; charset=UTF-8",
+    "body": {
+      "status": 400,
+      "error": "Bad Request"
+    }
+  },
+  "PATCH /rooms/486777696/messages/933434530.json array": {
+    "status": 500,
+    "type": "application/json; charset=UTF-8",
+    "body": {
+      "status": 500,
+      "error": "Internal Server Error"
+    }
+  },
+  "PATCH /rooms/486777696/messages/933434530.json scalar": {
+    "status": 500,
+    "type": "application/json; charset=UTF-8",
+    "body": {
+      "status": 500,
+      "error": "Internal Server Error"
+    }
+  },
+  "PATCH /rooms/486777696/messages/933434530.xml missing": {
+    "status": 400,
+    "type": "application/xml; charset=UTF-8",
+    "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<hash>\n  <status type=\"integer\">400</status>\n  <error>Bad Request</error>\n</hash>\n"
+  },
+  "PATCH /rooms/486777696/messages/933434530.xml blank": {
+    "status": 400,
+    "type": "application/xml; charset=UTF-8",
+    "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<hash>\n  <status type=\"integer\">400</status>\n  <error>Bad Request</error>\n</hash>\n"
+  },
+  "PATCH /rooms/486777696/messages/933434530.xml space": {
+    "status": 400,
+    "type": "application/xml; charset=UTF-8",
+    "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<hash>\n  <status type=\"integer\">400</status>\n  <error>Bad Request</error>\n</hash>\n"
+  },
+  "PATCH /rooms/486777696/messages/933434530.xml array": {
+    "status": 500,
+    "type": "application/xml; charset=UTF-8",
+    "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<hash>\n  <status type=\"integer\">500</status>\n  <error>Internal Server Error</error>\n</hash>\n"
+  },
+  "PATCH /rooms/486777696/messages/933434530.xml scalar": {
+    "status": 500,
+    "type": "application/xml; charset=UTF-8",
+    "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<hash>\n  <status type=\"integer\">500</status>\n  <error>Internal Server Error</error>\n</hash>\n"
+  },
+  "POST /messages/933434530/boosts.html missing": {
+    "status": 400,
+    "type": "text/html; charset=UTF-8",
+    "body": ""
+  },
+  "POST /messages/933434530/boosts.html blank": {
+    "status": 400,
+    "type": "text/html; charset=UTF-8",
+    "body": ""
+  },
+  "POST /messages/933434530/boosts.html space": {
+    "status": 400,
+    "type": "text/html; charset=UTF-8",
+    "body": ""
+  },
+  "POST /messages/933434530/boosts.html array": {
+    "status": 500,
+    "type": "text/html; charset=UTF-8",
+    "body": "<!DOCTYPE html>\n<html>\n  <head>\n    <title>Something went wrong (500)</title>\n    <meta charset=\"UTF-8\">\n    <style>\n      *,\n      *::before,\n      *::after {\n        box-sizing: border-box;\n      }\n\n      body {\n        --lch-black: 0% 0 0;\n        --lch-gray: 75% 0.005 96;\n        --lch-white: 100% 0 0;\n\n        --color-border: oklch(var(--lch-gray));\n        --color-bg: oklch(var(--lch-white));\n        --color-text: oklch(var(--lch-black));\n\n        --btn-size: 2.65em;\n\n        background-color: var(--color-bg);\n        block-size: 100dvh;\n        color: var(--color-text);\n        display: grid;\n        margin: 0;\n        padding: 0;\n        place-items: center;\n        font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\";\n\n        @media (prefers-color-scheme: dark) {\n          --lch-black: 100% 0 0;\n          --lch-gray: 44.95% 0 0;\n          --lch-white: 0% 0 0;\n        }\n      }\n\n      svg {\n        fill: var(--color-text);\n\n        @media (prefers-color-scheme: dark) {\n          fill: var(--color-text);\n        }\n      }\n\n      .error {\n        align-items: center;\n        display: flex;\n        flex-direction: column;\n        gap: 2em;\n        justify-content: start;\n        margin-block-end: 15dvh;\n      }\n\n      .error__img {\n        aspect-ratio: 1;\n        background-color: var(--color-text);\n        block-size: auto;\n        border-radius: 50%;\n        display: grid;\n        place-items: center;\n        inline-size: 30dvh;\n\n        svg {\n          fill: var(--color-bg);\n          grid-area: 1/1;\n          max-inline-size: 66%;\n\n          @media (prefers-color-scheme: dark) {\n            fill: var(--color-bg);\n          }\n        }\n      }\n\n      .buttons {\n        display: flex;\n        flex-direction: row;\n        gap: 1em;\n        justify-content: center;\n      }\n\n      .btn {\n        align-items: center;\n        aspect-ratio: 1;\n        background-color: var(--color-bg);\n        block-size: var(--btn-size);\n        border-radius: 50%;\n        border: 1px solid var(--color-border);\n        color: var(--color-text);\n        cursor: pointer;\n        display: grid;\n        font-weight: 600;\n        font-size: 1.4rem;\n        gap: 0.5em;\n        inline-size: var(--btn-size);\n        justify-content: center;\n        padding: 0;\n        place-items: center;\n        text-align: center;\n\n        svg {\n          -webkit-touch-callout: none;\n          grid-area: 1/1;\n          inline-size: 1.3em;\n          max-inline-size: unset;\n          user-select: none;\n        }\n      }\n\n      .for-screen-reader {\n        clip-path: inset(50%);\n        height: 1px;\n        width: 1px;\n        overflow: hidden;\n        position: absolute;\n        white-space: nowrap;\n      }\n    </style>\n  </head>\n\n  <body>\n    <div class=\"error\">\n      <div class=\"error__img\">\n        <svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" aria-label=\"Server error\">\n          <title>server-warning</title>\n          <path\n            d=\"M2.5,6h17A2.5,2.5,0,0,0,22,3.5v-1A2.5,2.5,0,0,0,19.5,0H2.5A2.5,2.5,0,0,0,0,2.5v1A2.5,2.5,0,0,0,2.5,6ZM3.635,3A1.115,1.115,0,1,1,4.749,4.114,1.114,1.114,0,0,1,3.635,3ZM7.5,3A1.115,1.115,0,1,1,8.614,4.114,1.115,1.115,0,0,1,7.5,3Z\" />\n          <path\n            d=\"M14.892,11.574a2.952,2.952,0,0,1,3.339-1.486,3.061,3.061,0,0,1,1.934,1.59l.26.495a.5.5,0,0,0,.765.154A2.468,2.468,0,0,0,22,10.5v-1A2.5,2.5,0,0,0,19.5,7H2.5A2.5,2.5,0,0,0,0,9.5v1A2.5,2.5,0,0,0,2.5,13H13.842a.5.5,0,0,0,.442-.268ZM9.729,10A1.115,1.115,0,1,1,8.614,8.885,1.115,1.115,0,0,1,9.729,10ZM5.864,10A1.115,1.115,0,1,1,4.749,8.885,1.115,1.115,0,0,1,5.864,10Z\" />\n          <path\n            d=\"M2.5,20h7.67a.5.5,0,0,0,.442-.268l2.624-5A.5.5,0,0,0,12.792,14H2.5A2.5,2.5,0,0,0,0,16.5v1A2.5,2.5,0,0,0,2.5,20Zm1.136-3a1.115,1.115,0,1,1,1.114,1.115A1.114,1.114,0,0,1,3.635,17ZM7.5,17a1.115,1.115,0,1,1,1.115,1.115A1.115,1.115,0,0,1,7.5,17Z\" />\n          <path\n            d=\"M11.165,21.905a1.429,1.429,0,0,0,.048,1.408A1.453,1.453,0,0,0,12.446,24H22.558a1.455,1.455,0,0,0,1.232-.687,1.429,1.429,0,0,0,.048-1.408l-5.055-9.634a1.45,1.45,0,0,0-2.562,0ZM17.5,14.75a.75.75,0,0,1,.75.75v3a.75.75,0,0,1-1.5,0v-3A.75.75,0,0,1,17.5,14.75Zm1,6.5a1,1,0,1,1-1-1A1,1,0,0,1,18.5,21.25Z\" />\n        </svg>\n      </div>\n      <a href=\"/\" class=\"btn\" autofocus=\"true\">\n        <svg viewBox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\">\n          <path\n            d=\"m21.864 9.5h-11.607a.25.25 0 0 1 -.174-.43l3.864-3.721a2.609 2.609 0 0 0 -.075-3.682 2.612 2.612 0 0 0 -3.68-.077l-9.792 9.699a1 1 0 0 0 -.008 1.411l9.625 9.724a2.66 2.66 0 0 0 3.755-3.757l-3.729-3.733a.25.25 0 0 1 .177-.427h11.673c1.556 0 2-1.675 2-2.51a2.28 2.28 0 0 0 -2.029-2.497z\" />\n        </svg>\n        <span class=\"for-screen-reader\">Go back</span>\n      </a>\n    </div>\n  </body>\n</html>\n"
+  },
+  "POST /messages/933434530/boosts.html scalar": {
+    "status": 500,
+    "type": "text/html; charset=UTF-8",
+    "body": "<!DOCTYPE html>\n<html>\n  <head>\n    <title>Something went wrong (500)</title>\n    <meta charset=\"UTF-8\">\n    <style>\n      *,\n      *::before,\n      *::after {\n        box-sizing: border-box;\n      }\n\n      body {\n        --lch-black: 0% 0 0;\n        --lch-gray: 75% 0.005 96;\n        --lch-white: 100% 0 0;\n\n        --color-border: oklch(var(--lch-gray));\n        --color-bg: oklch(var(--lch-white));\n        --color-text: oklch(var(--lch-black));\n\n        --btn-size: 2.65em;\n\n        background-color: var(--color-bg);\n        block-size: 100dvh;\n        color: var(--color-text);\n        display: grid;\n        margin: 0;\n        padding: 0;\n        place-items: center;\n        font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\";\n\n        @media (prefers-color-scheme: dark) {\n          --lch-black: 100% 0 0;\n          --lch-gray: 44.95% 0 0;\n          --lch-white: 0% 0 0;\n        }\n      }\n\n      svg {\n        fill: var(--color-text);\n\n        @media (prefers-color-scheme: dark) {\n          fill: var(--color-text);\n        }\n      }\n\n      .error {\n        align-items: center;\n        display: flex;\n        flex-direction: column;\n        gap: 2em;\n        justify-content: start;\n        margin-block-end: 15dvh;\n      }\n\n      .error__img {\n        aspect-ratio: 1;\n        background-color: var(--color-text);\n        block-size: auto;\n        border-radius: 50%;\n        display: grid;\n        place-items: center;\n        inline-size: 30dvh;\n\n        svg {\n          fill: var(--color-bg);\n          grid-area: 1/1;\n          max-inline-size: 66%;\n\n          @media (prefers-color-scheme: dark) {\n            fill: var(--color-bg);\n          }\n        }\n      }\n\n      .buttons {\n        display: flex;\n        flex-direction: row;\n        gap: 1em;\n        justify-content: center;\n      }\n\n      .btn {\n        align-items: center;\n        aspect-ratio: 1;\n        background-color: var(--color-bg);\n        block-size: var(--btn-size);\n        border-radius: 50%;\n        border: 1px solid var(--color-border);\n        color: var(--color-text);\n        cursor: pointer;\n        display: grid;\n        font-weight: 600;\n        font-size: 1.4rem;\n        gap: 0.5em;\n        inline-size: var(--btn-size);\n        justify-content: center;\n        padding: 0;\n        place-items: center;\n        text-align: center;\n\n        svg {\n          -webkit-touch-callout: none;\n          grid-area: 1/1;\n          inline-size: 1.3em;\n          max-inline-size: unset;\n          user-select: none;\n        }\n      }\n\n      .for-screen-reader {\n        clip-path: inset(50%);\n        height: 1px;\n        width: 1px;\n        overflow: hidden;\n        position: absolute;\n        white-space: nowrap;\n      }\n    </style>\n  </head>\n\n  <body>\n    <div class=\"error\">\n      <div class=\"error__img\">\n        <svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" aria-label=\"Server error\">\n          <title>server-warning</title>\n          <path\n            d=\"M2.5,6h17A2.5,2.5,0,0,0,22,3.5v-1A2.5,2.5,0,0,0,19.5,0H2.5A2.5,2.5,0,0,0,0,2.5v1A2.5,2.5,0,0,0,2.5,6ZM3.635,3A1.115,1.115,0,1,1,4.749,4.114,1.114,1.114,0,0,1,3.635,3ZM7.5,3A1.115,1.115,0,1,1,8.614,4.114,1.115,1.115,0,0,1,7.5,3Z\" />\n          <path\n            d=\"M14.892,11.574a2.952,2.952,0,0,1,3.339-1.486,3.061,3.061,0,0,1,1.934,1.59l.26.495a.5.5,0,0,0,.765.154A2.468,2.468,0,0,0,22,10.5v-1A2.5,2.5,0,0,0,19.5,7H2.5A2.5,2.5,0,0,0,0,9.5v1A2.5,2.5,0,0,0,2.5,13H13.842a.5.5,0,0,0,.442-.268ZM9.729,10A1.115,1.115,0,1,1,8.614,8.885,1.115,1.115,0,0,1,9.729,10ZM5.864,10A1.115,1.115,0,1,1,4.749,8.885,1.115,1.115,0,0,1,5.864,10Z\" />\n          <path\n            d=\"M2.5,20h7.67a.5.5,0,0,0,.442-.268l2.624-5A.5.5,0,0,0,12.792,14H2.5A2.5,2.5,0,0,0,0,16.5v1A2.5,2.5,0,0,0,2.5,20Zm1.136-3a1.115,1.115,0,1,1,1.114,1.115A1.114,1.114,0,0,1,3.635,17ZM7.5,17a1.115,1.115,0,1,1,1.115,1.115A1.115,1.115,0,0,1,7.5,17Z\" />\n          <path\n            d=\"M11.165,21.905a1.429,1.429,0,0,0,.048,1.408A1.453,1.453,0,0,0,12.446,24H22.558a1.455,1.455,0,0,0,1.232-.687,1.429,1.429,0,0,0,.048-1.408l-5.055-9.634a1.45,1.45,0,0,0-2.562,0ZM17.5,14.75a.75.75,0,0,1,.75.75v3a.75.75,0,0,1-1.5,0v-3A.75.75,0,0,1,17.5,14.75Zm1,6.5a1,1,0,1,1-1-1A1,1,0,0,1,18.5,21.25Z\" />\n        </svg>\n      </div>\n      <a href=\"/\" class=\"btn\" autofocus=\"true\">\n        <svg viewBox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\">\n          <path\n            d=\"m21.864 9.5h-11.607a.25.25 0 0 1 -.174-.43l3.864-3.721a2.609 2.609 0 0 0 -.075-3.682 2.612 2.612 0 0 0 -3.68-.077l-9.792 9.699a1 1 0 0 0 -.008 1.411l9.625 9.724a2.66 2.66 0 0 0 3.755-3.757l-3.729-3.733a.25.25 0 0 1 .177-.427h11.673c1.556 0 2-1.675 2-2.51a2.28 2.28 0 0 0 -2.029-2.497z\" />\n        </svg>\n        <span class=\"for-screen-reader\">Go back</span>\n      </a>\n    </div>\n  </body>\n</html>\n"
+  },
+  "POST /messages/933434530/boosts.json missing": {
+    "status": 400,
+    "type": "application/json; charset=UTF-8",
+    "body": {
+      "status": 400,
+      "error": "Bad Request"
+    }
+  },
+  "POST /messages/933434530/boosts.json blank": {
+    "status": 400,
+    "type": "application/json; charset=UTF-8",
+    "body": {
+      "status": 400,
+      "error": "Bad Request"
+    }
+  },
+  "POST /messages/933434530/boosts.json space": {
+    "status": 400,
+    "type": "application/json; charset=UTF-8",
+    "body": {
+      "status": 400,
+      "error": "Bad Request"
+    }
+  },
+  "POST /messages/933434530/boosts.json array": {
+    "status": 500,
+    "type": "application/json; charset=UTF-8",
+    "body": {
+      "status": 500,
+      "error": "Internal Server Error"
+    }
+  },
+  "POST /messages/933434530/boosts.json scalar": {
+    "status": 500,
+    "type": "application/json; charset=UTF-8",
+    "body": {
+      "status": 500,
+      "error": "Internal Server Error"
+    }
+  },
+  "POST /messages/933434530/boosts.xml missing": {
+    "status": 400,
+    "type": "application/xml; charset=UTF-8",
+    "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<hash>\n  <status type=\"integer\">400</status>\n  <error>Bad Request</error>\n</hash>\n"
+  },
+  "POST /messages/933434530/boosts.xml blank": {
+    "status": 400,
+    "type": "application/xml; charset=UTF-8",
+    "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<hash>\n  <status type=\"integer\">400</status>\n  <error>Bad Request</error>\n</hash>\n"
+  },
+  "POST /messages/933434530/boosts.xml space": {
+    "status": 400,
+    "type": "application/xml; charset=UTF-8",
+    "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<hash>\n  <status type=\"integer\">400</status>\n  <error>Bad Request</error>\n</hash>\n"
+  },
+  "POST /messages/933434530/boosts.xml array": {
+    "status": 500,
+    "type": "application/xml; charset=UTF-8",
+    "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<hash>\n  <status type=\"integer\">500</status>\n  <error>Internal Server Error</error>\n</hash>\n"
+  },
+  "POST /messages/933434530/boosts.xml scalar": {
+    "status": 500,
+    "type": "application/xml; charset=UTF-8",
+    "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<hash>\n  <status type=\"integer\">500</status>\n  <error>Internal Server Error</error>\n</hash>\n"
+  },
+  "update_anonymous": {
+    "status": 302,
+    "type": "text/html; charset=utf-8",
+    "body": "",
+    "location": "http://campfire.test/session/new"
+  },
+  "update_no_csrf": {
+    "status": 422,
+    "type": "application/json; charset=UTF-8",
+    "body": {
+      "status": 422,
+      "error": "Unprocessable Content"
+    },
+    "location": null
+  },
+  "update_valid_csrf": {
+    "status": 400,
+    "type": "application/json; charset=UTF-8",
+    "body": {
+      "status": 400,
+      "error": "Bad Request"
+    },
+    "location": null
+  },
+  "/account/edit query_bot=True": {
+    "status": 403,
+    "type": "text/html",
+    "body": "",
+    "location": null
+  },
+  "/account/edit query_bot=False": {
+    "status": 302,
+    "type": "text/html; charset=utf-8",
+    "body": "",
+    "location": "http://campfire.test/session/new"
+  },
+  "/rooms/486777696 query_bot=True": {
+    "status": 403,
+    "type": "text/html",
+    "body": "",
+    "location": null
+  },
+  "/rooms/486777696 query_bot=False": {
+    "status": 302,
+    "type": "text/html; charset=utf-8",
+    "body": "",
+    "location": "http://campfire.test/session/new"
+  },
+  "/rooms/486777696/messages query_bot=True": {
+    "status": 403,
+    "type": "text/html",
+    "body": "",
+    "location": null
+  },
+  "/rooms/486777696/messages query_bot=False": {
+    "status": 302,
+    "type": "text/html; charset=utf-8",
+    "body": "",
+    "location": "http://campfire.test/session/new"
+  },
+  "/session/new query_bot=True": {
+    "status": 200,
+    "type": "text/html; charset=utf-8",
+    "body": "<!DOCTYPE html>\n<html>\n  <head>\n    <title>Sign in</title>\n\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1, user-scalable=no, interactive-widget=resizes-content\">\n    <meta name=\"view-transition\" content=\"same-origin\">\n    <meta name=\"color-scheme\" content=\"light dark\">\n    <meta name=\"theme-color\" content=\"#ffffff\" media=\"(prefers-color-scheme: light)\">\n    <meta name=\"theme-color\" content=\"#000000\" media=\"(prefers-color-scheme: dark)\">\n    <meta name=\"apple-mobile-web-app-capable\" content=\"yes\">\n    <meta name=\"csrf-param\" content=\"authenticity_token\" />\n<meta name=\"csrf-token\" content=\"<VALIDATED_TOKEN>\" />\n    \n    \n    <meta name=\"action-cable-url\" content=\"/cable\">\n\n    <meta name=\"vapid-public-key\" content=\"BEYXTBB5_jNhNzXDmx5KEU55Vbbd-u--Lk9rM5OFQvUkPIBwZJ9QzAq0zdEzFw6yTV8cTriz_qYBVicY02_VxTQ=\">\n    <meta name=\"turbo-prefetch\" content=\"true\">\n\n    <link rel=\"manifest\" href=\"/webmanifest.json\">\n    <link rel=\"icon\" href=\"/account/logo?v=20260101160000\" type=\"image/png\">\n    <link rel=\"apple-touch-icon\" href=\"/account/logo?v=20260101160000\">\n\n    <link rel=\"stylesheet\" href=\"/assets/_reset-9c3efd7b.css\" data-turbo-track=\"reload\" />\n<link rel=\"stylesheet\" href=\"/assets/actiontext-7b8d51ea.css\" data-turbo-track=\"reload\" />\n<link rel=\"stylesheet\" href=\"/assets/animation-bcdb4bab.css\" data-turbo-track=\"reload\" />\n<link rel=\"stylesheet\" href=\"/assets/autocomplete-9de8c93f.css\" data-turbo-track=\"reload\" />\n<link rel=\"stylesheet\" href=\"/assets/avatars-279376ab.css\" data-turbo-track=\"reload\" />\n<link rel=\"stylesheet\" href=\"/assets/base-637a0ec8.css\" data-turbo-track=\"reload\" />\n<link rel=\"stylesheet\" href=\"/assets/boosts-da4032a8.css\" data-turbo-track=\"reload\" />\n<link rel=\"stylesheet\" href=\"/assets/buttons-c7d39fd4.css\" data-turbo-track=\"reload\" />\n<link rel=\"stylesheet\" href=\"/assets/code-333ae548.css\" data-turbo-track=\"reload\" />\n<link rel=\"stylesheet\" href=\"/assets/colorize-eb391ca0.css\" data-turbo-track=\"reload\" />\n<link rel=\"stylesheet\" href=\"/assets/colors-aee62523.css\" data-turbo-track=\"reload\" />\n<link rel=\"stylesheet\" href=\"/assets/composer-e490638a.css\" data-turbo-track=\"reload\" />\n<link rel=\"stylesheet\" href=\"/assets/embeds-c20d0a3a.css\" data-turbo-track=\"reload\" />\n<link rel=\"stylesheet\" href=\"/assets/filters-8a4d63ed.css\" data-turbo-track=\"reload\" />\n<link rel=\"stylesheet\" href=\"/assets/flash-a561c1e5.css\" data-turbo-track=\"reload\" />\n<link rel=\"stylesheet\" href=\"/assets/inputs-9e58a07c.css\" data-turbo-track=\"reload\" />\n<link rel=\"stylesheet\" href=\"/assets/layout-ff6ddfc6.css\" data-turbo-track=\"reload\" />\n<link rel=\"stylesheet\" href=\"/assets/lexxy-content-0ff2f961.css\" data-turbo-track=\"reload\" />\n<link rel=\"stylesheet\" href=\"/assets/lexxy-editor-2d5c7ebe.css\" data-turbo-track=\"reload\" />\n<link rel=\"stylesheet\" href=\"/assets/lexxy-variables-3fef4323.css\" data-turbo-track=\"reload\" />\n<link rel=\"stylesheet\" href=\"/assets/lexxy-2876c58e.css\" data-turbo-track=\"reload\" />\n<link rel=\"stylesheet\" href=\"/assets/lightbox-af496d39.css\" data-turbo-track=\"reload\" />\n<link rel=\"stylesheet\" href=\"/assets/messages-c5485fef.css\" data-turbo-track=\"reload\" />\n<link rel=\"stylesheet\" href=\"/assets/nav-05e7183a.css\" data-turbo-track=\"reload\" />\n<link rel=\"stylesheet\" href=\"/assets/panels-af44ec6d.css\" data-turbo-track=\"reload\" />\n<link rel=\"stylesheet\" href=\"/assets/separators-172b3ab8.css\" data-turbo-track=\"reload\" />\n<link rel=\"stylesheet\" href=\"/assets/sidebar-0be58db9.css\" data-turbo-track=\"reload\" />\n<link rel=\"stylesheet\" href=\"/assets/signup-6e02d591.css\" data-turbo-track=\"reload\" />\n<link rel=\"stylesheet\" href=\"/assets/spinner-5a118f25.css\" data-turbo-track=\"reload\" />\n<link rel=\"stylesheet\" href=\"/assets/trix-65afdb1d.css\" data-turbo-track=\"reload\" />\n<link rel=\"stylesheet\" href=\"/assets/utilities-e2f32466.css\" data-turbo-track=\"reload\" />\n    \n\n    <script type=\"importmap\" data-turbo-track=\"reload\">{\n  \"imports\": {\n    \"application\": \"/assets/application-a54c74a7.js\",\n    \"@hotwired/stimulus\": \"/assets/stimulus.min-4b1e420e.js\",\n    \"@hotwired/stimulus-loading\": \"/assets/stimulus-loading-1fc53fe7.js\",\n    \"@hotwired/turbo-rails\": \"/assets/turbo-a1e3a50a.js\",\n    \"@rails/actioncable\": \"/assets/actioncable.esm-e0ec9819.js\",\n    \"@rails/request.js\": \"/assets/@rails--request-3fc8489d.js\",\n    \"lexxy\": \"/assets/lexxy-a21f41d4.js\",\n    \"highlight.js\": \"/assets/highlight.js/core-4e141f64.js\",\n    \"initializers/autocomplete\": \"/assets/initializers/autocomplete-ba9abe45.js\",\n    \"initializers/current\": \"/assets/initializers/current-3a3b90da.js\",\n    \"initializers/highlight\": \"/assets/initializers/highlight-5bd558f1.js\",\n    \"initializers\": \"/assets/initializers/index-d2bbfae4.js\",\n    \"initializers/rich_text\": \"/assets/initializers/rich_text-f451a05e.js\",\n    \"lib/autocomplete/autocomplete_handler\": \"/assets/lib/autocomplete/autocomplete_handler-becd1e1a.js\",\n    \"lib/autocomplete/base_autocomplete_handler\": \"/assets/lib/autocomplete/base_autocomplete_handler-e29a896e.js\",\n    \"lib/autocomplete/collection\": \"/assets/lib/autocomplete/collection-3e251a0e.js\",\n    \"lib/autocomplete/constants\": \"/assets/lib/autocomplete/constants-17c2858b.js\",\n    \"lib/autocomplete/custom_elements/suggestion_option\": \"/assets/lib/autocomplete/custom_elements/suggestion_option-ac7846b3.js\",\n    \"lib/autocomplete/custom_elements/suggestion_select\": \"/assets/lib/autocomplete/custom_elements/suggestion_select-f0045305.js\",\n    \"lib/autocomplete/helpers\": \"/assets/lib/autocomplete/helpers-651308b9.js\",\n    \"lib/autocomplete/renderer\": \"/assets/lib/autocomplete/renderer-5caf6120.js\",\n    \"lib/autocomplete/selection\": \"/assets/lib/autocomplete/selection-862705bf.js\",\n    \"lib/autocomplete/suggestion_context\": \"/assets/lib/autocomplete/suggestion_context-b265ffb4.js\",\n    \"lib/autocomplete/suggestion_controller\": \"/assets/lib/autocomplete/suggestion_controller-10624c40.js\",\n    \"lib/autocomplete/suggestion_results_controller\": \"/assets/lib/autocomplete/suggestion_results_controller-91405749.js\",\n    \"lib/autocomplete/utils\": \"/assets/lib/autocomplete/utils-296fb278.js\",\n    \"lib/cookie\": \"/assets/lib/cookie-76006835.js\",\n    \"lib/rich_text/campfire_extension\": \"/assets/lib/rich_text/campfire_extension-f62f017b.js\",\n    \"lib/rich_text/cite_node\": \"/assets/lib/rich_text/cite_node-b4d2b89a.js\",\n    \"controllers/application\": \"/assets/controllers/application-f004202c.js\",\n    \"controllers/auto_submit_controller\": \"/assets/controllers/auto_submit_controller-ee52d396.js\",\n    \"controllers/autocomplete_controller\": \"/assets/controllers/autocomplete_controller-eaf5b07d.js\",\n    \"controllers/badge_dot_controller\": \"/assets/controllers/badge_dot_controller-e0d733c8.js\",\n    \"controllers/boost_delete_controller\": \"/assets/controllers/boost_delete_controller-29fd1686.js\",\n    \"controllers/composer_controller\": \"/assets/controllers/composer_controller-73c33f9f.js\",\n    \"controllers/copy_to_clipboard_controller\": \"/assets/controllers/copy_to_clipboard_controller-07e32f4d.js\",\n    \"controllers/drop_target_controller\": \"/assets/controllers/drop_target_controller-3a205782.js\",\n    \"controllers/element_removal_controller\": \"/assets/controllers/element_removal_controller-4526910a.js\",\n    \"controllers/filter_controller\": \"/assets/controllers/filter_controller-ca9769d5.js\",\n    \"controllers/form_controller\": \"/assets/controllers/form_controller-6f3d64db.js\",\n    \"controllers\": \"/assets/controllers/index-594ba2fb.js\",\n    \"controllers/lightbox_controller\": \"/assets/controllers/lightbox_controller-98fc07ca.js\",\n    \"controllers/local_time_controller\": \"/assets/controllers/local_time_controller-7daf3d0c.js\",\n    \"controllers/maintain_scroll_controller\": \"/assets/controllers/maintain_scroll_controller-1debbbfb.js\",\n    \"controllers/messages_controller\": \"/assets/controllers/messages_controller-3d90944a.js\",\n    \"controllers/notifications_controller\": \"/assets/controllers/notifications_controller-746d0662.js\",\n    \"controllers/popup_controller\": \"/assets/controllers/popup_controller-9f8ea824.js\",\n    \"controllers/presence_controller\": \"/assets/controllers/presence_controller-28f14aad.js\",\n    \"controllers/pwa_install_controller\": \"/assets/controllers/pwa_install_controller-3fe3fc5e.js\",\n    \"controllers/read_rooms_controller\": \"/assets/controllers/read_rooms_controller-8245522a.js\",\n    \"controllers/refresh_room_controller\": \"/assets/controllers/refresh_room_controller-4e4b6014.js\",\n    \"controllers/reply_controller\": \"/assets/controllers/reply_controller-278bb9cc.js\",\n    \"controllers/rooms_list_controller\": \"/assets/controllers/rooms_list_controller-64840fcd.js\",\n    \"controllers/scroll_into_view_controller\": \"/assets/controllers/scroll_into_view_controller-8a0bc733.js\",\n    \"controllers/search_results_controller\": \"/assets/controllers/search_results_controller-aab46974.js\",\n    \"controllers/sessions_controller\": \"/assets/controllers/sessions_controller-a9fdfe3d.js\",\n    \"controllers/soft_keyboard_controller\": \"/assets/controllers/soft_keyboard_controller-be1da837.js\",\n    \"controllers/sorted_list_controller\": \"/assets/controllers/sorted_list_controller-9f9ae485.js\",\n    \"controllers/sound_controller\": \"/assets/controllers/sound_controller-d3e5656e.js\",\n    \"controllers/toggle_class_controller\": \"/assets/controllers/toggle_class_controller-b67fa681.js\",\n    \"controllers/turbo_frame_controller\": \"/assets/controllers/turbo_frame_controller-9f4f722f.js\",\n    \"controllers/turbo_streaming_controller\": \"/assets/controllers/turbo_streaming_controller-04b85a80.js\",\n    \"controllers/typing_notifications_controller\": \"/assets/controllers/typing_notifications_controller-86906ab9.js\",\n    \"controllers/unfurl_controller\": \"/assets/controllers/unfurl_controller-4a868f9a.js\",\n    \"controllers/upload_preview_controller\": \"/assets/controllers/upload_preview_controller-9b8b26bb.js\",\n    \"controllers/web_share_controller\": \"/assets/controllers/web_share_controller-f7236b6f.js\",\n    \"helpers/dom_helpers\": \"/assets/helpers/dom_helpers-0f234176.js\",\n    \"helpers/navigator_helpers\": \"/assets/helpers/navigator_helpers-3c9f4c31.js\",\n    \"helpers/string_helpers\": \"/assets/helpers/string_helpers-40941ba8.js\",\n    \"helpers/timing_helpers\": \"/assets/helpers/timing_helpers-94d95529.js\",\n    \"helpers/turbo_helpers\": \"/assets/helpers/turbo_helpers-a3c01462.js\",\n    \"models/client_message\": \"/assets/models/client_message-de3c07cf.js\",\n    \"models/file_uploader\": \"/assets/models/file_uploader-d3a5c44b.js\",\n    \"models/message_formatter\": \"/assets/models/message_formatter-f39a0c5d.js\",\n    \"models/message_paginator\": \"/assets/models/message_paginator-b79013e3.js\",\n    \"models/scroll_manager\": \"/assets/models/scroll_manager-ed559629.js\",\n    \"models/typing_tracker\": \"/assets/models/typing_tracker-42a444a5.js\",\n    \"languages/bash\": \"/assets/languages/bash-13136668.js\",\n    \"languages/css\": \"/assets/languages/css-a7f2e40b.js\",\n    \"languages/diff\": \"/assets/languages/diff-94a335fe.js\",\n    \"languages/go\": \"/assets/languages/go-10465864.js\",\n    \"languages/java\": \"/assets/languages/java-95f3a30f.js\",\n    \"languages/javascript\": \"/assets/languages/javascript-18eb0dd8.js\",\n    \"languages/json\": \"/assets/languages/json-60184e1b.js\",\n    \"languages/python\": \"/assets/languages/python-8f48fd1a.js\",\n    \"languages/ruby\": \"/assets/languages/ruby-287ccd0f.js\",\n    \"languages/rust\": \"/assets/languages/rust-d48f93d8.js\",\n    \"languages/sql\": \"/assets/languages/sql-642be05a.js\",\n    \"languages/xml\": \"/assets/languages/xml-fa7f1eda.js\"\n  }\n}</script>\n<link rel=\"modulepreload\" href=\"/assets/application-a54c74a7.js\">\n<link rel=\"modulepreload\" href=\"/assets/stimulus.min-4b1e420e.js\">\n<link rel=\"modulepreload\" href=\"/assets/stimulus-loading-1fc53fe7.js\">\n<link rel=\"modulepreload\" href=\"/assets/turbo-a1e3a50a.js\">\n<link rel=\"modulepreload\" href=\"/assets/actioncable.esm-e0ec9819.js\">\n<link rel=\"modulepreload\" href=\"/assets/@rails--request-3fc8489d.js\">\n<link rel=\"modulepreload\" href=\"/assets/lexxy-a21f41d4.js\">\n<link rel=\"modulepreload\" href=\"/assets/highlight.js/core-4e141f64.js\">\n<link rel=\"modulepreload\" href=\"/assets/initializers/autocomplete-ba9abe45.js\">\n<link rel=\"modulepreload\" href=\"/assets/initializers/current-3a3b90da.js\">\n<link rel=\"modulepreload\" href=\"/assets/initializers/highlight-5bd558f1.js\">\n<link rel=\"modulepreload\" href=\"/assets/initializers/index-d2bbfae4.js\">\n<link rel=\"modulepreload\" href=\"/assets/initializers/rich_text-f451a05e.js\">\n<link rel=\"modulepreload\" href=\"/assets/lib/autocomplete/autocomplete_handler-becd1e1a.js\">\n<link rel=\"modulepreload\" href=\"/assets/lib/autocomplete/base_autocomplete_handler-e29a896e.js\">\n<link rel=\"modulepreload\" href=\"/assets/lib/autocomplete/collection-3e251a0e.js\">\n<link rel=\"modulepreload\" href=\"/assets/lib/autocomplete/constants-17c2858b.js\">\n<link rel=\"modulepreload\" href=\"/assets/lib/autocomplete/custom_elements/suggestion_option-ac7846b3.js\">\n<link rel=\"modulepreload\" href=\"/assets/lib/autocomplete/custom_elements/suggestion_select-f0045305.js\">\n<link rel=\"modulepreload\" href=\"/assets/lib/autocomplete/helpers-651308b9.js\">\n<link rel=\"modulepreload\" href=\"/assets/lib/autocomplete/renderer-5caf6120.js\">\n<link rel=\"modulepreload\" href=\"/assets/lib/autocomplete/selection-862705bf.js\">\n<link rel=\"modulepreload\" href=\"/assets/lib/autocomplete/suggestion_context-b265ffb4.js\">\n<link rel=\"modulepreload\" href=\"/assets/lib/autocomplete/suggestion_controller-10624c40.js\">\n<link rel=\"modulepreload\" href=\"/assets/lib/autocomplete/suggestion_results_controller-91405749.js\">\n<link rel=\"modulepreload\" href=\"/assets/lib/autocomplete/utils-296fb278.js\">\n<link rel=\"modulepreload\" href=\"/assets/lib/cookie-76006835.js\">\n<link rel=\"modulepreload\" href=\"/assets/lib/rich_text/campfire_extension-f62f017b.js\">\n<link rel=\"modulepreload\" href=\"/assets/lib/rich_text/cite_node-b4d2b89a.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/application-f004202c.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/auto_submit_controller-ee52d396.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/autocomplete_controller-eaf5b07d.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/badge_dot_controller-e0d733c8.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/boost_delete_controller-29fd1686.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/composer_controller-73c33f9f.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/copy_to_clipboard_controller-07e32f4d.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/drop_target_controller-3a205782.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/element_removal_controller-4526910a.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/filter_controller-ca9769d5.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/form_controller-6f3d64db.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/index-594ba2fb.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/lightbox_controller-98fc07ca.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/local_time_controller-7daf3d0c.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/maintain_scroll_controller-1debbbfb.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/messages_controller-3d90944a.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/notifications_controller-746d0662.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/popup_controller-9f8ea824.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/presence_controller-28f14aad.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/pwa_install_controller-3fe3fc5e.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/read_rooms_controller-8245522a.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/refresh_room_controller-4e4b6014.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/reply_controller-278bb9cc.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/rooms_list_controller-64840fcd.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/scroll_into_view_controller-8a0bc733.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/search_results_controller-aab46974.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/sessions_controller-a9fdfe3d.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/soft_keyboard_controller-be1da837.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/sorted_list_controller-9f9ae485.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/sound_controller-d3e5656e.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/toggle_class_controller-b67fa681.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/turbo_frame_controller-9f4f722f.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/turbo_streaming_controller-04b85a80.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/typing_notifications_controller-86906ab9.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/unfurl_controller-4a868f9a.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/upload_preview_controller-9b8b26bb.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/web_share_controller-f7236b6f.js\">\n<link rel=\"modulepreload\" href=\"/assets/helpers/dom_helpers-0f234176.js\">\n<link rel=\"modulepreload\" href=\"/assets/helpers/navigator_helpers-3c9f4c31.js\">\n<link rel=\"modulepreload\" href=\"/assets/helpers/string_helpers-40941ba8.js\">\n<link rel=\"modulepreload\" href=\"/assets/helpers/timing_helpers-94d95529.js\">\n<link rel=\"modulepreload\" href=\"/assets/helpers/turbo_helpers-a3c01462.js\">\n<link rel=\"modulepreload\" href=\"/assets/models/client_message-de3c07cf.js\">\n<link rel=\"modulepreload\" href=\"/assets/models/file_uploader-d3a5c44b.js\">\n<link rel=\"modulepreload\" href=\"/assets/models/message_formatter-f39a0c5d.js\">\n<link rel=\"modulepreload\" href=\"/assets/models/message_paginator-b79013e3.js\">\n<link rel=\"modulepreload\" href=\"/assets/models/scroll_manager-ed559629.js\">\n<link rel=\"modulepreload\" href=\"/assets/models/typing_tracker-42a444a5.js\">\n<link rel=\"modulepreload\" href=\"/assets/languages/bash-13136668.js\">\n<link rel=\"modulepreload\" href=\"/assets/languages/css-a7f2e40b.js\">\n<link rel=\"modulepreload\" href=\"/assets/languages/diff-94a335fe.js\">\n<link rel=\"modulepreload\" href=\"/assets/languages/go-10465864.js\">\n<link rel=\"modulepreload\" href=\"/assets/languages/java-95f3a30f.js\">\n<link rel=\"modulepreload\" href=\"/assets/languages/javascript-18eb0dd8.js\">\n<link rel=\"modulepreload\" href=\"/assets/languages/json-60184e1b.js\">\n<link rel=\"modulepreload\" href=\"/assets/languages/python-8f48fd1a.js\">\n<link rel=\"modulepreload\" href=\"/assets/languages/ruby-287ccd0f.js\">\n<link rel=\"modulepreload\" href=\"/assets/languages/rust-d48f93d8.js\">\n<link rel=\"modulepreload\" href=\"/assets/languages/sql-642be05a.js\">\n<link rel=\"modulepreload\" href=\"/assets/languages/xml-fa7f1eda.js\">\n<script type=\"module\">import \"application\"</script>\n\n    <meta name=\"turbo-visit-control\" content=\"reload\">\n  </head>\n\n  <body class=\"\" data-controller=\"local-time lightbox\">\n    <a href=\"#main-content\" class=\"skip-navigation btn\">Skip to main content</a>\n\n    <nav id=\"nav\">\n      \n    </nav>\n\n\n    <main id=\"main-content\">\n      \n<section class=\"txt-align-center\">\n  <div class=\"panel \">\n    <figure class=\"account-logo avatar center margin-block-end txt-xx-large\"><img alt=\"Account logo\" src=\"/account/logo?v=20260101160000\" width=\"300\" height=\"300\" /></figure>\n\n    <form class=\"flex flex-column gap\" action=\"http://campfire.test/session\" accept-charset=\"UTF-8\" method=\"post\"><input type=\"hidden\" name=\"authenticity_token\" value=\"<VALIDATED_TOKEN>\" />\n      <fieldset class=\"flex flex-column gap center-block upad\">\n        <legend class=\"txt-large txt-align-center\"><strong>37signals</strong></legend>\n\n        <div class=\"flex align-center gap\">\n          <details class=\"position-relative\" data-controller=\"popup\" data-action=\"keydown.esc-&gt;popup#close toggle-&gt;popup#toggle click@document-&gt;popup#closeOnClickOutside\" data-popup-orientation-top-class=\"popup-orientation-top\"><summary class=\"btn\" tabindex=\"-1\"><img aria-hidden=\"true\" class=\"color-icon\" src=\"/assets/globe-8c54d23b.svg\" width=\"20\" height=\"20\" /><span class=\"for-screen-reader\">Translate</span></summary><div class=\"language-list-menu shadow\" data-popup-target=\"menu\"><dl class=\"language-list\"><dt>\ud83c\uddfa\ud83c\uddf8</dt><dd class=\"margin-none\">Enter your email address</dd><dt>\ud83c\uddea\ud83c\uddf8</dt><dd class=\"margin-none\">Introduce tu correo electr\u00f3nico</dd><dt>\ud83c\uddeb\ud83c\uddf7</dt><dd class=\"margin-none\">Entrez votre adresse courriel</dd><dt>\ud83c\uddee\ud83c\uddf3</dt><dd class=\"margin-none\">\u0905\u092a\u0928\u093e \u0908\u092e\u0947\u0932 \u092a\u0924\u093e \u0926\u0930\u094d\u091c \u0915\u0930\u0947\u0902</dd><dt>\ud83c\udde9\ud83c\uddea</dt><dd class=\"margin-none\">Geben Sie Ihre E-Mail-Adresse ein</dd><dt>\ud83c\udde7\ud83c\uddf7</dt><dd class=\"margin-none\">Insira seu endere\u00e7o de email</dd><dt>\ud83c\uddef\ud83c\uddf5</dt><dd class=\"margin-none\">\u30e1\u30fc\u30eb\u30a2\u30c9\u30ec\u30b9\u3092\u5165\u529b\u3057\u3066\u304f\u3060\u3055\u3044</dd></dl></div></details>\n          <label class=\"flex align-center gap input input--actor txt-large\">\n            <input required=\"required\" class=\"input\" autofocus=\"autofocus\" autocomplete=\"username\" placeholder=\"Enter your email address\" type=\"email\" name=\"email_address\" id=\"email_address\" />\n            <img aria-hidden=\"true\" class=\"colorize--black\" src=\"/assets/email-6c595bc5.svg\" width=\"24\" height=\"24\" />\n          </label>\n        </div>\n\n        <div class=\"flex align-center gap\">\n          <details class=\"position-relative\" data-controller=\"popup\" data-action=\"keydown.esc-&gt;popup#close toggle-&gt;popup#toggle click@document-&gt;popup#closeOnClickOutside\" data-popup-orientation-top-class=\"popup-orientation-top\"><summary class=\"btn\" tabindex=\"-1\"><img aria-hidden=\"true\" class=\"color-icon\" src=\"/assets/globe-8c54d23b.svg\" width=\"20\" height=\"20\" /><span class=\"for-screen-reader\">Translate</span></summary><div class=\"language-list-menu shadow\" data-popup-target=\"menu\"><dl class=\"language-list\"><dt>\ud83c\uddfa\ud83c\uddf8</dt><dd class=\"margin-none\">Enter your password</dd><dt>\ud83c\uddea\ud83c\uddf8</dt><dd class=\"margin-none\">Introduce tu contrase\u00f1a</dd><dt>\ud83c\uddeb\ud83c\uddf7</dt><dd class=\"margin-none\">Saisissez votre mot de passe</dd><dt>\ud83c\uddee\ud83c\uddf3</dt><dd class=\"margin-none\">\u0905\u092a\u0928\u093e \u092a\u093e\u0938\u0935\u0930\u094d\u0921 \u0926\u0930\u094d\u091c \u0915\u0930\u0947\u0902</dd><dt>\ud83c\udde9\ud83c\uddea</dt><dd class=\"margin-none\">Geben Sie Ihr Passwort ein</dd><dt>\ud83c\udde7\ud83c\uddf7</dt><dd class=\"margin-none\">Insira sua senha</dd><dt>\ud83c\uddef\ud83c\uddf5</dt><dd class=\"margin-none\">\u30d1\u30b9\u30ef\u30fc\u30c9\u3092\u5165\u529b\u3057\u3066\u304f\u3060\u3055\u3044</dd></dl></div></details>\n          <label class=\"flex align-center gap input input--actor txt-large\">\n            <input required=\"required\" class=\"input\" autocomplete=\"current-password\" placeholder=\"Enter your password\" maxlength=\"72\" size=\"72\" type=\"password\" name=\"password\" id=\"password\" />\n            <img aria-hidden=\"true\" class=\"colorize--black\" src=\"/assets/password-0896da4e.svg\" width=\"24\" height=\"24\" />\n          </label>\n        </div>\n\n        <button name=\"log_in\" type=\"submit\" class=\"btn btn--reversed center txt-large\">\n          <img aria-hidden=\"true\" src=\"/assets/arrow-right-8f3eb40d.svg\" />\n          <span class=\"for-screen-reader\">Go</span>\n</button>      </fieldset>\n</form>  </div>\n\n    <div class=\"txt-align-center margin-block-double full-width\">\n    <a class=\"btn center\" title=\"Email David\" href=\"mailto:&quot;David&quot; &lt;david@37signals.com&gt;\">\n      <img aria-hidden=\"true\" src=\"/assets/lifebuoy-f31f26aa.svg\" />\n      <span>david@37signals.com</span>\n</a>\n    <div class=\"txt-align-center center margin-block txt-subtle\">Campfire&trade; version <span class=\"version-badge\">parity</span></div>\n  </div>\n\n</section>\n\n\n      <footer id=\"footer\">\n        \n      </footer>\n    </main>\n\n    <aside id=\"sidebar\" data-controller=\"toggle-class\" data-toggle-class-toggle-class=\"open\">\n      \n    </aside>\n\n    <dialog class=\"lightbox\" aria-label=\"Image Viewer (Press escape to close)\" data-lightbox-target=\"dialog\" data-action=\"close->lightbox#reset\">\n  <img src=\"\" class=\"lightbox__image\" data-lightbox-target=\"zoomedImage\" />\n\n  <form method=\"dialog\" class=\"lightbox__btn\">\n    <button class=\"btn\">\n      <img aria-hidden=\"true\" src=\"/assets/remove-0e7a045d.svg\" />\n      <span class=\"for-screen-reader\">Close image viewer</span>\n    </button>\n  </form>\n\n  <a href=\"\" class=\"lightbox__btn--download btn hide-in-ios-pwa\" data-lightbox-target=\"download\">\n    <img aria-hidden=\"true\" src=\"/assets/download-04029899.svg\" />\n    <span class=\"for-screen-reader\">Download file</span>\n  </a>\n\n  <button class=\"lightbox__btn--share btn\"\n      data-controller=\"web-share\"\n      data-action=\"web-share#share\"\n      data-web-share-files-value=\"\"\n      data-lightbox-target=\"share\">\n    <img aria-hidden=\"true\" src=\"/assets/share-bf28da4f.svg\" />\n    <span class=\"for-screen-reader\">Share file</span>\n  </button>\n</dialog>\n\n\n    <a href=\"https://once.com\" id=\"app-logo\" target=\"_blank\" aria-label=\"Once software from 37signals home page\">\n      <img alt=\"Campfire logo\" width=\"256\" height=\"216\" src=\"/assets/campfire-icon-3d9986c5.png\" />\n    </a>\n  </body>\n</html>\n",
+    "location": null
+  },
+  "/session/new query_bot=False": {
+    "status": 200,
+    "type": "text/html; charset=utf-8",
+    "body": "<!DOCTYPE html>\n<html>\n  <head>\n    <title>Sign in</title>\n\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1, user-scalable=no, interactive-widget=resizes-content\">\n    <meta name=\"view-transition\" content=\"same-origin\">\n    <meta name=\"color-scheme\" content=\"light dark\">\n    <meta name=\"theme-color\" content=\"#ffffff\" media=\"(prefers-color-scheme: light)\">\n    <meta name=\"theme-color\" content=\"#000000\" media=\"(prefers-color-scheme: dark)\">\n    <meta name=\"apple-mobile-web-app-capable\" content=\"yes\">\n    <meta name=\"csrf-param\" content=\"authenticity_token\" />\n<meta name=\"csrf-token\" content=\"<VALIDATED_TOKEN>\" />\n    \n    \n    <meta name=\"action-cable-url\" content=\"/cable\">\n\n    <meta name=\"vapid-public-key\" content=\"BEYXTBB5_jNhNzXDmx5KEU55Vbbd-u--Lk9rM5OFQvUkPIBwZJ9QzAq0zdEzFw6yTV8cTriz_qYBVicY02_VxTQ=\">\n    <meta name=\"turbo-prefetch\" content=\"true\">\n\n    <link rel=\"manifest\" href=\"/webmanifest.json\">\n    <link rel=\"icon\" href=\"/account/logo?v=20260101160000\" type=\"image/png\">\n    <link rel=\"apple-touch-icon\" href=\"/account/logo?v=20260101160000\">\n\n    <link rel=\"stylesheet\" href=\"/assets/_reset-9c3efd7b.css\" data-turbo-track=\"reload\" />\n<link rel=\"stylesheet\" href=\"/assets/actiontext-7b8d51ea.css\" data-turbo-track=\"reload\" />\n<link rel=\"stylesheet\" href=\"/assets/animation-bcdb4bab.css\" data-turbo-track=\"reload\" />\n<link rel=\"stylesheet\" href=\"/assets/autocomplete-9de8c93f.css\" data-turbo-track=\"reload\" />\n<link rel=\"stylesheet\" href=\"/assets/avatars-279376ab.css\" data-turbo-track=\"reload\" />\n<link rel=\"stylesheet\" href=\"/assets/base-637a0ec8.css\" data-turbo-track=\"reload\" />\n<link rel=\"stylesheet\" href=\"/assets/boosts-da4032a8.css\" data-turbo-track=\"reload\" />\n<link rel=\"stylesheet\" href=\"/assets/buttons-c7d39fd4.css\" data-turbo-track=\"reload\" />\n<link rel=\"stylesheet\" href=\"/assets/code-333ae548.css\" data-turbo-track=\"reload\" />\n<link rel=\"stylesheet\" href=\"/assets/colorize-eb391ca0.css\" data-turbo-track=\"reload\" />\n<link rel=\"stylesheet\" href=\"/assets/colors-aee62523.css\" data-turbo-track=\"reload\" />\n<link rel=\"stylesheet\" href=\"/assets/composer-e490638a.css\" data-turbo-track=\"reload\" />\n<link rel=\"stylesheet\" href=\"/assets/embeds-c20d0a3a.css\" data-turbo-track=\"reload\" />\n<link rel=\"stylesheet\" href=\"/assets/filters-8a4d63ed.css\" data-turbo-track=\"reload\" />\n<link rel=\"stylesheet\" href=\"/assets/flash-a561c1e5.css\" data-turbo-track=\"reload\" />\n<link rel=\"stylesheet\" href=\"/assets/inputs-9e58a07c.css\" data-turbo-track=\"reload\" />\n<link rel=\"stylesheet\" href=\"/assets/layout-ff6ddfc6.css\" data-turbo-track=\"reload\" />\n<link rel=\"stylesheet\" href=\"/assets/lexxy-content-0ff2f961.css\" data-turbo-track=\"reload\" />\n<link rel=\"stylesheet\" href=\"/assets/lexxy-editor-2d5c7ebe.css\" data-turbo-track=\"reload\" />\n<link rel=\"stylesheet\" href=\"/assets/lexxy-variables-3fef4323.css\" data-turbo-track=\"reload\" />\n<link rel=\"stylesheet\" href=\"/assets/lexxy-2876c58e.css\" data-turbo-track=\"reload\" />\n<link rel=\"stylesheet\" href=\"/assets/lightbox-af496d39.css\" data-turbo-track=\"reload\" />\n<link rel=\"stylesheet\" href=\"/assets/messages-c5485fef.css\" data-turbo-track=\"reload\" />\n<link rel=\"stylesheet\" href=\"/assets/nav-05e7183a.css\" data-turbo-track=\"reload\" />\n<link rel=\"stylesheet\" href=\"/assets/panels-af44ec6d.css\" data-turbo-track=\"reload\" />\n<link rel=\"stylesheet\" href=\"/assets/separators-172b3ab8.css\" data-turbo-track=\"reload\" />\n<link rel=\"stylesheet\" href=\"/assets/sidebar-0be58db9.css\" data-turbo-track=\"reload\" />\n<link rel=\"stylesheet\" href=\"/assets/signup-6e02d591.css\" data-turbo-track=\"reload\" />\n<link rel=\"stylesheet\" href=\"/assets/spinner-5a118f25.css\" data-turbo-track=\"reload\" />\n<link rel=\"stylesheet\" href=\"/assets/trix-65afdb1d.css\" data-turbo-track=\"reload\" />\n<link rel=\"stylesheet\" href=\"/assets/utilities-e2f32466.css\" data-turbo-track=\"reload\" />\n    \n\n    <script type=\"importmap\" data-turbo-track=\"reload\">{\n  \"imports\": {\n    \"application\": \"/assets/application-a54c74a7.js\",\n    \"@hotwired/stimulus\": \"/assets/stimulus.min-4b1e420e.js\",\n    \"@hotwired/stimulus-loading\": \"/assets/stimulus-loading-1fc53fe7.js\",\n    \"@hotwired/turbo-rails\": \"/assets/turbo-a1e3a50a.js\",\n    \"@rails/actioncable\": \"/assets/actioncable.esm-e0ec9819.js\",\n    \"@rails/request.js\": \"/assets/@rails--request-3fc8489d.js\",\n    \"lexxy\": \"/assets/lexxy-a21f41d4.js\",\n    \"highlight.js\": \"/assets/highlight.js/core-4e141f64.js\",\n    \"initializers/autocomplete\": \"/assets/initializers/autocomplete-ba9abe45.js\",\n    \"initializers/current\": \"/assets/initializers/current-3a3b90da.js\",\n    \"initializers/highlight\": \"/assets/initializers/highlight-5bd558f1.js\",\n    \"initializers\": \"/assets/initializers/index-d2bbfae4.js\",\n    \"initializers/rich_text\": \"/assets/initializers/rich_text-f451a05e.js\",\n    \"lib/autocomplete/autocomplete_handler\": \"/assets/lib/autocomplete/autocomplete_handler-becd1e1a.js\",\n    \"lib/autocomplete/base_autocomplete_handler\": \"/assets/lib/autocomplete/base_autocomplete_handler-e29a896e.js\",\n    \"lib/autocomplete/collection\": \"/assets/lib/autocomplete/collection-3e251a0e.js\",\n    \"lib/autocomplete/constants\": \"/assets/lib/autocomplete/constants-17c2858b.js\",\n    \"lib/autocomplete/custom_elements/suggestion_option\": \"/assets/lib/autocomplete/custom_elements/suggestion_option-ac7846b3.js\",\n    \"lib/autocomplete/custom_elements/suggestion_select\": \"/assets/lib/autocomplete/custom_elements/suggestion_select-f0045305.js\",\n    \"lib/autocomplete/helpers\": \"/assets/lib/autocomplete/helpers-651308b9.js\",\n    \"lib/autocomplete/renderer\": \"/assets/lib/autocomplete/renderer-5caf6120.js\",\n    \"lib/autocomplete/selection\": \"/assets/lib/autocomplete/selection-862705bf.js\",\n    \"lib/autocomplete/suggestion_context\": \"/assets/lib/autocomplete/suggestion_context-b265ffb4.js\",\n    \"lib/autocomplete/suggestion_controller\": \"/assets/lib/autocomplete/suggestion_controller-10624c40.js\",\n    \"lib/autocomplete/suggestion_results_controller\": \"/assets/lib/autocomplete/suggestion_results_controller-91405749.js\",\n    \"lib/autocomplete/utils\": \"/assets/lib/autocomplete/utils-296fb278.js\",\n    \"lib/cookie\": \"/assets/lib/cookie-76006835.js\",\n    \"lib/rich_text/campfire_extension\": \"/assets/lib/rich_text/campfire_extension-f62f017b.js\",\n    \"lib/rich_text/cite_node\": \"/assets/lib/rich_text/cite_node-b4d2b89a.js\",\n    \"controllers/application\": \"/assets/controllers/application-f004202c.js\",\n    \"controllers/auto_submit_controller\": \"/assets/controllers/auto_submit_controller-ee52d396.js\",\n    \"controllers/autocomplete_controller\": \"/assets/controllers/autocomplete_controller-eaf5b07d.js\",\n    \"controllers/badge_dot_controller\": \"/assets/controllers/badge_dot_controller-e0d733c8.js\",\n    \"controllers/boost_delete_controller\": \"/assets/controllers/boost_delete_controller-29fd1686.js\",\n    \"controllers/composer_controller\": \"/assets/controllers/composer_controller-73c33f9f.js\",\n    \"controllers/copy_to_clipboard_controller\": \"/assets/controllers/copy_to_clipboard_controller-07e32f4d.js\",\n    \"controllers/drop_target_controller\": \"/assets/controllers/drop_target_controller-3a205782.js\",\n    \"controllers/element_removal_controller\": \"/assets/controllers/element_removal_controller-4526910a.js\",\n    \"controllers/filter_controller\": \"/assets/controllers/filter_controller-ca9769d5.js\",\n    \"controllers/form_controller\": \"/assets/controllers/form_controller-6f3d64db.js\",\n    \"controllers\": \"/assets/controllers/index-594ba2fb.js\",\n    \"controllers/lightbox_controller\": \"/assets/controllers/lightbox_controller-98fc07ca.js\",\n    \"controllers/local_time_controller\": \"/assets/controllers/local_time_controller-7daf3d0c.js\",\n    \"controllers/maintain_scroll_controller\": \"/assets/controllers/maintain_scroll_controller-1debbbfb.js\",\n    \"controllers/messages_controller\": \"/assets/controllers/messages_controller-3d90944a.js\",\n    \"controllers/notifications_controller\": \"/assets/controllers/notifications_controller-746d0662.js\",\n    \"controllers/popup_controller\": \"/assets/controllers/popup_controller-9f8ea824.js\",\n    \"controllers/presence_controller\": \"/assets/controllers/presence_controller-28f14aad.js\",\n    \"controllers/pwa_install_controller\": \"/assets/controllers/pwa_install_controller-3fe3fc5e.js\",\n    \"controllers/read_rooms_controller\": \"/assets/controllers/read_rooms_controller-8245522a.js\",\n    \"controllers/refresh_room_controller\": \"/assets/controllers/refresh_room_controller-4e4b6014.js\",\n    \"controllers/reply_controller\": \"/assets/controllers/reply_controller-278bb9cc.js\",\n    \"controllers/rooms_list_controller\": \"/assets/controllers/rooms_list_controller-64840fcd.js\",\n    \"controllers/scroll_into_view_controller\": \"/assets/controllers/scroll_into_view_controller-8a0bc733.js\",\n    \"controllers/search_results_controller\": \"/assets/controllers/search_results_controller-aab46974.js\",\n    \"controllers/sessions_controller\": \"/assets/controllers/sessions_controller-a9fdfe3d.js\",\n    \"controllers/soft_keyboard_controller\": \"/assets/controllers/soft_keyboard_controller-be1da837.js\",\n    \"controllers/sorted_list_controller\": \"/assets/controllers/sorted_list_controller-9f9ae485.js\",\n    \"controllers/sound_controller\": \"/assets/controllers/sound_controller-d3e5656e.js\",\n    \"controllers/toggle_class_controller\": \"/assets/controllers/toggle_class_controller-b67fa681.js\",\n    \"controllers/turbo_frame_controller\": \"/assets/controllers/turbo_frame_controller-9f4f722f.js\",\n    \"controllers/turbo_streaming_controller\": \"/assets/controllers/turbo_streaming_controller-04b85a80.js\",\n    \"controllers/typing_notifications_controller\": \"/assets/controllers/typing_notifications_controller-86906ab9.js\",\n    \"controllers/unfurl_controller\": \"/assets/controllers/unfurl_controller-4a868f9a.js\",\n    \"controllers/upload_preview_controller\": \"/assets/controllers/upload_preview_controller-9b8b26bb.js\",\n    \"controllers/web_share_controller\": \"/assets/controllers/web_share_controller-f7236b6f.js\",\n    \"helpers/dom_helpers\": \"/assets/helpers/dom_helpers-0f234176.js\",\n    \"helpers/navigator_helpers\": \"/assets/helpers/navigator_helpers-3c9f4c31.js\",\n    \"helpers/string_helpers\": \"/assets/helpers/string_helpers-40941ba8.js\",\n    \"helpers/timing_helpers\": \"/assets/helpers/timing_helpers-94d95529.js\",\n    \"helpers/turbo_helpers\": \"/assets/helpers/turbo_helpers-a3c01462.js\",\n    \"models/client_message\": \"/assets/models/client_message-de3c07cf.js\",\n    \"models/file_uploader\": \"/assets/models/file_uploader-d3a5c44b.js\",\n    \"models/message_formatter\": \"/assets/models/message_formatter-f39a0c5d.js\",\n    \"models/message_paginator\": \"/assets/models/message_paginator-b79013e3.js\",\n    \"models/scroll_manager\": \"/assets/models/scroll_manager-ed559629.js\",\n    \"models/typing_tracker\": \"/assets/models/typing_tracker-42a444a5.js\",\n    \"languages/bash\": \"/assets/languages/bash-13136668.js\",\n    \"languages/css\": \"/assets/languages/css-a7f2e40b.js\",\n    \"languages/diff\": \"/assets/languages/diff-94a335fe.js\",\n    \"languages/go\": \"/assets/languages/go-10465864.js\",\n    \"languages/java\": \"/assets/languages/java-95f3a30f.js\",\n    \"languages/javascript\": \"/assets/languages/javascript-18eb0dd8.js\",\n    \"languages/json\": \"/assets/languages/json-60184e1b.js\",\n    \"languages/python\": \"/assets/languages/python-8f48fd1a.js\",\n    \"languages/ruby\": \"/assets/languages/ruby-287ccd0f.js\",\n    \"languages/rust\": \"/assets/languages/rust-d48f93d8.js\",\n    \"languages/sql\": \"/assets/languages/sql-642be05a.js\",\n    \"languages/xml\": \"/assets/languages/xml-fa7f1eda.js\"\n  }\n}</script>\n<link rel=\"modulepreload\" href=\"/assets/application-a54c74a7.js\">\n<link rel=\"modulepreload\" href=\"/assets/stimulus.min-4b1e420e.js\">\n<link rel=\"modulepreload\" href=\"/assets/stimulus-loading-1fc53fe7.js\">\n<link rel=\"modulepreload\" href=\"/assets/turbo-a1e3a50a.js\">\n<link rel=\"modulepreload\" href=\"/assets/actioncable.esm-e0ec9819.js\">\n<link rel=\"modulepreload\" href=\"/assets/@rails--request-3fc8489d.js\">\n<link rel=\"modulepreload\" href=\"/assets/lexxy-a21f41d4.js\">\n<link rel=\"modulepreload\" href=\"/assets/highlight.js/core-4e141f64.js\">\n<link rel=\"modulepreload\" href=\"/assets/initializers/autocomplete-ba9abe45.js\">\n<link rel=\"modulepreload\" href=\"/assets/initializers/current-3a3b90da.js\">\n<link rel=\"modulepreload\" href=\"/assets/initializers/highlight-5bd558f1.js\">\n<link rel=\"modulepreload\" href=\"/assets/initializers/index-d2bbfae4.js\">\n<link rel=\"modulepreload\" href=\"/assets/initializers/rich_text-f451a05e.js\">\n<link rel=\"modulepreload\" href=\"/assets/lib/autocomplete/autocomplete_handler-becd1e1a.js\">\n<link rel=\"modulepreload\" href=\"/assets/lib/autocomplete/base_autocomplete_handler-e29a896e.js\">\n<link rel=\"modulepreload\" href=\"/assets/lib/autocomplete/collection-3e251a0e.js\">\n<link rel=\"modulepreload\" href=\"/assets/lib/autocomplete/constants-17c2858b.js\">\n<link rel=\"modulepreload\" href=\"/assets/lib/autocomplete/custom_elements/suggestion_option-ac7846b3.js\">\n<link rel=\"modulepreload\" href=\"/assets/lib/autocomplete/custom_elements/suggestion_select-f0045305.js\">\n<link rel=\"modulepreload\" href=\"/assets/lib/autocomplete/helpers-651308b9.js\">\n<link rel=\"modulepreload\" href=\"/assets/lib/autocomplete/renderer-5caf6120.js\">\n<link rel=\"modulepreload\" href=\"/assets/lib/autocomplete/selection-862705bf.js\">\n<link rel=\"modulepreload\" href=\"/assets/lib/autocomplete/suggestion_context-b265ffb4.js\">\n<link rel=\"modulepreload\" href=\"/assets/lib/autocomplete/suggestion_controller-10624c40.js\">\n<link rel=\"modulepreload\" href=\"/assets/lib/autocomplete/suggestion_results_controller-91405749.js\">\n<link rel=\"modulepreload\" href=\"/assets/lib/autocomplete/utils-296fb278.js\">\n<link rel=\"modulepreload\" href=\"/assets/lib/cookie-76006835.js\">\n<link rel=\"modulepreload\" href=\"/assets/lib/rich_text/campfire_extension-f62f017b.js\">\n<link rel=\"modulepreload\" href=\"/assets/lib/rich_text/cite_node-b4d2b89a.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/application-f004202c.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/auto_submit_controller-ee52d396.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/autocomplete_controller-eaf5b07d.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/badge_dot_controller-e0d733c8.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/boost_delete_controller-29fd1686.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/composer_controller-73c33f9f.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/copy_to_clipboard_controller-07e32f4d.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/drop_target_controller-3a205782.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/element_removal_controller-4526910a.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/filter_controller-ca9769d5.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/form_controller-6f3d64db.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/index-594ba2fb.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/lightbox_controller-98fc07ca.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/local_time_controller-7daf3d0c.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/maintain_scroll_controller-1debbbfb.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/messages_controller-3d90944a.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/notifications_controller-746d0662.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/popup_controller-9f8ea824.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/presence_controller-28f14aad.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/pwa_install_controller-3fe3fc5e.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/read_rooms_controller-8245522a.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/refresh_room_controller-4e4b6014.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/reply_controller-278bb9cc.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/rooms_list_controller-64840fcd.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/scroll_into_view_controller-8a0bc733.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/search_results_controller-aab46974.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/sessions_controller-a9fdfe3d.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/soft_keyboard_controller-be1da837.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/sorted_list_controller-9f9ae485.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/sound_controller-d3e5656e.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/toggle_class_controller-b67fa681.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/turbo_frame_controller-9f4f722f.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/turbo_streaming_controller-04b85a80.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/typing_notifications_controller-86906ab9.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/unfurl_controller-4a868f9a.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/upload_preview_controller-9b8b26bb.js\">\n<link rel=\"modulepreload\" href=\"/assets/controllers/web_share_controller-f7236b6f.js\">\n<link rel=\"modulepreload\" href=\"/assets/helpers/dom_helpers-0f234176.js\">\n<link rel=\"modulepreload\" href=\"/assets/helpers/navigator_helpers-3c9f4c31.js\">\n<link rel=\"modulepreload\" href=\"/assets/helpers/string_helpers-40941ba8.js\">\n<link rel=\"modulepreload\" href=\"/assets/helpers/timing_helpers-94d95529.js\">\n<link rel=\"modulepreload\" href=\"/assets/helpers/turbo_helpers-a3c01462.js\">\n<link rel=\"modulepreload\" href=\"/assets/models/client_message-de3c07cf.js\">\n<link rel=\"modulepreload\" href=\"/assets/models/file_uploader-d3a5c44b.js\">\n<link rel=\"modulepreload\" href=\"/assets/models/message_formatter-f39a0c5d.js\">\n<link rel=\"modulepreload\" href=\"/assets/models/message_paginator-b79013e3.js\">\n<link rel=\"modulepreload\" href=\"/assets/models/scroll_manager-ed559629.js\">\n<link rel=\"modulepreload\" href=\"/assets/models/typing_tracker-42a444a5.js\">\n<link rel=\"modulepreload\" href=\"/assets/languages/bash-13136668.js\">\n<link rel=\"modulepreload\" href=\"/assets/languages/css-a7f2e40b.js\">\n<link rel=\"modulepreload\" href=\"/assets/languages/diff-94a335fe.js\">\n<link rel=\"modulepreload\" href=\"/assets/languages/go-10465864.js\">\n<link rel=\"modulepreload\" href=\"/assets/languages/java-95f3a30f.js\">\n<link rel=\"modulepreload\" href=\"/assets/languages/javascript-18eb0dd8.js\">\n<link rel=\"modulepreload\" href=\"/assets/languages/json-60184e1b.js\">\n<link rel=\"modulepreload\" href=\"/assets/languages/python-8f48fd1a.js\">\n<link rel=\"modulepreload\" href=\"/assets/languages/ruby-287ccd0f.js\">\n<link rel=\"modulepreload\" href=\"/assets/languages/rust-d48f93d8.js\">\n<link rel=\"modulepreload\" href=\"/assets/languages/sql-642be05a.js\">\n<link rel=\"modulepreload\" href=\"/assets/languages/xml-fa7f1eda.js\">\n<script type=\"module\">import \"application\"</script>\n\n    <meta name=\"turbo-visit-control\" content=\"reload\">\n  </head>\n\n  <body class=\"\" data-controller=\"local-time lightbox\">\n    <a href=\"#main-content\" class=\"skip-navigation btn\">Skip to main content</a>\n\n    <nav id=\"nav\">\n      \n    </nav>\n\n\n    <main id=\"main-content\">\n      \n<section class=\"txt-align-center\">\n  <div class=\"panel \">\n    <figure class=\"account-logo avatar center margin-block-end txt-xx-large\"><img alt=\"Account logo\" src=\"/account/logo?v=20260101160000\" width=\"300\" height=\"300\" /></figure>\n\n    <form class=\"flex flex-column gap\" action=\"http://campfire.test/session\" accept-charset=\"UTF-8\" method=\"post\"><input type=\"hidden\" name=\"authenticity_token\" value=\"<VALIDATED_TOKEN>\" />\n      <fieldset class=\"flex flex-column gap center-block upad\">\n        <legend class=\"txt-large txt-align-center\"><strong>37signals</strong></legend>\n\n        <div class=\"flex align-center gap\">\n          <details class=\"position-relative\" data-controller=\"popup\" data-action=\"keydown.esc-&gt;popup#close toggle-&gt;popup#toggle click@document-&gt;popup#closeOnClickOutside\" data-popup-orientation-top-class=\"popup-orientation-top\"><summary class=\"btn\" tabindex=\"-1\"><img aria-hidden=\"true\" class=\"color-icon\" src=\"/assets/globe-8c54d23b.svg\" width=\"20\" height=\"20\" /><span class=\"for-screen-reader\">Translate</span></summary><div class=\"language-list-menu shadow\" data-popup-target=\"menu\"><dl class=\"language-list\"><dt>\ud83c\uddfa\ud83c\uddf8</dt><dd class=\"margin-none\">Enter your email address</dd><dt>\ud83c\uddea\ud83c\uddf8</dt><dd class=\"margin-none\">Introduce tu correo electr\u00f3nico</dd><dt>\ud83c\uddeb\ud83c\uddf7</dt><dd class=\"margin-none\">Entrez votre adresse courriel</dd><dt>\ud83c\uddee\ud83c\uddf3</dt><dd class=\"margin-none\">\u0905\u092a\u0928\u093e \u0908\u092e\u0947\u0932 \u092a\u0924\u093e \u0926\u0930\u094d\u091c \u0915\u0930\u0947\u0902</dd><dt>\ud83c\udde9\ud83c\uddea</dt><dd class=\"margin-none\">Geben Sie Ihre E-Mail-Adresse ein</dd><dt>\ud83c\udde7\ud83c\uddf7</dt><dd class=\"margin-none\">Insira seu endere\u00e7o de email</dd><dt>\ud83c\uddef\ud83c\uddf5</dt><dd class=\"margin-none\">\u30e1\u30fc\u30eb\u30a2\u30c9\u30ec\u30b9\u3092\u5165\u529b\u3057\u3066\u304f\u3060\u3055\u3044</dd></dl></div></details>\n          <label class=\"flex align-center gap input input--actor txt-large\">\n            <input required=\"required\" class=\"input\" autofocus=\"autofocus\" autocomplete=\"username\" placeholder=\"Enter your email address\" type=\"email\" name=\"email_address\" id=\"email_address\" />\n            <img aria-hidden=\"true\" class=\"colorize--black\" src=\"/assets/email-6c595bc5.svg\" width=\"24\" height=\"24\" />\n          </label>\n        </div>\n\n        <div class=\"flex align-center gap\">\n          <details class=\"position-relative\" data-controller=\"popup\" data-action=\"keydown.esc-&gt;popup#close toggle-&gt;popup#toggle click@document-&gt;popup#closeOnClickOutside\" data-popup-orientation-top-class=\"popup-orientation-top\"><summary class=\"btn\" tabindex=\"-1\"><img aria-hidden=\"true\" class=\"color-icon\" src=\"/assets/globe-8c54d23b.svg\" width=\"20\" height=\"20\" /><span class=\"for-screen-reader\">Translate</span></summary><div class=\"language-list-menu shadow\" data-popup-target=\"menu\"><dl class=\"language-list\"><dt>\ud83c\uddfa\ud83c\uddf8</dt><dd class=\"margin-none\">Enter your password</dd><dt>\ud83c\uddea\ud83c\uddf8</dt><dd class=\"margin-none\">Introduce tu contrase\u00f1a</dd><dt>\ud83c\uddeb\ud83c\uddf7</dt><dd class=\"margin-none\">Saisissez votre mot de passe</dd><dt>\ud83c\uddee\ud83c\uddf3</dt><dd class=\"margin-none\">\u0905\u092a\u0928\u093e \u092a\u093e\u0938\u0935\u0930\u094d\u0921 \u0926\u0930\u094d\u091c \u0915\u0930\u0947\u0902</dd><dt>\ud83c\udde9\ud83c\uddea</dt><dd class=\"margin-none\">Geben Sie Ihr Passwort ein</dd><dt>\ud83c\udde7\ud83c\uddf7</dt><dd class=\"margin-none\">Insira sua senha</dd><dt>\ud83c\uddef\ud83c\uddf5</dt><dd class=\"margin-none\">\u30d1\u30b9\u30ef\u30fc\u30c9\u3092\u5165\u529b\u3057\u3066\u304f\u3060\u3055\u3044</dd></dl></div></details>\n          <label class=\"flex align-center gap input input--actor txt-large\">\n            <input required=\"required\" class=\"input\" autocomplete=\"current-password\" placeholder=\"Enter your password\" maxlength=\"72\" size=\"72\" type=\"password\" name=\"password\" id=\"password\" />\n            <img aria-hidden=\"true\" class=\"colorize--black\" src=\"/assets/password-0896da4e.svg\" width=\"24\" height=\"24\" />\n          </label>\n        </div>\n\n        <button name=\"log_in\" type=\"submit\" class=\"btn btn--reversed center txt-large\">\n          <img aria-hidden=\"true\" src=\"/assets/arrow-right-8f3eb40d.svg\" />\n          <span class=\"for-screen-reader\">Go</span>\n</button>      </fieldset>\n</form>  </div>\n\n    <div class=\"txt-align-center margin-block-double full-width\">\n    <a class=\"btn center\" title=\"Email David\" href=\"mailto:&quot;David&quot; &lt;david@37signals.com&gt;\">\n      <img aria-hidden=\"true\" src=\"/assets/lifebuoy-f31f26aa.svg\" />\n      <span>david@37signals.com</span>\n</a>\n    <div class=\"txt-align-center center margin-block txt-subtle\">Campfire&trade; version <span class=\"version-badge\">parity</span></div>\n  </div>\n\n</section>\n\n\n      <footer id=\"footer\">\n        \n      </footer>\n    </main>\n\n    <aside id=\"sidebar\" data-controller=\"toggle-class\" data-toggle-class-toggle-class=\"open\">\n      \n    </aside>\n\n    <dialog class=\"lightbox\" aria-label=\"Image Viewer (Press escape to close)\" data-lightbox-target=\"dialog\" data-action=\"close->lightbox#reset\">\n  <img src=\"\" class=\"lightbox__image\" data-lightbox-target=\"zoomedImage\" />\n\n  <form method=\"dialog\" class=\"lightbox__btn\">\n    <button class=\"btn\">\n      <img aria-hidden=\"true\" src=\"/assets/remove-0e7a045d.svg\" />\n      <span class=\"for-screen-reader\">Close image viewer</span>\n    </button>\n  </form>\n\n  <a href=\"\" class=\"lightbox__btn--download btn hide-in-ios-pwa\" data-lightbox-target=\"download\">\n    <img aria-hidden=\"true\" src=\"/assets/download-04029899.svg\" />\n    <span class=\"for-screen-reader\">Download file</span>\n  </a>\n\n  <button class=\"lightbox__btn--share btn\"\n      data-controller=\"web-share\"\n      data-action=\"web-share#share\"\n      data-web-share-files-value=\"\"\n      data-lightbox-target=\"share\">\n    <img aria-hidden=\"true\" src=\"/assets/share-bf28da4f.svg\" />\n    <span class=\"for-screen-reader\">Share file</span>\n  </button>\n</dialog>\n\n\n    <a href=\"https://once.com\" id=\"app-logo\" target=\"_blank\" aria-label=\"Once software from 37signals home page\">\n      <img alt=\"Campfire logo\" width=\"256\" height=\"216\" src=\"/assets/campfire-icon-3d9986c5.png\" />\n    </a>\n  </body>\n</html>\n",
+    "location": null
+  }
+}

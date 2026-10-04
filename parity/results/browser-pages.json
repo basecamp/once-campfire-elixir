@@ -1,0 +1,12 @@
+{
+  "passed": true,
+  "user_agents": 32,
+  "scope": [
+    "restricted browser HTML",
+    "minimum version boundaries",
+    "authenticated and anonymous request order",
+    "CSRF precedes browser guard",
+    "unrestricted and bot browser cases",
+    "health endpoint exemption"
+  ]
+}

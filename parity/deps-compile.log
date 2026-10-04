@@ -1,0 +1,18 @@
+==> bcrypt_elixir
+mkdir -p "/app/_build/dev/lib/bcrypt_elixir/priv"
+cc -g -O3 -Wall -Wno-format-truncation -I"/usr/local/lib/erlang/erts-16.4.0.6/include" -Ic_src -fPIC -shared  c_src/bcrypt_nif.c c_src/blowfish.c -o "/app/_build/dev/lib/bcrypt_elixir/priv/bcrypt_nif.so"
+==> campfire
+===> Analyzing applications...
+===> Compiling telemetry
+==> fast_html
+# Sadly, build components separately seems to sporadically fail
+cd c_src/lexbor; \
+	CFLAGS='-g -O2 -pedantic -Wcomment -Wextra -Wno-old-style-declaration -Wall' \
+	CPPFLAGS='' \
+	cmake -DLEXBOR_BUILD_SEPARATELY=OFF -DLEXBOR_BUILD_SHARED=OFF
+/bin/sh: 2: cmake: not found
+make: *** [Makefile:39: c_src/lexbor/liblexbor_static.a] Error 127
+could not compile dependency :fast_html, "mix compile" failed. Errors may have been logged above. You can recompile this dependency with "mix deps.compile fast_html --force", update it with "mix deps.update fast_html" or clean it with "mix deps.clean fast_html"
+==> campfire
+** (Mix) Could not compile with "make" (exit status: 2).
+Please check you have: a C compiler, GNU Make, CMake and Erlang development headers installed before reporting an issue.

@@ -1,0 +1,3 @@
+curl: (35) Send failure: Broken pipe
+curl: (35) Send failure: Broken pipe
+Production TLS/HTTP2/proxy parity passed

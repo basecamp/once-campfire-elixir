@@ -1,0 +1,35 @@
+      
+
+<section class="panel txt-align-center" style="view-transition-name: edit-room-<%= @id %>">
+  
+  <form action="/rooms/closeds/<%= @id %>" accept-charset="UTF-8" method="post"><input type="hidden" name="_method" value="patch" /><input type="hidden" name="authenticity_token" value="<%= @token %>" />
+  <div class="flex align-center gap">
+      <h1 class="flex-item-grow txt-x-large">
+        <%= @name %>
+      </h1>
+  </div>
+
+  <hr class="margin-block borderless">
+
+  <section class="room-access margin-block pad-inline fill-shade border-radius">
+    
+  <menu class="flex flex-column gap margin-none pad overflow-y constrain-height" data-controller="filter" data-filter-active-class="filter--active" data-filter-selected-class="selected">
+
+    
+
+<%= @filter %>    <div data-filter-target="list" contents>
+      <%= @selected_users %>
+
+<%= if @separator, do: "        <hr class=\"separator full-width\" style=\"--border-style: solid\">\n", else: "" %>
+      <%= @unselected_users %>
+    </div>
+</menu>
+  </section>
+
+  
+</form>
+
+</section>
+
+
+

@@ -1,0 +1,102 @@
+      
+
+<section class="panel txt-align-center flex flex-column gap" style="view-transition-name: account-settings">
+    <div class="align-center center avatar__form gap" data-controller="upload-preview">
+      <form class="txt--medium" data-controller="form" enctype="multipart/form-data" action="/account.<%= @account_id %>" accept-charset="UTF-8" method="post"><input type="hidden" name="_method" value="patch" /><input type="hidden" name="authenticity_token" value="<%= @patch_token %>" />
+        <label class="btn input--file">
+          <img aria-hidden="true" src="<%= Campfire.Assets.path("camera.svg") %>" width="20" height="20" />
+          <input class="input" accept="image/*" data-action="upload-preview#previewImage change-&gt;form#submit" type="file" name="account[logo]" id="account_logo" />
+          <span class="for-screen-reader">Upload logo</span>
+        </label>
+</form>
+      <form data-controller="form" enctype="multipart/form-data" action="/account.<%= @account_id %>" accept-charset="UTF-8" method="post"><input type="hidden" name="_method" value="patch" /><input type="hidden" name="authenticity_token" value="<%= @patch_token %>" />
+        <label class="btn avatar input--file account-logo txt-xx-large">
+          <img role="presentation" data-upload-preview-target="image" src="/account/logo?v=<%= @account_version %>" width="48" height="48" />
+          <input class="input" accept="image/*" data-action="upload-preview#previewImage change-&gt;form#submit" type="file" name="account[logo]" id="account_logo" />
+          <span class="for-screen-reader">Upload logo</span>
+        </label>
+</form>
+<%= @delete_logo %>    </div>
+
+    <form class="flex flex-column gap" data-controller="form" action="/account.<%= @account_id %>" accept-charset="UTF-8" method="post"><input type="hidden" name="_method" value="patch" /><input type="hidden" name="authenticity_token" value="<%= @patch_token %>" />
+      <div class="flex align-center gap">
+        <details class="position-relative" data-controller="popup" data-action="keydown.esc-&gt;popup#close toggle-&gt;popup#toggle click@document-&gt;popup#closeOnClickOutside" data-popup-orientation-top-class="popup-orientation-top"><summary class="btn" tabindex="-1"><img aria-hidden="true" class="color-icon" src="<%= Campfire.Assets.path("globe.svg") %>" width="20" height="20" /><span class="for-screen-reader">Translate</span></summary><div class="language-list-menu shadow" data-popup-target="menu"><dl class="language-list"><dt>🇺🇸</dt><dd class="margin-none">Name this account</dd><dt>🇪🇸</dt><dd class="margin-none">Nombre de esta cuenta</dd><dt>🇫🇷</dt><dd class="margin-none">Nommez ce compte</dd><dt>🇮🇳</dt><dd class="margin-none">इस खाते का नाम दें</dd><dt>🇩🇪</dt><dd class="margin-none">Benennen Sie dieses Konto</dd><dt>🇧🇷</dt><dd class="margin-none">Dê um nome a essa conta</dd><dt>🇯🇵</dt><dd class="margin-none">アカウントに名前を付ける</dd></dl></div></details>
+
+        <label class="flex align-center gap flex-item-grow">
+          <input class="input txt-large" autocomplete="off" placeholder="Name this account" autofocus="autofocus" data-action="keydown.enter-&gt;form#submit" type="text" value="<%= @name %>" name="account[name]" id="account_name" />
+        </label>
+
+        <button name="button" type="submit" class="btn btn--reversed center">
+          <img aria-hidden="true" src="<%= Campfire.Assets.path("check.svg") %>" width="20" height="20" />
+          <span class="for-screen-reader">Save changes</span>
+</button>      </div>
+</form>
+    <div class="margin-block-start pad-block pad-inline-double fill-shade border-radius">
+      <form class="flex align-center gap center" data-controller="form" action="/account.<%= @account_id %>" accept-charset="UTF-8" method="post"><input type="hidden" name="_method" value="put" /><input type="hidden" name="authenticity_token" value="<%= @put_token %>" />
+        <div class="flex-item-grow flex align-center gap txt-align-start">
+          <img class="colorize--black" aria-hidden="true" src="<%= Campfire.Assets.path("crown.svg") %>" width="18" height="18" /> Must be admin to create new rooms
+        </div>
+        
+          <input value="<%= @next_restriction %>" type="hidden" name="account[settings][restrict_room_creation_to_administrators]" id="account_settings_restrict_room_creation_to_administrators" />
+
+        <label class="switch">
+          <input type="checkbox"
+                class="switch__input"
+                <%= if @restricted, do: "checked", else: "" %>
+                data-action="change->form#submit">
+          <span class="switch__btn round"></span>
+          <span class="for-screen-reader">
+            Must be admin to create new rooms
+          </span>
+        </label>
+
+</form>    </div>
+
+  <div class="margin-block pad-inline pad-block-start fill-shade border-radius">
+    <div class="flex flex-column align-center gap">
+
+  <label class="flex flex-column gap full-width" style="--row-gap: 0.5em">
+    <strong id="invite_label" class="invite-label">Share to invite more people</strong>
+    <span class="flex align-center gap input input--actor fill-white">
+      <img aria-hidden="true" class="colorize--black" src="<%= Campfire.Assets.path("person-add.svg") %>" width="20" height="20" />
+      <input type="text" class="input" id="invite_url" value="<%= @invite_url %>" aria-labelledby="invite_label" readonly>
+    </span>
+  </label>
+
+  <div class="flex align-center gap">
+    <a class="btn" data-lightbox-target="image" data-action="lightbox#open" data-lightbox-url-value="/qr_code/<%= @invite_id %>" href="/qr_code/<%= @invite_id %>">
+      <span class="for-screen-reader">Show join link QR code</span>
+      <img aria-hidden="true" class="colorize--black" src="<%= Campfire.Assets.path("qr-code.svg") %>" width="20" height="20" />
+</a>
+    <button class="btn" data-controller="copy-to-clipboard" data-action="copy-to-clipboard#copy" data-copy-to-clipboard-success-class="btn--success" data-copy-to-clipboard-content-value="<%= @invite_url %>">
+      <span class="for-screen-reader">Copy join link</span>
+      <img aria-hidden="true" class="colorize--black" src="<%= Campfire.Assets.path("copy-paste.svg") %>" width="20" height="20" />
+</button>
+    <button class="btn" hidden="hidden" data-controller="web-share" data-action="web-share#share" data-web-share-url-value="<%= @invite_url %>" data-web-share-text-value="Hit this link to join me in Campfire and start chatting." data-web-share-title-value="Link to join Campfire">
+      <span class="for-screen-reader">Share join link</span>
+      <img aria-hidden="true" class="colorize--black" src="<%= Campfire.Assets.path("share.svg") %>" width="20" height="20" />
+</button>
+      <form class="button_to" method="post" action="/account/join_code"><button class="btn btn--regenerate" type="submit">
+        <img aria-hidden="true" class="colorize--black" src="<%= Campfire.Assets.path("refresh.svg") %>" width="20" height="20" />
+        <span class="for-screen-reader">Regenerate join link</span>
+</button><input type="hidden" name="authenticity_token" value="<%= @join_token %>" /></form>  </div>
+</div>
+
+
+    <hr class="margin-block separator full-width" style="--border-style: solid">
+
+    <menu class="flex flex-column gap margin-none pad">
+      <turbo-frame id="account_users">
+        <%= @administrators %>
+
+<%= if @separator, do: ~s(          <hr class="separator full-width" style="--border-style: solid">), else: "" %>
+
+        <%= @members %>
+        <%= @next_page %>
+      </turbo-frame>
+    </menu>
+  </div>
+</section>
+
+
+

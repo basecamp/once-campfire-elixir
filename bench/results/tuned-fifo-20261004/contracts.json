@@ -1,0 +1,177 @@
+{
+  "version": 1,
+  "reference_sha": "90b330024dec3e757c79b6a7e6568f93da8e3148",
+  "contracts": [
+    {
+      "id": "sessions",
+      "description": "Cookies, signing, encryption, CSRF, authentication and old browser tabs",
+      "status": "verified",
+      "evidence": [
+        "parity/all-test.log",
+        "test/rails_test.exs",
+        "parity/results/sessions.json",
+        "parity/results/first-run.json",
+        "parity/results/signup.json",
+        "parity/results/browser-pages.json",
+        "test/user_agent_test.exs",
+        "parity/results/session-lifecycle.json",
+        "parity/results/verification.json"
+      ],
+      "notes": "Live credential/CSRF/session lifecycle, signed/encrypted cookie interoperability, old-form continuity and actual browser/logout flows pass."
+    },
+    {
+      "id": "routing",
+      "description": "Ordered recognition, URL generation, verbs, formats and nested params",
+      "status": "verified",
+      "evidence": [
+        "vectors/routes.json",
+        "parity/results/http.json",
+        "parity/results/route-errors.json",
+        "parity/results/formats.json",
+        "parity/results/verification.json",
+        "parity/results/proxy-context.json",
+        "parity/results/public-files.json",
+        "parity/results/assets.json"
+      ],
+      "notes": "Pinned ordered route/verb recognition, optional/Accept formats, request/parameter failures, public documents and trusted local proxy URL context pass."
+    },
+    {
+      "id": "data",
+      "description": "Schema, encodings, nullability, typecasting and bidirectional writes",
+      "status": "verified",
+      "evidence": [
+        "vectors/schema.json",
+        "parity/chat-test.log",
+        "parity/results/mutation.json",
+        "parity/results/administration.json",
+        "parity/results/jobs.json",
+        "parity/results/media.json",
+        "parity/results/attachments.json",
+        "parity/results/branding.json",
+        "parity/results/rollback.json",
+        "parity/results/message-attachments.json",
+        "parity/results/verification.json"
+      ],
+      "notes": "Pinned schema and scalar casts, complete mutation/FTS/storage snapshots, transactional failure boundaries, fresh schema bootstrap and bidirectional production rollback pass."
+    },
+    {
+      "id": "mutations",
+      "description": "Callbacks, transactions, cancellation, outbox and post-commit effects",
+      "status": "verified",
+      "evidence": [
+        "parity/results/mutation.json",
+        "parity/results/message-broadcasts.json",
+        "parity/results/room-broadcasts.json",
+        "parity/results/message-attachments.json",
+        "parity/results/verification.json",
+        "parity/results/mutation-edges.json",
+        "parity/results/message-scalars.json",
+        "parity/results/transaction-failures.json",
+        "parity/results/room-deletion.json"
+      ],
+      "notes": "Message/boost/room/user/account/attachment mutations, dirty tracking, injected rollback failures and post-commit queue/broadcast effects pass."
+    },
+    {
+      "id": "views",
+      "description": "Templates, helper escaping, frontend assets and browser interactions",
+      "status": "verified",
+      "evidence": [
+        "parity/richtext-test.log",
+        "parity/results/http.json",
+        "parity/results/messages.json",
+        "parity/results/room-page.json",
+        "parity/results/richtext-corpus-differences.json",
+        "parity/results/browser-47070.json",
+        "parity/results/browser-47071.json",
+        "plans/richtext-comparison.md",
+        "parity/results/signup.json",
+        "parity/results/settings-pages.json",
+        "parity/results/account-page.json",
+        "parity/results/boost-pages.json",
+        "parity/results/profile-pages.json",
+        "parity/results/user-pages.json",
+        "test/pwa_test.exs",
+        "parity/results/room-forms.json",
+        "parity/results/qr.json",
+        "parity/results/navigation.json",
+        "parity/results/account-users.json",
+        "parity/results/verification.json",
+        "parity/results/browser-flows.json"
+      ],
+      "notes": "Byte comparisons plus actual Chromium composer, file uploads, room/profile/account edits and logout pass. Rich-text comparison retains the documented escaping/error rules."
+    },
+    {
+      "id": "storage",
+      "description": "Existing keys, checksums, signatures, variants, ranges and downloads",
+      "status": "verified",
+      "evidence": [
+        "parity/rack-test.log",
+        "parity/all-test.log",
+        "parity/results/storage.json",
+        "parity/results/media.json",
+        "parity/results/attachments.json",
+        "parity/results/branding.json",
+        "parity/results/message-attachments.json",
+        "parity/results/verification.json"
+      ],
+      "notes": "Existing signed uploads/downloads/ranges, replacements/purges/embeds, loader/saver/conversion image operations and image/video/audio/PDF bytes/state pass."
+    },
+    {
+      "id": "jobs",
+      "description": "Claims, retry, schedules, shutdown, mail and external integrations",
+      "status": "verified",
+      "evidence": [
+        "parity/results/mutation.json",
+        "parity/results/jobs.json",
+        "parity/results/worker-lifecycle.json",
+        "parity/results/webhook-replies.json",
+        "parity/results/push-delivery.json",
+        "parity/results/push-wire.json",
+        "parity/results/verification.json",
+        "parity/results/network-protocol.json"
+      ],
+      "notes": "Actual queue claims, failures/no retries, processed stats, worker drain, webhook replies/timeout/protocol boundaries and real isolated encrypted HTTPS push delivery pass."
+    },
+    {
+      "id": "realtime",
+      "description": "Cable or polling, authorization, revocation and unique-user fanout",
+      "status": "verified",
+      "evidence": [
+        "parity/results/cable.json",
+        "parity/results/cable-interop.json",
+        "parity/results/message-broadcasts.json",
+        "parity/results/room-broadcasts.json",
+        "parity/results/session-lifecycle.json",
+        "parity/results/verification.json",
+        "parity/results/user-lifecycle.json",
+        "parity/results/browser-flows.json"
+      ],
+      "notes": "Cable protocol/authorization, cross-runtime pubsub, message/boost/room/involvement fanout, session/ban/deactivation revocation and browser lifecycle pass."
+    },
+    {
+      "id": "operations",
+      "description": "Environment, readiness, deployment, metrics and rollback rehearsal",
+      "status": "verified",
+      "evidence": [
+        "parity/results/rollback.json",
+        "parity/results/verification.json",
+        "parity/results/frontend.json",
+        "parity/results/fresh-install.json",
+        "parity/results/release.json",
+        "parity/results/http-shutdown.json"
+      ],
+      "notes": "Native production release with pinned Thruster TLS/HTTP2, fresh first-run and real worker, ONCE backup/restore, in-flight HTTP/job drain and Rails\u2192Elixir\u2192Rails rollback pass on isolated volumes."
+    }
+  ],
+  "complete": true,
+  "benchmark_status": "complete: two balanced validated baseline rounds and two balanced validated tuned rounds per app; remaining Rust capacity gap retained",
+  "verified_at": "2026-10-04T11:35:55.266334+00:00",
+  "source_digest": "ad793a949fb8bc0f03f370a2b562b9226f3e86d9304fc4be6110ea72b0179056",
+  "comparison_rules": "plans/richtext-comparison.md",
+  "benchmark_evidence": [
+    "bench/results/baseline-20261004/report.md",
+    "bench/results/tuned-fifo-20261004/report.md",
+    "bench/results/tuning-comparison.md",
+    "bench/TUNING.md"
+  ]
+}

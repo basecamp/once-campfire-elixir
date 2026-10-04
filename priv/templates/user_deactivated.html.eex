@@ -1,0 +1,16 @@
+      
+
+<section class="panel txt-align-center">
+  <div class="flex flex-column gap ">
+    <div class="avatar txt-xx-large center" style="background: white">
+      <img alt="Profile avatar" class="avatar" src="<%= @avatar_src %>" />
+    </div>
+
+        <div>
+          <h1 class="txt-x-large margin-none"><%= @name %></h1>
+          <div><%= @name %> is no longer on this account</div>
+        </div>
+  </div>
+</section>
+
+

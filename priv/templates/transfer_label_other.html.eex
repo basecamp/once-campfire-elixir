@@ -1,0 +1,4 @@
+      <div class="flex align-center gap justify-center">
+        <img aria-hidden="true" class="flex-item-no-shrink colorize--black" src="<%= Assets.path("crown.svg") %>" width="16" height="16" />
+        <label for="session_transfer_url">Share to get them back into their account</label>
+      </div>

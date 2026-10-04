@@ -1,0 +1,56 @@
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile.dev
+#1 transferring dockerfile: 830B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/elixir:1.19.5-otp-28-slim@sha256:597474ac81f0d0bfa4d67546c2591a033315a2b9e6ab2f1a22824af9c913066a
+#2 DONE 0.1s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [1/9] FROM docker.io/library/elixir:1.19.5-otp-28-slim@sha256:597474ac81f0d0bfa4d67546c2591a033315a2b9e6ab2f1a22824af9c913066a
+#4 resolve docker.io/library/elixir:1.19.5-otp-28-slim@sha256:597474ac81f0d0bfa4d67546c2591a033315a2b9e6ab2f1a22824af9c913066a 0.0s done
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 1.28MB done
+#5 DONE 0.0s
+
+#6 [2/9] RUN apt-get update && apt-get install -y --no-install-recommends build-essential cmake git ca-certificates libsqlite3-dev pkg-config libvips-dev=8.16.1-1+deb13u1 ffmpeg=7:7.1.5-0+deb13u1 && rm -rf /var/lib/apt/lists/*
+#6 CACHED
+
+#7 [3/9] COPY native/vips.c /build/vips.c
+#7 CACHED
+
+#8 [4/9] RUN cc -O2 -Wall -Wextra -Werror /build/vips.c $(pkg-config --cflags --libs vips) -o /usr/local/bin/campfire-vips && rm -rf /build
+#8 CACHED
+
+#9 [5/9] COPY native/html.c /build/html.c
+#9 DONE 0.0s
+
+#10 [6/9] COPY native/vendor/gumbo /build/gumbo
+#10 DONE 0.0s
+
+#11 [7/9] RUN cc -O2 -std=c99 -I/build/gumbo/src /build/html.c /build/gumbo/src/*.c -o /usr/local/bin/campfire-html && rm -rf /build
+#11 DONE 1.6s
+
+#12 [8/9] WORKDIR /app
+#12 DONE 0.0s
+
+#13 [9/9] RUN mix local.hex --force && mix local.rebar --force
+#13 0.684 * creating .mix/archives/hex-2.5.1
+#13 1.186 * creating .mix/elixir/1-19-otp-28/rebar3
+#13 DONE 1.2s
+
+#14 exporting to image
+#14 exporting layers 0.1s done
+#14 exporting manifest sha256:7cf85daa215102dea711842fb6721a59e72556543f027f9265dfaef7d3500065 done
+#14 exporting config sha256:f26e5f49541f445b7f91de709668b889621ce8843307ff9570affc530b53e872 done
+#14 exporting attestation manifest sha256:28fa55bb594774fc6704684961b6c261c8f417311a9835cfea41af1accf50eeb done
+#14 exporting manifest list sha256:83fc477b61befcc2b1112da170248370c35089664ee938736d4cbd82b0b3eac8 done
+#14 naming to docker.io/library/campfire-elixir:toolchain done
+#14 unpacking to docker.io/library/campfire-elixir:toolchain 0.1s done
+#14 DONE 0.2s

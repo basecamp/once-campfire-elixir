@@ -1,0 +1,7 @@
+Compiling 5 files (.ex)
+Generated campfire app
+Running ExUnit with seed: 945415, max_cases: 64
+
+.....................
+Finished in 0.3 seconds (0.07s async, 0.3s sync)
+21 tests, 0 failures

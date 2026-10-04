@@ -1,0 +1,9 @@
+{
+  "output": "/home/dhh/Work/basecamp/once-campfire-elixir/vectors/richtext.json",
+  "kind": "richtext",
+  "reference_sha": "90b330024dec3e757c79b6a7e6568f93da8e3148",
+  "runtime": {
+    "ruby_version": "3.4.10",
+    "rails_version": "8.2.0.alpha"
+  }
+}

@@ -1,0 +1,182 @@
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.65kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/campfire-reference:app
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/campfire-elixir:toolchain
+#3 DONE 0.0s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 140B done
+#4 DONE 0.0s
+
+#5 [build 1/7] FROM docker.io/library/campfire-elixir:toolchain@sha256:d6ea3b465f6f0bb1ba425faed1ec1eb40d1a6dc4f0f63ecae4d9c7ca8b64b9a3
+#5 resolve docker.io/library/campfire-elixir:toolchain@sha256:d6ea3b465f6f0bb1ba425faed1ec1eb40d1a6dc4f0f63ecae4d9c7ca8b64b9a3 0.0s done
+#5 DONE 0.0s
+
+#6 [frontend 1/1] FROM docker.io/library/campfire-reference:app@sha256:d91fdb852402e2d3393ca262e50b657ea0cf861fc7d4150aaf3773c91d41c2fa
+#6 resolve docker.io/library/campfire-reference:app@sha256:d91fdb852402e2d3393ca262e50b657ea0cf861fc7d4150aaf3773c91d41c2fa 0.0s done
+#6 DONE 0.0s
+
+#7 [internal] load build context
+#7 transferring context: 210.77kB 0.0s done
+#7 DONE 0.0s
+
+#8 [build 2/7] COPY mix.exs mix.lock ./
+#8 CACHED
+
+#9 [build 3/7] COPY deps ./deps
+#9 CACHED
+
+#10 [build 4/7] COPY lib ./lib
+#10 DONE 0.0s
+
+#11 [build 5/7] COPY priv ./priv
+#11 DONE 0.1s
+
+#12 [build 6/7] COPY vectors/message-etags.json vectors/mime-types.json vectors/route-actions.json vectors/image-etags.json vectors/sounds.json vectors/fragment-digests.json ./vectors/
+#12 DONE 0.1s
+
+#13 [build 7/7] RUN mix deps.compile && mix compile --warnings-as-errors && mix release
+#13 0.425 ==> floki
+#13 0.425 Compiling 2 files (.erl)
+#13 0.635 Compiling 30 files (.ex)
+#13 1.426 Generated floki app
+#13 1.449 ==> mime
+#13 1.449 Compiling 1 file (.ex)
+#13 1.499 Generated mime app
+#13 1.507 ==> nimble_options
+#13 1.507 Compiling 3 files (.ex)
+#13 1.659 Generated nimble_options app
+#13 1.668 ==> jason
+#13 1.668 Compiling 10 files (.ex)
+#13 2.252 Generated jason app
+#13 2.260 ==> comeonin
+#13 2.260 Compiling 3 files (.ex)
+#13 2.273 Generated comeonin app
+#13 2.280 ==> plug_crypto
+#13 2.280 Compiling 5 files (.ex)
+#13 2.326 Generated plug_crypto app
+#13 2.334 ==> qqr
+#13 2.334 Compiling 24 files (.ex)
+#13 2.561 Generated qqr app
+#13 2.578 ==> hpax
+#13 2.578 Compiling 4 files (.ex)
+#13 2.759 Generated hpax app
+#13 2.766 ==> elixir_make
+#13 2.766 Compiling 8 files (.ex)
+#13 2.814 Generated elixir_make app
+#13 2.823 ==> bcrypt_elixir
+#13 2.827 mkdir -p "/app/_build/prod/lib/bcrypt_elixir/priv"
+#13 2.829 cc -g -O3 -Wall -Wno-format-truncation -I"/usr/local/lib/erlang/erts-16.4.0.6/include" -Ic_src -fPIC -shared  c_src/bcrypt_nif.c c_src/blowfish.c -o "/app/_build/prod/lib/bcrypt_elixir/priv/bcrypt_nif.so"
+#13 3.030 Compiling 3 files (.ex)
+#13 3.047 Generated bcrypt_elixir app
+#13 3.222 ==> campfire
+#13 3.222 ===> Analyzing applications...
+#13 3.231 ===> Compiling telemetry
+#13 3.336 ==> redix
+#13 3.336 Compiling 17 files (.ex)
+#13 3.541      warning: CAStore.file_path/0 is undefined (module CAStore is not available or is yet to be defined). Make sure the module name is correct and has been specified in full (or that an alias has been defined)
+#13 3.541      │
+#13 3.541  426 │               [cacertfile: ca_store_mod.file_path()]
+#13 3.541      │                                         ~
+#13 3.541      │
+#13 3.541      └─ lib/redix/connector.ex:426:41: Redix.Connector.build_socket_opts/3
+#13 3.541 
+#13 3.542 Generated redix app
+#13 3.555 ==> db_connection
+#13 3.555 Compiling 18 files (.ex)
+#13 3.813 Generated db_connection app
+#13 3.830 ==> thousand_island
+#13 3.830 Compiling 18 files (.ex)
+#13 3.909 Generated thousand_island app
+#13 3.923 ==> plug
+#13 3.923 Compiling 1 file (.erl)
+#13 3.981 Compiling 42 files (.ex)
+#13 4.785 Generated plug app
+#13 4.809 ==> cc_precompiler
+#13 4.809 Compiling 3 files (.ex)
+#13 4.876 Generated cc_precompiler app
+#13 4.889 ==> exqlite
+#13 4.892  CC sqlite3_nif.o
+#13 5.134  LD sqlite3_nif.so
+#13 5.151 Compiling 12 files (.ex)
+#13 5.262 Generated exqlite app
+#13 5.275 ==> websock
+#13 5.275 Compiling 1 file (.ex)
+#13 5.283 Generated websock app
+#13 5.293 ==> bandit
+#13 5.293 Compiling 54 files (.ex)
+#13 5.595 Generated bandit app
+#13 5.921 Compiling 89 files (.ex)
+#13 6.842 Generated campfire app
+#13 7.197 * assembling campfire-0.1.0 on MIX_ENV=prod
+#13 7.197 * skipping runtime configuration (config/runtime.exs not found)
+#13 7.271 * skipping elixir.bat for windows (bin/elixir.bat not found in the Elixir installation)
+#13 7.272 * skipping iex.bat for windows (bin/iex.bat not found in the Elixir installation)
+#13 7.366 
+#13 7.366 Release created at _build/prod/rel/campfire
+#13 7.366 
+#13 7.366     # To start your system
+#13 7.366     _build/prod/rel/campfire/bin/campfire start
+#13 7.366 
+#13 7.366 Once the release is running:
+#13 7.366 
+#13 7.366     # To connect to it remotely
+#13 7.366     _build/prod/rel/campfire/bin/campfire remote
+#13 7.366 
+#13 7.366     # To stop it gracefully (you may also send SIGINT/SIGTERM)
+#13 7.366     _build/prod/rel/campfire/bin/campfire stop
+#13 7.366 
+#13 7.366 To list all commands:
+#13 7.366 
+#13 7.366     _build/prod/rel/campfire/bin/campfire
+#13 7.366 
+#13 DONE 7.5s
+
+#14 [stage-2  2/10] RUN apt-get update && apt-get install -y --no-install-recommends redis-server && rm -rf /var/lib/apt/lists/*
+#14 CACHED
+
+#15 [stage-2  3/10] WORKDIR /campfire
+#15 CACHED
+
+#6 [frontend 1/1] FROM docker.io/library/campfire-reference:app@sha256:d91fdb852402e2d3393ca262e50b657ea0cf861fc7d4150aaf3773c91d41c2fa
+#6 CACHED
+
+#16 [stage-2  4/10] COPY --from=build /app/_build/prod/rel/campfire ./
+#16 DONE 0.1s
+
+#17 [stage-2  5/10] COPY --from=frontend /usr/local/bundle/ruby/3.4.0/gems/thruster-0.1.23-x86_64-linux/exe/x86_64-linux/thrust /usr/local/bin/thrust
+#17 DONE 0.1s
+
+#18 [stage-2  6/10] COPY --from=frontend /usr/local/bundle/ruby/3.4.0/gems/thruster-0.1.23-x86_64-linux/MIT-LICENSE /campfire/THRUSTER-LICENSE
+#18 DONE 0.1s
+
+#19 [stage-2  7/10] COPY --from=frontend /rails/public/502.html /campfire/public/502.html
+#19 DONE 0.1s
+
+#20 [stage-2  8/10] COPY --chmod=755 hooks /hooks
+#20 DONE 0.0s
+
+#21 [stage-2  9/10] COPY --chmod=755 bin/container-start /campfire/bin/container-start
+#21 DONE 0.0s
+
+#22 [stage-2 10/10] RUN mkdir -p /rails/storage/db /rails/storage/files /rails/storage/backups /rails/storage/thruster && chown -R 1000:1000 /rails/storage
+#22 DONE 0.1s
+
+#23 exporting to image
+#23 exporting layers
+#23 exporting layers 1.1s done
+#23 exporting manifest sha256:aa92454c7cebdd8e1988d7408b2f4848bdb62ea75e3db335cdd2bd6180a4dafb done
+#23 exporting config sha256:c6056dde6a57ddcfabd3708f21fba06d2c57ac87c11f7d1cac97818b694ace1e done
+#23 exporting attestation manifest sha256:2c8841f7e9e0190a638761b99dc77d3287b3fabd37058f9137dc4eed3700e242 done
+#23 exporting manifest list sha256:6faa05c3c97f1ce8a93dd626a7f5e4f84b008ccd4714b53115e9399d7c41a984 done
+#23 naming to docker.io/library/campfire-elixir:release done
+#23 unpacking to docker.io/library/campfire-elixir:release
+#23 unpacking to docker.io/library/campfire-elixir:release 0.5s done
+#23 DONE 1.6s
+c23de99bd5b9d87f6ff1b2fb00141cc45b091c3ee013f2c791f8d84d53bea622

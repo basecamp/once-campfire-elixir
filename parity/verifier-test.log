@@ -1,0 +1,9 @@
+Compiling 1 file (.ex)
+Generated campfire app
+Running ExUnit with seed: 713851, max_cases: 64
+Excluding tags: [:test]
+Including tags: [location: {"test/rails_test.exs", 92}]
+
+........................................
+Finished in 14.6 seconds (14.6s async, 0.00s sync)
+40 tests, 0 failures (355 excluded)

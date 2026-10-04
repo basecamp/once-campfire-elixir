@@ -1,0 +1,29 @@
+==> nimble_options
+Compiling 3 files (.ex)
+Generated nimble_options app
+==> redix
+Compiling 17 files (.ex)
+     warning: CAStore.file_path/0 is undefined (module CAStore is not available or is yet to be defined). Make sure the module name is correct and has been specified in full (or that an alias has been defined)
+     │
+ 426 │               [cacertfile: ca_store_mod.file_path()]
+     │                                         ~
+     │
+     └─ lib/redix/connector.ex:426:41: Redix.Connector.build_socket_opts/3
+
+Generated redix app
+==> campfire
+Compiling 3 files (.ex)
+    warning: Redix.transaction/2 is undefined or private. Did you mean:
+
+        * transaction_pipeline/2
+        * transaction_pipeline/3
+        * transaction_pipeline!/2
+        * transaction_pipeline!/3
+
+    │
+ 39 │         Redix.transaction(Campfire.Redis, [
+    │               ~
+    │
+    └─ lib/campfire/jobs.ex:39:15: Campfire.Jobs.enqueue/2
+
+Compilation failed due to warnings while using the --warnings-as-errors option

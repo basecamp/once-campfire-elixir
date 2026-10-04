@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "scope": [
+    "open room global create/update/remove",
+    "closed room per-user create/update/remove",
+    "direct room per-user create/reuse/remove",
+    "HTML escaping"
+  ]
+}

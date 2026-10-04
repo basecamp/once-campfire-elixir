@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "scope": [
+    "ban and deactivation revoke multiple active sockets",
+    "old authenticated cookies rejected",
+    "unban retains callback job",
+    "queued banned-content cleanup after unban",
+    "complete target user/session/membership/ban/subscription/search rows"
+  ]
+}

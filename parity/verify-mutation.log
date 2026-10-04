@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "kind": "mutation-parity",
+  "reference_sha": "90b330024dec3e757c79b6a7e6568f93da8e3148",
+  "passed": true,
+  "baseline_equal": true,
+  "state_sha256": {
+    "reference": "e04646d331df338d8d6f466e18d0189b2dd9249437f9f2cd8dcd116086b596f6",
+    "candidate": "e04646d331df338d8d6f466e18d0189b2dd9249437f9f2cd8dcd116086b596f6"
+  }
+}

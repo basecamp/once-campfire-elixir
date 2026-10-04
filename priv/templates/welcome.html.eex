@@ -1,0 +1,12 @@
+      
+
+<div id="message-area" class="message-area">
+  <div class="message-area--empty min-width center">
+    <figure class="center pad">
+      <img aria-hidden="true" class="colorize--black translucent" src="<%= Campfire.Assets.path("messages-empty.svg") %>" />
+      <span class="for-screen-reader"><%= Campfire.Assets.html_escape(@name) %></span>
+    </figure>
+  </div>
+</div>
+
+

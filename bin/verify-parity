@@ -1,0 +1,42 @@
+#!/usr/bin/env python3
+"""Sequential, fail-closed application parity gates on owned disposable fixtures."""
+import argparse,datetime,fcntl,hashlib,json,os,pathlib,subprocess,sys,time
+ROOT=pathlib.Path(__file__).resolve().parents[1]
+GATES=[
+ ('format',['bin/mix','format','--check-formatted']),
+ ('compile',['bin/mix','compile','--warnings-as-errors']),
+ ('unit',['bin/mix','test','--warnings-as-errors']),
+ ('toolkit',['python3','-m','unittest','discover','-s','tools/rails-to-elixir/tests']),
+ ('seed_reference',['bin/parity-services','reset','reference']),
+ ('seed_candidate',['bin/parity-services','reset','candidate']),
+ ('http',['bin/rails-to-elixir','parity','--output','parity/results/http.json','--force']),
+ ('mutation',['bin/rails-to-elixir','mutation-diff','--output','parity/results/mutation.json','--force'])]
+SCRIPTS='sessions first_run signup session_lifecycle request_failures proxy_context route_errors format_probe bot_formats http_headers public_files assets http_compression image_headers errors navigation browser_pages welcome account_page account_users settings_pages profile_pages user_pages push_subscription_pages room_forms room_page boost_pages messages message_cache administration mutation_edges message_scalars transaction_failures message_attachments storage media attachments branding room_deletion cable cable_interop message_broadcasts room_broadcasts user_lifecycle jobs network_protocol webhook_replies worker_lifecycle push_delivery browser_flows qr'.split()
+GATES += [(name,['python3','parity/'+name+'.py']) for name in SCRIPTS]
+GATES += [('release',['bin/release-fixture']),('frontend',['python3','parity/frontend.py']),('fresh_install',['python3','parity/fresh_install.py']),('release_smoke',['python3','parity/release_smoke.py']),('http_shutdown',['python3','parity/http_shutdown.py']),('rollback',['python3','parity/rollback.py'])]
+def identity():
+ files=[]
+ for folder in ['lib','native','priv','vectors','hooks','test','tools/rails-to-elixir/lib','bin']:
+  files += [p for p in (ROOT/folder).rglob('*') if p.is_file() and '__pycache__' not in p.parts]
+ files += [ROOT/x for x in ['mix.exs','mix.lock','Dockerfile','Dockerfile.dev','migration.toml']]
+ data=''.join(str(p.relative_to(ROOT))+' '+hashlib.sha256(p.read_bytes()).hexdigest()+'\n' for p in sorted(files))
+ return hashlib.sha256(data.encode()).hexdigest()
+def main():
+ parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--from',dest='start',choices=[x[0] for x in GATES]);parser.add_argument('--only',nargs='+',choices=[x[0] for x in GATES]);args=parser.parse_args()
+ (ROOT/'var').mkdir(exist_ok=True)
+ with (ROOT/'var/verify-parity.lock').open('w') as lock:
+  fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
+  chosen=GATES
+  if args.start:chosen=GATES[[x[0] for x in GATES].index(args.start):]
+  if args.only:chosen=[x for x in GATES if x[0] in args.only]
+  manifest={'passed':False,'complete_run':not(args.start or args.only),'source_digest':identity(),'reference_sha':subprocess.check_output(['git','-C',str(ROOT/'reference'),'rev-parse','HEAD'],text=True).strip(),'started_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'gates':[]}
+  output=ROOT/'parity/results/verification.json'
+  for name,cmd in chosen:
+   print(f'{name}: running',flush=True);begin=time.monotonic();path=ROOT/f'parity/verify-{name}.log'
+   with path.open('w') as log:r=subprocess.run(cmd,cwd=ROOT,stdout=log,stderr=log)
+   entry={'gate':name,'argv':cmd,'passed':r.returncode==0,'exit_code':r.returncode,'seconds':round(time.monotonic()-begin,3),'log':str(path.relative_to(ROOT))};manifest['gates'].append(entry);output.write_text(json.dumps(manifest,indent=2)+'\n')
+   if r.returncode:
+    print(path.read_text()[-10000:],flush=True);raise SystemExit(f'{name}: FAILED')
+   print(f'{name}: passed ({entry["seconds"]}s)',flush=True)
+  manifest['passed']=True;manifest['finished_at']=datetime.datetime.now(datetime.timezone.utc).isoformat();manifest['source_unchanged']=manifest['source_digest']==identity();output.write_text(json.dumps(manifest,indent=2)+'\n');print('All selected parity gates passed',flush=True)
+if __name__=='__main__':main()

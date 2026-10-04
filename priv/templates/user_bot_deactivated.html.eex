@@ -1,0 +1,15 @@
+      
+
+<section class="panel txt-align-center">
+  <div class="flex flex-column gap ">
+    <div class="avatar txt-xx-large center" style="background: white">
+      <img alt="Profile avatar" class="avatar" src="<%= @avatar_src %>" />
+    </div>
+
+      <div class="pad-double--inline push--inline push--block-start">
+          <div><%= @name %> is no longer on this account</div>
+      </div>
+  </div>
+</section>
+
+

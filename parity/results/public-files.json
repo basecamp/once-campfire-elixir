@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "scope": [
+    "all five pinned public documents",
+    "exact bytes and selected headers",
+    "GET and HEAD",
+    "gzip request",
+    "If-Modified-Since",
+    "single/multipart/unsatisfiable Rack ranges"
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "passed": true,
+  "scope": [
+    "collection model/template validators",
+    "conditional GET and HEAD",
+    "ETag lists/wildcards/strong validators",
+    "date validators",
+    "combined validators",
+    "record touch invalidation",
+    "JSON format failure"
+  ]
+}

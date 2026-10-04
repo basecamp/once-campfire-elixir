@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "scope": [
+    "custom boost form",
+    "form token submission",
+    "boost listing",
+    "regular and Turbo frame layouts",
+    "involvement frame layout",
+    "authentication and unreachable messages"
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "kind": "migration-preflight",
+  "ready": true,
+  "checks": [
+    {
+      "check": "pinned, unchanged reference",
+      "passed": true
+    },
+    {
+      "check": "configured reference runner",
+      "passed": true
+    },
+    {
+      "check": "nonempty HTTP parity inventory",
+      "passed": true
+    },
+    {
+      "check": "rollback rehearsal configured",
+      "passed": true
+    },
+    {
+      "check": "contract evidence ledger",
+      "passed": true
+    }
+  ],
+  "limits": "Preflight validates configuration and evidence links; verify executes gates. Neither authorizes deployment."
+}

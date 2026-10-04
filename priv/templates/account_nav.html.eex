@@ -1,0 +1,14 @@
+        <div class="flex-item-justify-start">
+    <a class="btn" href="<%= @back %>"><img aria-hidden="true" src="<%= Campfire.Assets.path("arrow-left.svg") %>" width="20" height="20" /><span class="for-screen-reader">Go Back</span></a>
+  </div>
+
+    <div class="flex align-center gap flex-item-justify-end">
+      <a class="btn" style="view-transition-name: chat-bots" href="/account/bots">
+        <img aria-hidden="true" src="<%= Campfire.Assets.path("bot.svg") %>" width="20" height="20" />
+        <span class="for-screen-reader">Set up chat bots</span>
+</a>
+      <a class="btn" style="view-transition-name: custom-styles" href="/account/custom_styles/edit">
+        <img aria-hidden="true" src="<%= Campfire.Assets.path("art.svg") %>" width="20" height="20" />
+        <span class="for-screen-reader">Custom styles</span>
+</a>    </div>
+

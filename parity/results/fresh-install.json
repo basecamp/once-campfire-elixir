@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "scope": {
+    "fresh_volume_initialized": true,
+    "first_run": true,
+    "message_write_and_real_worker": true,
+    "creator_membership_sequence": 3,
+    "backup_matches_all_tables": true,
+    "restore_matches_all_tables": true,
+    "wal_removed": true,
+    "sqlite_integrity": true
+  },
+  "runtime": "production images on fresh isolated volumes; real pre-backup and post-restore executables"
+}

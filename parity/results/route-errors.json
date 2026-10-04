@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "scope": [
+    "40 missing actions",
+    "missing controller",
+    "unmatched route",
+    "unsupported verbs",
+    "HTML/JSON error formats",
+    "before authentication/CSRF/browser callbacks"
+  ]
+}

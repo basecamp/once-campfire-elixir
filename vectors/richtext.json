@@ -1,0 +1,178 @@
+{
+  "version": 1,
+  "kind": "richtext",
+  "reference_sha": "90b330024dec3e757c79b6a7e6568f93da8e3148",
+  "policies": {
+    "tags": [
+      "a",
+      "abbr",
+      "acronym",
+      "address",
+      "b",
+      "big",
+      "blockquote",
+      "br",
+      "cite",
+      "code",
+      "dd",
+      "del",
+      "dfn",
+      "div",
+      "dl",
+      "dt",
+      "em",
+      "h1",
+      "h2",
+      "h3",
+      "h4",
+      "h5",
+      "h6",
+      "hr",
+      "i",
+      "img",
+      "ins",
+      "kbd",
+      "li",
+      "mark",
+      "ol",
+      "p",
+      "pre",
+      "samp",
+      "small",
+      "span",
+      "strong",
+      "sub",
+      "sup",
+      "time",
+      "tt",
+      "ul",
+      "var"
+    ],
+    "attributes": [
+      "abbr",
+      "alt",
+      "cite",
+      "class",
+      "datetime",
+      "height",
+      "href",
+      "lang",
+      "name",
+      "src",
+      "title",
+      "width",
+      "xml:lang"
+    ]
+  },
+  "runtime": {
+    "ruby_version": "3.4.10",
+    "rails_version": "8.2.0.alpha"
+  },
+  "data": [
+    {
+      "input": "",
+      "expected": {
+        "html": "<div class=\"lexxy-content\">\n  \n</div>\n",
+        "plain_text": ""
+      }
+    },
+    {
+      "input": "hello & goodbye",
+      "expected": {
+        "html": "<div class=\"lexxy-content\">\n  hello &amp; goodbye\n</div>\n",
+        "plain_text": "hello & goodbye"
+      }
+    },
+    {
+      "input": "<p>Hello &amp; goodbye</p>",
+      "expected": {
+        "html": "<div class=\"lexxy-content\">\n  <p>Hello &amp; goodbye</p>\n</div>\n",
+        "plain_text": "Hello & goodbye"
+      }
+    },
+    {
+      "input": "<div>Hello</div><div>World</div>",
+      "expected": {
+        "html": "<div class=\"lexxy-content\">\n  <div>Hello</div><div>World</div>\n</div>\n",
+        "plain_text": "Hello\nWorld"
+      }
+    },
+    {
+      "input": "<p>A<br>B</p><p>C</p>",
+      "expected": {
+        "html": "<div class=\"lexxy-content\">\n  <p>A<br>B</p><p>C</p>\n</div>\n",
+        "plain_text": "A\nB\n\nC"
+      }
+    },
+    {
+      "input": "<script>alert(1)</script><p>safe</p>",
+      "expected": {
+        "html": "<div class=\"lexxy-content\">\n  alert(1)<p>safe</p>\n</div>\n",
+        "plain_text": "safe"
+      }
+    },
+    {
+      "input": "<p onclick=\"alert(1)\" style=\"color: red\">safe</p>",
+      "expected": {
+        "html": "<div class=\"lexxy-content\">\n  <p style=\"color:red;\">safe</p>\n</div>\n",
+        "plain_text": "safe"
+      }
+    },
+    {
+      "input": "<a href=\"javascript:alert(1)\">bad</a>",
+      "expected": {
+        "html": "<div class=\"lexxy-content\">\n  <a>bad</a>\n</div>\n",
+        "plain_text": "bad"
+      }
+    },
+    {
+      "input": "<a href=\"https://example.com?a=1&amp;b=2\">link</a>",
+      "expected": {
+        "html": "<div class=\"lexxy-content\">\n  <a href=\"https://example.com?a=1&amp;b=2\">link</a>\n</div>\n",
+        "plain_text": "link"
+      }
+    },
+    {
+      "input": "<img src=\"x\" onerror=\"alert(1)\"><p>image</p>",
+      "expected": {
+        "html": "<div class=\"lexxy-content\">\n  <img src=\"x\"><p>image</p>\n</div>\n",
+        "plain_text": "image"
+      }
+    },
+    {
+      "input": "<table><tr><td>one</td><td>two</td></tr></table>",
+      "expected": {
+        "html": "<div class=\"lexxy-content\">\n  <table><tbody><tr><td>one</td><td>two</td></tr></tbody></table>\n</div>\n",
+        "plain_text": "onetwo"
+      }
+    },
+    {
+      "input": "<p><strong>Bold</strong> <em>em</em> <u>underline</u> <s>strike</s></p>",
+      "expected": {
+        "html": "<div class=\"lexxy-content\">\n  <p><strong>Bold</strong> <em>em</em> <u>underline</u> <s>strike</s></p>\n</div>\n",
+        "plain_text": "Bold em underline strike"
+      }
+    },
+    {
+      "input": "<pre data-language=\"ruby\">puts &quot;hi&quot;</pre>",
+      "expected": {
+        "html": "<div class=\"lexxy-content\">\n  <pre data-language=\"ruby\">puts \"hi\"</pre>\n</div>\n",
+        "plain_text": "puts \"hi\""
+      }
+    },
+    {
+      "input": "<p>Unicode: ☃ é</p>",
+      "expected": {
+        "html": "<div class=\"lexxy-content\">\n  <p>Unicode: ☃ é</p>\n</div>\n",
+        "plain_text": "Unicode: ☃ é"
+      }
+    },
+    {
+      "input": "<figure><figcaption>A caption</figcaption></figure>",
+      "expected": {
+        "html": "<div class=\"lexxy-content\">\n  <figure><figcaption>A caption</figcaption></figure>\n</div>\n",
+        "plain_text": "[A caption]"
+      }
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+<li class="flex flex-column gap flush fill-shade border-radius pad-block pad-inline-double">
+  <div class="flex align-center gap">
+    <figure class="avatar flex-item--no-shrink" style="--avatar-size: 2.65em;">
+      <%= @avatar %>
+    </figure>
+
+    <div class="min-width">
+      <div class="overflow-ellipsis txt-large"><strong><%= @name %></strong></div>
+    </div>
+
+    <a class="btn flex-item-justify-end" style="view-transition-name: chat-bot-<%= @id %>" href="/account/bots/<%= @id %>/edit">
+      <img aria-hidden="true" src="<%= Assets.path("pencil.svg") %>" width="20" height="20" />
+      <span class="for-screen-reader">Edit <%= @name %></span>
+</a>  </div>
+
+<%= @rooms %></li>

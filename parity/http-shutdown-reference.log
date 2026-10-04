@@ -1,0 +1,36 @@
+=> Booting Puma
+=> Rails 8.2.0.alpha application starting in production 
+=> Run `bin/rails server --help` for more startup options
+[1] Puma starting in cluster mode...
+[1] * Puma version: 7.2.1 ("On The Corner")
+[1] * Ruby version: ruby 3.4.10 (2026-06-30 revision 2b0b7728dc) +YJIT +PRISM [x86_64-linux]
+[1] *  Min threads: 5
+[1] *  Max threads: 5
+[1] *  Environment: production
+[1] *   Master PID: 1
+[1] *      Workers: 1
+[1] *     Restarts: (✔) hot (✔) phased (✖) refork
+[1] * Listening on http://127.0.0.1:47200
+[1] Use Ctrl-C to stop
+[1] ! WARNING: Detected running cluster mode with 1 worker.
+[1] ! Running Puma in cluster mode with a single worker is often a misconfiguration.
+[1] ! Consider running Puma in single-mode (workers = 0) in order to reduce memory overhead.
+[1] ! Set the `silence_single_worker_warning` option to silence this warning message.
+[1] - Worker 0 (PID: 11) booted in 0.0s, phase: 0
+I, [2026-10-04T11:35:31.512113 #11]  INFO -- : [f87d0dad-ed81-45a1-a419-37a11429b9dd] Started GET "/session/new" for 127.0.0.1 at 2026-10-04 11:35:31 +0000
+I, [2026-10-04T11:35:31.513118 #11]  INFO -- : [f87d0dad-ed81-45a1-a419-37a11429b9dd] Processing by SessionsController#new as */*
+I, [2026-10-04T11:35:31.599592 #11]  INFO -- : [f87d0dad-ed81-45a1-a419-37a11429b9dd] Completed 200 OK in 86ms (Views: 79.0ms | ActiveRecord: 2.2ms (9 queries, 5 cached) | GC: 23.0ms)
+I, [2026-10-04T11:35:31.606062 #11]  INFO -- : [154294a4-b484-4f28-bf16-fb974b087301] Started POST "/session" for 127.0.0.1 at 2026-10-04 11:35:31 +0000
+I, [2026-10-04T11:35:31.606571 #11]  INFO -- : [154294a4-b484-4f28-bf16-fb974b087301] Processing by SessionsController#create as */*
+I, [2026-10-04T11:35:31.606590 #11]  INFO -- : [154294a4-b484-4f28-bf16-fb974b087301]   Parameters: {"email_address" => "[FILTERED]", "password" => "[FILTERED]", "authenticity_token" => "[FILTERED]"}
+I, [2026-10-04T11:35:31.796297 #11]  INFO -- : [154294a4-b484-4f28-bf16-fb974b087301] Redirected to http://campfire.test/
+I, [2026-10-04T11:35:31.796507 #11]  INFO -- : [154294a4-b484-4f28-bf16-fb974b087301] Completed 302 Found in 190ms (ActiveRecord: 4.2ms (4 queries, 0 cached) | GC: 0.7ms)
+I, [2026-10-04T11:35:32.019771 #11]  INFO -- : [b0efa92d-aa03-4880-a3df-b824e3307413] Started POST "/users/me/push_subscriptions/123/test_notifications" for 127.0.0.1 at 2026-10-04 11:35:32 +0000
+I, [2026-10-04T11:35:32.020624 #11]  INFO -- : [b0efa92d-aa03-4880-a3df-b824e3307413] Processing by Users::PushSubscriptions::TestNotificationsController#create as */*
+I, [2026-10-04T11:35:32.020644 #11]  INFO -- : [b0efa92d-aa03-4880-a3df-b824e3307413]   Parameters: {"authenticity_token" => "[FILTERED]", "user_id" => "me", "push_subscription_id" => "123"}
+[1] === puma shutdown: 2026-10-04 11:35:32 +0000 ===
+[1] - Goodbye!
+[1] - Gracefully shutting down workers...
+I, [2026-10-04T11:35:38.079470 #11]  INFO -- : [b0efa92d-aa03-4880-a3df-b824e3307413] Redirected to http://campfire.test/users/me/push_subscriptions
+I, [2026-10-04T11:35:38.079671 #11]  INFO -- : [b0efa92d-aa03-4880-a3df-b824e3307413] Completed 302 Found in 6059ms (ActiveRecord: 0.6ms (5 queries, 0 cached) | GC: 0.5ms)
+Exiting

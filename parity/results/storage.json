@@ -1,0 +1,4 @@
+{
+  "passed": true,
+  "scope": "direct upload allocation, signature validation, checksum, disk single/multipart/error ranges, proxy range; variants pending"
+}

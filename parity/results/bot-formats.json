@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "scope": [
+    "bot and session authentication",
+    "index/show/create/update/destroy",
+    "JSON/HTML/XML/Turbo/PDF formats",
+    "inherited templates",
+    "status/body/MIME/pagination/location"
+  ]
+}

@@ -1,0 +1,2 @@
+    <meta name="turbo-cache-control" content="no-preview">  
+  <meta name="current-room-id" content="<%= @room_id %>">

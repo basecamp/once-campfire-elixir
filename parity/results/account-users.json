@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "scope": [
+    "500-user Turbo Stream pagination",
+    "lazy next-page frames",
+    "out-of-range and invalid page params",
+    "format negotiation",
+    "escaped row content and administrator form controls"
+  ]
+}

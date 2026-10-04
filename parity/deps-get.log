@@ -1,0 +1,28 @@
+Error opening ETS file /app/.hex/cache.ets: :badfile
+Resolving Hex dependencies...
+Resolution completed in 0.223s
+New:
+  nimble_options 1.1.1
+  redix 1.9.2
+Unchanged:
+  bandit 1.12.5
+  bcrypt_elixir 3.3.2
+  cc_precompiler 0.1.11
+  comeonin 5.5.1
+  db_connection 2.10.2
+  elixir_make 0.10.0
+  exqlite 0.42.0
+  fast_html 2.5.0
+  floki 0.38.4
+  hpax 1.1.0
+  jason 1.4.5
+  mime 2.0.7
+  nimble_pool 1.1.0
+  plug 1.20.3
+  plug_crypto 2.2.0
+  telemetry 1.4.2
+  thousand_island 1.5.0
+  websock 0.5.3
+* Getting redix (Hex package)
+* Getting nimble_options (Hex package)
+You have added/upgraded packages you could sponsor, run `mix hex.sponsor` to learn more

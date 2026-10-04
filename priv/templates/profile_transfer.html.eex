@@ -1,0 +1,27 @@
+<fieldset>
+  <legend class="gap">
+    <img aria-hidden="true" class="colorize--black" src="<%= Assets.path("laptop.svg") %>" width="36" height="36" />
+    <img aria-hidden="true" class="colorize--black" src="<%= Assets.path("transfer.svg") %>" width="36" height="36" />
+    <img aria-hidden="true" class="colorize--black" src="<%= Assets.path("mobile-phone.svg") %>" width="36" height="36" />
+  </legend>
+
+
+  <div class="flex flex-column gap">
+<%= @label %>
+    <input type="text" class="input" value="<%= @url %>" id="session_transfer_url" readonly>
+
+    <div class="flex align-center center gap">
+      <a class="btn" data-lightbox-target="image" data-action="lightbox#open" data-lightbox-url-value="/qr_code/<%= @qr %>" href="/qr_code/<%= @qr %>">
+        <span class="for-screen-reader">Show auto-login QR code</span>
+        <img aria-hidden="true" class="colorize--black" src="<%= Assets.path("qr-code.svg") %>" width="20" height="20" />
+</a>
+      <button class="btn" data-controller="copy-to-clipboard" data-action="copy-to-clipboard#copy" data-copy-to-clipboard-success-class="btn--success" data-copy-to-clipboard-content-value="<%= @url %>">
+        <span class="for-screen-reader">Copy auto-login link</span>
+        <img aria-hidden="true" class="flex-item-no-shrink colorize--black" src="<%= Assets.path("copy-paste.svg") %>" width="20" height="20" />
+</button>
+      <button class="btn" hidden="hidden" data-controller="web-share" data-action="web-share#share" data-web-share-url-value="<%= @url %>" data-web-share-text-value="This is your own private sign-in URL, DO NOT SHARE IT. Use it to sign-in on another device or if you get locked out." data-web-share-title-value="Your sign-in link">
+        <span class="for-screen-reader">Share auto-login link</span>
+        <img aria-hidden="true" class="flex-item-no-shrink colorize--black" src="<%= Assets.path("share.svg") %>" width="20" height="20" />
+</button>    </div>
+  </div>
+</fieldset>

@@ -1,0 +1,241 @@
+{
+  "version": 1,
+  "cases": [
+    {
+      "id": "bot-latest",
+      "path": "/rooms/486777696/394959859-BenderBot123/messages",
+      "expected_status": 200,
+      "headers": {
+        "Host": "campfire.test"
+      },
+      "comparison": "json",
+      "compare_headers": [
+        "content-type",
+        "x-total-count",
+        "link"
+      ]
+    },
+    {
+      "id": "bot-before",
+      "path": "/rooms/486777696/394959859-BenderBot123/messages?before=933434569",
+      "expected_status": 200,
+      "headers": {
+        "Host": "campfire.test"
+      },
+      "comparison": "json",
+      "compare_headers": [
+        "content-type",
+        "x-total-count",
+        "link"
+      ]
+    },
+    {
+      "id": "bot-after",
+      "path": "/rooms/486777696/394959859-BenderBot123/messages?after=933434569",
+      "expected_status": 200,
+      "headers": {
+        "Host": "campfire.test"
+      },
+      "comparison": "json",
+      "compare_headers": [
+        "content-type",
+        "x-total-count",
+        "link"
+      ]
+    },
+    {
+      "id": "health",
+      "path": "/up",
+      "expected_status": 200,
+      "headers": {
+        "Host": "campfire.test"
+      },
+      "comparison": "bytes",
+      "compare_headers": [
+        "content-type"
+      ]
+    },
+    {
+      "id": "manifest",
+      "path": "/webmanifest.json",
+      "expected_status": 200,
+      "headers": {
+        "Host": "campfire.test"
+      },
+      "comparison": "bytes",
+      "compare_headers": [
+        "content-type"
+      ]
+    },
+    {
+      "id": "service-worker",
+      "path": "/service-worker.js",
+      "expected_status": 200,
+      "headers": {
+        "Host": "campfire.test"
+      },
+      "comparison": "bytes",
+      "compare_headers": [
+        "content-type"
+      ]
+    },
+    {
+      "id": "inaccessible-room",
+      "path": "/rooms/0/394959859-BenderBot123/messages",
+      "expected_status": 404,
+      "headers": {
+        "Host": "campfire.test"
+      },
+      "comparison": "bytes",
+      "compare_headers": [
+        "content-type"
+      ]
+    },
+    {
+      "id": "missing-cursor",
+      "path": "/rooms/486777696/394959859-BenderBot123/messages?before=0",
+      "expected_status": 404,
+      "headers": {
+        "Host": "campfire.test"
+      },
+      "comparison": "bytes",
+      "compare_headers": [
+        "content-type"
+      ]
+    },
+    {
+      "id": "invalid-bot",
+      "path": "/rooms/486777696/0-bad/messages",
+      "expected_status": 302,
+      "headers": {
+        "Host": "campfire.test"
+      },
+      "comparison": "bytes",
+      "compare_headers": [
+        "content-type",
+        "location"
+      ]
+    },
+    {
+      "id": "empty-message",
+      "path": "/rooms/486777696/394959859-BenderBot123/messages",
+      "method": "POST",
+      "body": "",
+      "expected_status": 422,
+      "headers": {
+        "Host": "campfire.test",
+        "Content-Type": "text/plain"
+      },
+      "comparison": "bytes",
+      "compare_headers": [
+        "content-type"
+      ]
+    },
+    {
+      "id": "create-message",
+      "path": "/rooms/486777696/394959859-BenderBot123/messages",
+      "method": "POST",
+      "body": "<p>Native parity message</p>",
+      "expected_status": 201,
+      "headers": {
+        "Host": "campfire.test",
+        "Content-Type": "text/plain"
+      },
+      "comparison": "bytes",
+      "compare_headers": [
+        "content-type",
+        "location"
+      ]
+    },
+    {
+      "id": "edit-own-message",
+      "path": "/rooms/486777696/394959859-BenderBot123/messages/933434630",
+      "method": "PATCH",
+      "body": "<p>Native edit</p>",
+      "expected_status": 200,
+      "headers": {
+        "Host": "campfire.test",
+        "Content-Type": "text/plain"
+      },
+      "comparison": "json",
+      "compare_headers": [
+        "content-type"
+      ]
+    },
+    {
+      "id": "delete-own-message",
+      "path": "/rooms/486777696/394959859-BenderBot123/messages/933434630",
+      "method": "DELETE",
+      "body": "",
+      "expected_status": 204,
+      "headers": {
+        "Host": "campfire.test",
+        "Content-Type": "text/plain"
+      },
+      "comparison": "bytes",
+      "compare_headers": [
+        "content-type"
+      ]
+    },
+    {
+      "id": "delete-other-message",
+      "path": "/rooms/486777696/394959859-BenderBot123/messages/933434569",
+      "method": "DELETE",
+      "body": "",
+      "expected_status": 403,
+      "headers": {
+        "Host": "campfire.test",
+        "Content-Type": "text/plain"
+      },
+      "comparison": "bytes",
+      "compare_headers": [
+        "content-type"
+      ]
+    },
+    {
+      "id": "missing-boost-message",
+      "path": "/rooms/486777696/394959859-BenderBot123/messages/0/boosts",
+      "method": "POST",
+      "body": "+1",
+      "expected_status": 404,
+      "headers": {
+        "Host": "campfire.test",
+        "Content-Type": "text/plain"
+      },
+      "comparison": "bytes",
+      "compare_headers": [
+        "content-type"
+      ]
+    },
+    {
+      "id": "empty-boost",
+      "path": "/rooms/486777696/394959859-BenderBot123/messages/933434630/boosts",
+      "method": "POST",
+      "body": "",
+      "expected_status": 422,
+      "headers": {
+        "Host": "campfire.test",
+        "Content-Type": "text/plain"
+      },
+      "comparison": "bytes",
+      "compare_headers": [
+        "content-type"
+      ]
+    },
+    {
+      "id": "create-boost",
+      "path": "/rooms/486777696/394959859-BenderBot123/messages/933434630/boosts",
+      "method": "POST",
+      "body": "+1",
+      "expected_status": 201,
+      "headers": {
+        "Host": "campfire.test",
+        "Content-Type": "text/plain"
+      },
+      "comparison": "json",
+      "compare_headers": [
+        "content-type"
+      ]
+    }
+  ]
+}

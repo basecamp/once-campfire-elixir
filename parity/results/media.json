@@ -1,0 +1,12 @@
+{
+  "passed": true,
+  "scope": [
+    "fresh image representation redirects",
+    "proxy bytes",
+    "variant records",
+    "blob metadata before and after queued analysis",
+    "file integrity",
+    "idempotent processing",
+    "invalid signatures"
+  ]
+}

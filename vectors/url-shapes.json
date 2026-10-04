@@ -1,0 +1,100 @@
+[
+  {
+    "url": "http://example.com",
+    "valid": true,
+    "host": "example.com",
+    "path": "/"
+  },
+  {
+    "url": "https://example.com/a?x=1#part",
+    "valid": true,
+    "host": "example.com",
+    "path": "/a?x=1"
+  },
+  {
+    "url": "HTTP://EXAMPLE.COM/a",
+    "valid": true,
+    "host": "EXAMPLE.COM",
+    "path": "/a"
+  },
+  {
+    "url": "http://example.com/a b",
+    "valid": false
+  },
+  {
+    "url": "http://example.com/Ω",
+    "valid": false
+  },
+  {
+    "url": "http://example.com/%GG",
+    "valid": false
+  },
+  {
+    "url": "http://example.com/a\\b",
+    "valid": false
+  },
+  {
+    "url": "http://example.com/a|b",
+    "valid": false
+  },
+  {
+    "url": "http://example.com/a{b}",
+    "valid": false
+  },
+  {
+    "url": "http://example.com/a[b]",
+    "valid": false
+  },
+  {
+    "url": "http://example.com/a\\\"b",
+    "valid": false
+  },
+  {
+    "url": "http://example.com/a\r\nX-Test: injected",
+    "valid": false
+  },
+  {
+    "url": "http://example.com:99999",
+    "valid": true,
+    "host": "example.com",
+    "path": "/"
+  },
+  {
+    "url": "http://example.com:abc",
+    "valid": false
+  },
+  {
+    "url": "http://[::1]/",
+    "valid": true,
+    "host": "[::1]",
+    "path": "/"
+  },
+  {
+    "url": "http://user:password@example.com/a",
+    "valid": true,
+    "host": "example.com",
+    "path": "/a"
+  },
+  {
+    "url": "http:example.com",
+    "valid": true,
+    "host": null,
+    "path": null
+  },
+  {
+    "url": "https:///example.com",
+    "valid": true,
+    "host": "",
+    "path": "/example.com"
+  },
+  {
+    "url": "http://example.com/%20",
+    "valid": true,
+    "host": "example.com",
+    "path": "/%20"
+  },
+  {
+    "url": "http://example.com?query=é",
+    "valid": false
+  }
+]

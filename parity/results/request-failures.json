@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "scope": [
+    "10 mutation endpoints",
+    "missing/blank/whitespace/array/scalar nested params",
+    "HTML/JSON/XML public exceptions",
+    "authentication and CSRF before mutation format errors",
+    "query-string bot credentials with trimming",
+    "anonymous public login behavior"
+  ]
+}

@@ -1,0 +1,33 @@
+<section class="txt-align-center">
+  <div class="panel <%= if @rejected, do: "shake", else: "" %>">
+    <figure class="account-logo avatar center margin-block-end txt-xx-large"><img alt="Account logo" src="/account/logo?v=<%= @account_version %>" width="300" height="300" /></figure>
+
+    <form class="flex flex-column gap" action="<%= @base %>/session" accept-charset="UTF-8" method="post"><input type="hidden" name="authenticity_token" value="<%= @form_token %>" />
+      <fieldset class="flex flex-column gap center-block upad">
+        <legend class="txt-large txt-align-center"><strong><%= @account_name %></strong></legend>
+
+        <div class="flex align-center gap">
+          <details class="position-relative" data-controller="popup" data-action="keydown.esc-&gt;popup#close toggle-&gt;popup#toggle click@document-&gt;popup#closeOnClickOutside" data-popup-orientation-top-class="popup-orientation-top"><summary class="btn" tabindex="-1"><img aria-hidden="true" class="color-icon" src="<%= Campfire.Assets.path("globe.svg") %>" width="20" height="20" /><span class="for-screen-reader">Translate</span></summary><div class="language-list-menu shadow" data-popup-target="menu"><dl class="language-list"><dt>🇺🇸</dt><dd class="margin-none">Enter your email address</dd><dt>🇪🇸</dt><dd class="margin-none">Introduce tu correo electrónico</dd><dt>🇫🇷</dt><dd class="margin-none">Entrez votre adresse courriel</dd><dt>🇮🇳</dt><dd class="margin-none">अपना ईमेल पता दर्ज करें</dd><dt>🇩🇪</dt><dd class="margin-none">Geben Sie Ihre E-Mail-Adresse ein</dd><dt>🇧🇷</dt><dd class="margin-none">Insira seu endereço de email</dd><dt>🇯🇵</dt><dd class="margin-none">メールアドレスを入力してください</dd></dl></div></details>
+          <label class="flex align-center gap input input--actor txt-large">
+            <input required="required" class="input" autofocus="autofocus" autocomplete="username" placeholder="Enter your email address"<%= if @email, do: " value=\"" <> @email <> "\"", else: "" %> type="email" name="email_address" id="email_address" />
+            <img aria-hidden="true" class="colorize--black" src="<%= Campfire.Assets.path("email.svg") %>" width="24" height="24" />
+          </label>
+        </div>
+
+        <div class="flex align-center gap">
+          <details class="position-relative" data-controller="popup" data-action="keydown.esc-&gt;popup#close toggle-&gt;popup#toggle click@document-&gt;popup#closeOnClickOutside" data-popup-orientation-top-class="popup-orientation-top"><summary class="btn" tabindex="-1"><img aria-hidden="true" class="color-icon" src="<%= Campfire.Assets.path("globe.svg") %>" width="20" height="20" /><span class="for-screen-reader">Translate</span></summary><div class="language-list-menu shadow" data-popup-target="menu"><dl class="language-list"><dt>🇺🇸</dt><dd class="margin-none">Enter your password</dd><dt>🇪🇸</dt><dd class="margin-none">Introduce tu contraseña</dd><dt>🇫🇷</dt><dd class="margin-none">Saisissez votre mot de passe</dd><dt>🇮🇳</dt><dd class="margin-none">अपना पासवर्ड दर्ज करें</dd><dt>🇩🇪</dt><dd class="margin-none">Geben Sie Ihr Passwort ein</dd><dt>🇧🇷</dt><dd class="margin-none">Insira sua senha</dd><dt>🇯🇵</dt><dd class="margin-none">パスワードを入力してください</dd></dl></div></details>
+          <label class="flex align-center gap input input--actor txt-large">
+            <input required="required" class="input" autocomplete="current-password" placeholder="Enter your password" maxlength="72" size="72" type="password" name="password" id="password" />
+            <img aria-hidden="true" class="colorize--black" src="<%= Campfire.Assets.path("password.svg") %>" width="24" height="24" />
+          </label>
+        </div>
+
+        <button name="log_in" type="submit" class="btn btn--reversed center txt-large">
+          <img aria-hidden="true" src="<%= Campfire.Assets.path("arrow-right.svg") %>" />
+          <span class="for-screen-reader">Go</span>
+</button>      </fieldset>
+</form>  </div>
+
+  <%= @help %></section>
+
+

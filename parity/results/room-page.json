@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "scope": [
+    "closed room scaffold",
+    "message list",
+    "composer",
+    "permalink pagination",
+    "last room cookie",
+    "sidebar",
+    "mention autocomplete",
+    "involvement controls"
+  ]
+}

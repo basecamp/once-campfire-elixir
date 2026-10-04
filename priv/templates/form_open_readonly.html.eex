@@ -1,0 +1,47 @@
+      
+
+<section class="panel txt-align-center" style="view-transition-name: edit-room-<%= @id %>">
+  
+  <form action="/rooms/opens/<%= @id %>" accept-charset="UTF-8" method="post"><input type="hidden" name="_method" value="patch" /><input type="hidden" name="authenticity_token" value="<%= @token %>" />
+  <div class="flex align-center gap">
+      <h1 class="flex-item-grow txt-x-large">
+        <%= @name %>
+      </h1>
+  </div>
+
+  <hr class="margin-block borderless">
+
+  <section class="room-access margin-block pad-inline fill-shade border-radius">
+    
+  <menu class="flex flex-column gap margin-none pad overflow-y constrain-height" data-controller="filter" data-filter-active-class="filter--active" data-filter-selected-class="selected">
+    <li class="flex align-center gap margin-none">
+      <figure class="avatar flex-item-no-shrink" style="--avatar-border-radius: 0; --avatar-size: 4ch;">
+        <img aria-hidden="true" class="colorize--black" style="background-color: transparent" src="<%= Assets.path("everyone.svg") %>" />
+        <span class="for-screen-reader">Everyone</span>
+      </figure>
+
+      <div class="min-width">
+        <div class="overflow-ellipsis fill-shade"><strong>Everyone</strong></div>
+      </div>
+
+      <hr class="separator" aria-hidden="true">
+
+    </li>
+
+    <hr class="separator full-width" style="--border-style: solid">
+
+    
+
+<%= @filter %>    <div data-filter-target="list" contents>
+      <%= @users %>
+    </div>
+</menu>
+  </section>
+
+  
+</form>
+
+</section>
+
+
+

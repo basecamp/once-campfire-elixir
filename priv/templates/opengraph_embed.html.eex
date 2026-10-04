@@ -1,0 +1,15 @@
+<figure class="attachment attachment--content attachment--og">
+  <actiontext-opengraph-embed>
+    <div class="og-embed gap <%= if @twitter_avatar, do: "og-embed--twitter-avatar", else: "" %>">
+      <div class="og-embed__content">
+        <div class="og-embed__title">
+          <%= @title %>
+        </div>
+        <div class="og-embed__description"><%= @description %></div>
+      </div>
+<%= if @image do %>        <div class="og-embed__image">
+          <img src="<%= @image %>" class="image center" alt="">
+        </div>
+<% end %>    </div>
+  </actiontext-opengraph-embed>
+</figure>

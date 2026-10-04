@@ -1,0 +1,15 @@
+#!/bin/sh
+set -eu
+ROOT=$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)
+SCRIPT=${1:-export.rb}
+case "$SCRIPT" in
+  "$ROOT/reference-tools/"*) SCRIPT=${SCRIPT#"$ROOT/reference-tools/"} ;;
+  reference-tools/*) SCRIPT=${SCRIPT#reference-tools/} ;;
+esac
+case "$SCRIPT" in /*|../*|*/../*) echo "Oracle script must be inside reference-tools" >&2; exit 1 ;; esac
+[ -f "$ROOT/reference-tools/$SCRIPT" ] || { echo "Oracle script missing: $SCRIPT" >&2; exit 1; }
+RAILS_TO_RUST_REFERENCE_SHA=${RAILS_TO_RUST_REFERENCE_SHA:-$(git -C "$ROOT/reference" rev-parse HEAD)}
+export RAILS_TO_RUST_REFERENCE_SHA
+REVISION=$(docker image inspect campfire-reference:app --format '{{range .Config.Env}}{{println .}}{{end}}' | sed -n 's/^GIT_REVISION=//p')
+[ "$REVISION" = "$RAILS_TO_RUST_REFERENCE_SHA" ] || { echo "Reference image revision differs from pinned source" >&2; exit 1; }
+exec docker run --rm --entrypoint /bin/sh -e RAILS_TO_RUST_EXPORT -e RAILS_TO_RUST_REFERENCE_SHA --env-file "$ROOT/parity/reference.env" -v "$ROOT/reference-tools:/oracle:ro" -v "$ROOT/reference/test/fixtures:/rails/test/fixtures:ro" -v "$ROOT/var/oracle-db:/rails/storage/db" campfire-reference:app -c 'exec bin/rails runner "/oracle/$1"' oracle "$SCRIPT"

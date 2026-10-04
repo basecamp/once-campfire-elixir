@@ -1,0 +1,49 @@
+              <details class="notifications-help" data-notifications-target="details">
+    <summary class="btn">
+      <img aria-hidden="true" src="<%= Assets.path("external/web.svg") %>" width="20" height="20" />
+      <strong>Check your <%= @browser %> settings</strong>
+      <img aria-hidden="true" class="disclosure" src="<%= Assets.path("disclosure.svg") %>" width="10" height="10" />
+    </summary>
+
+        <ol>
+          <li>Tap <em><img alt="the View site information button" src="<%= Assets.path("lock.svg") %>" width="20" height="20" /></em> in the address bar.</li>
+          <li>Tap <em>Notification</em> to change to <em>Allowed</em>.</li>
+        </ol>
+  </details>
+
+            <details class="notifications-help hide-in-browser" data-notifications-target="details">
+  <summary class="btn">
+    <img aria-hidden="true" src="<%= Assets.path("external/gear.svg") %>" width="20" height="20" />
+    <strong>Check your Android settings</strong>
+    <img aria-hidden="true" class="disclosure" src="<%= Assets.path("disclosure.svg") %>" width="10" height="10" />
+  </summary>
+
+      <ol>
+        <li>Tap the <em><img alt="More options" src="<%= Assets.path("menu-dots-vertical.svg") %>" width="16" height="16" /></em> menu button.</li>
+        <li>Tap <em>Settings</em>.</li>
+        <li>Tap <em>Notifications</em>.</li>
+        <li>Tap <em><img alt="the toggle button" src="<%= Assets.path("external/switch.svg") %>" width="22" height="22" /></em> to <em>Allow <%= @browser %> notifications</em>.</li>
+      </ol>
+</details>
+
+              <details class="notifications-help pwa__instructions hide-in-pwa" data-controller="pwa-install" data-pwa-install-prompting-class="pwa--can-install" data-notifications-target="details">
+    <summary class="btn">
+      <img aria-hidden="true" src="<%= Assets.path("external/install.svg") %>" width="20" height="20" />
+      <strong>Install Campfire as a web app.</strong>
+      <img aria-hidden="true" class="disclosure" src="<%= Assets.path("disclosure.svg") %>" width="10" height="10" />
+    </summary>
+
+        <ol>
+          <li>Tap the <em><img alt="More options" src="<%= Assets.path("menu-dots-vertical.svg") %>" width="16" height="16" /></em> menu button.</li>
+          <li>Tap <em>Install</em> in the menu.</li>
+        </ol>
+
+    <div class="margin-block-start txt-align-center pwa__installer">
+      <hr class="separator margin-block">
+      <button class="btn btn--reversed center" data-action="pwa-install#promptInstall">
+        <img aria-hidden="true" src="<%= Assets.path("external/install.svg") %>" />
+        Install now
+      </button>
+    </div>
+  </details>
+

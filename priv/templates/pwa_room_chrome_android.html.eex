@@ -1,0 +1,34 @@
+              <details class="notifications-help" data-notifications-target="details">
+    <summary class="btn">
+      <img aria-hidden="true" src="<%= Assets.path("external/web.svg") %>" width="20" height="20" />
+      <strong>Check your <%= @browser %> settings</strong>
+      <img aria-hidden="true" class="disclosure" src="<%= Assets.path("disclosure.svg") %>" width="10" height="10" />
+    </summary>
+
+        <ol>
+          <li>Tap the <em><img alt="More options" src="<%= Assets.path("menu-dots-vertical.svg") %>" width="16" height="16" /></em> menu button.</li>
+          <li>Tap <em>Settings</em>.</li>
+          <li>Tap <em>Notifications</em>.</li>
+          <li>Tap <em><img alt="the switch" src="<%= Assets.path("external/switch.svg") %>" width="22" height="22" /></em> to <em>Allow <%= @browser %> notifications</em>.</li>
+          <li>Tap <em><img alt="the switch" src="<%= Assets.path("external/switch.svg") %>" width="22" height="22" /></em> next to <em>Web apps</em>.</li>
+          <li>Tap <em><img alt="the notification bell" src="<%= Assets.path("notification-bell-alert.svg") %>" width="16" height="16" /></em> and select <em>Allow</em>.</li>
+        </ol>
+  </details>
+
+            <details class="notifications-help hide-in-browser" data-notifications-target="details">
+  <summary class="btn">
+    <img aria-hidden="true" src="<%= Assets.path("external/gear.svg") %>" width="20" height="20" />
+    <strong>Check your Android settings</strong>
+    <img aria-hidden="true" class="disclosure" src="<%= Assets.path("disclosure.svg") %>" width="10" height="10" />
+  </summary>
+
+      <ol>
+        <li>Open the <em><img aria-hidden="true" src="<%= Assets.path("external/gear.svg") %>" width="20" height="20" /></em> Settings app.</li>
+        <li>Tap <em>Notifications</em>.</li>
+        <li>Tap <em>App notifications</em>.</li>
+        <li>Scroll to <em>Campfire</em>.</li>
+        <li>Tap <em><img alt="the switch" src="<%= Assets.path("external/switch.svg") %>" width="22" height="22" /></em> to <em>Allow Notifications</em>.</li>
+      </ol>
+</details>
+
+            

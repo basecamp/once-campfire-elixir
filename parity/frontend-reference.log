@@ -1,0 +1,62 @@
+9:C 04 Oct 2026 11:35:15.933 # WARNING Memory overcommit must be enabled! Without it, a background save or replication may fail under low memory condition. Being disabled, it can also cause failures without low memory condition, see https://github.com/jemalloc/jemalloc/issues/1328. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+9:C 04 Oct 2026 11:35:15.933 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+9:C 04 Oct 2026 11:35:15.933 * Redis version=8.0.2, bits=64, commit=00000000, modified=0, pid=9, just started
+9:C 04 Oct 2026 11:35:15.933 * Configuration loaded
+9:M 04 Oct 2026 11:35:15.934 * monotonic clock: POSIX clock_gettime
+9:M 04 Oct 2026 11:35:15.934 * Running mode=standalone, port=6379.
+9:M 04 Oct 2026 11:35:15.934 * Server initialized
+9:M 04 Oct 2026 11:35:15.934 * Ready to accept connections tcp
+{"time":"2026-10-04T11:35:16.115057679Z","level":"INFO","msg":"Server started","http":":80","https":":443","tls_domain":["campfire.test"]}
+{"time":"2026-10-04T11:35:16.118839124Z","level":"INFO","msg":"Unable to proxy request","path":"/up","error":"dial tcp [::1]:3000: connect: connection refused"}
+resque-pool-manager[rails][11]: Resque Pool running in production environment
+{"time":"2026-10-04T11:35:16.226932642Z","level":"INFO","msg":"Unable to proxy request","path":"/up","error":"dial tcp [::1]:3000: connect: connection refused"}
+{"time":"2026-10-04T11:35:16.334776852Z","level":"INFO","msg":"Unable to proxy request","path":"/up","error":"dial tcp [::1]:3000: connect: connection refused"}
+{"time":"2026-10-04T11:35:16.442018874Z","level":"INFO","msg":"Unable to proxy request","path":"/up","error":"dial tcp [::1]:3000: connect: connection refused"}
+{"time":"2026-10-04T11:35:16.550167961Z","level":"INFO","msg":"Unable to proxy request","path":"/up","error":"dial tcp [::1]:3000: connect: connection refused"}
+{"time":"2026-10-04T11:35:16.658132467Z","level":"INFO","msg":"Unable to proxy request","path":"/up","error":"dial tcp [::1]:3000: connect: connection refused"}
+{"time":"2026-10-04T11:35:16.766211828Z","level":"INFO","msg":"Unable to proxy request","path":"/up","error":"dial tcp [::1]:3000: connect: connection refused"}
+{"time":"2026-10-04T11:35:16.874151475Z","level":"INFO","msg":"Unable to proxy request","path":"/up","error":"dial tcp [::1]:3000: connect: connection refused"}
+{"time":"2026-10-04T11:35:16.982086212Z","level":"INFO","msg":"Unable to proxy request","path":"/up","error":"dial tcp [::1]:3000: connect: connection refused"}
+{"time":"2026-10-04T11:35:17.090072791Z","level":"INFO","msg":"Unable to proxy request","path":"/up","error":"dial tcp [::1]:3000: connect: connection refused"}
+{"time":"2026-10-04T11:35:17.197884939Z","level":"INFO","msg":"Unable to proxy request","path":"/up","error":"dial tcp [::1]:3000: connect: connection refused"}
+{"time":"2026-10-04T11:35:17.305792563Z","level":"INFO","msg":"Unable to proxy request","path":"/up","error":"dial tcp [::1]:3000: connect: connection refused"}
+{"time":"2026-10-04T11:35:17.413935368Z","level":"INFO","msg":"Unable to proxy request","path":"/up","error":"dial tcp [::1]:3000: connect: connection refused"}
+resque-pool-worker[rails][39]: Starting worker 96e48f041522:39:default
+resque-pool-manager[rails][11]: started manager
+resque-pool-manager[rails][11]: Pool contains worker PIDs: [39, 48]
+resque-pool-worker[rails][48]: Starting worker 96e48f041522:48:default
+{"time":"2026-10-04T11:35:17.521753578Z","level":"INFO","msg":"Unable to proxy request","path":"/up","error":"dial tcp [::1]:3000: connect: connection refused"}
+{"time":"2026-10-04T11:35:17.630120832Z","level":"INFO","msg":"Unable to proxy request","path":"/up","error":"dial tcp [::1]:3000: connect: connection refused"}
+{"time":"2026-10-04T11:35:17.738420865Z","level":"INFO","msg":"Unable to proxy request","path":"/up","error":"dial tcp [::1]:3000: connect: connection refused"}
+=> Booting Puma
+=> Rails 8.2.0.alpha application starting in production 
+=> Run `bin/rails server --help` for more startup options
+{"time":"2026-10-04T11:35:17.846521788Z","level":"INFO","msg":"Unable to proxy request","path":"/up","error":"dial tcp [::1]:3000: connect: connection refused"}
+{"time":"2026-10-04T11:35:17.954544107Z","level":"INFO","msg":"Unable to proxy request","path":"/up","error":"dial tcp [::1]:3000: connect: connection refused"}
+{"time":"2026-10-04T11:35:18.062435961Z","level":"INFO","msg":"Unable to proxy request","path":"/up","error":"dial tcp [::1]:3000: connect: connection refused"}
+{"time":"2026-10-04T11:35:18.170914022Z","level":"INFO","msg":"Unable to proxy request","path":"/up","error":"dial tcp [::1]:3000: connect: connection refused"}
+{"time":"2026-10-04T11:35:18.27898175Z","level":"INFO","msg":"Unable to proxy request","path":"/up","error":"dial tcp [::1]:3000: connect: connection refused"}
+{"time":"2026-10-04T11:35:18.386753568Z","level":"INFO","msg":"Unable to proxy request","path":"/up","error":"dial tcp [::1]:3000: connect: connection refused"}
+[37] Puma starting in cluster mode...
+[37] * Puma version: 7.2.1 ("On The Corner")
+[37] * Ruby version: ruby 3.4.10 (2026-06-30 revision 2b0b7728dc) +YJIT +PRISM [x86_64-linux]
+[37] *  Min threads: 5
+[37] *  Max threads: 5
+[37] *  Environment: production
+[37] *   Master PID: 37
+[37] *      Workers: 1
+[37] *     Restarts: (✔) hot (✔) phased (✖) refork
+[37] * Listening on http://0.0.0.0:3000
+[37] Use Ctrl-C to stop
+[37] ! WARNING: Detected running cluster mode with 1 worker.
+[37] ! Running Puma in cluster mode with a single worker is often a misconfiguration.
+[37] ! Consider running Puma in single-mode (workers = 0) in order to reduce memory overhead.
+[37] ! Set the `silence_single_worker_warning` option to silence this warning message.
+[37] - Worker 0 (PID: 63) booted in 0.0s, phase: 0
+I, [2026-10-04T11:35:18.555907 #63]  INFO -- : [30f5eca0-5ea9-4ef8-8259-a4ace8529b54] Started GET "/rooms/486777696" for 172.17.0.1 at 2026-10-04 11:35:18 +0000
+I, [2026-10-04T11:35:18.556377 #63]  INFO -- : [30f5eca0-5ea9-4ef8-8259-a4ace8529b54] Processing by RoomsController#show as */*
+I, [2026-10-04T11:35:18.556396 #63]  INFO -- : [30f5eca0-5ea9-4ef8-8259-a4ace8529b54]   Parameters: {"id" => "486777696"}
+I, [2026-10-04T11:35:18.557808 #63]  INFO -- : [30f5eca0-5ea9-4ef8-8259-a4ace8529b54] Redirected to https://campfire.test/session/new
+I, [2026-10-04T11:35:18.557867 #63]  INFO -- : [30f5eca0-5ea9-4ef8-8259-a4ace8529b54] Filter chain halted as :require_authentication rendered or redirected
+I, [2026-10-04T11:35:18.557983 #63]  INFO -- : [30f5eca0-5ea9-4ef8-8259-a4ace8529b54] Completed 302 Found in 1ms (ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+sh: 1: ps: not found

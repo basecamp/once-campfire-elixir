@@ -1,0 +1,7 @@
+
+11:34:47.980 [notice] TLS :client: In state :wait_cert_cr at ssl_handshake.erl:2218 generated CLIENT ALERT: Fatal - Unknown CA
+
+{:error,
+ {:tls_alert,
+  {:unknown_ca,
+   ~c"TLS client: In state wait_cert_cr at ssl_handshake.erl:2218 generated CLIENT ALERT: Fatal - Unknown CA\n"}}}

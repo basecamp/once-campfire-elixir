@@ -1,0 +1,10 @@
+#!/bin/sh
+set -eu
+db_path=${DATABASE_PATH:-/rails/storage/db/${RAILS_ENV:-production}.sqlite3}
+backup_path=${BACKUP_PATH:-/rails/storage/backups}
+snapshot="$backup_path/$(basename "$db_path")"
+if [ -f "$snapshot" ]; then
+  mkdir -p "$(dirname "$db_path")"
+  cp "$snapshot" "$db_path"
+  rm -f "$db_path-wal" "$db_path-shm"
+fi

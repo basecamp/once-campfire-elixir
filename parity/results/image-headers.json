@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "scope": [
+    "model ETags and cache invalidation",
+    "stock/attached logo and avatar bytes",
+    "conditional GET validators",
+    "HEAD"
+  ]
+}

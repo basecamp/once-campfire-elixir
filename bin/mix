@@ -1,0 +1,5 @@
+#!/bin/sh
+set -eu
+ROOT=$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)
+mkdir -p "$ROOT/var/tmp"
+exec docker run --rm --network host --user "$(id -u):$(id -g)" -e HOME=/app -e TMPDIR=/app/var/tmp -e HEX_HOME=/app/.hex -e MIX_HOME=/app/.mix -e EXQLITE_USE_SYSTEM=1 -e CAMPFIRE_NO_SERVER=1 -e CAMPFIRE_JOBS_ADAPTER=disabled -e DATABASE_PATH=/app/var/test.sqlite3 -v "$ROOT:/app" -w /app campfire-elixir:toolchain mix "$@"

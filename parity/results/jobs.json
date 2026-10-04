@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "scope": [
+    "real queued push without subscriptions",
+    "webhook HTTP delivery",
+    "text reply",
+    "all persisted tables",
+    "queue drained without failures"
+  ]
+}

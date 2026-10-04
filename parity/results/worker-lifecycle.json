@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "scope": {
+    "failed_payload_preserved": true,
+    "failure_record": true,
+    "failed_job_processed_count": true,
+    "automatic_retry": false,
+    "active_claim": true,
+    "graceful_reply_committed": true,
+    "worker_unregistered": true,
+    "reply_push_queued": true
+  },
+  "exception_comparison": "Runtime-specific exception names and stacks are retained in raw worker logs; failure payload and effects are checked."
+}

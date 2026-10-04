@@ -1,0 +1,16 @@
+{
+  "Users::AvatarsController": {
+    "template": "users/avatars/show",
+    "digest": "d500db55e2a67222018ef0156839c3c9",
+    "key": "users/127326141-20260102160000000000",
+    "expanded": "users/127326141-20260102160000000000/d500db55e2a67222018ef0156839c3c9",
+    "etag": "W/\"04d9bef0d34acdbaa21f666a275df659\""
+  },
+  "Accounts::LogosController": {
+    "template": null,
+    "digest": null,
+    "key": "accounts/873240054-20260101160000000000",
+    "expanded": "accounts/873240054-20260101160000000000",
+    "etag": "W/\"ba406155241302571a06615e754be1d0\""
+  }
+}

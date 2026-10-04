@@ -1,0 +1,9 @@
+<li class="flex align-center gap margin-none min-width membership-item">
+  <a class="overflow-ellipsis fill-shade txt-primary txt-undecorated" href="/rooms/<%= @id %>">
+    <strong><%= @name %></strong>
+</a>
+  <hr class="separator" aria-hidden="true">
+
+  <span class="txt-small">
+    <%= @involvement %>  </span>
+</li>
