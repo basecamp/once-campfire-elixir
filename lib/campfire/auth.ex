@@ -15,12 +15,22 @@ defmodule Campfire.Auth do
     end
   end
 
+  # Resolved once per request; later calls reuse the guard's lookup.
+  def session_user(%{private: %{campfire_session_user: {user, session}}} = conn),
+    do: {conn, user, session}
+
   def session_user(conn) do
-    case session_lookup(conn) do
-      {conn, nil, nil} -> {conn, nil, nil}
-      {conn, user, session} -> {conn, user, resume_session(conn, session)}
-    end
+    {conn, user, session} =
+      case session_lookup(conn) do
+        {conn, nil, nil} -> {conn, nil, nil}
+        {conn, user, session} -> {conn, user, resume_session(conn, session)}
+      end
+
+    {put_private(conn, :campfire_session_user, {user, session}), user, session}
   end
+
+  defp forget_session_user(conn),
+    do: %{conn | private: Map.delete(conn.private, :campfire_session_user)}
 
   def start_session(conn, user) do
     now = Chat.timestamp()
@@ -40,7 +50,7 @@ defmodule Campfire.Auth do
         ]
       )
 
-    set_auth_cookie(conn, session)
+    conn |> forget_session_user() |> set_auth_cookie(session)
   end
 
   def set_auth_cookie(conn, session) do
@@ -148,7 +158,11 @@ defmodule Campfire.Auth do
 
     DB.query("DELETE FROM sessions WHERE id=?", [session["id"]])
     Campfire.Cable.disconnect(session["user_id"], true)
-    conn |> delete_resp_cookie("session_token") |> delete_resp_cookie("_campfire_session")
+
+    conn
+    |> forget_session_user()
+    |> delete_resp_cookie("session_token")
+    |> delete_resp_cookie("_campfire_session")
   end
 
   def redirect(conn, destination) do

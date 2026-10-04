@@ -2,11 +2,18 @@ defmodule Campfire.Platform do
   alias Campfire.UserAgent
 
   @fields ~w(ios android mac chrome firefox safari edge apple_messages mobile desktop windows operating_system browser)
-  def describe(raw), do: Map.new(@fields, &{&1, value(raw, &1)})
+  def describe(raw) do
+    raw = raw || ""
+    a = UserAgent.parse(raw)
+    Map.new(@fields, &{&1, value(raw, a, &1)})
+  end
 
   def value(raw, field) do
     raw = raw || ""
-    a = UserAgent.parse(raw)
+    value(raw, UserAgent.parse(raw), field)
+  end
+
+  defp value(raw, a, field) do
     ios = String.contains?(raw, ["iPhone", "iPad"])
     android = String.contains?(raw, "Android")
 

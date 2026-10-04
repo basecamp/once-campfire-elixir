@@ -7,32 +7,13 @@ defmodule Campfire.Application do
       {Registry, keys: :duplicate, name: Campfire.Connections},
       Campfire.RateLimiter,
       Campfire.FragmentCache,
-      Campfire.CableFrames,
       {Campfire.DB, path: System.get_env("DATABASE_PATH", "var/production.sqlite3")}
     ]
 
-    children = children ++ Campfire.HtmlParser.children()
-
     children =
-      case System.get_env("REDIS_URL") do
-        nil ->
-          children
-
-        url ->
-          children ++
-            [
-              {Redix, {url, [name: Campfire.Redis]}},
-              %{
-                id: Campfire.CableRedis,
-                start: {Redix.PubSub, :start_link, [url, [name: Campfire.CableRedis]]}
-              }
-            ]
-      end
-
-    children =
-      if System.get_env("CAMPFIRE_WORKER") == "1",
-        do: children ++ [Campfire.Worker],
-        else: children
+      if System.get_env("CAMPFIRE_JOBS_ADAPTER") == "disabled",
+        do: children,
+        else: children ++ [{Task.Supervisor, name: Campfire.JobTasks}, Campfire.Worker]
 
     children =
       if System.get_env("CAMPFIRE_NO_SERVER") == "1",

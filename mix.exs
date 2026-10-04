@@ -8,15 +8,18 @@ defmodule Campfire.MixProject do
       elixir: "~> 1.19",
       start_permanent: Mix.env() == :prod,
       test_ignore_filters: [~r/test\/support\//],
+      compilers: [:elixir_make] ++ Mix.compilers(),
+      make_cwd: "native",
       deps: [
-        {:bandit, "~> 1.8"},
+        {:bandit, github: "zachdaniel/bandit", branch: "batched-websocket-writes"},
         {:plug, "~> 1.18"},
         {:jason, "~> 1.4"},
         {:exqlite, "~> 0.33"},
         {:bcrypt_elixir, "~> 3.3"},
         {:floki, "~> 0.38"},
-        {:redix, "~> 1.5"},
-        {:qqr, "0.2.0"}
+        {:qqr, "0.2.0"},
+        {:elixir_make, "~> 0.9", runtime: false},
+        {:nimble_pool, "~> 1.1"}
       ]
     ]
   end

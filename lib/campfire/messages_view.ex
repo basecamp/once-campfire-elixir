@@ -17,6 +17,9 @@ defmodule Campfire.MessagesView do
     |> Enum.join()
   end
 
+  def render_parts(messages, base, csrf),
+    do: Campfire.FragmentCache.parts(:message, messages, &render_fragment(&1, base, csrf))
+
   defp render_fragment(message, base, csrf) do
     creator = DB.one("SELECT * FROM users WHERE id=?", [message["creator_id"]])
     room = DB.one("SELECT * FROM rooms WHERE id=?", [message["room_id"]])

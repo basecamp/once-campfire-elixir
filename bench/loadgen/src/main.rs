@@ -6,7 +6,7 @@
 //!   loadgen http   --base URL --cookie C --path P --conc N --duration S
 //!                  [--post-room ID --csrf T]                     -> latency/throughput
 //!   loadgen cable  --base URL --cookie C --room ID --csrf T --clients N [--streams a,b,c]
-//!                  [--sources 127.0.0.2,127.0.0.3 --hold-secs 60 --deflate 1]
+//!                  [--sources 127.0.0.2,127.0.0.3 --hold-secs 60 --deflate 1 --reconnect 0]
 //!                  [--latency-msgs 30 --interval-ms 200 --tput-secs 15 --posters 4]
 //!   loadgen upload --base URL --cookie C --room ID --csrf T --file PATH [--reps 5]
 //!   loadgen fetch  --base URL --cookie C --path P --out FILE     -> saves an uncompressed body
@@ -386,6 +386,10 @@ struct Delivery {
     receipts: AtomicU64,
     /// Bytes read off the sockets (`--deflate` clients only): what the network carries.
     wire_bytes: AtomicU64,
+    /// Sessions re-established after the server closed an established one.
+    reconnects: AtomicU64,
+    /// Clients whose established session the server closed at least once.
+    disconnected_clients: AtomicU64,
 }
 
 fn markers(text: &str) -> Vec<u64> {
@@ -404,6 +408,10 @@ fn markers(text: &str) -> Vec<u64> {
     out
 }
 
+/// A browser-like Action Cable client: when the server closes an established session it
+/// reconnects after about a second and resubscribes, as the Action Cable JavaScript client does
+/// (`--reconnect 0` disables this). Messages broadcast while it is disconnected are missed, so
+/// they never complete; a failed initial connection fails the client.
 #[allow(clippy::too_many_arguments)]
 async fn cable_client(
     addr: String,
@@ -414,6 +422,40 @@ async fn cable_client(
     connected: Arc<AtomicUsize>,
     stop: Arc<AtomicBool>,
     delivery: Arc<Delivery>,
+    reconnect: bool,
+) -> Res<()> {
+    let mut seen = HashSet::new();
+    cable_session(&addr, source, &cookie, &subs, &confirmed, &connected, &stop, &delivery, &mut seen, true).await?;
+    let mut disconnected = false;
+    while reconnect && !stop.load(Ordering::Relaxed) {
+        if !disconnected {
+            disconnected = true;
+            delivery.disconnected_clients.fetch_add(1, Ordering::Relaxed);
+        }
+        let jitter = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map_or(0, |d| d.subsec_nanos() as u64 % 500);
+        tokio::time::sleep(Duration::from_millis(1000 + jitter)).await;
+        if stop.load(Ordering::Relaxed) {
+            break;
+        }
+        delivery.reconnects.fetch_add(1, Ordering::Relaxed);
+        let _ = cable_session(&addr, source, &cookie, &subs, &confirmed, &connected, &stop, &delivery, &mut seen, false).await;
+    }
+    Ok(())
+}
+
+/// One WebSocket session; the first counts towards `connected`/`confirmed`.
+#[allow(clippy::too_many_arguments)]
+async fn cable_session(
+    addr: &str,
+    source: Option<std::net::IpAddr>,
+    cookie: &str,
+    subs: &[String],
+    confirmed: &AtomicUsize,
+    connected: &AtomicUsize,
+    stop: &AtomicBool,
+    delivery: &Delivery,
+    seen: &mut HashSet<u64>,
+    first: bool,
 ) -> Res<()> {
     let mut req = format!("ws://{addr}/cable").into_client_request()?;
     let h = req.headers_mut();
@@ -433,7 +475,7 @@ async fn cable_client(
     if let Some(source) = source {
         socket.bind(std::net::SocketAddr::new(source, 0))?;
     }
-    let stream = socket.connect(tokio::net::lookup_host(&addr).await?.next().ok_or("no address")?).await?;
+    let stream = socket.connect(tokio::net::lookup_host(addr).await?.next().ok_or("no address")?).await?;
     stream.set_nodelay(true)?;
     let (ws, _) = tokio_tungstenite::client_async(req, stream).await.inspect_err(|e| {
         if debug {
@@ -443,13 +485,15 @@ async fn cable_client(
     if debug {
         eprintln!("connected");
     }
-    connected.fetch_add(1, Ordering::Relaxed);
+    if first {
+        connected.fetch_add(1, Ordering::Relaxed);
+    }
     let (mut tx, mut rx) = ws.split();
-    for ident in &subs {
+    for ident in subs {
         tx.send(WsMessage::text(json!({"command": "subscribe", "identifier": ident}).to_string())).await?;
     }
-    let mut seen = HashSet::new();
-    let mut confirms = 0;
+    // Reconnected sessions resubscribe without counting the client as newly confirmed.
+    let mut confirms = if first { 0 } else { usize::MAX / 2 };
     while let Some(msg) = rx.next().await {
         if stop.load(Ordering::Relaxed) {
             break;
@@ -459,7 +503,7 @@ async fn cable_client(
             WsMessage::Close(_) => break,
             _ => continue,
         };
-        on_text(&text, subs.len(), &mut confirms, &mut seen, &confirmed, &delivery);
+        on_text(&text, subs.len(), &mut confirms, seen, confirmed, delivery);
     }
     let _ = tx.send(WsMessage::Close(None)).await;
     Ok(())
@@ -685,6 +729,7 @@ async fn cable(a: &Args) -> Res<Value> {
     let posters: usize = a.num("posters", 4);
     let hold_secs: u64 = a.num("hold-secs", 0);
     let deflate = a.num("deflate", 0u8) != 0;
+    let reconnect = a.num("reconnect", 1u8) != 0;
     let sources: Vec<std::net::IpAddr> =
         a.opt("sources").unwrap_or_default().split(',').filter(|s| !s.is_empty()).map(|s| s.parse()).collect::<Result<_, _>>()?;
 
@@ -705,6 +750,8 @@ async fn cable(a: &Args) -> Res<Value> {
         got: Mutex::new(HashMap::new()),
         per_client: Mutex::new(hist()),
         receipts: AtomicU64::new(0),
+        reconnects: AtomicU64::new(0),
+        disconnected_clients: AtomicU64::new(0),
         wire_bytes: AtomicU64::new(0),
     });
     let confirmed = Arc::new(AtomicUsize::new(0));
@@ -736,7 +783,7 @@ async fn cable(a: &Args) -> Res<Value> {
             let task = if deflate {
                 tokio::spawn(deflate_cable_client(addr, source, cookie, subs, confirmed, connected, stop, delivery))
             } else {
-                tokio::spawn(cable_client(addr, source, cookie, subs, confirmed, connected, stop, delivery))
+                tokio::spawn(cable_client(addr, source, cookie, subs, confirmed, connected, stop, delivery, reconnect))
             };
             // Release the permit once this client has connected (or failed).
             let until = Instant::now() + Duration::from_secs(30);
@@ -842,6 +889,8 @@ async fn cable(a: &Args) -> Res<Value> {
         "complete": tcomplete,
         "delivered_msgs_per_sec": ((tcomplete as f64 / span) * 10.0).round() / 10.0,
         "frames_per_sec": (receipts as f64 / span).round(),
+        "reconnects": delivery.reconnects.load(Ordering::Relaxed),
+        "disconnected_clients": delivery.disconnected_clients.load(Ordering::Relaxed),
         "wire_mb_per_sec": (wire_bytes as f64 / span / 1e6 * 10.0).round() / 10.0,
         "drain_secs": ((span - posting_secs) * 100.0).round() / 100.0,
         "post": summary(&tpost_h),

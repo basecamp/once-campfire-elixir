@@ -1,123 +1,68 @@
 defmodule Campfire.Worker do
+  @moduledoc """
+  In-process background job queue. Jobs run under `Campfire.JobTasks` with at
+  most `JOB_CONCURRENCY` (default 2) at a time, in enqueue order; failures are
+  logged. Like the container's non-persistent Redis it replaces, queued jobs do
+  not survive a restart.
+  """
   use GenServer
   require Logger
   alias Campfire.{Cable, Chat, DB, Push, Webhooks}
-  def start_link(_), do: GenServer.start_link(__MODULE__, %{}, name: __MODULE__)
+
+  def start_link(_), do: GenServer.start_link(__MODULE__, nil, name: __MODULE__)
 
   def child_spec(options),
     do: %{id: __MODULE__, start: {__MODULE__, :start_link, [options]}, shutdown: 30_000}
 
-  def init(state) do
-    Process.flag(:trap_exit, true)
-    {:ok, hostname} = :inet.gethostname()
-    worker = "#{hostname}:#{System.pid()}:default"
+  def enqueue(job), do: GenServer.cast(__MODULE__, {:enqueue, job})
 
-    {:ok, _} =
-      Redix.transaction_pipeline(Campfire.Redis, [
-        ["SADD", "resque:workers", worker],
-        [
-          "SET",
-          "resque:worker:#{worker}:started",
-          Calendar.strftime(Campfire.Clock.now(), "%Y-%m-%d %H:%M:%S %z")
-        ]
-      ])
-
-    send(self(), :poll)
-    {:ok, Map.put(state, :worker, worker)}
+  @impl GenServer
+  def init(nil) do
+    concurrency = String.to_integer(System.get_env("JOB_CONCURRENCY", "2"))
+    {:ok, %{queue: :queue.new(), running: %{}, concurrency: max(concurrency, 1)}}
   end
 
-  def terminate(_, %{worker: worker}) do
-    Redix.transaction_pipeline(Campfire.Redis, [
-      ["SREM", "resque:workers", worker],
-      [
-        "DEL",
-        "resque:worker:#{worker}",
-        "resque:worker:#{worker}:started",
-        "resque:stat:processed:#{worker}",
-        "resque:stat:failed:#{worker}"
-      ]
-    ])
+  @impl GenServer
+  def handle_cast({:enqueue, job}, state),
+    do: {:noreply, start_jobs(%{state | queue: :queue.in(job, state.queue)})}
 
-    :ok
+  @impl GenServer
+  def handle_info({ref, _result}, state) when is_map_key(state.running, ref) do
+    Process.demonitor(ref, [:flush])
+    {:noreply, start_jobs(%{state | running: Map.delete(state.running, ref)})}
   end
 
-  def handle_info(:poll, state) do
-    claimed = Redix.command(Campfire.Redis, ["LPOP", "resque:queue:default"])
-
-    case claimed do
-      {:ok, nil} ->
-        :ok
-
-      {:ok, payload} ->
-        decoded =
-          case Jason.decode(payload) do
-            {:ok, decoded} -> decoded
-            _ -> %{"raw" => payload}
-          end
-
-        current = %{
-          "queue" => "default",
-          "run_at" => Calendar.strftime(Campfire.Clock.now(), "%Y-%m-%dT%H:%M:%SZ"),
-          "payload" => decoded
-        }
-
-        Redix.command(Campfire.Redis, [
-          "SET",
-          "resque:worker:#{state.worker}",
-          Jason.encode!(current)
-        ])
-
-        try do
-          %{"class" => "ActiveJob::QueueAdapters::ResqueAdapter::JobWrapper", "args" => [job]} =
-            Jason.decode!(payload)
-
-          case perform(job) do
-            {:error, error} -> raise "job failed: #{inspect(error)}"
-            _ -> :ok
-          end
-        rescue
-          error ->
-            Logger.error("Campfire job failed: #{Exception.message(error)}")
-
-            failure = %{
-              "failed_at" => Calendar.strftime(Campfire.Clock.now(), "%Y/%m/%d %H:%M:%S UTC"),
-              "payload" => decoded,
-              "exception" => inspect(error.__struct__),
-              "error" => Exception.message(error),
-              "backtrace" => Enum.map(__STACKTRACE__, &Exception.format_stacktrace_entry/1),
-              "worker" => state.worker,
-              "queue" => "default"
-            }
-
-            Redix.transaction_pipeline(Campfire.Redis, [
-              ["INCR", "resque:stat:failed"],
-              ["INCR", "resque:stat:failed:#{state.worker}"],
-              ["RPUSH", "resque:failed", Jason.encode!(failure)]
-            ])
-        after
-          Redix.transaction_pipeline(Campfire.Redis, [
-            ["INCR", "resque:stat:processed"],
-            ["INCR", "resque:stat:processed:#{state.worker}"],
-            ["DEL", "resque:worker:#{state.worker}"]
-          ])
-        end
-
-      {:error, error} ->
-        Logger.error("Campfire queue unavailable: #{inspect(error)}")
-    end
-
-    Process.send_after(
-      self(),
-      :poll,
-      if(match?({:ok, payload} when is_binary(payload), claimed), do: 0, else: 50)
+  def handle_info({:DOWN, ref, :process, _, reason}, state) when is_map_key(state.running, ref) do
+    Logger.error(
+      "Campfire job crashed: #{inspect(state.running[ref]["job_class"])} #{inspect(reason)}"
     )
 
-    {:noreply, state}
+    {:noreply, start_jobs(%{state | running: Map.delete(state.running, ref)})}
   end
 
-  # System.cmd media helpers are linked ports. Their completed exit is already
-  # represented by the command result and must not restart the queue consumer.
-  def handle_info({:EXIT, port, _reason}, state) when is_port(port), do: {:noreply, state}
+  def handle_info(_, state), do: {:noreply, state}
+
+  defp start_jobs(state) do
+    with true <- map_size(state.running) < state.concurrency,
+         {{:value, job}, queue} <- :queue.out(state.queue) do
+      task = Task.Supervisor.async_nolink(Campfire.JobTasks, fn -> run(job) end)
+      start_jobs(%{state | queue: queue, running: Map.put(state.running, task.ref, job)})
+    else
+      _ -> state
+    end
+  end
+
+  defp run(job) do
+    case perform(job) do
+      {:error, error} ->
+        Logger.error("Campfire job failed: #{job["job_class"]} #{inspect(error)}")
+
+      _ ->
+        :ok
+    end
+  rescue
+    error -> Logger.error("Campfire job failed: #{job["job_class"]} #{Exception.message(error)}")
+  end
 
   def perform(%{"job_class" => class, "arguments" => arguments}) do
     records = Enum.map(arguments, &record/1)

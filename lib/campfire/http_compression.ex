@@ -20,9 +20,11 @@ defmodule Campfire.HttpCompression do
 
         "gzip" ->
           compressed =
-            if conn.state == :set_file,
-              do: nil,
-              else: gzip(IO.iodata_to_binary(body), conn.assigns[:gzip_chunks])
+            cond do
+              conn.state == :set_file -> nil
+              parts = conn.assigns[:page_parts] -> gzip_parts(parts)
+              true -> gzip(IO.iodata_to_binary(body), conn.assigns[:gzip_chunks])
+            end
 
           %{conn | resp_body: compressed}
           |> put_resp_header("content-encoding", "gzip")
@@ -112,6 +114,93 @@ defmodule Campfire.HttpCompression do
     do:
       <<prefix::binary, DateTime.to_unix(Campfire.Clock.now())::little-unsigned-size(32),
         rest::binary>>
+
+  @doc """
+  Splits a rendered page at `marker`, the placeholder standing in for `fragments`,
+  returning the response iodata and the parts used by `gzip_parts/1`.
+  Returns `nil` when the marker is absent.
+  """
+  def splice(html, marker, fragments) do
+    case :binary.split(html, marker) do
+      [before, rest] ->
+        parts = [{:raw, before} | fragments] ++ [{:raw, rest}]
+        {Enum.map(parts, &part_data/1), parts}
+
+      [_] ->
+        nil
+    end
+  end
+
+  defp part_data({:raw, data}), do: data
+  defp part_data({:fragment, _, _, html}), do: html
+
+  # A gzip member assembled from separately deflated pieces. Each piece is a raw
+  # deflate stream ending in a sync flush, primed with the bytes that precede it
+  # in the page as its preset dictionary, so pieces concatenate into one valid
+  # stream with the redundancy between messages intact. Cached fragments keep
+  # their piece for a given predecessor; only the per-request page text is
+  # compressed here.
+  @doc false
+  def gzip_parts(parts) do
+    {pieces, crc, size, _} =
+      Enum.reduce(parts, {[], :erlang.crc32(<<>>), 0, {nil, ""}}, fn part,
+                                                                     {pieces, crc, size, previous} ->
+        {piece, part_crc, part_size} = packed(part, previous)
+
+        {[pieces | piece], :erlang.crc32_combine(crc, part_crc, part_size), size + part_size,
+         identity(part)}
+      end)
+
+    mtime = DateTime.to_unix(Campfire.Clock.now())
+
+    [
+      <<0x1F, 0x8B, 8, 0, mtime::little-unsigned-32, 0, 3>>,
+      pieces,
+      # An empty final fixed-Huffman block ends the stream.
+      <<3, 0>>,
+      <<crc::little-unsigned-32, rem(size, 4_294_967_296)::little-unsigned-32>>
+    ]
+  end
+
+  defp identity({:raw, data}), do: {nil, data}
+  defp identity({:fragment, key, version, html}), do: {{key, version}, html}
+
+  defp packed({:raw, data}, {_, before}), do: pack(data, before)
+
+  # A fragment's piece depends on the bytes primed as its dictionary, so it is
+  # cached per predecessor: after another fragment (whose identity fixes those
+  # bytes) it is primed with that fragment; after per-request text it is
+  # compressed without a dictionary.
+  defp packed({:fragment, key, version, html}, {nil, _}),
+    do: Campfire.FragmentCache.derived(key, version, html, {:piece, :start}, &pack/1)
+
+  defp packed({:fragment, key, version, html}, {previous, before}),
+    do: Campfire.FragmentCache.derived(key, version, html, {:piece, previous}, &pack(&1, before))
+
+  @window 32_768
+
+  @doc false
+  def pack(data, before \\ "") do
+    z = :zlib.open()
+
+    try do
+      :ok = :zlib.deflateInit(z, :default, :deflated, -15, 8, :default)
+      dictionary = IO.iodata_to_binary(before)
+      size = byte_size(dictionary)
+
+      if size > 0,
+        do:
+          :zlib.deflateSetDictionary(
+            z,
+            binary_part(dictionary, max(size - @window, 0), min(size, @window))
+          )
+
+      piece = IO.iodata_to_binary(:zlib.deflate(z, data, :sync))
+      {piece, :erlang.crc32(data), IO.iodata_length(data)}
+    after
+      :zlib.close(z)
+    end
+  end
 
   defp gzip(body, chunks) do
     z = :zlib.open()

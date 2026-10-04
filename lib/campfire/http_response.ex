@@ -43,10 +43,9 @@ defmodule Campfire.HttpResponse do
                |> put_resp_header("x-rev", System.get_env("GIT_REVISION", "dev"))
 
         conn =
-          if is_binary(conn.resp_body) &&
-               String.contains?(conn.resp_body, ~s(<link rel="stylesheet")),
-             do: put_resp_header(conn, "link", Campfire.Assets.preload_header()),
-             else: conn
+          if stylesheet?(conn.resp_body),
+            do: put_resp_header(conn, "link", Campfire.Assets.preload_header()),
+            else: conn
 
         conn = etag(conn)
 
@@ -141,6 +140,12 @@ defmodule Campfire.HttpResponse do
     conn = if head?, do: put_resp_header(conn, "content-length", "0"), else: conn
     if body != "", do: put_resp_header(conn, "vary", "Accept-Encoding"), else: conn
   end
+
+  defp stylesheet?(body) when is_binary(body),
+    do: String.contains?(body, ~s(<link rel="stylesheet"))
+
+  defp stylesheet?(body) when is_list(body), do: Enum.any?(body, &stylesheet?/1)
+  defp stylesheet?(_), do: false
 
   defp etag(conn) do
     if conn.status in [200, 201] && get_resp_header(conn, "etag") == [] &&

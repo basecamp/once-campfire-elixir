@@ -25,6 +25,11 @@ defmodule Campfire.RoomPage do
           {conn, data} = Auth.csrf_session(conn)
           token = Rails.csrf_mask(Rails.csrf_global(data["_csrf_token"]))
           messages = messages(room, message_id)
+          fragments = MessagesView.render_parts(messages, Auth.base(conn), token)
+          # Messages are spliced in after layout so their cached gzip pieces are reused.
+          marker =
+            "<!--campfire-messages-" <> Base.encode16(:crypto.strong_rand_bytes(16)) <> "-->"
+
           account = DB.one("SELECT * FROM accounts LIMIT 1")
           gid = Base.url_encode64("gid://campfire/#{room["type"]}/#{room["id"]}", padding: false)
           name = display_name(room, user)
@@ -52,7 +57,7 @@ defmodule Campfire.RoomPage do
               account["updated_at"] |> String.replace(~r/[^0-9]/, "") |> String.slice(0, 14),
             stream: Rails.sign_stream(gid <> ":messages"),
             invitation: invitation_for(conn, user, data, account, room),
-            messages: MessagesView.render_many(messages, Auth.base(conn), token)
+            messages: marker
           ]
 
           {conn, html} =
@@ -72,7 +77,7 @@ defmodule Campfire.RoomPage do
             max_age: DateTime.diff(Auth.permanent_expiry(), Campfire.Clock.now())
           )
           |> put_resp_content_type("text/html")
-          |> send_resp(200, html)
+          |> send_page(html, marker, fragments)
         else
           conn
           |> Campfire.Flash.put("alert", "Room not found or inaccessible")
@@ -82,6 +87,12 @@ defmodule Campfire.RoomPage do
   rescue
     Campfire.Pwa.MissingAsset ->
       Campfire.HttpResponse.exception(conn, 500, Campfire.Assets.read("public/500.html"))
+  end
+
+  defp send_page(conn, html, marker, fragments) do
+    case Campfire.HttpCompression.splice(html, marker, fragments) do
+      {body, parts} -> conn |> assign(:page_parts, parts) |> send_resp(200, body)
+    end
   end
 
   defp invitation_for(conn, user, data, account, room) do
