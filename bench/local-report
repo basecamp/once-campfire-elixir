@@ -1,0 +1,87 @@
+#!/usr/bin/env python3
+"""Compare bench/local-run result directories: medians per variant, ratio against the first.
+
+  bench/local-report bench/results/local/baseline bench/results/local/step1 ...
+"""
+import glob, json, os, statistics, sys
+
+dirs = sys.argv[1:]
+runs = {}
+for d in dirs:
+    name = os.path.basename(d.rstrip("/"))
+    for f in sorted(glob.glob(os.path.join(d, "*-*.json"))):
+        r = json.load(open(f))
+        if "app" in r and "http" in r:
+            for h in r["http"]:
+                assert h["errors"] == 0 and h.get("invalid_responses", 0) == 0 and set(h["statuses"]) == {"200"}, f
+            runs.setdefault(name, []).append(r)
+names = [os.path.basename(d.rstrip("/")) for d in dirs]
+
+
+def med(name, get):
+    vals = []
+    for r in runs.get(name, []):
+        try:
+            vals.append(get(r))
+        except (KeyError, StopIteration, TypeError, IndexError):
+            pass
+    return statistics.median(vals) if vals else None
+
+
+def fmt(v):
+    if v is None:
+        return "–"
+    return f"{v:,.0f}" if v >= 100 else f"{v:.1f}" if v >= 10 else f"{v:.2f}"
+
+
+def table(title, rows, higher_better):
+    print(f"\n### {title}\n")
+    print("| Metric | " + " | ".join(names) + (" | vs " + names[0] if len(names) > 1 else "") + " |")
+    print("|---|" + "---:|" * len(names) + ("---:|" if len(names) > 1 else ""))
+    for label, get in rows:
+        vals = [med(n, get) for n in names]
+        ratio = ""
+        if len(names) > 1 and vals[0] and vals[-1]:
+            x = vals[-1] / vals[0] if higher_better else vals[0] / vals[-1]
+            ratio = f" {x:.2f}× |"
+        print(f"| {label} | " + " | ".join(fmt(v) for v in vals) + " |" + ratio)
+
+
+def http(route, conc, key):
+    def get(r):
+        h = next(h for h in r["http"] if h["route"] == route and h["conc"] == conc)
+        return h["latency"][key] if key.startswith("p") else h[key]
+    return get
+
+
+routes = ["room_show", "messages_page", "sidebar", "search", "post_message", "avatar", "static_css", "up"]
+concs = sorted({h["conc"] for rs in runs.values() for r in rs for h in r["http"]})
+for c in concs:
+    table(f"HTTP throughput, req/s, {c} concurrent", [(f"{route}", http(route, c, "rps")) for route in routes], True)
+for c in concs:
+    if c > 1:
+        table(f"HTTP p99 latency, ms, {c} concurrent", [(f"{route}", http(route, c, "p99_ms")) for route in routes], False)
+table(f"CPU µs per successful response, {concs[-1] if concs else ''} concurrent", [(route, http(route, concs[-1], "cpu_us_per_success")) for route in routes] if concs else [], False)
+
+
+def cable(clients, path, higher):
+    def get(r):
+        c = next(c for c in r["cable"] if c["clients"] == clients)
+        for k in path:
+            c = c[k]
+        return c
+    return get
+
+
+clients = sorted({c["clients"] for rs in runs.values() for r in rs for c in r.get("cable", [])})
+rows = []
+for n in clients:
+    rows.append((f"{n} clients: delivered msgs/s (to all clients)", cable(n, ["throughput", "delivered_msgs_per_sec"], True)))
+if rows:
+    table("Action Cable fan-out throughput", rows, True)
+    table("Action Cable paced post → all clients, ms", [(f"{n} clients p50", cable(n, ["latency", "all_clients", "p50_ms"], False)) for n in clients] + [(f"{n} clients p99", cable(n, ["latency", "all_clients", "p99_ms"], False)) for n in clients] + [(f"{n} clients connect+subscribe (s)", cable(n, ["connect_secs"], False)) for n in clients], False)
+table("Startup and memory", [("cold start to /up (ms)", lambda r: r["cold_start_ms"]), ("idle RSS (MB)", lambda r: r["memory"]["idle_rss_mb"]), ("peak RSS under load (MB)", lambda r: r["memory"]["peak_rss_mb"])], False)
+print("\nJobs at end of run:")
+for n in names:
+    for r in runs.get(n, []):
+        print(f"- {n} rep {r['rep']}: {json.dumps(r.get('jobs'))}")

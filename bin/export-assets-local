@@ -1,0 +1,141 @@
+#!/usr/bin/env python3
+"""Export the pinned Rails frontend without Docker.
+
+bin/export-assets copies the precompiled assets out of the campfire-reference:app
+image. This script reproduces Propshaft 1.2.1's precompile (digest, CSS/JS asset
+URL rewriting, source map URL rewriting, manifest) from the reference submodule
+plus the gem-provided assets, so the Elixir app can be built on a machine without
+Docker. Gem assets are read from GEM_ASSETS (a directory holding unpacked gems).
+
+Verified against parity/results/assets.candidate.json: digested names and served
+bodies match for every recorded asset.
+"""
+import hashlib, json, os, pathlib, re, shutil, sys
+
+ROOT = pathlib.Path(__file__).resolve().parents[1]
+REF = ROOT / "reference"
+GEMS = pathlib.Path(os.environ.get("GEM_ASSETS", ROOT / "var" / "gem-assets"))
+VERSION = "1.0"  # config/initializers/assets.rb
+URL_PREFIX = "/assets"
+
+# Propshaft load paths in Rails' order: the app, then engines.
+LOAD_PATHS = [p for p in sorted((REF / "app/assets").iterdir()) if p.is_dir()]
+LOAD_PATHS += [REF / "lib/assets", REF / "app/javascript", REF / "vendor/javascript"]
+for gem in ["actioncable", "actiontext", "action_text-trix", "turbo-rails", "stimulus-rails", "lexxy"]:
+    base = GEMS / gem / "app/assets"
+    if not base.is_dir():
+        raise SystemExit(f"missing gem assets for {gem} under {GEMS}")
+    LOAD_PATHS += [p for p in sorted(base.iterdir()) if p.is_dir()]
+
+CSS_URL = re.compile(r"""url\(\s*["']?(?!(?:\#|%23|data:|http:|https:|//))([^"'\s?#)]+)([#?][^"')]+)?\s*["']?\)""")
+JS_URL = re.compile(r"""RAILS_ASSET_URL\(\s*["']?(?!(?:\#|%23|data|http|//))([^"'\s?#)]+)([#?][^"')]+)?\s*["']?\)""")
+# Ruby's \Z also matches before a final newline; Python's needs the lookahead.
+SOURCE_MAP = re.compile(r"(//|/\*)# sourceMappingURL=(.+\.map)(\s*?\*/)?\s*?(?=\n?\Z)")
+
+
+class Asset:
+    def __init__(self, path, logical):
+        self.path, self.logical = path, logical
+        self.content = path.read_bytes()
+        self._digest = None
+
+    @property
+    def digested(self):
+        if re.search(r"-([0-9a-zA-Z_-]{7,128})\.digested", self.logical):
+            return self.logical
+        return re.sub(r"\.(\w+(\.map)?)$", lambda m: f"-{self.digest}.{m.group(1)}", self.logical)
+
+    @property
+    def digest(self):
+        if self._digest is None:
+            data = self.content + b"".join(a.content for a in referenced_by(self, set())) + VERSION.encode()
+            self._digest = hashlib.sha1(data).hexdigest()[:8]
+        return self._digest
+
+
+assets = {}
+for base in LOAD_PATHS:
+    for path in sorted(base.rglob("*")):
+        if path.is_file() and not path.name.startswith("."):
+            logical = path.relative_to(base).as_posix()
+            assets.setdefault(logical, Asset(path, logical))
+
+
+def resolve(directory, filename):
+    if filename.startswith("../"):
+        return os.path.normpath(os.path.join(directory, filename))
+    if filename.startswith("/"):
+        return filename[1:]
+    return os.path.normpath(os.path.join(directory, filename.removeprefix("./"))) if directory != "." else filename.removeprefix("./")
+
+
+def url_pattern(asset):
+    return CSS_URL if asset.logical.endswith(".css") else JS_URL if asset.logical.endswith(".js") else None
+
+
+def referenced_by(asset, seen):
+    pattern = url_pattern(asset)
+    if not pattern:
+        return []
+    out = []
+    for ref, _ in pattern.findall(asset.content.decode("utf-8", "surrogateescape")):
+        target = assets.get(resolve(os.path.dirname(asset.logical) or ".", ref))
+        if target and target not in seen:
+            seen.add(target)
+            out.append(target)
+            out += referenced_by(target, seen)
+    return out
+
+
+def compile_asset(asset):
+    text = asset.content.decode("utf-8", "surrogateescape")
+    directory = os.path.dirname(asset.logical) or "."
+    if asset.logical.endswith(".css"):
+        def css(m):
+            target = assets.get(resolve(directory, m.group(1)))
+            return f'url("{URL_PREFIX}/{target.digested}{m.group(2) or ""}")' if target else f'url("{m.group(1)}")'
+        text = CSS_URL.sub(css, text)
+    if asset.logical.endswith(".js"):
+        def js(m):
+            target = assets.get(resolve(directory, m.group(1)))
+            return f'"{URL_PREFIX}/{target.digested}{m.group(2) or ""}"' if target else f'"{m.group(1)}"'
+        text = JS_URL.sub(js, text)
+    if asset.logical.endswith((".css", ".js")):
+        def srcmap(m):
+            url = re.sub(rf"^(.+/)?{re.escape(URL_PREFIX)}/", "", m.group(2))
+            resolved = url if directory == "." else os.path.normpath(os.path.join(directory, url))
+            target = assets.get(resolved)
+            if target:
+                return f"{m.group(1)}# sourceMappingURL={URL_PREFIX}/{target.digested}{m.group(3) or ''}"
+            return f"{m.group(1)}{m.group(3) or ''}"
+        text = SOURCE_MAP.sub(srcmap, text)
+    return text.encode("utf-8", "surrogateescape")
+
+
+out = ROOT / "priv/static/assets"
+if out.exists():
+    shutil.rmtree(out)
+out.mkdir(parents=True)
+manifest = {}
+for logical, asset in sorted(assets.items()):
+    target = out / asset.digested
+    target.parent.mkdir(parents=True, exist_ok=True)
+    body = compile_asset(asset) if logical.endswith((".css", ".js")) else asset.content
+    target.write_bytes(body)
+    manifest[logical] = {
+        "digested_path": asset.digested,
+        "integrity": "sha256-" + __import__("base64").b64encode(hashlib.sha256(body).digest()).decode(),
+    }
+(out / ".manifest.json").write_text(json.dumps(manifest, separators=(",", ":")))
+
+for name in ["robots.txt", "404.html", "422.html", "500.html", "502.html"]:
+    (ROOT / "priv/public").mkdir(parents=True, exist_ok=True)
+    shutil.copy(REF / "public" / name, ROOT / "priv/public" / name)
+(ROOT / "priv/pwa").mkdir(parents=True, exist_ok=True)
+for name in ["manifest.json.erb", "service_worker.js"]:
+    shutil.copy(REF / "app/views/pwa" / name, ROOT / "priv/pwa" / name)
+(ROOT / "priv/images/logos").mkdir(parents=True, exist_ok=True)
+for name in ["app-icon.png", "app-icon-192.png"]:
+    shutil.copy(REF / "app/assets/images/logos" / name, ROOT / "priv/images/logos" / name)
+shutil.copy(REF / "app/assets/images/default-bot-avatar.svg", ROOT / "priv/images/default-bot-avatar.svg")
+print(f"wrote {len(manifest)} assets to {out}")
