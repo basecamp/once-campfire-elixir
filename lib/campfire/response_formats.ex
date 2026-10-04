@@ -21,7 +21,8 @@ defmodule Campfire.ResponseFormats do
       params["format"] ->
         [params["format"]]
 
-      Regex.match?(~r/\.(json|xml)\z/, conn.request_path) ->
+      String.contains?(conn.request_path, ".") and
+          Regex.match?(~r/\.(json|xml)\z/, conn.request_path) ->
         [List.last(String.split(conn.request_path, "."))]
 
       true ->

@@ -2,6 +2,8 @@ defmodule Campfire.Application do
   use Application
 
   def start(_, _) do
+    Campfire.HttpCompression.configure_level()
+
     children = [
       {Registry, keys: :duplicate, name: Campfire.Streams},
       {Registry, keys: :duplicate, name: Campfire.Connections},

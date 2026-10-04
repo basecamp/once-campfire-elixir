@@ -22,15 +22,31 @@ defmodule Campfire.RequestURL do
         else: authority |> String.split(~r/,\s?/) |> List.last()
 
     if authority do
-      case Regex.run(~r/^(.*):(\d+)$/, authority) do
-        [_, host, port] ->
-          %{conn | scheme: scheme, host: host, port: String.to_integer(port)}
+      case host_port(authority) do
+        {host, port} ->
+          %{conn | scheme: scheme, host: host, port: port}
 
-        _ ->
+        nil ->
           %{conn | scheme: scheme, host: authority, port: if(scheme == :https, do: 443, else: 80)}
       end
     else
       %{conn | scheme: scheme}
+    end
+  end
+
+  # "host:port" when the part after the last colon is one or more digits.
+  defp host_port(authority) do
+    case :binary.matches(authority, ":") do
+      [] ->
+        nil
+
+      matches ->
+        {at, 1} = List.last(matches)
+        port = binary_part(authority, at + 1, byte_size(authority) - at - 1)
+
+        if port != "" and port == String.replace(port, ~r/\D/, ""),
+          do: {binary_part(authority, 0, at), String.to_integer(port)},
+          else: nil
     end
   end
 

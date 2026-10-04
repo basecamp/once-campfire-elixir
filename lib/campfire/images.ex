@@ -99,14 +99,12 @@ defmodule Campfire.Images do
         "max-age=1800, public, stale-while-revalidate=604800"
       )
 
-    cond do
-      attachment &&
-          Storage.variable?(
-            DB.one("SELECT * FROM active_storage_blobs WHERE id=?", [attachment["blob_id"]])
-          ) ->
-        blob =
-          DB.one("SELECT * FROM active_storage_blobs WHERE id=?", [attachment["blob_id"]])
+    blob =
+      if attachment,
+        do: DB.one("SELECT * FROM active_storage_blobs WHERE id=?", [attachment["blob_id"]])
 
+    cond do
+      Storage.variable?(blob) ->
         typed = %{"hash" => [["format", %{"sym" => "webp"}], ["resize_to_limit", [512, 512]]]}
 
         case Campfire.StorageMedia.process(blob, typed) do

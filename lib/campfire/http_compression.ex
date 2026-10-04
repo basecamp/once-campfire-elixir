@@ -2,9 +2,19 @@ defmodule Campfire.HttpCompression do
   @moduledoc "Rack-compatible gzip selection and response framing."
   import Plug.Conn
   # Rack::Deflater uses zlib's default level (6). Level 1 compresses this app's
-  # HTML about 2.5x faster for roughly 1.6x the wire bytes.
-  @level 1
-  def level, do: @level
+  # HTML about 2.5x faster for roughly 1.5x the wire bytes; CAMPFIRE_GZIP_LEVEL
+  # selects another level (1-9) at startup.
+  def level, do: :persistent_term.get({__MODULE__, :level}, 1)
+
+  def configure_level do
+    level =
+      case Integer.parse(System.get_env("CAMPFIRE_GZIP_LEVEL", "1")) do
+        {n, ""} when n in 1..9 -> n
+        _ -> 1
+      end
+
+    :persistent_term.put({__MODULE__, :level}, level)
+  end
 
   def apply(conn) do
     body = conn.resp_body
@@ -76,6 +86,14 @@ defmodule Campfire.HttpCompression do
     end
   end
 
+  # Exact matches for the headers browsers and proxies send; the general
+  # negotiation below gives the same answers for them.
+  def encoding(""), do: "identity"
+  def encoding("gzip"), do: "gzip"
+  def encoding("gzip, deflate"), do: "gzip"
+  def encoding("gzip, deflate, br"), do: "gzip"
+  def encoding("gzip, deflate, br, zstd"), do: "gzip"
+
   def encoding(raw) do
     available = ["gzip", "identity"]
 
@@ -139,7 +157,7 @@ defmodule Campfire.HttpCompression do
     z = :zlib.open()
 
     try do
-      :ok = :zlib.deflateInit(z, @level, :deflated, 31, 8, :default)
+      :ok = :zlib.deflateInit(z, level(), :deflated, 31, 8, :default)
       chunks = chunks || if(body == "", do: [], else: [body])
       parts = Enum.map(chunks, &:zlib.deflate(z, &1, :sync))
       bytes = IO.iodata_to_binary([parts, :zlib.deflate(z, "", :finish)])

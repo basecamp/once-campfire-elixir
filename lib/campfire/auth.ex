@@ -47,7 +47,7 @@ defmodule Campfire.Auth do
     expires = permanent_expiry() |> DateTime.to_iso8601()
     value = Rails.sign_cookie("session_token", session["token"], expires)
 
-    put_resp_cookie(conn, "session_token", URI.encode(value, &URI.char_unreserved?/1),
+    put_resp_cookie(conn, "session_token", Rails.cookie_escape(value),
       http_only: true,
       same_site: "Lax",
       max_age: DateTime.diff(permanent_expiry(), Campfire.Clock.now())
@@ -71,6 +71,10 @@ defmodule Campfire.Auth do
       ]) != nil
   end
 
+  # The incoming session cookie is decrypted once per request; later callers (flash
+  # sweeping, cache keys) reuse the same data, including a generated fallback.
+  def csrf_session(%{private: %{campfire_csrf_session: data}} = conn), do: {conn, data}
+
   def csrf_session(conn) do
     conn = fetch_cookies(conn)
 
@@ -80,14 +84,15 @@ defmodule Campfire.Auth do
         _ -> nil
       end
 
-    if is_map(data),
-      do: {conn, data},
-      else:
-        {conn,
-         %{
-           "session_id" => Base.encode16(:crypto.strong_rand_bytes(16), case: :lower),
-           "_csrf_token" => Rails.csrf_token()
-         }}
+    data =
+      if is_map(data),
+        do: data,
+        else: %{
+          "session_id" => Base.encode16(:crypto.strong_rand_bytes(16), case: :lower),
+          "_csrf_token" => Rails.csrf_token()
+        }
+
+    {put_private(conn, :campfire_csrf_session, data), data}
   end
 
   def set_csrf_session(conn, data),
@@ -95,7 +100,7 @@ defmodule Campfire.Auth do
       put_resp_cookie(
         conn,
         "_campfire_session",
-        URI.encode(Rails.encrypt_cookie("_campfire_session", data), &URI.char_unreserved?/1),
+        Rails.cookie_escape(Rails.encrypt_cookie("_campfire_session", data)),
         http_only: true,
         same_site: "Lax",
         max_age: DateTime.diff(permanent_expiry(), Campfire.Clock.now())

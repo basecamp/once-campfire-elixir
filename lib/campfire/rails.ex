@@ -7,6 +7,21 @@ defmodule Campfire.Rails do
       |> String.replace(">", "\\u003e")
       |> String.replace("&", "\\u0026")
 
+  @doc "URI.encode/2 with URI.char_unreserved?/1 as a single pass over the bytes."
+  def cookie_escape(value), do: cookie_escape(value, [])
+
+  defp cookie_escape(<<c, rest::binary>>, acc)
+       when c in ?A..?Z or c in ?a..?z or c in ?0..?9 or c in ~c"-_.~",
+       do: cookie_escape(rest, [c | acc])
+
+  defp cookie_escape(<<c, rest::binary>>, acc),
+    do: cookie_escape(rest, [<<?%, hex(div(c, 16)), hex(rem(c, 16))>> | acc])
+
+  defp cookie_escape(<<>>, acc), do: acc |> Enum.reverse() |> IO.iodata_to_binary()
+
+  defp hex(n) when n < 10, do: ?0 + n
+  defp hex(n), do: ?A + n - 10
+
   def key(salt, length) do
     secret = System.fetch_env!("SECRET_KEY_BASE")
     cache = {__MODULE__, secret, salt, length}
