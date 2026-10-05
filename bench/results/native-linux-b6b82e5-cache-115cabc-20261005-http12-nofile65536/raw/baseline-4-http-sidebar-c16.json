@@ -1,0 +1,1 @@
+{"avg_bytes":6107,"conc":16,"errors":0,"gzip":true,"invalid_responses":0,"latency":{"max_ms":65.279,"mean_ms":36.03,"n":5335,"p50_ms":35.423,"p90_ms":42.399,"p99_ms":54.367},"ok":5335,"path":"/users/me/sidebar","rps":443.6,"secs":12.03,"statuses":{"200":5335}}

@@ -1,0 +1,39 @@
+{
+  "schema_version": 2,
+  "status": "complete",
+  "complete": true,
+  "expected": {
+    "apps": [
+      "baseline",
+      "candidate"
+    ],
+    "reps": 4,
+    "suites": [
+      "http",
+      "cable",
+      "upload"
+    ],
+    "http_routes": [
+      "room_show",
+      "messages_page",
+      "sidebar",
+      "search",
+      "avatar",
+      "static_css",
+      "up",
+      "post_message"
+    ],
+    "http_concs": [
+      1,
+      16,
+      64
+    ],
+    "cable_clients": [
+      100,
+      500,
+      1000
+    ],
+    "upload_reps": 5
+  },
+  "audit": "audit.json"
+}

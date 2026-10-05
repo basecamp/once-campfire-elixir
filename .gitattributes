@@ -1,0 +1,4 @@
+bench/results/** linguist-generated=true
+bench/results/**/README.md linguist-generated=false
+parity/checkpoints/** linguist-generated=true
+parity/checkpoints/**/README.md linguist-generated=false

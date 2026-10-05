@@ -83,6 +83,38 @@ docker run -d --name campfire -p 80:80 -p 443:443 \
 
 ## Performance
 
+The current reader/statement-cache candidate improves populated HTTP throughput in
+a same-host, four-round comparison against untouched upstream, but **high-concurrency
+rendering latency still regresses**. This is work in progress, not a universal speedup.
+
+Hardware: native amd64 Linux orb, guest-reported **Intel Xeon @ 2.60 GHz, 16 vCPUs,
+31 GiB RAM**. The server was pinned to guest CPUs `0,2,4,6`, the load generator to
+`8,10,12,14`; these are CPU affinity sets, not a claim of separate physical cores.
+Both production images used Elixir 1.20.4 / OTP 29.1.1 JIT, four online normal
+schedulers, default dirty-IO scheduling, equal 65,536 descriptor limits and Thruster.
+These absolute rates are **not directly comparable** with the Ryzen numbers below.
+
+| Native amd64 Linux, 16 connections | Upstream req/s | Candidate req/s | Change |
+|---|---:|---:|---:|
+| Room page | 287.55 | 343.25 | +19.4% |
+| Messages page | 392.35 | 453.65 | +15.6% |
+| Sidebar | 449.00 | 733.10 | +63.3% |
+| Search | 415.75 | 641.65 | +54.3% |
+| Post a message | 273.40 | 396.30 | +45.0% |
+
+At 64 connections, room p99 rose **260 → 401 ms (+54.4%)** and messages p99
+**210 → 393 ms (+87.0%)**, worsening in every paired round. Sampled whole-run
+cgroup peak memory rose 574.5 → 620 MiB. Cable throughput improved, but saturated
+1,000-client p99 also rose 12.3%. These regressions remain unresolved.
+
+The run retained all 192 twelve-second HTTP cells (12,858,383 successes), 24 Cable
+cases and 40 uploads, with zero reported errors, complete fanouts and drained jobs.
+See the [current comparison and limitations](bench/results/native-linux-b6b82e5-cache-115cabc-20261005-http12-nofile65536/README.md)
+for complete ranges, raw records, exact source/image provenance and reproduction.
+This measures the whole candidate, not the statement cache in isolation.
+
+### Historical pre-reader-fix checkpoint
+
 The retained pre-reader-fix comparison below freezes upstream baseline `b6b82e5` and candidate
 `7c1ed67` on Elixir 1.20.4 / OTP 29.1.1 with four server and four load-generator
 CPUs, the same populated seed, four balanced rounds, and validated HTTP, Cable and

@@ -1,0 +1,14 @@
+{
+  "schema_version": 2,
+  "passed": true,
+  "counts": {
+    "runs": 8,
+    "http_samples": 192,
+    "http_successes": 12858383,
+    "cable_cases": 24,
+    "cable_paced_attempts": 720,
+    "cable_saturated_attempts": 30650,
+    "cable_saturated_completed": 30650,
+    "uploads": 40
+  }
+}

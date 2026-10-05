@@ -48,6 +48,17 @@ release; profiler timings are diagnostic and are never used as benchmark results
 The toolkit benchmark command measures whole-process primitive wall time rather
 than full application throughput.
 
+The current reader/statement-cache comparison is in
+[`results/native-linux-b6b82e5-cache-115cabc-20261005-http12-nofile65536/`](results/native-linux-b6b82e5-cache-115cabc-20261005-http12-nofile65536/README.md).
+Four balanced rounds on a native amd64 Xeon @ 2.60 GHz Linux orb used four guest
+server CPUs and four separate guest load-generator CPUs, twelve-second HTTP cells,
+the production Thruster path and identical populated seeds. All 192 HTTP cells,
+24 Cable cases and 40 uploads validated, with complete fanouts and drained jobs.
+Populated HTTP throughput improves, but room/messages p99 at 64 connections and
+peak memory regress. The directory includes full ranges, raw data, a reproducible
+report and a checksummed provenance archive. These are not Ryzen or Mac rates;
+the older checkpoints below remain historical evidence, not current-code results.
+
 The matched Elixir architecture review is preserved in
 [`results/elixir-baseline-final-20261004/`](results/elixir-baseline-final-20261004/).
 It compares untouched upstream `b6b82e5` with `a6225d7` on the same two-vCPU host,

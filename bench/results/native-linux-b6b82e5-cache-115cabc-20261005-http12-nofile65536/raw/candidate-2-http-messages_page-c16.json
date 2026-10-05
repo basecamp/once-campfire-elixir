@@ -1,0 +1,1 @@
+{"avg_bytes":12084,"conc":16,"errors":0,"gzip":true,"invalid_responses":0,"latency":{"max_ms":118.079,"mean_ms":35.16,"n":5465,"p50_ms":32.415,"p90_ms":55.519,"p99_ms":82.751},"ok":5465,"path":"/rooms/486777696/messages?before=933434569","rps":454.6,"secs":12.02,"statuses":{"200":5465}}
