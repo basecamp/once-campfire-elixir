@@ -23,7 +23,8 @@ defmodule Campfire.SessionsTest do
   end
 
   defp forgery_check(headers, scheme \\ :http) do
-    conn = %{conn(:post, "/session") | scheme: scheme, host: "campfire.test", port: 443}
+    port = if scheme == :https, do: 443, else: 80
+    conn = %{conn(:post, "/session") | scheme: scheme, host: "campfire.test", port: port}
 
     conn =
       Enum.reduce(headers, conn, fn {name, value}, conn -> put_req_header(conn, name, value) end)
@@ -79,9 +80,13 @@ defmodule Campfire.SessionsTest do
       refute forgery_check([{"sec-fetch-site", site}], :https)
     end
 
-    # Browsers send Sec-Fetch-Site only to secure origins.
-    assert forgery_check([])
+    # Without Sec-Fetch-Site (plain HTTP, or an old browser), a write needs a matching Origin.
+    refute forgery_check([])
     refute forgery_check([], :https)
+    assert forgery_check([{"origin", "http://campfire.test"}])
+    assert forgery_check([{"origin", "https://campfire.test"}], :https)
+    refute forgery_check([{"origin", "http://evil.test"}])
+    refute forgery_check([{"origin", "null"}])
 
     assert forgery_check(
              [{"origin", "https://campfire.test"}, {"sec-fetch-site", "same-origin"}],
@@ -94,6 +99,27 @@ defmodule Campfire.SessionsTest do
            )
 
     refute forgery_check([{"origin", "null"}, {"sec-fetch-site", "same-origin"}], :https)
+  end
+
+  test "a write with neither Sec-Fetch-Site nor Origin is refused" do
+    forged =
+      conn(:post, "/session", %{
+        "email_address" => "david@37signals.com",
+        "password" => "secret123456"
+      })
+      |> Router.call(Router.init([]))
+
+    assert forged.status == 422
+
+    with_origin =
+      conn(:post, "/session", %{
+        "email_address" => "david@37signals.com",
+        "password" => "secret123456"
+      })
+      |> put_req_header("origin", "http://www.example.com")
+      |> Router.call(Router.init([]))
+
+    assert with_origin.status == 302
   end
 
   test "the session cookie is written only when its data changes" do

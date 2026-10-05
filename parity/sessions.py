@@ -13,15 +13,22 @@ def request(port,path,method='GET',params=None,cookies=None,headers=None):
   if k.lower()=='set-cookie' and cookies is not None:
    n,val=v.split(';',1)[0].split('=',1);cookies[n]=val
  return r.status,s,dict((k.lower(),v) for k,v in headers)
-def normalize(s):return re.sub(r'(name="(?:csrf-token|authenticity_token)" (?:content|value)=")[^"]+',r'\1<VALIDATED_TOKEN>',s)
+# Rails pages carry masked tokens; the candidate checks Sec-Fetch-Site/Origin instead and renders
+# no authenticity_token inputs and an empty csrf-token meta. Both normalize to the same page.
+def normalize(s):
+ s=re.sub(r'<input type="hidden" name="authenticity_token" value="[^"]*" />','',s)
+ return re.sub(r'(<meta name="csrf-token" content=")[^"]*',r'\1<VALIDATED_TOKEN>',s)
+# What a browser sends with a same-origin form POST.
+BROWSER={'Origin':'http://campfire.test','Sec-Fetch-Site':'same-origin'}
+def token(page):
+ m=re.search(r'name="authenticity_token" value="([^"]+)"',page)
+ return {'authenticity_token':m[1]} if m else {}
 def run(side,port):
  subprocess.run([str(ROOT/'bin/parity-services'),'reset',side],check=True)
  cookies={};status,page,h=request(port,'/session/new',cookies=cookies);assert status==200
- token=re.search(r'name="authenticity_token" value="([^"]+)"',page)[1]
  forged=request(port,'/session','POST',{'email_address':'david@37signals.com','password':'secret123456'},cookies)[0];assert forged==422
- status,rejected,h=request(port,'/session','POST',{'email_address':'david@37signals.com','password':'incorrect','authenticity_token':token},cookies);assert status==401
- token=re.search(r'name="authenticity_token" value="([^"]+)"',rejected)[1]
- status,body,h=request(port,'/session','POST',{'email_address':'david@37signals.com','password':'secret123456','authenticity_token':token},cookies);assert status==302 and h['location']=='http://campfire.test/'
+ status,rejected,h=request(port,'/session','POST',{'email_address':'david@37signals.com','password':'incorrect',**token(page)},cookies,BROWSER);assert status==401
+ status,body,h=request(port,'/session','POST',{'email_address':'david@37signals.com','password':'secret123456',**token(rejected)},cookies,BROWSER);assert status==302 and h['location']=='http://campfire.test/'
  dbpath=ROOT/'var'/('rails/db' if side=='reference' else 'candidate')/'production.sqlite3'
  with sqlite3.connect(dbpath) as db:
   db.row_factory=sqlite3.Row;row=dict(db.execute('SELECT * FROM sessions ORDER BY id DESC LIMIT 1').fetchone())

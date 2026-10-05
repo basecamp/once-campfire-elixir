@@ -204,8 +204,9 @@ Performance changes deliberately depart from Rails, most of them following the
 The affected contracts are pending in `plans/contracts.json` until they are re-verified:
 
 - **CSRF:** `Sec-Fetch-Site` replaces tokens. Writes are accepted when it is
-  `same-origin` or `same-site`, or when it is missing on plain HTTP, and are refused
-  (422) otherwise or when `Origin` is `null` or differs from the base URL. Pages
+  `same-origin` or `same-site`. Without it (plain HTTP, or an old browser) a write needs an
+  `Origin` equal to the base URL. Anything else is refused (422), as is an `Origin` that is
+  `null` or differs from the base URL. Pages
   carry no `authenticity_token` inputs. The `csrf-token` meta tag is kept but
   empty, so `file_uploader.js` is unchanged. Pages render the same on every
   request, so their ETags are stable and revalidate with 304.

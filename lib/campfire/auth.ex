@@ -192,10 +192,10 @@ defmodule Campfire.Auth do
   end
 
   # Forgery protection by `Sec-Fetch-Site` instead of tokens, as in Rails main's
-  # `protect_from_forgery using: :header_only` and the Rust port. Browsers send the header on
-  # every request to a secure origin; without it (plain HTTP, or an old browser) a write is
-  # allowed only over plain HTTP, where the SameSite=Lax session cookie and the Origin check
-  # protect it. Callers apply this to non-GET/HEAD requests.
+  # `protect_from_forgery using: :header_only`. Browsers send the header on every request to a
+  # secure origin. Without it (plain HTTP, or an old browser) a write must carry an Origin equal
+  # to the base URL, which browsers send on every same-origin POST and fetch write; a write with
+  # neither header is refused. Callers apply this to non-GET/HEAD requests.
   def csrf_valid?(conn, _params) do
     origin = List.first(get_req_header(conn, "origin"))
 
@@ -209,7 +209,7 @@ defmodule Campfire.Auth do
       true ->
         case List.first(get_req_header(conn, "sec-fetch-site")) do
           site when site in ["same-origin", "same-site"] -> true
-          nil -> conn.scheme != :https
+          nil -> origin == base(conn)
           _ -> false
         end
     end
