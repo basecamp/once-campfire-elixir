@@ -1,0 +1,50 @@
+#!/bin/bash
+# The body of bench/docker-desktop/profile, run inside the bench runner container.
+set -euo pipefail
+IMAGE=$1 ROUTE=$2 SECS=${3:-10}
+ROOT=$(pwd) PORT=47150 NAME=campfire-elixir-profile
+SEED=$RUST_ROOT/parity/.seed/default LG=$ROOT/target/bench/release/loadgen
+OUT=$ROOT/bench/results/profile-macos/$ROUTE.txt
+W=/work/profile; rm -rf "$W"; mkdir -p "$W"; cp -a "$SEED/db" "$SEED/storage" "$W/"; chmod -R a+rwX "$W"
+sqlite3 "$W/db/production.sqlite3" "UPDATE push_subscriptions SET endpoint='https://127.0.0.1:9/push/'||id; UPDATE webhooks SET url='http://127.0.0.1:9/hook/'||id"
+docker rm -f "$NAME" >/dev/null 2>&1 || true
+trap 'docker rm -f "$NAME" >/dev/null 2>&1 || true' EXIT
+docker run -d --name "$NAME" --network host --cpuset-cpus 0-3 --env-file "$ROOT/parity/reference.env" \
+  -e HTTP_PORT=$PORT -e TARGET_PORT=$((PORT + 1)) -e LOG_REQUESTS=false \
+  --mount type=volume,src=campfire-bench-work,dst=/rails/storage/db,volume-subpath=profile/db \
+  --mount type=volume,src=campfire-bench-work,dst=/rails/storage/files,volume-subpath=profile/storage "$IMAGE" >/dev/null
+B=http://127.0.0.1:$PORT
+for _ in $(seq 300); do curl -sf "$B/up" >/dev/null && break; sleep 0.1; done
+label() { python3 -c "import json,sys; print(json.load(open('$SEED/labels.json'))[sys.argv[1]])" "$1"; }
+lg() { taskset -c 4-7 "$LG" "$@"; }
+field() { python3 -c "import json,sys; v=json.load(sys.stdin)[sys.argv[1]]; print(','.join(v) if isinstance(v, list) else (v or ''))" "$1"; }
+COOKIE=$(lg login --base "$B" --email "$(label emails.david)" --password "$(label passwords.all)" | field cookie)
+ROOM=$(label rooms.watercooler)
+SCRAPE=$(lg scrape --base "$B" --cookie "$COOKIE" --room "$ROOM")
+CSRF=$(echo "$SCRAPE" | field csrf)
+case $ROUTE in
+  room_show) ARGS=(--path "/rooms/$ROOM") ;;
+  messages_page) ARGS=(--path "/rooms/$ROOM/messages?before=$(label messages.busy_060)") ;;
+  sidebar) ARGS=(--path /users/me/sidebar) ;;
+  search) ARGS=(--path "/searches?q=coffee") ;;
+  up) ARGS=(--path /up) ;;
+  post_message) ARGS=(--post-room "$(label rooms.hq)" --csrf "$CSRF") ;;
+  cable) ;;
+  *) echo "unknown route $ROUTE" >&2; exit 2 ;;
+esac
+rpc() { docker exec "$NAME" /campfire/bin/campfire rpc "$1"; }
+if [ "$ROUTE" != cable ]; then lg http --base "$B" --cookie "$COOKIE" --conc 16 --duration 3 "${ARGS[@]}" >/dev/null; fi
+rpc 'Path.wildcard("/usr/local/lib/erlang/lib/tools-*/ebin") |> Enum.each(fn p -> :code.add_patha(String.to_charlist(p)); :code.load_abs(String.to_charlist(Path.join(p, "eprof"))) end); :eprof.start(); :eprof.start_profiling(:erlang.processes())' >/dev/null
+if [ "$ROUTE" = cable ]; then
+  SAMPLE=$(lg cable --base "$B" --cookie "$COOKIE" --room "$ROOM" --csrf "$CSRF" --streams "$(echo "$SCRAPE" | field streams)" \
+    --clients 1000 --latency-msgs 3 --tput-secs "$SECS" --posters 4)
+else
+  SAMPLE=$(lg http --base "$B" --cookie "$COOKIE" --conc 16 --duration "$SECS" "${ARGS[@]}")
+fi
+{
+  echo "image: $IMAGE $(docker image inspect -f '{{.Id}}' "$IMAGE")"
+  echo "route: $ROUTE secs: $SECS"
+  echo "load: $SAMPLE" | cut -c1-400
+  rpc ':eprof.stop_profiling(); :erlang.group_leader(Process.group_leader(), Process.whereis(:eprof)); :eprof.analyze(:total, sort: :time); :eprof.stop()'
+} > "$OUT"
+echo "$OUT"
