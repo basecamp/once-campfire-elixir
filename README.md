@@ -221,9 +221,11 @@ The complete native amd64 and ARM64 Linux runs pass **65 gates and 1,941 tests**
 Chromium flows, all-table/FTS/storage mutation snapshots, injected transaction
 failures, media operations, cross-runtime Cable delivery and session revocation,
 worker claims/failures/drain, webhook replies and encrypted HTTPS push delivery,
-TLS/HTTP2, fresh schema/setup and production rollback. See the
-[evidence ledger](plans/contracts.json), [verification record](parity/results/verification.json)
-and [conversion state](plans/elixir-conversion.md).
+TLS/HTTP2, fresh schema/setup and production rollback. See the exact
+[statement-cache verification receipts](parity/checkpoints/20261005-statement-cache/README.md)
+for source/image identities, both architecture ledgers and limitations. The
+[contract ledger](plans/contracts.json), [historical verification record](parity/results/verification.json)
+and [conversion state](plans/elixir-conversion.md) retain the earlier migration evidence.
 
 Strict compilation, Credo, Dialyzer, 37 toolkit tests and the load-generator test/check
 also pass. Additional release-image probes verify reads during an open writer

@@ -1,0 +1,131 @@
+format: running
+format: passed (0.493s)
+compile: running
+compile: passed (0.545s)
+unit: running
+unit: passed (27.083s)
+toolkit: running
+toolkit: passed (7.772s)
+seed_reference: running
+seed_reference: passed (1.803s)
+seed_candidate: running
+seed_candidate: passed (1.041s)
+http: running
+http: passed (24.933s)
+mutation: running
+mutation: passed (3.788s)
+sessions: running
+sessions: passed (4.258s)
+first_run: running
+first_run: passed (3.94s)
+signup: running
+signup: passed (9.908s)
+session_lifecycle: running
+session_lifecycle: passed (8.436s)
+request_failures: running
+request_failures: passed (4.543s)
+proxy_context: running
+proxy_context: passed (3.017s)
+route_errors: running
+route_errors: passed (3.08s)
+format_probe: running
+format_probe: passed (5.14s)
+bot_formats: running
+bot_formats: passed (4.82s)
+http_headers: running
+http_headers: passed (2.995s)
+public_files: running
+public_files: passed (2.812s)
+assets: running
+assets: passed (3.388s)
+http_compression: running
+http_compression: passed (4.192s)
+image_headers: running
+image_headers: passed (4.438s)
+errors: running
+errors: passed (4.164s)
+navigation: running
+navigation: passed (4.246s)
+browser_pages: running
+browser_pages: passed (5.131s)
+welcome: running
+welcome: passed (4.59s)
+account_page: running
+account_page: passed (4.3s)
+account_users: running
+account_users: passed (4.025s)
+settings_pages: running
+settings_pages: passed (4.385s)
+profile_pages: running
+profile_pages: passed (4.512s)
+user_pages: running
+user_pages: passed (4.494s)
+push_subscription_pages: running
+push_subscription_pages: passed (4.607s)
+room_forms: running
+room_forms: passed (4.765s)
+room_page: running
+room_page: passed (4.606s)
+boost_pages: running
+boost_pages: passed (3.649s)
+messages: running
+messages: passed (4.283s)
+message_cache: running
+message_cache: passed (4.158s)
+administration: running
+administration: passed (3.886s)
+mutation_edges: running
+mutation_edges: passed (3.774s)
+message_scalars: running
+message_scalars: passed (4.013s)
+transaction_failures: running
+transaction_failures: passed (6.537s)
+message_attachments: running
+message_attachments: passed (28.44s)
+storage: running
+storage: passed (3.567s)
+media: running
+media: passed (8.792s)
+attachments: running
+attachments: passed (9.196s)
+branding: running
+branding: passed (6.034s)
+room_deletion: running
+room_deletion: passed (8.718s)
+cable: running
+cable: passed (4.107s)
+cable_interop: running
+cable_interop: passed (3.613s)
+message_broadcasts: running
+message_broadcasts: passed (3.722s)
+room_broadcasts: running
+room_broadcasts: passed (3.727s)
+user_lifecycle: running
+user_lifecycle: passed (7.705s)
+jobs: running
+jobs: passed (6.175s)
+network_protocol: running
+network_protocol: passed (9.598s)
+webhook_replies: running
+webhook_replies: passed (79.257s)
+worker_lifecycle: running
+worker_lifecycle: passed (19.306s)
+push_delivery: running
+push_delivery: passed (21.897s)
+browser_flows: running
+browser_flows: passed (12.491s)
+qr: running
+qr: passed (3.176s)
+release: running
+release: passed (15.855s)
+frontend: running
+frontend: passed (4.076s)
+fresh_install: running
+fresh_install: passed (6.807s)
+release_smoke: running
+release_smoke: passed (1.288s)
+http_shutdown: running
+http_shutdown: passed (17.389s)
+rollback: running
+rollback: passed (9.657s)
+All selected parity gates passed
