@@ -6,30 +6,47 @@ defmodule Campfire.MessagesView do
 
   EEx.function_from_file(:defp, :boosts_html, "priv/templates/boosts.html.eex", [:assigns])
 
-  def render(message, base) do
-    Campfire.FragmentCache.record(:message, message, fn -> render_fragment(message, base) end)
+  @doc """
+  The message's fragment. `preload` may carry records the caller already holds (`:creator`,
+  `:room`, `:body`, `:boosts`), as when a message was just posted, so rendering it doesn't
+  query them again.
+  """
+  def render(message, base, preload \\ %{}) do
+    Campfire.FragmentCache.record(:message, message, fn ->
+      render_fragment(message, base, preload)
+    end)
   end
 
   def render_many(messages, base) do
-    Campfire.FragmentCache.records(:message, messages, &render_fragment(&1, base))
+    Campfire.FragmentCache.records(:message, messages, &render_fragment(&1, base, %{}))
     |> Enum.join()
   end
 
   def render_parts(messages, base),
-    do: Campfire.FragmentCache.parts(:message, messages, &render_fragment(&1, base))
+    do: Campfire.FragmentCache.parts(:message, messages, &render_fragment(&1, base, %{}))
 
-  defp render_fragment(message, base) do
-    creator = DB.cached_one("SELECT * FROM users WHERE id=?", [message["creator_id"]], ~w(users))
-    room = DB.cached_one("SELECT * FROM rooms WHERE id=?", [message["room_id"]], ~w(rooms))
+  defp render_fragment(message, base, preload) do
+    creator =
+      Map.get_lazy(preload, :creator, fn ->
+        DB.cached_one("SELECT * FROM users WHERE id=?", [message["creator_id"]], ~w(users))
+      end)
 
-    text =
-      DB.cached_one(
-        "SELECT body FROM action_text_rich_texts WHERE record_type='Message' AND record_id=? AND name='body'",
-        [message["id"]],
-        ~w(action_text_rich_texts)
-      )
+    room =
+      Map.get_lazy(preload, :room, fn ->
+        DB.cached_one("SELECT * FROM rooms WHERE id=?", [message["room_id"]], ~w(rooms))
+      end)
 
-    body = if text, do: text["body"], else: nil
+    body =
+      Map.get_lazy(preload, :body, fn ->
+        text =
+          DB.cached_one(
+            "SELECT body FROM action_text_rich_texts WHERE record_type='Message' AND record_id=? AND name='body'",
+            [message["id"]],
+            ~w(action_text_rich_texts)
+          )
+
+        if text, do: text["body"], else: nil
+      end)
 
     title =
       [creator["name"], creator["bio"]]
@@ -55,7 +72,7 @@ defmodule Campfire.MessagesView do
         if(all_emoji?(RichText.plain_text(body || "")), do: "message--emoji", else: ""),
       presentation: presentation_message(message, body),
       attachment_actions: attachment_actions(message),
-      boosting: render_boosts(message)
+      boosting: render_boosts(message, preload[:boosts])
     )
   rescue
     _ ->
@@ -84,17 +101,19 @@ defmodule Campfire.MessagesView do
     end
   end
 
-  def render_boosts(message) do
-    boosts_html(
-      client_id: Assets.html_escape(message["client_message_id"]),
-      id: message["id"],
-      boosts:
+  def render_boosts(message, boosts \\ nil) do
+    boosts =
+      boosts ||
         DB.cached(
           "SELECT * FROM boosts WHERE message_id=? ORDER BY created_at",
           [message["id"]],
           ~w(boosts)
         )
-        |> Enum.map_join(&render_boost/1)
+
+    boosts_html(
+      client_id: Assets.html_escape(message["client_message_id"]),
+      id: message["id"],
+      boosts: Enum.map_join(boosts, &render_boost/1)
     )
     |> String.trim_trailing("\n")
   end

@@ -215,6 +215,10 @@ The affected contracts are pending in `plans/contracts.json` until they are re-v
   keeps its 20-year expiry.
 - **SQLite:** boot adds `index_messages_on_room_id_and_created_at` if it is
   missing (additive; the Rails image ignores it). Memory mapping is disabled.
+- **Read cache:** reads are kept until a table they read is written. Writes through the app bump
+  their tables after commit. Commits by any other SQLite client are seen through the WAL index
+  (`-shm`) header and invalidate everything, so tools that edit the database while the app runs
+  remain safe.
 - **Jobs and Cable:** in-process queues and fan-out replace Redis/Resque, so
   queued jobs are lost on a crash and there is no cross-runtime pub/sub.
 - **Front server:** Bandit replaces Thruster. Responses gzip at zlib level 1

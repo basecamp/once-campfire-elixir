@@ -175,4 +175,27 @@ defmodule Campfire.PagePartsTest do
 
     assert body(get("/searches?q=sure", cookie, "identity")) =~ "a brand new query"
   end
+
+  test "a posted message's fragment, rendered from the request's records, matches a fresh render",
+       %{cookie: cookie} do
+    response =
+      conn(:post, "/rooms/#{@room}/messages", %{
+        "message" => %{
+          "body" => "<div>Hello <strong>there</strong></div>",
+          "client_message_id" => "preload-test"
+        }
+      })
+      |> put_req_cookie("session_token", cookie)
+      |> put_req_header("sec-fetch-site", "same-origin")
+      |> put_req_header("accept", "text/vnd.turbo-stream.html, text/html")
+      |> Router.call(Router.init([]))
+
+    assert response.status == 200
+    message = DB.one("SELECT * FROM messages WHERE client_message_id='preload-test'")
+    posted = Campfire.MessagesView.render(message, "http://www.example.com")
+    assert body(response) =~ String.trim_trailing(posted, "\n")
+
+    :ets.delete(Campfire.FragmentCache, {:message, message["id"]})
+    assert Campfire.MessagesView.render(message, "http://www.example.com") == posted
+  end
 end

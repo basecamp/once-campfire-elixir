@@ -1,8 +1,14 @@
 defmodule Campfire.Broadcasts do
   alias Campfire.{Cable, DB, MessagesView}
 
-  def create(room, message, base \\ System.get_env("APP_URL", "http://example.org"), _user \\ nil) do
-    html = "\n" <> String.trim_trailing(MessagesView.render(message, base), "\n")
+  def create(
+        room,
+        message,
+        base \\ System.get_env("APP_URL", "http://example.org"),
+        _user \\ nil,
+        preload \\ %{}
+      ) do
+    html = "\n" <> String.trim_trailing(MessagesView.render(message, base, preload), "\n")
 
     append =
       ~s(<turbo-stream action="append" target="messages_#{room_key(room)}"><template>#{html}</template></turbo-stream>)

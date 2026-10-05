@@ -1,6 +1,6 @@
 defmodule Campfire.Messages do
   import Plug.Conn
-  alias Campfire.{Auth, Broadcasts, Chat, DB, MessagesView, Rails, Webhooks}
+  alias Campfire.{Auth, Broadcasts, Chat, DB, MessagesView, Rails, RichText, Webhooks}
 
   require EEx
   EEx.function_from_file(:defp, :editor, "priv/templates/message_edit.html.eex", [:assigns])
@@ -83,12 +83,19 @@ defmodule Campfire.Messages do
     case Chat.create_message(user, room, attrs["body"], attrs) do
       message when is_map(message) ->
         Campfire.Attachments.process_message(message)
-        Broadcasts.create(room, message, Auth.base(conn), user)
-        Webhooks.enqueue(room, message)
+
+        # The new fragment renders from what this request holds: the creator, the room (only its
+        # name and type show), the body as create_message stored it, and no boosts yet.
+        body =
+          if is_nil(attrs["body"]), do: nil, else: RichText.serialize(to_string(attrs["body"]))
+
+        preload = %{creator: user, room: room, body: body, boosts: []}
+        Broadcasts.create(room, message, Auth.base(conn), user, preload)
+        Webhooks.enqueue(room, message, body)
 
         stream =
           ~s(<turbo-stream action="append" target="messages_#{Broadcasts.room_key(room)}"><template>
-#{MessagesView.render(message, Auth.base(conn)) |> String.trim_trailing("\n")}</template></turbo-stream>\n)
+#{MessagesView.render(message, Auth.base(conn), preload) |> String.trim_trailing("\n")}</template></turbo-stream>\n)
 
         conn |> put_resp_content_type("text/vnd.turbo-stream.html") |> send_resp(200, stream)
 

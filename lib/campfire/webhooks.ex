@@ -3,18 +3,23 @@ defmodule Campfire.Webhooks do
   @external_resource "priv/compat/rails-mime.json"
   @mime Jason.decode!(File.read!(@external_resource))
 
-  def enqueue(room, message) do
+  def enqueue(room, message, body \\ :unknown) do
     bots =
       DB.query(
         "SELECT u.* FROM users u JOIN memberships m ON m.user_id=u.id JOIN webhooks w ON w.user_id=u.id WHERE m.room_id=? AND u.role=2 AND u.status=0 AND u.id!=?",
         [room["id"], message["creator_id"]]
       )
 
+    # The posting request passes the body it stored; otherwise it is read.
     text =
-      DB.one(
-        "SELECT body FROM action_text_rich_texts WHERE record_type='Message' AND record_id=? AND name='body'",
-        [message["id"]]
-      )
+      if body == :unknown,
+        do:
+          DB.cached_one(
+            "SELECT body FROM action_text_rich_texts WHERE record_type='Message' AND record_id=? AND name='body'",
+            [message["id"]],
+            ~w(action_text_rich_texts)
+          ),
+        else: %{"body" => body}
 
     mentioned = if text, do: Enum.map(Mentions.users(text["body"] || ""), & &1["id"]), else: []
 

@@ -119,7 +119,9 @@ defmodule Campfire.Chat do
               [message["id"], body, now, now]
             )
 
-          Campfire.BlobEmbeds.sync(q, text["id"], embeds)
+          # The rich text was just created (AUTOINCREMENT never reuses an id), so with no
+          # embeds there is nothing to sync.
+          if embeds != [], do: Campfire.BlobEmbeds.sync(q, text["id"], embeds)
         end
 
         if attachment do
@@ -345,13 +347,14 @@ defmodule Campfire.Chat do
 
   def present_message(message, base) do
     text =
-      DB.one(
+      DB.cached_one(
         "SELECT body FROM action_text_rich_texts WHERE record_type='Message' AND record_id=? AND name='body'",
-        [message["id"]]
+        [message["id"]],
+        ~w(action_text_rich_texts)
       )
 
     body = if text, do: text["body"], else: nil
-    user = DB.one("SELECT * FROM users WHERE id=?", [message["creator_id"]])
+    user = DB.cached_one("SELECT * FROM users WHERE id=?", [message["creator_id"]], ~w(users))
 
     %{
       "id" => message["id"],
