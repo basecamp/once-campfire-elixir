@@ -628,12 +628,16 @@ async fn post_marked(
     let t0 = Instant::now();
     delivery.sent.lock().unwrap().insert(seq, t0);
     match send(sender.as_mut()?, addr, "POST", &format!("/rooms/{room}/messages"), &h, b).await {
-        Ok(r) if r.status < 400 => Some(t0.elapsed().as_micros() as u64),
+        Ok(r) if valid_message_post(r.status, &r.body) => Some(t0.elapsed().as_micros() as u64),
         _ => {
             *sender = None;
             None
         }
     }
+}
+
+fn valid_message_post(status: u16, body: &[u8]) -> bool {
+    status == 200 && body.windows(b"<turbo-stream".len()).any(|part| part == b"<turbo-stream")
 }
 
 async fn wait_drain(delivery: &Delivery, seqs: &[u64], clients: usize, timeout: Duration) {
@@ -768,6 +772,7 @@ async fn cable(a: &Args) -> Res<Value> {
     // Phase 1: paced messages, one at a time (open loop at `interval`), for delivery latency.
     let mut poster = None;
     let mut post_h = hist();
+    let mut post_errors = 0u64;
     let mut seqs = Vec::new();
     let mut seq = 0u64;
     for _ in 0..latency_msgs {
@@ -775,6 +780,8 @@ async fn cable(a: &Args) -> Res<Value> {
         let tick = Instant::now();
         if let Some(us) = post_marked(&mut poster, &addr, &room, &cookie, &csrf, seq, &delivery).await {
             post_h.record(us).ok();
+        } else {
+            post_errors += 1;
         }
         seqs.push(seq);
         let spent = tick.elapsed();
@@ -788,6 +795,9 @@ async fn cable(a: &Args) -> Res<Value> {
     let client_h = std::mem::replace(&mut *delivery.per_client.lock().unwrap(), hist());
     let latency = json!({
         "messages": latency_msgs,
+        "post_attempts": latency_msgs,
+        "post_successes": post_h.len(),
+        "post_errors": post_errors,
         "complete": complete,
         "post": summary(&post_h),
         "per_client": summary(&client_h),
@@ -809,22 +819,31 @@ async fn cable(a: &Args) -> Res<Value> {
             let mut conn = None;
             let mut mine = Vec::new();
             let mut h = hist();
+            let mut attempts = 0u64;
+            let mut errors = 0u64;
             while Instant::now() < tput_deadline {
                 let s = next.fetch_add(1, Ordering::Relaxed);
+                attempts += 1;
                 if let Some(us) = post_marked(&mut conn, &addr, &room, &cookie, &csrf, s, &delivery).await {
                     h.record(us).ok();
                     mine.push(s);
+                } else {
+                    errors += 1;
                 }
             }
-            (mine, h)
+            (mine, h, attempts, errors)
         }));
     }
     let mut tseqs = Vec::new();
     let mut tpost_h = hist();
+    let mut post_attempts = 0u64;
+    let mut post_errors = 0u64;
     for t in ptasks {
-        let (m, h) = t.await?;
+        let (m, h, attempts, errors) = t.await?;
         tseqs.extend(m);
         tpost_h.add(&h).ok();
+        post_attempts += attempts;
+        post_errors += errors;
     }
     let posting_secs = tput_start.elapsed().as_secs_f64();
     phase("saturated_posted");
@@ -837,6 +856,8 @@ async fn cable(a: &Args) -> Res<Value> {
     let wire_bytes = delivery.wire_bytes.load(Ordering::Relaxed) - wire_before;
     let throughput = json!({
         "posters": posters,
+        "post_attempts": post_attempts,
+        "post_errors": post_errors,
         "posted": tseqs.len(),
         "posts_per_sec": ((tseqs.len() as f64 / posting_secs) * 10.0).round() / 10.0,
         "complete": tcomplete,
@@ -1022,5 +1043,20 @@ async fn main() {
             eprintln!("loadgen {cmd}: {e}");
             std::process::exit(1);
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::valid_message_post;
+
+    #[test]
+    fn message_post_requires_200_and_turbo_stream_body() {
+        assert!(valid_message_post(200, b"<turbo-stream action=\"append\"></turbo-stream>"));
+        assert!(!valid_message_post(201, b"<turbo-stream></turbo-stream>"));
+        assert!(!valid_message_post(302, b"<turbo-stream></turbo-stream>"));
+        assert!(!valid_message_post(500, b"<turbo-stream></turbo-stream>"));
+        assert!(!valid_message_post(200, b""));
+        assert!(!valid_message_post(200, b"an error page"));
     }
 }

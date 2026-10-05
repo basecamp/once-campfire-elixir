@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Summarize a bench/run results dir: median [min-max] across reps, Rails vs Rust.
+"""Summarize a bench/run results dir: median [min-max] across reps.
 
   bench/report bench/results/<stamp>
 
@@ -9,11 +9,20 @@ otherwise it compares Rust to Rails. When the results include `rust-identity` ru
 (the Rust image serving `Accept-Encoding: identity`), the HTTP table adds a "Rust, no gzip" column
 and its advantage over Rust with gzip.
 """
-import glob, json, os, statistics, sys
+import glob, json, os, pathlib, statistics, subprocess, sys
 
-out = sys.argv[1]
+legacy = len(sys.argv) == 3 and sys.argv[1] == "--legacy"
+if len(sys.argv) != (3 if legacy else 2):
+    raise SystemExit("usage: bench/report [--legacy] RESULTS_DIR")
+out = sys.argv[2] if legacy else sys.argv[1]
 if os.path.exists(os.path.join(out, "INCOMPLETE.md")):
     raise SystemExit("Incomplete diagnostic run: refusing to publish benchmark report")
+if legacy:
+    if os.path.exists(os.path.join(out, "manifest.json")):
+        raise SystemExit("--legacy is only for historical evidence without a manifest")
+    print("**LEGACY EVIDENCE:** historical schema; completeness, jobs, uploads, and POST attempts were not re-audited.\n")
+else:
+    subprocess.run([sys.executable, str(pathlib.Path(__file__).with_name("validate-results.py")), "check", out], check=True)
 runs = {}
 for f in sorted(glob.glob(os.path.join(out, "*-*.json"))):
     r = json.load(open(f))
@@ -24,7 +33,7 @@ for f in sorted(glob.glob(os.path.join(out, "*-*.json"))):
             assert c["ready"] == c["clients"] and c["failed"] == 0 and c["latency"]["complete"] == c["latency"]["messages"] and c["throughput"]["complete"] == c["throughput"]["posted"], f
         runs.setdefault(r["app"], []).append(r)
 identity = runs.pop("rust-identity", None)
-apps = [a for a in ("reference", "elixir", "go", "rust") if a in runs]
+apps = [a for a in ("reference", "baseline", "elixir", "candidate", "go", "rust") if a in runs]
 
 
 def cell(vals):
@@ -50,9 +59,10 @@ def row(name, getter, higher_better, with_identity=False):
         meds[a] = m
         cells.append(c)
     ratio = "–"
-    baseline = "elixir" if "elixir" in meds else "reference"
-    if meds.get(baseline) and meds.get("rust"):
-        x = meds["rust"] / meds[baseline] if higher_better else meds[baseline] / meds["rust"]
+    baseline = "baseline" if "baseline" in meds and "candidate" in meds else "elixir" if "elixir" in meds else "reference"
+    comparison = "candidate" if baseline == "baseline" else "rust"
+    if meds.get(baseline) and meds.get(comparison):
+        x = meds[comparison] / meds[baseline] if higher_better else meds[baseline] / meds[comparison]
         ratio = f"{x:.1f}×"
     extra = ""
     if with_identity:
@@ -75,8 +85,9 @@ def header(title, with_identity=False, note=""):
     if note:
         print(note + "\n")
     more = " Rust, no gzip | vs Rust gzip |" if with_identity else ""
-    advantage = "Rust advantage over Elixir" if "elixir" in apps else "Rust advantage over Rails"
-    print("| Metric | " + " | ".join({"reference":"Rails", "elixir":"Elixir", "go":"Go", "rust":"Rust"}[a] for a in apps) + " | " + advantage + " |" + more)
+    advantage = "Candidate advantage over baseline" if "baseline" in apps and "candidate" in apps else "Rust advantage over Elixir" if "elixir" in apps else "Rust advantage over Rails"
+    labels = {"reference":"Rails", "baseline":"Elixir baseline", "elixir":"Elixir", "candidate":"Elixir candidate", "go":"Go", "rust":"Rust"}
+    print("| Metric | " + " | ".join(labels[a] for a in apps) + " | " + advantage + " |" + more)
     print("|---|" + "---|" * len(apps) + "---|" + ("---|---|" if with_identity else ""))
 
 
@@ -132,16 +143,37 @@ for i, c in enumerate(first["cable"]):
     row(f"{n} clients: paced post→one client p50 ms", lambda r, i=i: r["cable"][i]["latency"]["per_client"]["p50_ms"], False)
     row(f"{n} clients: paced post→all clients p50 ms", lambda r, i=i: r["cable"][i]["latency"]["all_clients"]["p50_ms"], False)
     row(f"{n} clients: paced post→all clients p99 ms", lambda r, i=i: r["cable"][i]["latency"]["all_clients"]["p99_ms"], False)
+    if not legacy:
+        row(f"{n} clients: paced POST attempts", lambda r, i=i: r["cable"][i]["latency"]["post_attempts"], True)
+        row(f"{n} clients: paced successful POSTs", lambda r, i=i: r["cable"][i]["latency"]["post_successes"], True)
+        row(f"{n} clients: paced POST errors", lambda r, i=i: r["cable"][i]["latency"]["post_errors"], False)
+        row(f"{n} clients: paced completed fanouts", lambda r, i=i: r["cable"][i]["latency"]["complete"], True)
     row(f"{n} clients: max sustained msgs/s (delivered to all)", lambda r, i=i: r["cable"][i]["throughput"]["delivered_msgs_per_sec"], True)
     row(f"{n} clients: deliveries/s (client×message)", lambda r, i=i: r["cable"][i]["throughput"]["frames_per_sec"], True)
     row(f"{n} clients: saturated post→all p50 ms", lambda r, i=i: r["cable"][i]["throughput"]["all_clients"]["p50_ms"], False)
     row(f"{n} clients: saturated POST p50 ms", lambda r, i=i: r["cable"][i]["throughput"]["post"]["p50_ms"], False)
+    if not legacy:
+        row(f"{n} clients: saturated POST attempts", lambda r, i=i: r["cable"][i]["throughput"]["post_attempts"], True)
+        row(f"{n} clients: saturated successful POSTs", lambda r, i=i: r["cable"][i]["throughput"]["posted"], True)
+        row(f"{n} clients: saturated POST errors", lambda r, i=i: r["cable"][i]["throughput"]["post_errors"], False)
+        row(f"{n} clients: completed fanouts", lambda r, i=i: r["cable"][i]["throughput"]["complete"], True)
+        row(f"{n} clients: saturated POSTs/s", lambda r, i=i: r["cable"][i]["throughput"]["posts_per_sec"], True)
+        row(f"{n} clients: wire MB/s", lambda r, i=i: r["cable"][i]["throughput"]["wire_mb_per_sec"], True)
+        row(f"{n} clients: drain (s)", lambda r, i=i: r["cable"][i]["throughput"]["drain_secs"], False)
 
 header("Upload + thumbnail (black_hole.jpg, 505 KB)")
 med = lambda key: (lambda r: statistics.median([x[key] for x in r["upload"]["runs"] if key in x]))
 row("POST with attachment (ms)", med("post_ms"), False)
 row("then GET thumb → 200 (ms)", med("thumb_ms"), False)
 row("POST → thumbnail served (ms)", lambda r: r["upload"]["median_total_ms"], False)
+if not legacy:
+    row("completed uploads", lambda r: len(r["upload"]["runs"]), True)
+    row("thumbnail bytes (median)", lambda r: statistics.median(x["thumb_bytes"] for x in r["upload"]["runs"]), True)
+
+if not legacy:
+    header("Final Redis/Resque audit")
+    for metric in ("queued", "active", "failed"):
+        row(f"{metric} jobs", lambda r, metric=metric: json.load(open(os.path.join(out, f"{r['app']}-{r['rep']}-jobs.json"))).get("final", {}).get(metric), False)
 
 
 def procmem(n, phase, what):
@@ -150,11 +182,11 @@ def procmem(n, phase, what):
         p = c["process_memory"][phase]
         roles = p["roles"]
         if what == "app":
-            return roles[{"rust":"campfire","go":"campfire","elixir":"beam","reference":"puma"}[r["app"]]]["peak_pss_mb"]
+            return roles[{"rust":"campfire","go":"campfire","baseline":"beam","elixir":"beam","candidate":"beam","reference":"puma"}[r["app"]]]["peak_pss_mb"]
         if what == "app_anon":
-            return roles[{"rust":"campfire","go":"campfire","elixir":"beam","reference":"puma"}[r["app"]]]["peak_anon_mb"]
+            return roles[{"rust":"campfire","go":"campfire","baseline":"beam","elixir":"beam","candidate":"beam","reference":"puma"}[r["app"]]]["peak_anon_mb"]
         if what == "serving":  # everything that takes part in a cable delivery
-            keys = ["campfire"] if r["app"] in ["rust", "go"] else ["beam", "redis", "helpers", "thrust"] if r["app"] == "elixir" else ["puma", "redis", "thrust"]
+            keys = ["campfire"] if r["app"] in ["rust", "go"] else ["beam", "redis", "helpers", "thrust"] if r["app"] in ["baseline", "elixir", "candidate"] else ["puma", "redis", "thrust"]
             return sum(roles[k]["peak_pss_mb"] for k in keys if k in roles)
         return p["peak_total_pss_mb"]
     return get
