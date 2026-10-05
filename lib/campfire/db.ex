@@ -153,7 +153,18 @@ defmodule Campfire.DB do
     @behaviour NimblePool
     alias Exqlite.Sqlite3, as: SQL
 
-    @pragmas "PRAGMA synchronous=NORMAL; PRAGMA cache_size=2000; PRAGMA mmap_size=134217728;"
+    # Rails' per-connection settings (SQLite3Adapter#configure_connection) except mmap_size:
+    # every reader remaps a memory-mapped database after each commit.
+    @pragmas "PRAGMA synchronous=NORMAL; PRAGMA journal_size_limit=67108864; PRAGMA cache_size=2000;"
+
+    # Indexes added to the Rails schema on boot, for new and existing databases alike. Additive
+    # only, so the database still works with the Rails image. A room's messages are paged by
+    # created_at; with only index_messages_on_room_id each page sorted the room's whole history.
+    @additions [
+      ~s{CREATE INDEX IF NOT EXISTS "index_messages_on_room_id_and_created_at" ON "messages" ("room_id", "created_at")}
+    ]
+
+    def additions, do: @additions
 
     @impl NimblePool
     def init_worker({role, path} = pool_state) do
@@ -179,6 +190,7 @@ defmodule Campfire.DB do
       :ok = SQL.set_busy_timeout(db, 5000)
       conn = {db, :ets.new(:statements, [:set, :public])}
       initialize(conn)
+      for sql <- @additions, do: :ok = SQL.execute(db, sql)
       conn
     end
 
