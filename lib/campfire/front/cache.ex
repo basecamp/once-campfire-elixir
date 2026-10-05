@@ -148,8 +148,6 @@ defmodule Campfire.Front.Cache do
 
   defp size_ref, do: :persistent_term.get({__MODULE__, :size})
 
-  defp key(base, _conn, []), do: IO.iodata_to_binary(base)
-
   defp key(base, conn, names),
     do:
       IO.iodata_to_binary([

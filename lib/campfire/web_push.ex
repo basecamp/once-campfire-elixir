@@ -31,14 +31,14 @@ defmodule Campfire.WebPush do
 
   def decrypt(body, private, auth) do
     <<salt::binary-size(16), size::32, length::8, rest::binary>> = body
-    <<server::binary-size(length), ciphertext::binary>> = rest
+    <<server::binary-size(^length), ciphertext::binary>> = rest
     {public, _} = :crypto.generate_key(:ecdh, :secp256r1, private)
     shared = :crypto.compute_key(:ecdh, server, private, :secp256r1)
     prk = hkdf(auth, shared, "WebPush: info\0" <> public <> server, 32)
     key = hkdf(salt, prk, "Content-Encoding: aes128gcm\0", 16)
     nonce = hkdf(salt, prk, "Content-Encoding: nonce\0", 12)
     split = byte_size(ciphertext) - 16
-    <<encrypted::binary-size(split), tag::binary-size(16)>> = ciphertext
+    <<encrypted::binary-size(^split), tag::binary-size(16)>> = ciphertext
     {size, :crypto.crypto_one_time_aead(:aes_128_gcm, key, nonce, encrypted, "", tag, false)}
   end
 

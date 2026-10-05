@@ -54,27 +54,22 @@ defmodule Campfire.Signup do
   end
 
   defp create(conn) do
-    case Campfire.Params.required(conn.params, "user") do
-      %{} = attrs ->
-        attrs = Campfire.Params.permit(attrs, ~w(name avatar email_address password))
+    attrs =
+      Campfire.Params.required(conn.params, "user")
+      |> Campfire.Params.permit(~w(name avatar email_address password))
 
-        case People.create(attrs) do
-          user when is_map(user) ->
-            conn |> Auth.start_session(user) |> Auth.redirect("/")
+    case People.create(attrs) do
+      user when is_map(user) ->
+        conn |> Auth.start_session(user) |> Auth.redirect("/")
 
-          {:error, error} ->
-            if String.contains?(inspect(error), "UNIQUE constraint failed: users.email_address"),
-              do:
-                Auth.redirect(
-                  conn,
-                  "/session/new?email_address=" <>
-                    URI.encode_www_form(attrs["email_address"] || "")
-                ),
-              else: raise(error)
-        end
-
-      _ ->
-        head(conn, 400)
+      {:error, error} ->
+        if String.contains?(inspect(error), "UNIQUE constraint failed: users.email_address"),
+          do:
+            Auth.redirect(
+              conn,
+              "/session/new?email_address=" <> URI.encode_www_form(attrs["email_address"] || "")
+            ),
+          else: raise(error)
     end
   end
 

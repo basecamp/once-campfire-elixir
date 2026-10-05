@@ -4,7 +4,7 @@ An Elixir implementation of [ONCE Campfire](https://github.com/basecamp/once-cam
 It keeps the existing SQLite database, storage layout, signed/encrypted cookies and
 Action Cable protocol, so existing installs can retain their data and sessions.
 
-The application runs on Elixir 1.19.5 / OTP 28 with Bandit and Plug. Jobs and
+The application runs on Elixir 1.20.4 / OTP 29.1.1 with Bandit and Plug. Jobs and
 Action Cable fan-out run in process; Bandit serves HTTP directly, with Thruster's
 response cache, gzip and forwarded headers reimplemented in `Campfire.Front` and
 TLS from `site_encrypt`. libvips and FFmpeg process media. The Rails frontend is
