@@ -47,6 +47,10 @@ defmodule Campfire.FrontTest do
         "/image" ->
           conn |> put_resp_content_type("image/png") |> send_resp(200, :binary.copy(<<1>>, 4096))
 
+        "/session" ->
+          # The real app, whose parsers read the body through Campfire.HttpAdapter.
+          Campfire.Endpoint.call(conn, Campfire.Endpoint.init([]))
+
         "/echo" ->
           body =
             Jason.encode!(%{
@@ -187,6 +191,43 @@ defmodule Campfire.FrontTest do
       )
 
     assert app_calls() == 0
+  end
+
+  # A chunked POST has no Content-Length, so only reading the body can enforce the limit.
+  defp chunked_post(port, path, body) do
+    {:ok, socket} = :gen_tcp.connect(~c"127.0.0.1", port, [:binary, active: false])
+
+    chunks =
+      for <<chunk::binary-size(4) <- body>>,
+        into: "",
+        do: Integer.to_string(byte_size(chunk), 16) <> "\r\n" <> chunk <> "\r\n"
+
+    :ok =
+      :gen_tcp.send(
+        socket,
+        "POST #{path} HTTP/1.1\r\nhost: 127.0.0.1\r\ncontent-type: application/x-www-form-urlencoded\r\n" <>
+          "transfer-encoding: chunked\r\nconnection: close\r\n\r\n" <> chunks <> "0\r\n\r\n"
+      )
+
+    response = read_all(socket, "")
+    :gen_tcp.close(socket)
+    [_, status | _] = String.split(response, " ", parts: 3)
+    String.to_integer(status)
+  end
+
+  defp read_all(socket, acc) do
+    case :gen_tcp.recv(socket, 0, 5000) do
+      {:ok, data} -> read_all(socket, acc <> data)
+      {:error, _} -> acc
+    end
+  end
+
+  test "chunked request bodies read past MAX_REQUEST_BODY are refused", %{port: port} do
+    Config.load(%{"LOG_REQUESTS" => "false", "MAX_REQUEST_BODY" => "32"})
+
+    assert chunked_post(port, "/session", String.duplicate("a=1&", 16)) == 413
+    # Under the limit the app reads the body and answers (a headerless post is a forgery: 422).
+    assert chunked_post(port, "/session", "a=1&b=2&") == 422
   end
 
   test "request log lines are written only with LOG_REQUESTS", %{port: port} do

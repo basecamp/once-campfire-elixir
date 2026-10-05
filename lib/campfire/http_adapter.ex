@@ -97,7 +97,15 @@ defmodule Campfire.HttpAdapter do
 
   defdelegate send_chunked(adapter, status, headers), to: Bandit.Adapter
   defdelegate chunk(adapter, body), to: Bandit.Adapter
-  defdelegate read_req_body(adapter, opts), to: Bandit.Adapter
+
+  # Bandit returns {:ok | :more, data, adapter} (it raises on errors); every chunk counts
+  # toward MAX_REQUEST_BODY (Campfire.Front.body_read/1).
+  def read_req_body(adapter, opts) do
+    {_, data, _} = result = Bandit.Adapter.read_req_body(adapter, opts)
+    Campfire.Front.body_read(byte_size(data))
+    result
+  end
+
   defdelegate inform(adapter, status, headers), to: Bandit.Adapter
 
   def upgrade(adapter, protocol, opts) do

@@ -17,6 +17,31 @@ defmodule Campfire.Front do
   @key :campfire_front
   @loopback {127, 0, 0, 1}
 
+  defmodule BodyTooLarge do
+    @moduledoc "A request body read past `MAX_REQUEST_BODY` (Thruster's `http.MaxBytesReader`)."
+    defexception message: "request body exceeds MAX_REQUEST_BODY", plug_status: 413
+  end
+
+  @doc """
+  Counts body bytes read for the current request against `MAX_REQUEST_BODY`, raising
+  `BodyTooLarge` past it. `Content-Length` is checked up front; this also covers chunked and
+  length-less bodies.
+  """
+  def body_read(bytes) do
+    case Process.get(@key) do
+      %{config: %{max_request_body: limit}} when limit > 0 ->
+        total = Process.get(:campfire_front_body_read, 0) + bytes
+        Process.put(:campfire_front_body_read, total)
+        if total > limit, do: raise(BodyTooLarge)
+
+      _ ->
+        :ok
+    end
+  end
+
+  @doc "The empty 413 the front sends for an oversized body."
+  def too_large(conn), do: conn |> put_resp_headers([]) |> send_resp(413, "") |> halt()
+
   def call(%Plug.Conn{adapter: {Bandit.Adapter, adapter}} = conn) do
     config = Config.get()
     started = System.monotonic_time()
@@ -36,10 +61,11 @@ defmodule Campfire.Front do
     }
 
     Process.put(@key, front)
+    Process.delete(:campfire_front_body_read)
 
     cond do
       too_large?(conn, config.max_request_body) ->
-        conn |> put_resp_headers([]) |> send_resp(413, "") |> halt()
+        too_large(conn)
 
       Cache.cacheable_request?(conn) ->
         now = System.monotonic_time(:millisecond)
