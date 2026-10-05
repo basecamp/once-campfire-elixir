@@ -31,6 +31,27 @@ defmodule Campfire.Rails do
   def verify_cookie(name, raw, now \\ Campfire.Clock.now()),
     do: verify(raw, key("signed cookie", 64), :sha, "cookie." <> name, now, true)
 
+  @doc """
+  Like `verify_cookie/3`, also returning the cookie's expiry (`nil` when it has none), so a
+  caller can keep a verified cookie and recheck only its expiry.
+  """
+  def verify_cookie_expiry(name, raw, now \\ Campfire.Clock.now()) do
+    with value when not is_nil(value) <- verify_cookie(name, raw, now),
+         [encoded, _] <- String.split(raw, "--"),
+         {:ok, plain} <- decode64(encoded),
+         {:ok, decoded} <- Jason.decode(plain) do
+      expires =
+        with %{"_rails" => %{"exp" => exp}} when is_binary(exp) <- decoded,
+             {:ok, time, _} <- DateTime.from_iso8601(exp),
+             do: time,
+             else: (_ -> nil)
+
+      {value, expires}
+    else
+      _ -> nil
+    end
+  end
+
   def encrypt_cookie(name, value, expires \\ nil) do
     iv = :crypto.strong_rand_bytes(12)
 

@@ -26,8 +26,7 @@ defmodule Campfire.RoomPage do
           messages = messages(room, message_id)
           fragments = MessagesView.render_parts(messages, Auth.base(conn))
           # Messages are spliced in after layout so their cached gzip pieces are reused.
-          marker =
-            "<!--campfire-messages-" <> Base.encode16(:crypto.strong_rand_bytes(16)) <> "-->"
+          marker = Campfire.HttpCompression.marker()
 
           account = Campfire.Page.account()
           gid = Base.url_encode64("gid://campfire/#{room["type"]}/#{room["id"]}", padding: false)
@@ -54,23 +53,47 @@ defmodule Campfire.RoomPage do
             messages: marker
           ]
 
-          {conn, html} =
-            Campfire.Page.render(conn, user, data,
-              account: account,
-              title: Assets.html_escape(name),
-              body_class: "sidebar",
-              head: head(assigns),
-              nav: nav(assigns),
-              content: content(assigns),
-              footer: footer(assigns),
-              sidebar: sidebar(assigns)
+          # The templates are pure functions of these inputs, so the rendered shell around the
+          # messages, with its parts' digests, is kept by a digest of them.
+          frame? = get_req_header(conn, "turbo-frame") != []
+          inputs = {assigns, name, user, account, data["flash"], frame?}
+          key = :crypto.hash(:sha256, :erlang.term_to_binary(inputs, [:deterministic]))
+
+          {before, rest} =
+            Campfire.FragmentCache.memo(
+              {:room_shell, key},
+              fn {{_, b, _}, {_, a, _}} -> byte_size(b) + byte_size(a) end,
+              fn ->
+                {_conn, html} =
+                  Campfire.Page.render(conn, user, data,
+                    account: account,
+                    title: Assets.html_escape(name),
+                    body_class: "sidebar",
+                    head: head(assigns),
+                    nav: nav(assigns),
+                    content: content(assigns),
+                    footer: footer(assigns),
+                    sidebar: sidebar(assigns)
+                  )
+
+                [before, rest] = :binary.split(html, marker)
+
+                [before, rest] =
+                  Campfire.HttpCompression.with_digests([{:raw, before}, {:raw, rest}])
+
+                {before, rest}
+              end
             )
 
+          parts = [before | fragments] ++ [rest]
+
           conn
+          |> Campfire.Page.finish_session(data)
           |> Auth.set_auth_cookie(session)
           |> put_last_room(room)
           |> put_resp_content_type("text/html")
-          |> send_page(html, marker, fragments)
+          |> assign(:page_parts, parts)
+          |> send_resp(200, Campfire.HttpCompression.body(parts))
         else
           conn
           |> Campfire.Flash.put("alert", "Room not found or inaccessible")
@@ -93,18 +116,10 @@ defmodule Campfire.RoomPage do
         )
   end
 
-  defp send_page(conn, html, marker, fragments) do
-    case Campfire.HttpCompression.splice(html, marker, fragments) do
-      {body, parts} -> conn |> assign(:page_parts, parts) |> send_resp(200, body)
-    end
-  end
-
   defp invitation_for(conn, user, account, room) do
-    original = DB.one("SELECT id FROM rooms ORDER BY created_at LIMIT 1")
-
     # The invitation shows only in the original room while it has at most 40 messages, so the
     # count stops at 41 and is skipped for every other room.
-    if original["id"] == room["id"] &&
+    if account["page.original_room_id"] == room["id"] &&
          DB.one(
            "SELECT count(*) AS count FROM (SELECT 1 FROM messages WHERE room_id=? LIMIT 41)",
            [room["id"]]

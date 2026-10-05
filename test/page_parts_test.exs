@@ -50,10 +50,10 @@ defmodule Campfire.PagePartsTest do
   end
 
   test "a room page's per-request text is compressed once and reused", %{cookie: cookie} do
-    :ets.match_delete(Campfire.FragmentCache, {{:raw_piece, :_, :_}, :_, :_, :_})
+    :ets.match_delete(Campfire.FragmentCache.Memo, {{:raw_piece, :_, :_}, :_, :_, :_})
     assert_spliced("/rooms/#{@room}", cookie, "message__body")
 
-    assert :ets.select_count(Campfire.FragmentCache, [
+    assert :ets.select_count(Campfire.FragmentCache.Memo, [
              {{{:raw_piece, :_, :_}, :_, :_, :_}, [], [true]}
            ]) > 0
   end
@@ -85,5 +85,65 @@ defmodule Campfire.PagePartsTest do
 
     assert Campfire.Assets.html_escape(~s(<a href="x">'&'</a>)) ==
              "&lt;a href=&quot;x&quot;&gt;&#39;&amp;&#39;&lt;/a&gt;"
+  end
+
+  test "a room page's shell is kept by its inputs and misses when they change", %{cookie: cookie} do
+    first = body(get("/rooms/#{@room}", cookie, "identity"))
+    assert body(get("/rooms/#{@room}", cookie, "identity")) == first
+
+    DB.query("UPDATE rooms SET name=? WHERE id=?", ["Renamed for the shell test", @room])
+    renamed = body(get("/rooms/#{@room}", cookie, "identity"))
+    assert renamed =~ "Renamed for the shell test"
+    refute first =~ "Renamed for the shell test"
+  end
+
+  test "paging from an anchor matches the direct query, with 204 and 404 kept", %{cookie: cookie} do
+    [newest | _] =
+      DB.query("SELECT * FROM messages WHERE room_id=? ORDER BY created_at DESC", [@room])
+
+    oldest = DB.one("SELECT * FROM messages WHERE room_id=? ORDER BY created_at LIMIT 1", [@room])
+    room = DB.one("SELECT * FROM rooms WHERE id=?", [@room])
+
+    expected =
+      DB.query(
+        "SELECT * FROM messages WHERE room_id=? AND created_at < ? ORDER BY created_at DESC LIMIT 40",
+        [@room, newest["created_at"]]
+      )
+      |> Enum.reverse()
+
+    assert Campfire.Chat.messages(room, %{"before" => to_string(newest["id"])}) == expected
+
+    assert get("/rooms/#{@room}/messages?before=#{oldest["id"]}", cookie, "identity").status ==
+             204
+
+    assert get("/rooms/#{@room}/messages?before=1", cookie, "identity").status == 404
+  end
+
+  test "a kept session cookie verification still rejects tampering and expiry", %{cookie: cookie} do
+    lookup = fn raw ->
+      {_, user, _} =
+        conn(:get, "/") |> put_req_cookie("session_token", raw) |> Auth.session_lookup()
+
+      user
+    end
+
+    assert lookup.(cookie)["id"] == @user
+    assert lookup.(cookie)["id"] == @user
+    refute lookup.(String.replace_suffix(cookie, String.last(cookie), "0") <> "0")
+
+    System.put_env("CAMPFIRE_CLOCK", "2050-01-01T00:00:00Z")
+    refute lookup.(cookie)
+  end
+
+  test "timestamp digits take the fast path for SQLite timestamps and match the general one" do
+    for value <- [
+          "2026-03-02 16:00:00",
+          "2026-03-02 16:00:00.123456",
+          "2026-03-02T16:00:00Z",
+          "x9"
+        ] do
+      assert Campfire.Chat.digits(value) ==
+               for(<<c <- value>>, c in ?0..?9, into: "", do: <<c>>)
+    end
   end
 end

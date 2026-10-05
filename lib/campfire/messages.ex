@@ -49,13 +49,27 @@ defmodule Campfire.Messages do
             Rails.json(Enum.map(messages, &Chat.present_message(&1, Auth.base(conn))))
           )
         else
-          # Fragment parts, so the response reuses each message's cached gzip piece.
-          parts = [{:raw, "\n"} | MessagesView.render_parts(messages, Auth.base(conn))]
+          base = Auth.base(conn)
+          [etag] = get_resp_header(conn, "etag")
+
+          # The ETag covers every message version, the template digest and the flash, so equal
+          # ETags mean equal pages: the fragment parts and their gzip are kept per ETag and base.
+          # Only the gzip bytes are counted, since the parts share the cached fragments.
+          {parts, gzip} =
+            Campfire.FragmentCache.memo(
+              {:messages_page, etag, base},
+              fn {_, gzip} -> 1024 + byte_size(gzip) end,
+              fn ->
+                parts = [{:raw, "\n"} | MessagesView.render_parts(messages, base)]
+                {parts, IO.iodata_to_binary(Campfire.HttpCompression.gzip_parts(parts))}
+              end
+            )
 
           conn
           |> Auth.set_csrf_session(data)
           |> put_resp_content_type("text/html")
           |> assign(:page_parts, parts)
+          |> assign(:precompressed, gzip)
           |> send_resp(200, Campfire.HttpCompression.body(parts))
         end
     end

@@ -13,8 +13,21 @@ defmodule Campfire.Chat do
   def present?(v), do: is_binary(v) and String.trim(v) != ""
 
   @doc "The ASCII digits of a timestamp, as `String.replace(value, ~r/[^0-9]/, \"\")` gave."
-  def digits(value) when is_binary(value),
-    do: for(<<c <- value>>, c in ?0..?9, into: "", do: <<c>>)
+  def digits(
+        <<y::binary-size(4), ?-, mo::binary-size(2), ?-, d::binary-size(2), ?\s,
+          h::binary-size(2), ?:, mi::binary-size(2), ?:, s::binary-size(2), rest::binary>> = value
+      ) do
+    # The usual SQLite timestamp layout, with an optional ".ffffff" fraction.
+    case rest do
+      "" -> y <> mo <> d <> h <> mi <> s
+      <<?., fraction::binary>> -> y <> mo <> d <> h <> mi <> s <> digits_of(fraction)
+      _ -> digits_of(value)
+    end
+  end
+
+  def digits(value) when is_binary(value), do: digits_of(value)
+
+  defp digits_of(value), do: for(<<c <- value>>, c in ?0..?9, into: "", do: <<c>>)
 
   def bot(key) do
     case String.split(String.trim(key), "-") do
@@ -55,19 +68,21 @@ defmodule Campfire.Chat do
     end
   end
 
+  # One query pages from the anchor message; only an empty page needs a second query to tell a
+  # missing anchor (404) from no more messages.
   defp page(room, id, op, order) do
-    case DB.one("SELECT * FROM messages WHERE room_id=? AND id=?", [room["id"], integer(id)]) do
-      nil ->
-        {:error, :not_found}
+    params = [room["id"], integer(id)]
 
-      m ->
-        result =
-          DB.query(
-            "SELECT * FROM messages WHERE room_id=? AND created_at #{op} ? ORDER BY created_at #{order} LIMIT 40",
-            [room["id"], m["created_at"]]
-          )
+    result =
+      DB.query(
+        "WITH anchor AS (SELECT created_at FROM messages WHERE room_id=?1 AND id=?2) SELECT m.* FROM messages m, anchor WHERE m.room_id=?1 AND m.created_at #{op} anchor.created_at ORDER BY m.created_at #{order} LIMIT 40",
+        params
+      )
 
-        if order == "DESC", do: Enum.reverse(result), else: result
+    cond do
+      result != [] -> if order == "DESC", do: Enum.reverse(result), else: result
+      DB.one("SELECT id FROM messages WHERE room_id=? AND id=?", params) -> []
+      true -> {:error, :not_found}
     end
   end
 

@@ -13,12 +13,29 @@ defmodule Campfire.Auth do
     conn = fetch_cookies(conn)
 
     with raw when is_binary(raw) <- conn.cookies["session_token"],
-         token when is_binary(token) <- Rails.verify_cookie("session_token", URI.decode(raw)),
+         token when is_binary(token) <- session_token(raw),
          row when is_map(row) <- DB.one(@session_user_sql, [token]) do
       {session, user} = Map.split(row, @session_keys)
       {conn, user, Map.new(session, fn {"session." <> key, value} -> {key, value} end)}
     else
       _ -> {conn, nil, nil}
+    end
+  end
+
+  # A verified session_token cookie is kept (its signature check is deterministic), and only its
+  # expiry is compared with the clock on later requests. Unverifiable cookies are not kept.
+  defp session_token(raw) do
+    now = Campfire.Clock.now()
+
+    verified =
+      Campfire.FragmentCache.memo({:session_cookie, raw}, 64 + byte_size(raw), fn ->
+        Rails.verify_cookie_expiry("session_token", URI.decode(raw), now)
+      end)
+
+    case verified do
+      {token, nil} -> token
+      {token, expires} -> if DateTime.compare(expires, now) == :gt, do: token
+      nil -> nil
     end
   end
 

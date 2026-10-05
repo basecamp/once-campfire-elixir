@@ -145,8 +145,8 @@ defmodule Campfire.HttpResponse do
 
   # A spliced page's message fragments are sanitized and never link a stylesheet, so only its
   # per-request text is searched rather than the whole (up to 450 KB) body.
-  defp stylesheet?([{:raw, _} | _] = parts),
-    do: Enum.any?(for {:raw, data} <- parts, do: stylesheet?(data))
+  defp stylesheet?([part | _] = parts) when elem(part, 0) == :raw,
+    do: Enum.any?(parts, &(elem(&1, 0) == :raw and stylesheet?(elem(&1, 1))))
 
   defp stylesheet?(body) when is_binary(body),
     do: String.contains?(body, ~s(<link rel="stylesheet"))

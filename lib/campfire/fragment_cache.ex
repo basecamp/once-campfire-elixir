@@ -16,6 +16,10 @@ defmodule Campfire.FragmentCache do
 
   @table __MODULE__
   @max_bytes 64 * 1024 * 1024
+  # Memoized values (page shells, compressed page text, finished responses, parsed headers) are
+  # bounded separately, so their churn never wipes the message fragments, nor the reverse.
+  @memo Module.concat(__MODULE__, Memo)
+  @max_memo_bytes 64 * 1024 * 1024
 
   def start_link(_), do: GenServer.start_link(__MODULE__, nil, name: __MODULE__)
 
@@ -30,6 +34,10 @@ defmodule Campfire.FragmentCache do
     ])
 
     :ets.insert(@table, {:bytes, 0})
+
+    :ets.new(@memo, [:named_table, :set, :public, read_concurrency: true, write_concurrency: true])
+
+    :ets.insert(@memo, {:bytes, 0})
     {:ok, nil}
   end
 
@@ -77,17 +85,32 @@ defmodule Campfire.FragmentCache do
   page's per-request text keyed by its digest, computed on first use. It shares the
   fragments' byte bound, counting `size` bytes (the value's own size when it is a binary).
   """
-  def memo(key, compute) do
-    case :ets.lookup(@table, key) do
+  def memo(key, compute), do: memo(key, nil, compute)
+
+  @doc """
+  Like `memo/2`, counting `size` bytes, or what `size` returns for the value when it is a
+  function. A `nil` result is returned but not kept.
+  """
+  def memo(key, size, compute) do
+    case :ets.lookup(@memo, key) do
       [{_, :memo, value, _}] ->
         value
 
       _ ->
-        value = compute.()
-        store(key, :memo, value, memo_size(value), %{})
-        value
+        case compute.() do
+          nil ->
+            nil
+
+          value ->
+            store(@memo, @max_memo_bytes, key, :memo, value, size_of(size, value), %{})
+            value
+        end
     end
   end
+
+  defp size_of(nil, value), do: memo_size(value)
+  defp size_of(size, value) when is_function(size, 1), do: size.(value)
+  defp size_of(size, _value), do: size
 
   defp memo_size(value) when is_binary(value), do: byte_size(value)
   defp memo_size({piece, _crc, _size}) when is_binary(piece), do: byte_size(piece)
@@ -100,19 +123,19 @@ defmodule Campfire.FragmentCache do
 
       _ ->
         html = render.()
-        store(key, version, html, byte_size(html), %{})
+        store(@table, @max_bytes, key, version, html, byte_size(html), %{})
         html
     end
   end
 
-  defp store(key, version, value, size, derived) do
+  defp store(table, max_bytes, key, version, value, size, derived) do
     # The default covers a concurrent wipe, which briefly removes the counter.
-    if :ets.update_counter(@table, :bytes, size, {:bytes, 0}) > @max_bytes do
-      :ets.delete_all_objects(@table)
-      :ets.insert(@table, {:bytes, size})
+    if :ets.update_counter(table, :bytes, size, {:bytes, 0}) > max_bytes do
+      :ets.delete_all_objects(table)
+      :ets.insert(table, {:bytes, size})
     end
 
-    :ets.insert(@table, {key, version, value, derived})
+    :ets.insert(table, {key, version, value, derived})
   end
 
   defp identity(:message, record), do: {{:message, record["id"]}, record["updated_at"]}

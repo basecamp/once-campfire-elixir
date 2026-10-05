@@ -52,7 +52,9 @@ defmodule Campfire.ModelCache do
     version = record["updated_at"] || record["created_at"]
 
     if version do
-      stamp = version |> Campfire.Chat.digits() |> String.pad_trailing(20, "0")
+      # The digits are ASCII, so padding by bytes matches String.pad_trailing/3.
+      digits = Campfire.Chat.digits(version)
+      stamp = digits <> :binary.copy("0", max(20 - byte_size(digits), 0))
       "#{table}/#{record["id"]}-#{stamp}"
     else
       "#{table}/#{record["id"]}"

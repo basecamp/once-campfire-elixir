@@ -27,6 +27,7 @@ defmodule Campfire.HttpCompression do
           compressed =
             cond do
               conn.state == :set_file -> nil
+              compressed = conn.assigns[:precompressed] -> compressed
               parts = conn.assigns[:page_parts] -> gzip_parts(parts)
               true -> gzip(IO.iodata_to_binary(body), conn.assigns[:gzip_chunks])
             end
@@ -139,7 +140,24 @@ defmodule Campfire.HttpCompression do
   @doc "The response body of page parts built without a marker."
   def body(parts), do: Enum.map(parts, &part_data/1)
 
+  @doc """
+  A splice marker chosen once per boot, so a page shell rendered around it can be kept. It is
+  random because some page text (an admin's custom styles) is not escaped.
+  """
+  def marker do
+    case :persistent_term.get({__MODULE__, :marker}, nil) do
+      nil ->
+        marker = "<!--campfire-messages-" <> Base.encode16(:crypto.strong_rand_bytes(16)) <> "-->"
+        :persistent_term.put({__MODULE__, :marker}, marker)
+        marker
+
+      marker ->
+        marker
+    end
+  end
+
   defp part_data({:raw, data}), do: data
+  defp part_data({:raw, data, _}), do: data
   defp part_data({:fragment, _, _, html}), do: html
 
   # A gzip member assembled from separately deflated pieces. Each piece is a raw
