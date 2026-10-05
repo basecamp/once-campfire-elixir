@@ -55,78 +55,18 @@ docker run -d --name campfire -p 80:80 -p 443:443 \
 
 ## Performance
 
-Production images, the same populated seed and four pinned hardware threads per app
-on an AMD Ryzen AI MAX+ 395. These are medians of two runs per version on October 4,
-2026. Elixir comes from the earlier alternating Elixir/older-Rust runs; Ruby, Go
-and the optimized Rust version were each measured separately afterward with the
-same harness and settings, using each public server with gzip. The
-[full report](bench/results/ruby-elixir-go-rust-20261004/report.md) preserves ranges,
-image IDs, response sizes and the original measurement environments.
+Measured with 16 concurrent clients on an AMD Ryzen AI MAX+ 395,
+with four hardware threads allocated to each app.
 
-The measured code revisions are Elixir
-[`3498c18`](https://github.com/basecamp/once-campfire-elixir/commit/3498c18f3705de2bcaff778132cd5699199e1cbc),
-Rails [`90b3300`](https://github.com/basecamp/once-campfire/commit/90b330024dec3e757c79b6a7e6568f93da8e3148),
-Go [`504428a`](https://github.com/basecamp/once-campfire-go/commit/504428addff333549f1fc88b003c7331779a3c2a),
-and Rust
-[`1ea6d6f`](https://github.com/basecamp/once-campfire-rust/commit/1ea6d6f6b24fd21e7d01e69b7c92df5c380bcbde),
-using the same optimized production image as the Rust README. The report retains
-the image ID; its build revision identifies the measured Rust code. The local
-checkout recorded by the harness is used for the seed and is a different revision.
-Go's published HTTP comparison uses its direct application listener with identity
-encoding; this table measures its production public server with gzip.
+| HTTP workload (requests/sec) | Rails | [Django](https://github.com/basecamp/once-campfire-django) | [Laravel](https://github.com/basecamp/once-campfire-laravel) | [Express](https://github.com/basecamp/once-campfire-express) | [Elixir](https://github.com/basecamp/once-campfire-elixir) | [Go](https://github.com/basecamp/once-campfire-go) | [Rust](https://github.com/basecamp/once-campfire-rust) |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Room page | 241 | 170 | 164 | 559 | 722 | 3,860 | 36,260 |
+| Messages page | 413 | 196 | 175 | 777 | 1,053 | 5,573 | 40,872 |
+| Sidebar | 552 | 615 | 715 | 4,125 | 1,275 | 19,753 | 34,672 |
+| Search | 435 | 315 | 305 | 1,294 | 1,156 | 7,053 | 33,299 |
+| Post a message | 273 | 154 | 137 | 256 | 801 | 4,767 | 6,896 |
 
-### HTTP throughput (16 concurrent clients)
-
-| Measurement | Ruby (Rails) | Elixir | Go | Rust |
-|---|---:|---:|---:|---:|
-| Room page | 216 req/s | 722 req/s | 3,860 req/s | 36,260 req/s |
-| Messages page | 384 req/s | 1,053 req/s | 5,573 req/s | 40,872 req/s |
-| Sidebar | 503 req/s | 1,275 req/s | 19,753 req/s | 34,672 req/s |
-| Search | 380 req/s | 1,156 req/s | 7,053 req/s | 33,299 req/s |
-| Post a message | 267 req/s | 801 req/s | 4,767 req/s | 6,896 req/s |
-| Avatar | 94,703 req/s | 96,970 req/s | 200,856 req/s | 364,915 req/s |
-| Static CSS | 129,639 req/s | 125,904 req/s | 289,554 req/s | 383,609 req/s |
-| `/up` | 4,054 req/s | 8,493 req/s | 154,476 req/s | 230,480 req/s |
-
-### Latency and real time
-
-| Measurement | Ruby (Rails) | Elixir | Go | Rust |
-|---|---:|---:|---:|---:|
-| Room page p99, 64 clients | 474.0 ms | 108.2 ms | 60.5 ms | 3.1 ms |
-| Post a message p99, 64 clients | 368.3 ms | 83.1 ms | 59.7 ms | 14.5 ms |
-| Upload a 505 KB JPEG until its thumbnail is served | 57.8 ms | 92.6 ms | 28.4 ms | 28.3 ms |
-| Complete broadcasts/s, 1,000 clients in one room | 12.4 | 60.2 | 239.1 | 545.6 |
-| Deliveries/s, 1,000 clients in one room | 12,412 | 60,219 | 239,119 | 545,654 |
-| Paced post → all 1,000 clients, p50 | 134.6 ms | 18.3 ms | 9.4 ms | 6.2 ms |
-| Paced post → all 1,000 clients, p99 | 188.4 ms | 21.7 ms | 15.9 ms | 8.5 ms |
-| Connect and subscribe 1,000 clients | 1.50 s | 0.40 s | 0.17 s | 0.12 s |
-
-Every client subscribed and received every paced and saturated broadcast. All HTTP
-workloads returned validated successful responses with zero errors. Cable uses one
-authenticated user with many connections; these loopback measurements exclude TLS
-and NIC costs.
-
-### Startup, memory and image size
-
-| Measurement | Ruby (Rails) | Elixir | Go | Rust |
-|---|---:|---:|---:|---:|
-| Cold start until `/up` answers | 2,601 ms | 530 ms | 145 ms | 177 ms |
-| Idle container memory, including page cache | 298 MiB | 152 MiB | 16 MiB | 32 MiB |
-| Peak anonymous container memory | 1,419 MiB | 564 MiB | 349 MiB | 268 MiB |
-| App memory, 1,000 idle clients (PSS) | 678 MiB | 394 MiB | 169 MiB | 126 MiB |
-| App memory, 1,000 clients under load (PSS) | 991 MiB | 423 MiB | 218 MiB | 125 MiB |
-| Whole container, 1,000 clients under load (PSS) | 1,381 MiB | 600 MiB | 218 MiB | 125 MiB |
-| Image size, unpacked | 1,232 MiB | 2,490 MiB | 230 MiB | 225 MiB |
-
-Ruby includes Puma, Redis and Thruster. Elixir includes BEAM, Redis, native helpers
-and Thruster. Go and Rust each use one integrated app/server process. Container memory varies
-with page cache; PSS apportions shared pages. MiB means 1,048,576 bytes.
-
-The earlier [Elixir tuning comparison](bench/results/tuning-comparison.md) records an 8.07×
-CSS improvement, 3.42× improvement in 1,000-client fanout and 1.65× improvement in
-message posting over the initial Elixir build, using an older Rust image. Both tuned Elixir runs ended with
-empty job queues and no failed jobs. Rust remains substantially faster on dynamic
-HTTP and fanout.
+See [benchmark commands](bench/README.md) and [earlier measurements](bench/results/ruby-elixir-go-rust-20261004/report.md).
 
 ## Development
 
