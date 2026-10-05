@@ -110,43 +110,10 @@ cgroup peak memory rose 574.5 → 620 MiB. Cable throughput improved, but satura
 The run retained all 192 twelve-second HTTP cells (12,858,383 successes), 24 Cable
 cases and 40 uploads, with zero reported errors, complete fanouts and drained jobs.
 See the [current comparison and limitations](bench/results/native-linux-b6b82e5-cache-115cabc-20261005-http12-nofile65536/README.md)
-for complete ranges, raw records, exact source/image provenance and reproduction.
+for complete ranges, exact source/image provenance and the evidence archive identity.
+Raw records are preserved locally and available on request, rather than included in
+the review diff. Earlier runs and failed diagnostics are also retained locally.
 This measures the whole candidate, not the statement cache in isolation.
-
-### Historical pre-reader-fix checkpoint
-
-The retained pre-reader-fix comparison below freezes upstream baseline `b6b82e5` and candidate
-`7c1ed67` on Elixir 1.20.4 / OTP 29.1.1 with four server and four load-generator
-CPUs, the same populated seed, four balanced rounds, and validated HTTP, Cable and
-upload responses. Results are platform-specific; they do **not** establish a general
-performance improvement. This checkpoint predates the current reader implementation
-and statement cache; it is not a measurement of the current code.
-
-For that checkpoint, the native x86_64 Linux run is the clean benchmark: all eight rounds
-ended with empty job queues and zero failed jobs. At 16 HTTP connections the
-candidate regressed on every populated dynamic route and on Cable fanout:
-
-| Native x86_64 Linux metric | Baseline | Candidate | Change |
-|---|---:|---:|---:|
-| Room page | 305.4 req/s | 255.8 req/s | −16.3% |
-| Messages page | 429.5 req/s | 330.3 req/s | −23.1% |
-| Sidebar | 462.0 req/s | 243.5 req/s | −47.3% |
-| Search | 448.8 req/s | 318.9 req/s | −28.9% |
-| Post a message | 287.6 req/s | 174.1 req/s | −39.5% |
-| Cable, 1,000 clients | 34.85 msg/s | 33.20 msg/s | −4.7% |
-
-Native ARM64 Linux containers under OrbStack on an M4 Pro showed different response
-rates: room, messages, search and posting improved at 16 connections, while sidebar
-regressed 6.8%. Those are qualified shared-workstation observations, not a clean
-benchmark result: unrelated macOS activity drove host load as high as 29.06, and one
-candidate round retained 1,125 queued jobs. All rounds remain in the evidence; none
-was removed or replaced after seeing its result.
-
-See the [clean Linux report](bench/results/native-linux-b6b82e5-7c1ed67-20261005-nofile65536/README.md)
-and [qualified M4 report](bench/results/m4-arm64-b6b82e5-7c1ed67-20261005/README.md)
-for medians, complete ranges, raw interleaved records, immutable image/runtime
-identities, fixture provenance and limitations. No cause for the cross-platform
-performance difference was isolated.
 
 ### Upstream seven-language comparison
 
@@ -254,8 +221,9 @@ Chromium flows, all-table/FTS/storage mutation snapshots, injected transaction
 failures, media operations, cross-runtime Cable delivery and session revocation,
 worker claims/failures/drain, webhook replies and encrypted HTTPS push delivery,
 TLS/HTTP2, fresh schema/setup and production rollback. See the exact
-[statement-cache verification receipts](parity/checkpoints/20261005-statement-cache/README.md)
-for source/image identities, both architecture ledgers and limitations. The
+[statement-cache verification summary](parity/checkpoints/20261005-statement-cache/README.md)
+for source/image identities, archive checksums and limitations. Detailed receipts
+for both architectures are preserved locally and available on request. The
 [contract ledger](plans/contracts.json), [historical verification record](parity/results/verification.json)
 and [conversion state](plans/elixir-conversion.md) retain the earlier migration evidence.
 

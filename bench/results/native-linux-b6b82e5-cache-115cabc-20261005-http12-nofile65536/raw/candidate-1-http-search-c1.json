@@ -1,1 +1,0 @@
-{"avg_bytes":9990,"conc":1,"errors":0,"gzip":true,"invalid_responses":0,"latency":{"max_ms":19.311,"mean_ms":4.08,"n":2939,"p50_ms":3.893,"p90_ms":4.719,"p99_ms":6.291},"ok":2939,"path":"/searches?q=coffee","rps":244.9,"secs":12.0,"statuses":{"200":2939}}

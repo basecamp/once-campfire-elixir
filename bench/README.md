@@ -55,42 +55,11 @@ server CPUs and four separate guest load-generator CPUs, twelve-second HTTP cell
 the production Thruster path and identical populated seeds. All 192 HTTP cells,
 24 Cable cases and 40 uploads validated, with complete fanouts and drained jobs.
 Populated HTTP throughput improves, but room/messages p99 at 64 connections and
-peak memory regress. The directory includes full ranges, raw data, a reproducible
-report and a checksummed provenance archive. These are not Ryzen or Mac rates;
-the older checkpoints below remain historical evidence, not current-code results.
-
-The matched Elixir architecture review is preserved in
-[`results/elixir-baseline-final-20261004/`](results/elixir-baseline-final-20261004/).
-It compares untouched upstream `b6b82e5` with `a6225d7` on the same two-vCPU host,
-using one pinned server CPU and one pinned load-generator CPU, immutable production
-images, the same populated seed, alternating order, three repetitions, eight-second
-HTTP samples, fifteen-second Cable samples, and five uploads. All response, fanout,
-upload, and job-drain validations passed with zero errors. See the result directory's
-README for exact commands, source/image hashes, profiling evidence, results, and
-semantic caveats. These matched numbers supersede neither the four-language table
-nor figures captured on other hardware.
-
-### Frozen `7c1ed67` comparison
-
-The October 5 comparison reruns untouched upstream `b6b82e5` against frozen candidate
-`7c1ed67` for four balanced rounds on two native architectures:
-
-- [`results/native-linux-b6b82e5-7c1ed67-20261005-nofile65536/`](results/native-linux-b6b82e5-7c1ed67-20261005-nofile65536/)
-  is a clean native x86_64 Linux run. All response checks and deliveries passed, and
-  every round ended with zero queued or failed jobs. Populated dynamic HTTP throughput
-  regressed 16–47% at concurrency 16; Cable throughput regressed 5–20%.
-- [`results/m4-arm64-b6b82e5-7c1ed67-20261005/`](results/m4-arm64-b6b82e5-7c1ed67-20261005/)
-  retains native ARM64 Linux/OrbStack observations from an M4 Pro. Response, Cable and
-  upload checks passed, but the strict audit is intentionally failed because one
-  candidate round retained 1,125 queued jobs. Unrelated macOS host activity also
-  reached load 29.06. Treat this table as qualified shared-host observations, not a
-  clean or fully drained benchmark.
-
-Both directories preserve all eight rounds, generated reports, raw hidden Cable and
-memory samples, immutable image/runtime identities, fixture hashes and audit receipts.
-The adjacent Linux directory without the `-nofile65536` suffix preserves an excluded
-attempt that correctly aborted when the original 1,024-file descriptor limit prevented
-the 1,000-client Cable case. No cross-platform or universal performance win is claimed.
+peak memory regress. The directory includes the summary, full ranges and a provenance
+archive checksum. Raw measurements, executable audit scripts and complete verification
+receipts are preserved locally and available on request; they are not part of the
+review diff. Earlier runs, including failed and qualified attempts, are also preserved
+locally. These are not Ryzen or Mac rates, and no universal performance win is claimed.
 
 ### Exact populated seed
 

@@ -1,7 +1,8 @@
 # Statement-cache verification checkpoint
 
-These are unchanged receipts from the October 5, 2026 verification of the
-statement-cache integration. They do not replace historical records under
+This summarizes the October 5, 2026 verification of the statement-cache integration.
+Detailed receipts are preserved locally in the checksummed archives listed below
+and are available on request. This does not replace historical records under
 `parity/results/`, and correctness results do not establish a performance win.
 
 | Check | Native amd64 Linux | Native ARM64 Linux under OrbStack |
@@ -13,19 +14,16 @@ statement-cache integration. They do not replace historical records under
 | Strict Credo / Dialyzer | Passed / zero errors | Passed / zero errors |
 | Production mixed-write visibility / reader recovery | Passed | Passed |
 
-The gate commands, durations and source identities are in the
-[amd64 ledger](amd64/parity/results/verification.json) and
-[ARM64 ledger](arm64/parity/results/verification.json). Each architecture directory
-preserves the original archive paths. The compact subset includes unit/toolkit
-logs, strict checks, production probes and source hashes; paths to other gate logs
-inside the ledgers refer to the full archives, not this compact subset.
+The archives retain both architecture ledgers, gate commands, durations, source
+identities, unit/toolkit logs, strict checks and production probes. Only this
+summary is included in the review diff.
 
 ## Exact source and images
 
 Both runs used base revision `6f06e50f2ec5dae69331c2c5dd033b4ac8849580` plus three
 overlay files: `lib/campfire/db.ex`, `test/db_statement_cache_test.exs`, and
-`test/messages_view_test.exs`. Their hashes are recorded in each architecture's
-`var/` directory and match the subsequently committed integration. The base Git
+`test/messages_view_test.exs`. Their hashes are recorded in the archived receipts
+and match the subsequently committed integration. The base Git
 revision alone does **not** identify the verified source.
 
 - amd64 source digest: `d95a406a33915790b632420d97840c96d76e4bd8a5e7595c58bdf2d84bf58efe`.
@@ -47,9 +45,8 @@ unchanged; they are not relabeled as tests of that later harness revision.
 
 ## Full capture archives retained separately
 
-The compact records here were copied byte-for-byte from these archives. Full raw
-HTTP/media/browser captures, detailed gate logs and executable probe scripts remain
-in the archives; they are not all duplicated in Git.
+Full raw HTTP/media/browser captures, detailed gate logs and executable probe
+scripts remain unchanged in these local archives; they are not duplicated in Git.
 
 | Archive | SHA-256 |
 |---|---|

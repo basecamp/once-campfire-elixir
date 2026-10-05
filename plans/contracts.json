@@ -173,9 +173,7 @@
     "bench/results/tuned-fifo-20261004/report.md",
     "bench/results/tuning-comparison.md",
     "bench/TUNING.md",
-    "bench/results/native-linux-b6b82e5-7c1ed67-20261005-nofile65536/README.md",
-    "bench/results/native-linux-b6b82e5-7c1ed67-20261005-nofile65536/audit.json",
-    "bench/results/m4-arm64-b6b82e5-7c1ed67-20261005/README.md",
-    "bench/results/m4-arm64-b6b82e5-7c1ed67-20261005/audit.json"
+    "bench/results/native-linux-b6b82e5-cache-115cabc-20261005-http12-nofile65536/README.md",
+    "bench/results/native-linux-b6b82e5-cache-115cabc-20261005-http12-nofile65536/comparison.md"
   ]
 }

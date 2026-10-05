@@ -1,1 +1,0 @@
-{"avg_bytes":653,"conc":64,"errors":0,"gzip":true,"invalid_responses":0,"latency":{"max_ms":35.871,"mean_ms":2.0,"n":382821,"p50_ms":1.064,"p90_ms":4.871,"p99_ms":11.647},"ok":382821,"path":"/assets/_reset-9c3efd7b.css","rps":31887.5,"secs":12.01,"statuses":{"200":382821}}

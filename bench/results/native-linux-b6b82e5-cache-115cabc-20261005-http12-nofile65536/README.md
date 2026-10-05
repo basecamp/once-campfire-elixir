@@ -64,8 +64,8 @@ uploads completed. Every arm passed a populated-response preflight and ended wit
   `115cabc787bd3ed7bb6ccba5a6d9d6a4fc7e5948`; this was **not** a rebuild of that commit.
 - Candidate source digest: `d95a406a33915790b632420d97840c96d76e4bd8a5e7595c58bdf2d84bf58efe`.
 
-[Dual-architecture correctness receipts](../../../parity/checkpoints/20261005-statement-cache/README.md)
-record 65/65 gates and 1,941 unit tests on each architecture, strict checks and
+[Dual-architecture correctness summary](../../../parity/checkpoints/20261005-statement-cache/README.md)
+records 65/65 gates and 1,941 unit tests on each architecture, strict checks and
 production read/write visibility and reader-recovery probes. The later harness
 passed 37 toolkit tests, pinned Rust test/check/build and real Cable wire-accounting
 smokes before this run. These do not establish production readiness or continuity
@@ -73,24 +73,28 @@ of an in-flight call interrupted by reader death.
 
 ## Reproduce the report and inspect evidence
 
-From the repository root, without starting servers or rerunning timing:
+Only this summary and `comparison.md` are included in Git. The original evidence
+archive is preserved locally and available on request:
+`linux-final-baseline-cache-http12-evidence.tar.gz`, SHA-256
+`317745a9faac3132586108455a188cc63351ea669ae3a085b00005ca288aaa73`.
+
+It contains all raw cells, warmups, populated preflights, quiet-job windows,
+environment records, reports, CPU/latency tables, exact commands, image inspections,
+source identities, prechecks and audit scripts. All 438 payload hashes were checked,
+and the report reproduced byte-identically. Older results and failed diagnostics
+are preserved separately; removing their generated files from Git does not discard
+their evidence.
+
+After obtaining the archive and restoring its raw result directory, the report can
+be checked without starting servers or rerunning timing. From the repository root,
+set `RESULT` to that restored directory:
 
 ```sh
-RESULT=bench/results/native-linux-b6b82e5-cache-115cabc-20261005-http12-nofile65536
+RESULT=/path/to/restored/result-directory
 python3 bench/validate-results.py check "$RESULT"
 bench/report "$RESULT" > /tmp/campfire-cache-report.md
 cmp "$RESULT/report.md" /tmp/campfire-cache-report.md
 ```
-
-The raw cells, warmups, populated preflights, quiet-job windows, [environment](env.txt),
-[full report](report.md), [HTTP summary](http-summary.csv), [HTTP cells](http-cells.csv)
-and [audit receipt](receipt.json) are retained here unchanged. The complete original
-[evidence archive](evidence.tar.gz) also retains exact commands, image inspections,
-source identities, prechecks, audit scripts and preservation receipts in their
-original paths. Its SHA-256 is
-`317745a9faac3132586108455a188cc63351ea669ae3a085b00005ca288aaa73`.
-All 438 payload hashes were checked; the archived and copied reports reproduce
-byte-identically. Older results and failed diagnostics were preserved separately.
 
 ## Limits of the evidence
 

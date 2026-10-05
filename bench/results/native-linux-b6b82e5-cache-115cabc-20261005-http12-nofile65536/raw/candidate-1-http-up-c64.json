@@ -1,1 +1,0 @@
-{"avg_bytes":88,"conc":64,"errors":0,"gzip":true,"invalid_responses":0,"latency":{"max_ms":81.215,"mean_ms":14.36,"n":53474,"p50_ms":13.279,"p90_ms":24.991,"p99_ms":38.079},"ok":53474,"path":"/up","rps":4450.7,"secs":12.01,"statuses":{"200":53474}}

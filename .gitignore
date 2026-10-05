@@ -13,3 +13,14 @@ __pycache__/
 /bench/.work/
 
 /bench/loadgen/target/
+
+# Keep generated measurements local; commit only the current review summaries.
+/bench/results/*
+!/bench/results/native-linux-b6b82e5-cache-115cabc-20261005-http12-nofile65536/
+/bench/results/native-linux-b6b82e5-cache-115cabc-20261005-http12-nofile65536/*
+!/bench/results/native-linux-b6b82e5-cache-115cabc-20261005-http12-nofile65536/README.md
+!/bench/results/native-linux-b6b82e5-cache-115cabc-20261005-http12-nofile65536/comparison.md
+/parity/checkpoints/*
+!/parity/checkpoints/20261005-statement-cache/
+/parity/checkpoints/20261005-statement-cache/*
+!/parity/checkpoints/20261005-statement-cache/README.md
