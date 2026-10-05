@@ -1,0 +1,413 @@
+parity ledger gate SKIPPED
+date: 2026-10-05T08:08:53+00:00
+host: 7.0.12-linuxkit, , 8 threads, 7GB
+server cpus: 0-3 (nproc 4); loadgen cpus: 4-7; network: host
+env: WEB_CONCURRENCY=3 JOB_CONCURRENCY=3 RAILS_MAX_THREADS=5 
+seed sha256: 58e6bb4498a188b33a52bbb79d82499d96a531f9afb9fc736a801532ddba1817  /Users/lau/oss/once-campfire-rust/parity/.seed/default/db/production.sqlite3
+elixir source digest: a6d19867bfe1c5170d501725c82fe26ee82fdbd02432bedc89ce64f058fdd0ea
+rust extra env: 
+workload: suites=http cable HTTP_SECS=4 HTTP_CONCS=1 16 64 CABLE_CLIENTS=100 500 1000 CABLE_TPUT_SECS=15 CABLE_POSTERS=4 UPLOAD_REPS=5 REPS=3
+request logging (LOG_REQUESTS): false
+parity ledger gate: skipped; runner: bench/docker-desktop
+quiet wait: LOAD_MAX=1.5 LOAD_WAIT_SECS=120
+user agent: (none)
+elixir image: campfire-elixir:further-perf-r2 sha256:9f25d3da2160a42b326141bb8ad730f5158ade580823868cad725babd936da4d 2026-10-05T08:08:41.624360552Z unpacked_bytes=1705209136
+reference image: campfire-elixir:further-perf-otp29 sha256:29396bafc9e0453d884ba117485dc681ea9c978cbe9ee8081c30b121d3b50c01 2026-10-05T07:36:36.967708842Z unpacked_bytes=1705188693
+rust HEAD: 64f8635 (dirty: 0 files)
+[08:09:54] load before run: 1.48 1.77 1.63 (waited 60s)
+[08:09:54] elixir rep 1: starting (load: 1.48 1.77 1.63)
+[08:10:08] elixir rep 1: cold start 3415ms, idle 175MB (anon 140MB)
+[08:10:15] elixir rep 1: room_show c=1 1708.2 rps p50 0.527 p99 1.299 {'200': 6834} err 0
+[08:10:19] elixir rep 1: room_show c=16 4364.8 rps p50 3.277 p99 10.383 {'200': 17536} err 0
+[08:10:23] elixir rep 1: room_show c=64 2910.3 rps p50 19.359 p99 71.167 {'200': 11698} err 0
+[08:10:29] elixir rep 1: messages_page c=1 1751.8 rps p50 0.465 p99 2.067 {'200': 7009} err 0
+[08:10:33] elixir rep 1: messages_page c=16 6455.8 rps p50 2.179 p99 7.091 {'200': 25841} err 0
+[08:10:37] elixir rep 1: messages_page c=64 7259.5 rps p50 8.463 p99 15.175 {'200': 29094} err 0
+[08:10:43] elixir rep 1: sidebar c=1 1809.2 rps p50 0.485 p99 0.945 {'200': 7237} err 0
+[08:10:47] elixir rep 1: sidebar c=16 5387.0 rps p50 2.745 p99 7.283 {'200': 21561} err 0
+[08:10:52] elixir rep 1: sidebar c=64 5347.8 rps p50 11.551 p99 17.455 {'200': 21450} err 0
+[08:10:58] elixir rep 1: search c=1 2310.4 rps p50 0.404 p99 0.849 {'200': 9242} err 0
+[08:11:02] elixir rep 1: search c=16 6109.2 rps p50 2.457 p99 5.847 {'200': 24479} err 0
+[08:11:06] elixir rep 1: search c=64 5636.1 rps p50 11.007 p99 18.063 {'200': 22592} err 0
+[08:11:12] elixir rep 1: avatar c=1 17420.9 rps p50 0.055 p99 0.085 {'200': 69685} err 0
+[08:11:16] elixir rep 1: avatar c=16 120972.3 rps p50 0.114 p99 0.344 {'200': 483980} err 0
+[08:11:20] elixir rep 1: avatar c=64 168209.4 rps p50 0.333 p99 1.143 {'200': 673190} err 0
+[08:11:26] elixir rep 1: static_css c=1 18535.3 rps p50 0.051 p99 0.085 {'200': 74143} err 0
+[08:11:30] elixir rep 1: static_css c=16 135830.6 rps p50 0.102 p99 0.303 {'200': 543398} err 0
+[08:11:34] elixir rep 1: static_css c=64 183706.8 rps p50 0.3 p99 1.068 {'200': 735138} err 0
+[08:11:40] elixir rep 1: up c=1 10546.8 rps p50 0.092 p99 0.132 {'200': 42189} err 0
+[08:11:44] elixir rep 1: up c=16 55907.2 rps p50 0.267 p99 0.683 {'200': 223670} err 0
+[08:11:48] elixir rep 1: up c=64 59603.3 rps p50 1.061 p99 2.237 {'200': 238529} err 0
+[08:11:54] elixir rep 1: post_message c=1 784.7 rps p50 1.029 p99 7.215 {'200': 3139} err 0
+[08:11:58] elixir rep 1: post_message c=16 1955.0 rps p50 6.955 p99 17.023 {'200': 7831} err 0
+[08:12:02] elixir rep 1: post_message c=64 2044.4 rps p50 30.255 p99 43.615 {'200': 8244} err 0
+[08:12:25] elixir rep 1: cable 100 clients ready 100 lat all p50 8.351 p99 13.807 tput 1003.3 msg/s 15053 / 15053
+[08:12:50] elixir rep 1: cable 500 clients ready 500 lat all p50 16.247 p99 20.319 tput 332.1 msg/s 4986 / 4986
+[08:13:15] elixir rep 1: cable 1000 clients ready 1000 lat all p50 19.951 p99 27.151 tput 198.0 msg/s 2975 / 2975
+[08:13:18] elixir rep 1: done -> bench/results/further-perf-round2-macos-m3-20261005/elixir-1.json
+[08:15:18] load before run: 1.31 3.37 2.57 (waited 120s)
+[08:15:18] reference rep 1: starting (load: 1.31 3.37 2.57)
+[08:15:29] reference rep 1: cold start 1071ms, idle 170MB (anon 133MB)
+[08:15:35] reference rep 1: room_show c=1 1363.9 rps p50 0.669 p99 1.277 {'200': 5456} err 0
+[08:15:39] reference rep 1: room_show c=16 4496.7 rps p50 3.321 p99 8.031 {'200': 18000} err 0
+[08:15:43] reference rep 1: room_show c=64 4459.0 rps p50 13.847 p99 20.831 {'200': 17889} err 0
+[08:15:49] reference rep 1: messages_page c=1 972.5 rps p50 1.01 p99 1.345 {'200': 3891} err 0
+[08:15:53] reference rep 1: messages_page c=16 3223.9 rps p50 4.783 p99 9.743 {'200': 12910} err 0
+[08:15:57] reference rep 1: messages_page c=64 3156.5 rps p50 19.887 p99 27.007 {'200': 12686} err 0
+[08:16:04] reference rep 1: sidebar c=1 1238.2 rps p50 0.783 p99 1.186 {'200': 4953} err 0
+[08:16:08] reference rep 1: sidebar c=16 3824.5 rps p50 3.805 p99 9.903 {'200': 15309} err 0
+[08:16:12] reference rep 1: sidebar c=64 3828.7 rps p50 16.183 p99 24.095 {'200': 15361} err 0
+[08:16:18] reference rep 1: search c=1 1314.7 rps p50 0.711 p99 1.255 {'200': 5259} err 0
+[08:16:22] reference rep 1: search c=16 4217.5 rps p50 3.471 p99 8.951 {'200': 16880} err 0
+[08:16:26] reference rep 1: search c=64 4052.8 rps p50 15.127 p99 23.855 {'200': 16250} err 0
+[08:16:32] reference rep 1: avatar c=1 18373.2 rps p50 0.051 p99 0.081 {'200': 73495} err 0
+[08:16:36] reference rep 1: avatar c=16 138530.2 rps p50 0.101 p99 0.299 {'200': 554228} err 0
+[08:16:40] reference rep 1: avatar c=64 173169.8 rps p50 0.326 p99 1.068 {'200': 693005} err 0
+[08:16:46] reference rep 1: static_css c=1 15344.0 rps p50 0.069 p99 0.089 {'200': 61378} err 0
+[08:16:50] reference rep 1: static_css c=16 147588.6 rps p50 0.095 p99 0.279 {'200': 590439} err 0
+[08:16:54] reference rep 1: static_css c=64 194166.3 rps p50 0.287 p99 0.992 {'200': 777040} err 0
+[08:17:00] reference rep 1: up c=1 9748.9 rps p50 0.096 p99 0.145 {'200': 38996} err 0
+[08:17:04] reference rep 1: up c=16 58339.5 rps p50 0.257 p99 0.651 {'200': 233436} err 0
+[08:17:08] reference rep 1: up c=64 60849.1 rps p50 1.017 p99 2.281 {'200': 243504} err 0
+[08:17:14] reference rep 1: post_message c=1 816.6 rps p50 1.014 p99 6.603 {'200': 3267} err 0
+[08:17:18] reference rep 1: post_message c=16 2041.9 rps p50 6.231 p99 17.007 {'200': 8179} err 0
+[08:17:22] reference rep 1: post_message c=64 2064.5 rps p50 29.839 p99 42.719 {'200': 8339} err 0
+[08:17:45] reference rep 1: cable 100 clients ready 100 lat all p50 7.747 p99 14.143 tput 1000.2 msg/s 15007 / 15007
+[08:18:10] reference rep 1: cable 500 clients ready 500 lat all p50 16.447 p99 20.159 tput 355.0 msg/s 5331 / 5331
+[08:18:35] reference rep 1: cable 1000 clients ready 1000 lat all p50 21.295 p99 25.839 tput 196.2 msg/s 2946 / 2946
+[08:18:38] reference rep 1: done -> bench/results/further-perf-round2-macos-m3-20261005/reference-1.json
+[08:20:18] load before run: 1.35 3.83 3.15 (waited 100s)
+[08:20:18] reference rep 2: starting (load: 1.35 3.83 3.15)
+[08:20:29] reference rep 2: cold start 853ms, idle 159MB (anon 126MB)
+[08:20:35] reference rep 2: room_show c=1 1205.4 rps p50 0.672 p99 1.29 {'200': 4822} err 0
+[08:20:39] reference rep 2: room_show c=16 4686.6 rps p50 3.169 p99 8.231 {'200': 18761} err 0
+[08:20:43] reference rep 2: room_show c=64 4589.0 rps p50 13.567 p99 20.223 {'200': 18407} err 0
+[08:20:49] reference rep 2: messages_page c=1 1007.6 rps p50 0.984 p99 1.17 {'200': 4031} err 0
+[08:20:53] reference rep 2: messages_page c=16 3423.4 rps p50 4.515 p99 9.015 {'200': 13706} err 0
+[08:20:57] reference rep 2: messages_page c=64 3360.0 rps p50 18.799 p99 25.967 {'200': 13497} err 0
+[08:21:03] reference rep 2: sidebar c=1 1241.9 rps p50 0.774 p99 1.479 {'200': 4969} err 0
+[08:21:07] reference rep 2: sidebar c=16 4006.5 rps p50 3.675 p99 9.407 {'200': 16042} err 0
+[08:21:11] reference rep 2: sidebar c=64 4074.2 rps p50 15.271 p99 20.911 {'200': 16327} err 0
+[08:21:17] reference rep 2: search c=1 1129.7 rps p50 0.777 p99 1.238 {'200': 4520} err 0
+[08:21:21] reference rep 2: search c=16 4391.9 rps p50 3.333 p99 9.111 {'200': 17580} err 0
+[08:21:25] reference rep 2: search c=64 4345.4 rps p50 14.439 p99 20.463 {'200': 17452} err 0
+[08:21:31] reference rep 2: avatar c=1 18019.5 rps p50 0.052 p99 0.078 {'200': 72080} err 0
+[08:21:35] reference rep 2: avatar c=16 144372.1 rps p50 0.097 p99 0.269 {'200': 577579} err 0
+[08:21:40] reference rep 2: avatar c=64 186513.3 rps p50 0.314 p99 0.923 {'200': 746466} err 0
+[08:21:46] reference rep 2: static_css c=1 14378.4 rps p50 0.072 p99 0.085 {'200': 57515} err 0
+[08:21:50] reference rep 2: static_css c=16 152119.8 rps p50 0.093 p99 0.263 {'200': 608569} err 0
+[08:21:54] reference rep 2: static_css c=64 200232.9 rps p50 0.287 p99 0.895 {'200': 801298} err 0
+[08:22:00] reference rep 2: up c=1 10224.1 rps p50 0.095 p99 0.131 {'200': 40898} err 0
+[08:22:04] reference rep 2: up c=16 60314.0 rps p50 0.257 p99 0.497 {'200': 241291} err 0
+[08:22:08] reference rep 2: up c=64 62930.6 rps p50 1.026 p99 1.812 {'200': 251834} err 0
+[08:22:14] reference rep 2: post_message c=1 854.9 rps p50 0.98 p99 6.415 {'200': 3420} err 0
+[08:22:18] reference rep 2: post_message c=16 2167.3 rps p50 5.827 p99 16.039 {'200': 8680} err 0
+[08:22:22] reference rep 2: post_message c=64 2223.4 rps p50 27.983 p99 38.815 {'200': 8968} err 0
+[08:22:45] reference rep 2: cable 100 clients ready 100 lat all p50 7.911 p99 18.607 tput 1034.2 msg/s 15518 / 15518
+[08:23:10] reference rep 2: cable 500 clients ready 500 lat all p50 14.335 p99 18.799 tput 399.2 msg/s 5993 / 5993
+[08:23:35] reference rep 2: cable 1000 clients ready 1000 lat all p50 19.263 p99 25.199 tput 222.0 msg/s 3333 / 3333
+[08:23:37] reference rep 2: done -> bench/results/further-perf-round2-macos-m3-20261005/reference-2.json
+[08:25:27] load before run: 1.30 4.12 3.66 (waited 110s)
+[08:25:27] elixir rep 2: starting (load: 1.30 4.12 3.66)
+[08:25:38] elixir rep 2: cold start 775ms, idle 158MB (anon 125MB)
+[08:25:45] elixir rep 2: room_show c=1 1653.3 rps p50 0.513 p99 0.844 {'200': 6614} err 0
+[08:25:49] elixir rep 2: room_show c=16 6867.7 rps p50 2.217 p99 5.007 {'200': 27485} err 0
+[08:25:53] elixir rep 2: room_show c=64 6464.4 rps p50 9.687 p99 14.927 {'200': 25936} err 0
+[08:25:59] elixir rep 2: messages_page c=1 2570.0 rps p50 0.382 p99 0.519 {'200': 10281} err 0
+[08:26:03] elixir rep 2: messages_page c=16 8183.7 rps p50 1.859 p99 4.719 {'200': 32771} err 0
+[08:26:07] elixir rep 2: messages_page c=64 8154.3 rps p50 7.687 p99 11.695 {'200': 32669} err 0
+[08:26:13] elixir rep 2: sidebar c=1 2146.4 rps p50 0.456 p99 0.621 {'200': 8586} err 0
+[08:26:17] elixir rep 2: sidebar c=16 5905.6 rps p50 2.517 p99 7.135 {'200': 23636} err 0
+[08:26:21] elixir rep 2: sidebar c=64 5897.6 rps p50 10.423 p99 16.703 {'200': 23639} err 0
+[08:26:27] elixir rep 2: search c=1 2498.6 rps p50 0.392 p99 0.532 {'200': 9995} err 0
+[08:26:31] elixir rep 2: search c=16 6493.7 rps p50 2.333 p99 5.923 {'200': 25987} err 0
+[08:26:35] elixir rep 2: search c=64 6268.3 rps p50 10.023 p99 13.503 {'200': 25116} err 0
+[08:26:41] elixir rep 2: avatar c=1 17782.5 rps p50 0.053 p99 0.08 {'200': 71132} err 0
+[08:26:45] elixir rep 2: avatar c=16 148025.3 rps p50 0.097 p99 0.243 {'200': 592203} err 0
+[08:26:49] elixir rep 2: avatar c=64 184232.4 rps p50 0.317 p99 0.938 {'200': 737272} err 0
+[08:26:55] elixir rep 2: static_css c=1 20176.6 rps p50 0.048 p99 0.075 {'200': 80708} err 0
+[08:26:59] elixir rep 2: static_css c=16 156221.0 rps p50 0.092 p99 0.243 {'200': 624978} err 0
+[08:27:03] elixir rep 2: static_css c=64 203431.1 rps p50 0.293 p99 0.827 {'200': 814128} err 0
+[08:27:09] elixir rep 2: up c=1 10341.6 rps p50 0.094 p99 0.132 {'200': 41367} err 0
+[08:27:13] elixir rep 2: up c=16 60845.5 rps p50 0.255 p99 0.46 {'200': 243413} err 0
+[08:27:17] elixir rep 2: up c=64 64354.4 rps p50 1.015 p99 1.425 {'200': 257535} err 0
+[08:27:23] elixir rep 2: post_message c=1 928.2 rps p50 0.929 p99 6.131 {'200': 3714} err 0
+[08:27:27] elixir rep 2: post_message c=16 2184.8 rps p50 6.031 p99 14.535 {'200': 8759} err 0
+[08:27:31] elixir rep 2: post_message c=64 2092.6 rps p50 29.375 p99 50.271 {'200': 8428} err 0
+[08:27:54] elixir rep 2: cable 100 clients ready 100 lat all p50 9.111 p99 13.831 tput 1101.3 msg/s 16522 / 16522
+[08:28:19] elixir rep 2: cable 500 clients ready 500 lat all p50 15.567 p99 21.215 tput 399.0 msg/s 5989 / 5989
+[08:28:44] elixir rep 2: cable 1000 clients ready 1000 lat all p50 21.839 p99 25.199 tput 221.2 msg/s 3320 / 3320
+[08:28:47] elixir rep 2: done -> bench/results/further-perf-round2-macos-m3-20261005/elixir-2.json
+[08:30:37] load before run: 1.45 4.32 4.05 (waited 110s)
+[08:30:37] elixir rep 3: starting (load: 1.45 4.32 4.05)
+[08:30:48] elixir rep 3: cold start 847ms, idle 170MB (anon 138MB)
+[08:30:54] elixir rep 3: room_show c=1 1761.7 rps p50 0.501 p99 0.864 {'200': 7047} err 0
+[08:30:58] elixir rep 3: room_show c=16 6781.1 rps p50 2.201 p99 6.983 {'200': 27138} err 0
+[08:31:02] elixir rep 3: room_show c=64 6360.5 rps p50 9.823 p99 14.735 {'200': 25494} err 0
+[08:31:08] elixir rep 3: messages_page c=1 2685.7 rps p50 0.365 p99 0.502 {'200': 10743} err 0
+[08:31:12] elixir rep 3: messages_page c=16 8158.0 rps p50 1.859 p99 5.159 {'200': 32658} err 0
+[08:31:16] elixir rep 3: messages_page c=64 8208.1 rps p50 7.635 p99 12.223 {'200': 32890} err 0
+[08:31:22] elixir rep 3: sidebar c=1 2018.7 rps p50 0.464 p99 0.874 {'200': 8075} err 0
+[08:31:26] elixir rep 3: sidebar c=16 6002.3 rps p50 2.495 p99 6.735 {'200': 24022} err 0
+[08:31:31] elixir rep 3: sidebar c=64 5921.0 rps p50 10.383 p99 16.943 {'200': 23736} err 0
+[08:31:37] elixir rep 3: search c=1 2456.9 rps p50 0.394 p99 0.75 {'200': 9828} err 0
+[08:31:41] elixir rep 3: search c=16 6588.5 rps p50 2.275 p99 6.163 {'200': 26366} err 0
+[08:31:45] elixir rep 3: search c=64 6175.1 rps p50 10.167 p99 14.655 {'200': 24728} err 0
+[08:31:51] elixir rep 3: avatar c=1 18508.7 rps p50 0.05 p99 0.079 {'200': 74037} err 0
+[08:31:55] elixir rep 3: avatar c=16 146228.0 rps p50 0.097 p99 0.255 {'200': 585000} err 0
+[08:31:59] elixir rep 3: avatar c=64 193533.6 rps p50 0.305 p99 0.893 {'200': 774484} err 0
+[08:32:05] elixir rep 3: static_css c=1 19928.7 rps p50 0.048 p99 0.075 {'200': 79716} err 0
+[08:32:09] elixir rep 3: static_css c=16 161469.8 rps p50 0.09 p99 0.225 {'200': 645960} err 0
+[08:32:13] elixir rep 3: static_css c=64 198443.3 rps p50 0.293 p99 0.894 {'200': 794158} err 0
+[08:32:19] elixir rep 3: up c=1 8759.1 rps p50 0.115 p99 0.144 {'200': 35037} err 0
+[08:32:23] elixir rep 3: up c=16 62071.0 rps p50 0.251 p99 0.458 {'200': 248319} err 0
+[08:32:27] elixir rep 3: up c=64 63388.9 rps p50 1.001 p99 1.79 {'200': 253666} err 0
+[08:32:33] elixir rep 3: post_message c=1 880.2 rps p50 0.956 p99 6.423 {'200': 3521} err 0
+[08:32:37] elixir rep 3: post_message c=16 2161.8 rps p50 5.811 p99 15.463 {'200': 8657} err 0
+[08:32:41] elixir rep 3: post_message c=64 2193.4 rps p50 28.303 p99 38.719 {'200': 8833} err 0
+[08:33:04] elixir rep 3: cable 100 clients ready 100 lat all p50 8.543 p99 17.967 tput 1094.4 msg/s 16418 / 16418
+[08:33:29] elixir rep 3: cable 500 clients ready 500 lat all p50 16.031 p99 22.655 tput 394.4 msg/s 5920 / 5920
+[08:33:54] elixir rep 3: cable 1000 clients ready 1000 lat all p50 20.623 p99 27.039 tput 218.4 msg/s 3279 / 3279
+[08:33:56] elixir rep 3: done -> bench/results/further-perf-round2-macos-m3-20261005/elixir-3.json
+[08:35:47] load before run: 1.38 4.13 4.21 (waited 110s)
+[08:35:47] reference rep 3: starting (load: 1.38 4.13 4.21)
+[08:35:57] reference rep 3: cold start 837ms, idle 162MB (anon 129MB)
+[08:36:04] reference rep 3: room_show c=1 1335.2 rps p50 0.665 p99 1.283 {'200': 5341} err 0
+[08:36:08] reference rep 3: room_show c=16 4650.1 rps p50 3.143 p99 8.431 {'200': 18608} err 0
+[08:36:12] reference rep 3: room_show c=64 4632.4 rps p50 13.383 p99 20.511 {'200': 18571} err 0
+[08:36:18] reference rep 3: messages_page c=1 954.6 rps p50 0.996 p99 1.388 {'200': 3819} err 0
+[08:36:22] reference rep 3: messages_page c=16 3435.7 rps p50 4.483 p99 8.791 {'200': 13756} err 0
+[08:36:26] reference rep 3: messages_page c=64 3418.8 rps p50 18.575 p99 23.775 {'200': 13728} err 0
+[08:36:32] reference rep 3: sidebar c=1 1281.6 rps p50 0.77 p99 1.012 {'200': 5127} err 0
+[08:36:36] reference rep 3: sidebar c=16 4039.5 rps p50 3.635 p99 9.015 {'200': 16163} err 0
+[08:36:40] reference rep 3: sidebar c=64 4054.8 rps p50 15.399 p99 21.343 {'200': 16256} err 0
+[08:36:46] reference rep 3: search c=1 1099.9 rps p50 1.047 p99 1.198 {'200': 4400} err 0
+[08:36:50] reference rep 3: search c=16 4345.1 rps p50 3.345 p99 9.295 {'200': 17391} err 0
+[08:36:54] reference rep 3: search c=64 4322.2 rps p50 14.415 p99 20.991 {'200': 17340} err 0
+[08:37:00] reference rep 3: avatar c=1 18190.3 rps p50 0.051 p99 0.08 {'200': 72763} err 0
+[08:37:04] reference rep 3: avatar c=16 142580.3 rps p50 0.099 p99 0.27 {'200': 570394} err 0
+[08:37:08] reference rep 3: avatar c=64 187602.2 rps p50 0.314 p99 0.932 {'200': 750765} err 0
+[08:37:14] reference rep 3: static_css c=1 19165.6 rps p50 0.049 p99 0.077 {'200': 76664} err 0
+[08:37:18] reference rep 3: static_css c=16 156040.8 rps p50 0.091 p99 0.247 {'200': 624258} err 0
+[08:37:23] reference rep 3: static_css c=64 201287.9 rps p50 0.285 p99 0.885 {'200': 805538} err 0
+[08:37:29] reference rep 3: up c=1 10114.3 rps p50 0.095 p99 0.134 {'200': 40458} err 0
+[08:37:33] reference rep 3: up c=16 60258.3 rps p50 0.256 p99 0.514 {'200': 241090} err 0
+[08:37:37] reference rep 3: up c=64 61816.0 rps p50 1.061 p99 1.832 {'200': 247399} err 0
+[08:37:43] reference rep 3: post_message c=1 897.6 rps p50 0.96 p99 6.563 {'200': 3591} err 0
+[08:37:47] reference rep 3: post_message c=16 2218.7 rps p50 5.747 p99 14.935 {'200': 8889} err 0
+[08:37:51] reference rep 3: post_message c=64 2220.4 rps p50 28.239 p99 37.215 {'200': 8945} err 0
+[08:38:14] reference rep 3: cable 100 clients ready 100 lat all p50 9.863 p99 21.407 tput 1074.5 msg/s 16125 / 16125
+[08:38:38] reference rep 3: cable 500 clients ready 500 lat all p50 13.439 p99 20.511 tput 402.3 msg/s 6038 / 6038
+[08:39:03] reference rep 3: cable 1000 clients ready 1000 lat all p50 20.911 p99 28.607 tput 214.5 msg/s 3220 / 3220
+[08:39:06] reference rep 3: done -> bench/results/further-perf-round2-macos-m3-20261005/reference-3.json
+```
+date: 2026-10-05T08:08:53+00:00
+host: 7.0.12-linuxkit, , 8 threads, 7GB
+server cpus: 0-3 (nproc 4); loadgen cpus: 4-7; network: host
+env: WEB_CONCURRENCY=3 JOB_CONCURRENCY=3 RAILS_MAX_THREADS=5 
+seed sha256: 58e6bb4498a188b33a52bbb79d82499d96a531f9afb9fc736a801532ddba1817  /Users/lau/oss/once-campfire-rust/parity/.seed/default/db/production.sqlite3
+elixir source digest: a6d19867bfe1c5170d501725c82fe26ee82fdbd02432bedc89ce64f058fdd0ea
+rust extra env: 
+workload: suites=http cable HTTP_SECS=4 HTTP_CONCS=1 16 64 CABLE_CLIENTS=100 500 1000 CABLE_TPUT_SECS=15 CABLE_POSTERS=4 UPLOAD_REPS=5 REPS=3
+request logging (LOG_REQUESTS): false
+parity ledger gate: skipped; runner: bench/docker-desktop
+quiet wait: LOAD_MAX=1.5 LOAD_WAIT_SECS=120
+user agent: (none)
+elixir image: campfire-elixir:further-perf-r2 sha256:9f25d3da2160a42b326141bb8ad730f5158ade580823868cad725babd936da4d 2026-10-05T08:08:41.624360552Z unpacked_bytes=1705209136
+reference image: campfire-elixir:further-perf-otp29 sha256:29396bafc9e0453d884ba117485dc681ea9c978cbe9ee8081c30b121d3b50c01 2026-10-05T07:36:36.967708842Z unpacked_bytes=1705188693
+rust HEAD: 64f8635 (dirty: 0 files)
+```
+
+Reps: reference 3, elixir 3. Cells: median [min–max].
+
+### Startup and memory
+
+| Metric | Rails | Elixir | Rust advantage over Elixir |
+|---|---|---|---|
+| cold start: docker run → /up 200 (ms) | 853 [837–1,071] | 847 [775–3,415] | – |
+| idle memory.current (MiB) | 162 [159–170] | 170 [158–175] | – |
+| idle anon (MiB) | 129 [126–133] | 138 [125–140] | – |
+| peak memory.current under load (MiB) | 420 [400–432] | 409 [399–436] | – |
+| peak anon under load (MiB) | 336 [312–356] | 329 [327–358] | – |
+
+### HTTP (signed in as david; keep-alive; c = concurrent connections)
+
+| Metric | Rails | Elixir | Rust advantage over Elixir |
+|---|---|---|---|
+| room_show c=1 req/s | 1,335 [1,205–1,364] | 1,708 [1,653–1,762] | – |
+| room_show c=1 p50 ms | 0.67 [0.67–0.67] | 0.51 [0.50–0.53] | – |
+| room_show c=1 p99 ms | 1.28 [1.28–1.29] | 0.86 [0.84–1.30] | – |
+| room_show c=1 CPU µs/success | 1,193 [1,193–1,243] | 930 [912–962] | – |
+| room_show c=16 req/s | 4,650 [4,497–4,687] | 6,781 [4,365–6,868] | – |
+| room_show c=16 p50 ms | 3.17 [3.14–3.32] | 2.22 [2.20–3.28] | – |
+| room_show c=16 p99 ms | 8.23 [8.03–8.43] | 6.98 [5.01–10.38] | – |
+| room_show c=16 CPU µs/success | 811 [806–844] | 564 [560–853] | – |
+| room_show c=64 req/s | 4,589 [4,459–4,632] | 6,360 [2,910–6,464] | – |
+| room_show c=64 p50 ms | 13.6 [13.4–13.8] | 9.82 [9.69–19.36] | – |
+| room_show c=64 p99 ms | 20.5 [20.2–20.8] | 14.9 [14.7–71.2] | – |
+| room_show c=64 CPU µs/success | 830 [821–856] | 598 [592–1,228] | – |
+| messages_page c=1 req/s | 972 [955–1,008] | 2,570 [1,752–2,686] | – |
+| messages_page c=1 p50 ms | 1.00 [0.98–1.01] | 0.38 [0.36–0.47] | – |
+| messages_page c=1 p99 ms | 1.34 [1.17–1.39] | 0.52 [0.50–2.07] | – |
+| messages_page c=1 CPU µs/success | 1,311 [1,276–1,341] | 652 [635–861] | – |
+| messages_page c=16 req/s | 3,423 [3,224–3,436] | 8,158 [6,456–8,184] | – |
+| messages_page c=16 p50 ms | 4.51 [4.48–4.78] | 1.86 [1.86–2.18] | – |
+| messages_page c=16 p99 ms | 9.02 [8.79–9.74] | 5.16 [4.72–7.09] | – |
+| messages_page c=16 CPU µs/success | 1,063 [1,060–1,112] | 465 [465–576] | – |
+| messages_page c=64 req/s | 3,360 [3,156–3,419] | 8,154 [7,260–8,208] | – |
+| messages_page c=64 p50 ms | 18.8 [18.6–19.9] | 7.69 [7.63–8.46] | – |
+| messages_page c=64 p99 ms | 26.0 [23.8–27.0] | 12.2 [11.7–15.2] | – |
+| messages_page c=64 CPU µs/success | 1,082 [1,081–1,139] | 470 [466–524] | – |
+| sidebar c=1 req/s | 1,242 [1,238–1,282] | 2,019 [1,809–2,146] | – |
+| sidebar c=1 p50 ms | 0.77 [0.77–0.78] | 0.46 [0.46–0.48] | – |
+| sidebar c=1 p99 ms | 1.19 [1.01–1.48] | 0.87 [0.62–0.94] | – |
+| sidebar c=1 CPU µs/success | 1,514 [1,495–1,531] | 886 [867–906] | – |
+| sidebar c=16 req/s | 4,006 [3,824–4,040] | 5,906 [5,387–6,002] | – |
+| sidebar c=16 p50 ms | 3.67 [3.63–3.81] | 2.52 [2.50–2.75] | – |
+| sidebar c=16 p99 ms | 9.41 [9.02–9.90] | 7.13 [6.74–7.28] | – |
+| sidebar c=16 CPU µs/success | 946 [940–989] | 636 [628–693] | – |
+| sidebar c=64 req/s | 4,055 [3,829–4,074] | 5,898 [5,348–5,921] | – |
+| sidebar c=64 p50 ms | 15.4 [15.3–16.2] | 10.4 [10.4–11.6] | – |
+| sidebar c=64 p99 ms | 21.3 [20.9–24.1] | 16.9 [16.7–17.5] | – |
+| sidebar c=64 CPU µs/success | 954 [948–1,004] | 643 [638–703] | – |
+| search c=1 req/s | 1,130 [1,100–1,315] | 2,457 [2,310–2,499] | – |
+| search c=1 p50 ms | 0.78 [0.71–1.05] | 0.39 [0.39–0.40] | – |
+| search c=1 p99 ms | 1.24 [1.20–1.25] | 0.75 [0.53–0.85] | – |
+| search c=1 CPU µs/success | 1,250 [1,199–1,264] | 785 [773–801] | – |
+| search c=16 req/s | 4,345 [4,218–4,392] | 6,494 [6,109–6,588] | – |
+| search c=16 p50 ms | 3.35 [3.33–3.47] | 2.33 [2.27–2.46] | – |
+| search c=16 p99 ms | 9.11 [8.95–9.29] | 5.92 [5.85–6.16] | – |
+| search c=16 CPU µs/success | 852 [844–880] | 584 [576–619] | – |
+| search c=64 req/s | 4,322 [4,053–4,345] | 6,175 [5,636–6,268] | – |
+| search c=64 p50 ms | 14.4 [14.4–15.1] | 10.2 [10.0–11.0] | – |
+| search c=64 p99 ms | 21.0 [20.5–23.9] | 14.7 [13.5–18.1] | – |
+| search c=64 CPU µs/success | 866 [862–918] | 615 [608–669] | – |
+| avatar c=1 req/s | 18,190 [18,020–18,373] | 17,782 [17,421–18,509] | – |
+| avatar c=1 p50 ms | 0.05 [0.05–0.05] | 0.05 [0.05–0.06] | – |
+| avatar c=1 p99 ms | 0.08 [0.08–0.08] | 0.08 [0.08–0.09] | – |
+| avatar c=1 CPU µs/success | 57.4 [56.0–57.4] | 58.9 [55.0–59.5] | – |
+| avatar c=16 req/s | 142,580 [138,530–144,372] | 146,228 [120,972–148,025] | – |
+| avatar c=16 p50 ms | 0.10 [0.10–0.10] | 0.10 [0.10–0.11] | – |
+| avatar c=16 p99 ms | 0.27 [0.27–0.30] | 0.26 [0.24–0.34] | – |
+| avatar c=16 CPU µs/success | 24.8 [24.6–25.4] | 24.3 [24.3–26.8] | – |
+| avatar c=64 req/s | 186,513 [173,170–187,602] | 184,232 [168,209–193,534] | – |
+| avatar c=64 p50 ms | 0.31 [0.31–0.33] | 0.32 [0.30–0.33] | – |
+| avatar c=64 p99 ms | 0.93 [0.92–1.07] | 0.94 [0.89–1.14] | – |
+| avatar c=64 CPU µs/success | 21.3 [21.2–22.9] | 21.5 [20.6–23.2] | – |
+| static_css c=1 req/s | 15,344 [14,378–19,166] | 19,929 [18,535–20,177] | – |
+| static_css c=1 p50 ms | 0.07 [0.05–0.07] | 0.05 [0.05–0.05] | – |
+| static_css c=1 p99 ms | 0.09 [0.08–0.09] | 0.07 [0.07–0.09] | – |
+| static_css c=1 CPU µs/success | 49.8 [46.4–53.6] | 54.1 [53.4–56.0] | – |
+| static_css c=16 req/s | 152,120 [147,589–156,041] | 156,221 [135,831–161,470] | – |
+| static_css c=16 p50 ms | 0.09 [0.09–0.10] | 0.09 [0.09–0.10] | – |
+| static_css c=16 p99 ms | 0.26 [0.25–0.28] | 0.24 [0.23–0.30] | – |
+| static_css c=16 CPU µs/success | 23.6 [23.2–23.9] | 23.2 [23.1–24.6] | – |
+| static_css c=64 req/s | 200,233 [194,166–201,288] | 198,443 [183,707–203,431] | – |
+| static_css c=64 p50 ms | 0.29 [0.28–0.29] | 0.29 [0.29–0.30] | – |
+| static_css c=64 p99 ms | 0.90 [0.89–0.99] | 0.89 [0.83–1.07] | – |
+| static_css c=64 CPU µs/success | 19.9 [19.7–20.4] | 19.9 [19.6–21.5] | – |
+| up c=1 req/s | 10,114 [9,749–10,224] | 10,342 [8,759–10,547] | – |
+| up c=1 p50 ms | 0.10 [0.10–0.10] | 0.09 [0.09–0.12] | – |
+| up c=1 p99 ms | 0.13 [0.13–0.14] | 0.13 [0.13–0.14] | – |
+| up c=1 CPU µs/success | 101 [101–101] | 98.7 [96.8–100.5] | – |
+| up c=16 req/s | 60,258 [58,340–60,314] | 60,846 [55,907–62,071] | – |
+| up c=16 p50 ms | 0.26 [0.26–0.26] | 0.26 [0.25–0.27] | – |
+| up c=16 p99 ms | 0.51 [0.50–0.65] | 0.46 [0.46–0.68] | – |
+| up c=16 CPU µs/success | 65.8 [65.5–67.2] | 65.3 [64.2–70.3] | – |
+| up c=64 req/s | 61,816 [60,849–62,931] | 63,389 [59,603–64,354] | – |
+| up c=64 p50 ms | 1.03 [1.02–1.06] | 1.01 [1.00–1.06] | – |
+| up c=64 p99 ms | 1.83 [1.81–2.28] | 1.79 [1.43–2.24] | – |
+| up c=64 CPU µs/success | 64.5 [63.4–65.6] | 62.9 [62.0–66.8] | – |
+| post_message c=1 req/s | 855 [817–898] | 880 [785–928] | – |
+| post_message c=1 p50 ms | 0.98 [0.96–1.01] | 0.96 [0.93–1.03] | – |
+| post_message c=1 p99 ms | 6.56 [6.42–6.60] | 6.42 [6.13–7.21] | – |
+| post_message c=1 CPU µs/success | 2,805 [2,728–2,885] | 2,779 [2,680–2,967] | – |
+| post_message c=16 req/s | 2,167 [2,042–2,219] | 2,162 [1,955–2,185] | – |
+| post_message c=16 p50 ms | 5.83 [5.75–6.23] | 6.03 [5.81–6.96] | – |
+| post_message c=16 p99 ms | 16.0 [14.9–17.0] | 15.5 [14.5–17.0] | – |
+| post_message c=16 CPU µs/success | 1,669 [1,633–1,769] | 1,680 [1,667–1,911] | – |
+| post_message c=64 req/s | 2,220 [2,064–2,223] | 2,093 [2,044–2,193] | – |
+| post_message c=64 p50 ms | 28.2 [28.0–29.8] | 29.4 [28.3–30.3] | – |
+| post_message c=64 p99 ms | 38.8 [37.2–42.7] | 43.6 [38.7–50.3] | – |
+| post_message c=64 CPU µs/success | 1,644 [1,641–1,771] | 1,725 [1,632–1,783] | – |
+
+### HTTP errors / non-2xx-3xx (first rep, per app)
+
+| Metric | Rails | Elixir | Rust advantage over Elixir |
+|---|---|---|---|
+- reference: none
+- elixir: none
+
+### Action Cable fan-out (one room; chatter.js subscriptions per client)
+
+| Metric | Rails | Elixir | Rust advantage over Elixir |
+|---|---|---|---|
+| 100 clients: subscribed | 100 [100–100] | 100 [100–100] | – |
+| 100 clients: connect+subscribe all (s) | 0.06 [0.06–0.07] | 0.06 [0.06–0.07] | – |
+| 100 clients: paced post→one client p50 ms | 7.55 [7.29–9.41] | 8.30 [8.10–8.70] | – |
+| 100 clients: paced post→all clients p50 ms | 7.91 [7.75–9.86] | 8.54 [8.35–9.11] | – |
+| 100 clients: paced post→all clients p99 ms | 18.6 [14.1–21.4] | 13.8 [13.8–18.0] | – |
+| 100 clients: max sustained msgs/s (delivered to all) | 1,034 [1,000–1,074] | 1,094 [1,003–1,101] | – |
+| 100 clients: deliveries/s (client×message) | 103,425 [100,016–107,452] | 109,435 [100,330–110,130] | – |
+| 100 clients: saturated post→all p50 ms | 3.20 [3.05–3.28] | 2.97 [2.96–3.26] | – |
+| 100 clients: saturated POST p50 ms | 3.17 [3.05–3.27] | 2.95 [2.95–3.26] | – |
+| 500 clients: subscribed | 500 [500–500] | 500 [500–500] | – |
+| 500 clients: connect+subscribe all (s) | 0.14 [0.13–0.14] | 0.16 [0.14–0.19] | – |
+| 500 clients: paced post→one client p50 ms | 12.6 [12.1–14.1] | 13.7 [13.7–14.1] | – |
+| 500 clients: paced post→all clients p50 ms | 14.3 [13.4–16.4] | 16.0 [15.6–16.2] | – |
+| 500 clients: paced post→all clients p99 ms | 20.2 [18.8–20.5] | 21.2 [20.3–22.7] | – |
+| 500 clients: max sustained msgs/s (delivered to all) | 399 [355–402] | 394 [332–399] | – |
+| 500 clients: deliveries/s (client×message) | 199,617 [177,507–201,161] | 197,223 [166,031–199,499] | – |
+| 500 clients: saturated post→all p50 ms | 10.1 [10.1–11.3] | 10.2 [10.2–11.6] | – |
+| 500 clients: saturated POST p50 ms | 9.62 [9.54–10.78] | 9.70 [9.63–11.17] | – |
+| 1000 clients: subscribed | 1,000 [1,000–1,000] | 1,000 [1,000–1,000] | – |
+| 1000 clients: connect+subscribe all (s) | 0.27 [0.27–0.27] | 0.28 [0.27–0.35] | – |
+| 1000 clients: paced post→one client p50 ms | 18.4 [16.9–18.7] | 17.3 [17.3–18.0] | – |
+| 1000 clients: paced post→all clients p50 ms | 20.9 [19.3–21.3] | 20.6 [20.0–21.8] | – |
+| 1000 clients: paced post→all clients p99 ms | 25.8 [25.2–28.6] | 27.0 [25.2–27.2] | – |
+| 1000 clients: max sustained msgs/s (delivered to all) | 214 [196–222] | 218 [198–221] | – |
+| 1000 clients: deliveries/s (client×message) | 214,466 [196,199–221,982] | 218,360 [198,030–221,159] | – |
+| 1000 clients: saturated post→all p50 ms | 19.0 [18.4–20.4] | 18.7 [18.7–20.4] | – |
+| 1000 clients: saturated POST p50 ms | 18.2 [17.6–19.8] | 18.0 [17.8–19.7] | – |
+
+### Upload + thumbnail (black_hole.jpg, 505 KB)
+
+| Metric | Rails | Elixir | Rust advantage over Elixir |
+|---|---|---|---|
+| POST with attachment (ms) | – | – | – |
+| then GET thumb → 200 (ms) | – | – | – |
+| POST → thumbnail served (ms) | – | – | – |
+
+### Memory during cable fan-out, by process (MiB, peak within the phase)
+
+App process: Elixir BEAM; Rails Puma master/workers when included;
+Go/Rust's integrated campfire processes. Serving totals include native helpers, Redis and Thruster.
+PSS apportions shared pages; RssAnon counts them in each process.
+
+| Metric | Rails | Elixir | Rust advantage over Elixir |
+|---|---|---|---|
+| 100 clients, all subscribed, idle: app process Pss | – | 280 [264–281] | – |
+| 100 clients, all subscribed, idle: app process RssAnon | – | 240 [224–241] | – |
+| 100 clients, all subscribed, idle: serving processes Pss | 0.00 [0.00–0.00] | 280 [264–281] | – |
+| 100 clients, all subscribed, idle: whole container Pss | 268 [266–280] | 281 [265–282] | – |
+| 100 clients, saturated fan-out: app process Pss | – | 287 [281–293] | – |
+| 100 clients, saturated fan-out: app process RssAnon | – | 247 [241–253] | – |
+| 100 clients, saturated fan-out: serving processes Pss | 0.00 [0.00–0.00] | 287 [281–293] | – |
+| 100 clients, saturated fan-out: whole container Pss | 276 [274–289] | 288 [282–294] | – |
+| 500 clients, all subscribed, idle: app process Pss | – | 285 [273–289] | – |
+| 500 clients, all subscribed, idle: app process RssAnon | – | 244 [233–249] | – |
+| 500 clients, all subscribed, idle: serving processes Pss | 0.00 [0.00–0.00] | 285 [273–289] | – |
+| 500 clients, all subscribed, idle: whole container Pss | 270 [267–284] | 286 [274–290] | – |
+| 500 clients, saturated fan-out: app process Pss | – | 329 [315–334] | – |
+| 500 clients, saturated fan-out: app process RssAnon | – | 288 [275–294] | – |
+| 500 clients, saturated fan-out: serving processes Pss | 0.00 [0.00–0.00] | 329 [315–334] | – |
+| 500 clients, saturated fan-out: whole container Pss | 330 [324–337] | 330 [316–335] | – |
+| 1000 clients, all subscribed, idle: app process Pss | – | 344 [302–360] | – |
+| 1000 clients, all subscribed, idle: app process RssAnon | – | 304 [262–319] | – |
+| 1000 clients, all subscribed, idle: serving processes Pss | 0.00 [0.00–0.00] | 344 [302–360] | – |
+| 1000 clients, all subscribed, idle: whole container Pss | 313 [280–325] | 345 [303–361] | – |
+| 1000 clients, saturated fan-out: app process Pss | – | 370 [366–399] | – |
+| 1000 clients, saturated fan-out: app process RssAnon | – | 330 [326–358] | – |
+| 1000 clients, saturated fan-out: serving processes Pss | 0.00 [0.00–0.00] | 370 [366–399] | – |
+| 1000 clients, saturated fan-out: whole container Pss | 378 [353–398] | 371 [367–400] | – |
+EXIT 0
