@@ -81,7 +81,8 @@ defmodule Campfire.FragmentCache do
         html = render.()
         size = byte_size(html)
 
-        if :ets.update_counter(@table, :bytes, size) > @max_bytes do
+        # The default covers a concurrent wipe, which briefly removes the counter.
+        if :ets.update_counter(@table, :bytes, size, {:bytes, 0}) > @max_bytes do
           :ets.delete_all_objects(@table)
           :ets.insert(@table, {:bytes, size})
         end
