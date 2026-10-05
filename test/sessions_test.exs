@@ -195,6 +195,32 @@ defmodule Campfire.SessionsTest do
     assert Rails.verify_cookie("session_token", URI.decode(value)) == session["token"]
   end
 
+  test "a room page renders the same bytes and ETag twice and revalidates with 304" do
+    user = DB.one("SELECT * FROM users WHERE id=127326141")
+    raw = (conn(:get, "/") |> Auth.start_session(user)).resp_cookies["session_token"][:value]
+
+    get = fn headers ->
+      Enum.reduce(headers, conn(:get, "/rooms/486777696"), fn {name, value}, conn ->
+        put_req_header(conn, name, value)
+      end)
+      |> put_req_cookie("session_token", raw)
+      |> put_req_header("accept-encoding", "gzip")
+      |> Router.call(Router.init([]))
+    end
+
+    first = get.([])
+    second = get.([])
+    assert first.status == 200
+    assert :zlib.gunzip(IO.iodata_to_binary(first.resp_body)) =~ "message__body"
+
+    assert :zlib.gunzip(IO.iodata_to_binary(first.resp_body)) ==
+             :zlib.gunzip(IO.iodata_to_binary(second.resp_body))
+
+    [etag] = Plug.Conn.get_resp_header(first, "etag")
+    assert Plug.Conn.get_resp_header(second, "etag") == [etag]
+    assert get.([{"if-none-match", etag}]).status == 304
+  end
+
   test "login rate limit rejects the eleventh same-origin attempt" do
     for _ <- 1..10,
         do:

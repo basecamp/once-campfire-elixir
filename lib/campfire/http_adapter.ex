@@ -1,22 +1,15 @@
 defmodule Campfire.HttpAdapter do
   @moduledoc """
-  Bandit transport adapter preserving Rack's streaming gzip headers, with the front
-  server's response handling (`Campfire.Front`) applied to everything sent.
+  Bandit transport adapter with the front server's response handling (`Campfire.Front`)
+  applied to everything sent. Gzipped files stream in Rack's chunked framing; a gzipped
+  body that is already complete is sent with its length in one write (Rack and Thruster
+  chunked it, a known difference).
   """
   @behaviour Plug.Conn.Adapter
 
   def send_resp(adapter, status, headers, body) do
-    {status, headers, body, front_compressed} = Campfire.Front.respond(status, headers, body)
-
-    if not front_compressed and
-         List.keyfind(headers, "content-encoding", 0) == {"content-encoding", "gzip"} do
-      {:ok, _, adapter} = Bandit.Adapter.send_chunked(adapter, status, headers)
-      {:ok, _, adapter} = Bandit.Adapter.chunk(adapter, body)
-      {:ok, _, adapter} = Bandit.Adapter.chunk(adapter, "")
-      {:ok, nil, adapter}
-    else
-      Bandit.Adapter.send_resp(adapter, status, headers, body)
-    end
+    {status, headers, body, _} = Campfire.Front.respond(status, headers, body)
+    Bandit.Adapter.send_resp(adapter, status, headers, body)
   end
 
   def send_file(adapter, status, headers, path, offset, length) do

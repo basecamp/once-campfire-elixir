@@ -155,7 +155,9 @@ defmodule Campfire.HttpResponse do
          (is_binary(conn.resp_body) || is_list(conn.resp_body)) &&
          IO.iodata_length(conn.resp_body) > 0 do
       digest =
-        :crypto.hash(:sha256, conn.resp_body) |> Base.encode16(case: :lower) |> binary_part(0, 32)
+        :crypto.hash(:sha256, digested(conn))
+        |> Base.encode16(case: :lower)
+        |> binary_part(0, 32)
 
       conn = put_resp_header(conn, "etag", ~s(W/"#{digest}"))
 
@@ -166,6 +168,21 @@ defmodule Campfire.HttpResponse do
       conn
     end
   end
+
+  # Rack::ETag digests the whole body. A page spliced from cached message fragments (about
+  # 450 KB for a room) is digested from its per-request text and each fragment's digest, which
+  # is computed once and kept with the fragment: just as exact, without rehashing the messages.
+  defp digested(%{assigns: %{page_parts: parts}}) do
+    Enum.map(parts, fn
+      {:raw, data} ->
+        data
+
+      {:fragment, key, version, html} ->
+        Campfire.FragmentCache.derived(key, version, html, :digest, &:crypto.hash(:sha256, &1))
+    end)
+  end
+
+  defp digested(conn), do: conn.resp_body
 
   defp fresh?(conn) do
     case get_req_header(conn, "if-none-match") do
