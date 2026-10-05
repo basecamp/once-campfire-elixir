@@ -17,9 +17,10 @@ defmodule Campfire.Sidebar do
       {conn, data} = Auth.csrf_session(conn)
 
       rows =
-        DB.query(
+        DB.cached(
           "SELECT r.*,m.unread_at FROM rooms r JOIN memberships m ON m.room_id=r.id WHERE m.user_id=? AND m.involvement!='invisible' ORDER BY LOWER(r.name)",
-          [user["id"]]
+          [user["id"]],
+          ~w(rooms memberships)
         )
 
       {directs, others} = Enum.split_with(rows, &(&1["type"] == "Rooms::Direct"))
@@ -28,9 +29,10 @@ defmodule Campfire.Sidebar do
       # index_memberships_on_room_id_and_user_id order: they are excluded from the
       # placeholders, and each listed direct room shows its members.
       direct_members =
-        DB.query(
+        DB.cached(
           ~s{SELECT m.room_id AS "sidebar.room_id", u.* FROM memberships m JOIN users u ON u.id=m.user_id WHERE m.room_id IN (SELECT r.id FROM rooms r JOIN memberships mm ON mm.room_id=r.id WHERE mm.user_id=? AND r.type='Rooms::Direct') ORDER BY m.room_id, m.user_id},
-          [user["id"]]
+          [user["id"]],
+          ~w(memberships users rooms)
         )
         |> Enum.group_by(& &1["sidebar.room_id"], &Map.delete(&1, "sidebar.room_id"))
 
@@ -42,7 +44,7 @@ defmodule Campfire.Sidebar do
         |> then(&Enum.uniq([user["id"] | &1]))
 
       users =
-        DB.query("SELECT * FROM users WHERE status=0 ORDER BY created_at")
+        DB.cached("SELECT * FROM users WHERE status=0 ORDER BY created_at", [], ~w(users))
         |> Enum.reject(&(&1["id"] in excludes))
         |> Enum.take(max(20 - length(excludes), 0))
 

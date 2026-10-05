@@ -10,7 +10,13 @@ defmodule Campfire.Page do
   """
 
   @doc "The account row for a page; pass it as `account:` to `render/4` to avoid a second query."
-  def account, do: DB.one(@account_sql)
+  def account,
+    do:
+      DB.cached_one(
+        @account_sql,
+        [],
+        ~w(accounts active_storage_attachments active_storage_blobs rooms)
+      )
 
   def render(conn, user, data, assigns) do
     {account, assigns} = Keyword.pop_lazy(assigns, :account, &account/0)

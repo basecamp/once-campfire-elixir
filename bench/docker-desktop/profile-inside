@@ -34,7 +34,15 @@ case $ROUTE in
 esac
 rpc() { docker exec "$NAME" /campfire/bin/campfire rpc "$1"; }
 if [ "$ROUTE" != cable ]; then lg http --base "$B" --cookie "$COOKIE" --conc 16 --duration 3 "${ARGS[@]}" >/dev/null; fi
-rpc 'Path.wildcard("/usr/local/lib/erlang/lib/tools-*/ebin") |> Enum.each(fn p -> :code.add_patha(String.to_charlist(p)); :code.load_abs(String.to_charlist(Path.join(p, "eprof"))) end); :eprof.start(); :eprof.start_profiling(:erlang.processes())' >/dev/null
+# PROFILER=tprof aggregates call time over every process, including short-lived job tasks, for
+# which eprof's analysis comes back empty.
+PROFILER=${PROFILER:-eprof}
+LOAD='Path.wildcard("/usr/local/lib/erlang/lib/tools-*/ebin") |> Enum.each(fn p -> :code.add_patha(String.to_charlist(p)); for m <- ~w(eprof tprof), do: :code.load_abs(String.to_charlist(Path.join(p, m))) end)'
+if [ "$PROFILER" = tprof ]; then
+  rpc "$LOAD; :tprof.start(%{type: :call_time}); :tprof.set_pattern(:_, :_, :_); :tprof.enable_trace(:all)" >/dev/null
+else
+  rpc "$LOAD; :eprof.start(); :eprof.start_profiling(:erlang.processes())" >/dev/null
+fi
 if [ "$ROUTE" = cable ]; then
   SAMPLE=$(lg cable --base "$B" --cookie "$COOKIE" --room "$ROOM" --csrf "$CSRF" --streams "$(echo "$SCRAPE" | field streams)" \
     --clients 1000 --latency-msgs 3 --tput-secs "$SECS" --posters 4)
@@ -45,6 +53,11 @@ fi
   echo "image: $IMAGE $(docker image inspect -f '{{.Id}}' "$IMAGE")"
   echo "route: $ROUTE secs: $SECS"
   echo "load: $SAMPLE" | cut -c1-400
-  rpc ':eprof.stop_profiling(); :erlang.group_leader(Process.group_leader(), Process.whereis(:eprof)); :eprof.analyze(:total, sort: :time); :eprof.stop()'
+  echo "profiler: $PROFILER"
+  if [ "$PROFILER" = tprof ]; then
+    rpc ':tprof.disable_trace(:all); sample = :tprof.collect(); :tprof.format(:tprof.inspect(sample, :total, :measurement)); :tprof.stop()'
+  else
+    rpc ':eprof.stop_profiling(); :erlang.group_leader(Process.group_leader(), Process.whereis(:eprof)); :eprof.analyze(:total, sort: :time); :eprof.stop()'
+  fi
 } > "$OUT"
 echo "$OUT"

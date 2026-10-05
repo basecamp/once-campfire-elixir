@@ -5,7 +5,8 @@
 #   bench/docker-desktop/profile IMAGE ROUTE [SECS]
 #
 # ROUTE is room_show, messages_page, sidebar, search, post_message, up or cable. The output goes
-# to bench/results/$PROFILE_DIR/ROUTE.txt (PROFILE_DIR defaults to profile-macos). The app runs on vCPUs 0-3 and the load generator on
+# to bench/results/$PROFILE_DIR/ROUTE.txt (PROFILE_DIR defaults to profile-macos;
+# PROFILER=tprof aggregates over short-lived processes too). The app runs on vCPUs 0-3 and the load generator on
 # 4-7, with the populated seed from the sibling once-campfire-rust checkout.
 set -eu
 ROOT=$(CDPATH= cd -- "$(dirname "$0")/../.." && pwd)
@@ -15,5 +16,5 @@ docker volume inspect campfire-bench-work >/dev/null 2>&1 || docker volume creat
 mkdir -p "$ROOT/bench/results/${PROFILE_DIR:-profile-macos}"
 exec docker run --rm -i --privileged --network host --pid host \
   -v campfire-bench-work:/work -v /var/run/docker.sock:/var/run/docker.sock -v "$PARENT:$PARENT" \
-  -e RUST_ROOT="${RUST_ROOT:-$PARENT/once-campfire-rust}" -e PROFILE_DIR="${PROFILE_DIR:-profile-macos}" -w "$ROOT" campfire-bench-runner \
+  -e RUST_ROOT="${RUST_ROOT:-$PARENT/once-campfire-rust}" -e PROFILE_DIR="${PROFILE_DIR:-profile-macos}" -e PROFILER="${PROFILER:-eprof}" -w "$ROOT" campfire-bench-runner \
   bash "$ROOT/bench/docker-desktop/profile-inside" "$@"

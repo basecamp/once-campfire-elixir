@@ -7,12 +7,18 @@ defmodule Campfire.DB do
   writes stay serialized exactly as with Rails' one-writer SQLite setup.
   Connections are checked out into the calling process and keep a bounded
   cache of prepared statements.
+
+  `cached/3` keeps a read's rows until a table it reads is written. Every write bumps its
+  table's generation after it commits, so a result is only ever stored under generations at
+  least as old as any write it missed. Commits by other processes (another SQLite client) are
+  seen through the WAL index's change counter, and invalidate everything.
   """
   use Supervisor
   alias Exqlite.Sqlite3, as: SQL
 
   @writer Campfire.DB.Writer
   @readers Campfire.DB.Readers
+  @generations Campfire.DB.Generations
 
   def start_link(opts), do: Supervisor.start_link(__MODULE__, opts, name: __MODULE__)
 
@@ -20,6 +26,16 @@ defmodule Campfire.DB do
   def init(opts) do
     path = Keyword.fetch!(opts, :path)
     readers = Keyword.get(opts, :readers, System.schedulers_online())
+
+    :ets.new(@generations, [
+      :named_table,
+      :public,
+      :set,
+      read_concurrency: true,
+      write_concurrency: true
+    ])
+
+    :persistent_term.put({__MODULE__, :wal_index}, path <> "-shm")
 
     children = [
       Supervisor.child_spec(
@@ -47,23 +63,125 @@ defmodule Campfire.DB do
       end
     end
 
-    checkout(if(read?(sql), do: @readers, else: @writer), 5_000, run_safely)
+    if read?(sql) do
+      checkout(@readers, 5_000, run_safely)
+    else
+      checkout(@writer, 5_000, fn conn ->
+        result = run_safely.(conn)
+        written([written_table(sql)])
+        result
+      end)
+    end
   end
 
   def one(sql, params \\ []), do: List.first(query(sql, params))
+
+  @doc """
+  `query/2` for a read whose rows are kept until one of `tables` (every table it reads) is
+  written, here or by another SQLite client.
+  """
+  def cached(sql, params, tables) do
+    key = {:query, sql, params, generations(tables)}
+
+    case Campfire.FragmentCache.memo(key, &(:erlang.external_size(&1) + 64), fn ->
+           case query(sql, params) do
+             rows when is_list(rows) -> {:rows, rows}
+             _ -> nil
+           end
+         end) do
+      {:rows, rows} -> rows
+      nil -> query(sql, params)
+    end
+  end
+
+  def cached_one(sql, params, tables), do: List.first(cached(sql, params, tables))
+
+  defp generations(tables) do
+    outside_commits()
+    [generation(:all) | Enum.map(tables, &generation/1)]
+  end
+
+  defp generation(table), do: :ets.lookup_element(@generations, table, 2, 0)
+
+  # Bumps the written tables after their commit; `:all` invalidates every cached read.
+  defp written(tables) do
+    for table <- Enum.uniq(tables), do: :ets.update_counter(@generations, table, 1, {table, 0})
+    :ets.insert(@generations, {:wal, wal_state()})
+  end
+
+  @doc false
+  def invalidate_all, do: written([:all])
+
+  # Every commit, by any client, changes the WAL index header (its transaction counter iChange
+  # and mxFrame), which a raw read sees as SQLite maps the same pages. Checked once per request
+  # (Campfire.HttpResponse clears the marker) and on every lookup outside one.
+  defp outside_commits do
+    unless Process.get(:campfire_db_checked) do
+      if Process.get(:campfire_request), do: Process.put(:campfire_db_checked, true)
+      state = wal_state()
+
+      case :ets.lookup(@generations, :wal) do
+        [{:wal, ^state}] -> :ok
+        # The first observation is the baseline: nothing was cached before it.
+        [] -> :ets.insert_new(@generations, {:wal, state})
+        _ -> written([:all])
+      end
+    end
+  end
+
+  defp wal_state do
+    with path when is_binary(path) <- :persistent_term.get({__MODULE__, :wal_index}, nil),
+         {:ok, file} <- :file.open(path, [:read, :raw, :binary]) do
+      try do
+        case :file.pread(file, 0, 48) do
+          {:ok, header} -> header
+          _ -> :none
+        end
+      after
+        :file.close(file)
+      end
+    else
+      _ -> :none
+    end
+  end
+
+  # The table an INSERT, UPDATE, DELETE or REPLACE writes; anything else is :all.
+  defp written_table(sql) do
+    case Regex.run(
+           ~r/\A\s*(?:INSERT(?:\s+OR\s+\w+)?\s+INTO|REPLACE\s+INTO|UPDATE(?:\s+OR\s+\w+)?|DELETE\s+FROM)\s+"?(\w+)"?/i,
+           sql
+         ) do
+      [_, table] -> table
+      nil -> :all
+    end
+  end
 
   def transaction(fun) do
     checkout(@writer, 30_000, fn {db, _} = conn ->
       :ok = SQL.execute(db, "BEGIN IMMEDIATE")
 
+      Process.put(:campfire_db_written, [])
+
       try do
-        result = fun.(fn sql, params -> run(conn, sql, params) end)
+        result =
+          fun.(fn sql, params ->
+            unless read?(sql),
+              do:
+                Process.put(:campfire_db_written, [
+                  written_table(sql) | Process.get(:campfire_db_written)
+                ])
+
+            run(conn, sql, params)
+          end)
+
         :ok = SQL.execute(db, "COMMIT")
         result
       rescue
         e ->
           SQL.execute(db, "ROLLBACK")
           {:error, e}
+      after
+        written(Process.delete(:campfire_db_written) || [:all])
       end
     end)
   end
@@ -99,6 +217,7 @@ defmodule Campfire.DB do
       end
 
       :ok = SQL.execute(db, "COMMIT; PRAGMA foreign_keys=ON")
+      written([:all])
       :ok
     end)
   end
@@ -109,8 +228,12 @@ defmodule Campfire.DB do
 
   defp read?(<<c, rest::binary>>) when c in ~c" \t\r\n", do: read?(rest)
 
-  defp read?(<<s, e, l, e2, c, t, _::binary>>),
+  defp read?(<<s, e, l, e2, c, t, _::binary>>) when s in ~c"Ss" and e in ~c"Ee",
     do: String.upcase(<<s, e, l, e2, c, t>>) == "SELECT"
+
+  # A common table expression in front of a SELECT (this app writes no DML through WITH).
+  defp read?(<<w, i, t, h, c, _::binary>>) when w in ~c"Ww" and c in ~c" \t\r\n",
+    do: String.upcase(<<w, i, t, h>>) == "WITH"
 
   defp read?(_), do: false
 

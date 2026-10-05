@@ -2,9 +2,10 @@ defmodule Campfire.Attachments do
   alias Campfire.{Chat, DB, Jobs, Mime, Rails, Storage, StorageMedia}
 
   def find(type, id, name) do
-    DB.one(
+    DB.cached_one(
       "SELECT b.* FROM active_storage_attachments a JOIN active_storage_blobs b ON b.id=a.blob_id WHERE a.record_type=? AND a.record_id=? AND a.name=?",
-      [type, id, name]
+      [type, id, name],
+      ~w(active_storage_attachments active_storage_blobs)
     )
   end
 

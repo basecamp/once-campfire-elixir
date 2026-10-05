@@ -19,13 +19,14 @@ defmodule Campfire.MessagesView do
     do: Campfire.FragmentCache.parts(:message, messages, &render_fragment(&1, base))
 
   defp render_fragment(message, base) do
-    creator = DB.one("SELECT * FROM users WHERE id=?", [message["creator_id"]])
-    room = DB.one("SELECT * FROM rooms WHERE id=?", [message["room_id"]])
+    creator = DB.cached_one("SELECT * FROM users WHERE id=?", [message["creator_id"]], ~w(users))
+    room = DB.cached_one("SELECT * FROM rooms WHERE id=?", [message["room_id"]], ~w(rooms))
 
     text =
-      DB.one(
+      DB.cached_one(
         "SELECT body FROM action_text_rich_texts WHERE record_type='Message' AND record_id=? AND name='body'",
-        [message["id"]]
+        [message["id"]],
+        ~w(action_text_rich_texts)
       )
 
     body = if text, do: text["body"], else: nil
@@ -88,7 +89,11 @@ defmodule Campfire.MessagesView do
       client_id: Assets.html_escape(message["client_message_id"]),
       id: message["id"],
       boosts:
-        DB.query("SELECT * FROM boosts WHERE message_id=? ORDER BY created_at", [message["id"]])
+        DB.cached(
+          "SELECT * FROM boosts WHERE message_id=? ORDER BY created_at",
+          [message["id"]],
+          ~w(boosts)
+        )
         |> Enum.map_join(&render_boost/1)
     )
     |> String.trim_trailing("\n")
@@ -99,7 +104,7 @@ defmodule Campfire.MessagesView do
   end
 
   defp render_boost_fragment(boost) do
-    booster = DB.one("SELECT * FROM users WHERE id=?", [boost["booster_id"]])
+    booster = DB.cached_one("SELECT * FROM users WHERE id=?", [boost["booster_id"]], ~w(users))
 
     avatar =
       Mentions.avatar(booster, :page)
@@ -120,9 +125,10 @@ defmodule Campfire.MessagesView do
 
   def presentation_element(message) do
     text =
-      DB.one(
+      DB.cached_one(
         "SELECT body FROM action_text_rich_texts WHERE record_type='Message' AND record_id=? AND name='body'",
-        [message["id"]]
+        [message["id"]],
+        ~w(action_text_rich_texts)
       )
 
     body = if text, do: text["body"], else: nil

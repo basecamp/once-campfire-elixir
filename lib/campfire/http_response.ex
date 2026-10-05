@@ -12,8 +12,11 @@ defmodule Campfire.HttpResponse do
   def init(opts), do: opts
 
   def call(conn, _) do
-    # The per-request session cache kept by Campfire.Auth.
+    # The per-request session cache kept by Campfire.Auth, and Campfire.DB's once-per-request
+    # check for commits by other SQLite clients.
     Process.delete(:campfire_session)
+    Process.delete(:campfire_db_checked)
+    Process.put(:campfire_request, true)
     conn = delete_resp_header(conn, "cache-control")
 
     conn =

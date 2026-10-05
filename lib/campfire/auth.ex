@@ -14,7 +14,7 @@ defmodule Campfire.Auth do
 
     with raw when is_binary(raw) <- conn.cookies["session_token"],
          token when is_binary(token) <- session_token(raw),
-         row when is_map(row) <- DB.one(@session_user_sql, [token]) do
+         row when is_map(row) <- DB.cached_one(@session_user_sql, [token], ~w(sessions users)) do
       {session, user} = Map.split(row, @session_keys)
       {conn, user, Map.new(session, fn {"session." <> key, value} -> {key, value} end)}
     else
@@ -127,9 +127,11 @@ defmodule Campfire.Auth do
 
   def banned?(conn) do
     conn.method not in ["GET", "HEAD"] and
-      DB.one("SELECT id FROM bans WHERE ip_address=? LIMIT 1", [
-        Campfire.RemoteIP.address(conn)
-      ]) != nil
+      DB.cached_one(
+        "SELECT id FROM bans WHERE ip_address=? LIMIT 1",
+        [Campfire.RemoteIP.address(conn)],
+        ~w(bans)
+      ) != nil
   end
 
   # The `_campfire_session` cookie's data, decrypted at most once per request (cached by raw

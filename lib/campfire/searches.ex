@@ -70,23 +70,29 @@ defmodule Campfire.Searches do
     messages =
       if Chat.present?(q),
         do:
-          DB.query(
+          DB.cached(
             "SELECT * FROM (SELECT m.* FROM messages m JOIN message_search_index idx ON m.id=idx.rowid JOIN memberships mm ON mm.room_id=m.room_id WHERE mm.user_id=? AND idx.body MATCH ? ORDER BY m.created_at DESC LIMIT 100) ORDER BY created_at",
-            [user["id"], q]
+            [user["id"], q],
+            ~w(messages message_search_index memberships)
           ),
         else: []
 
     recents =
-      DB.query("SELECT * FROM searches WHERE user_id=? ORDER BY updated_at DESC", [user["id"]])
+      DB.cached(
+        "SELECT * FROM searches WHERE user_id=? ORDER BY updated_at DESC",
+        [user["id"]],
+        ~w(searches)
+      )
 
     {conn, data} = Auth.csrf_session(conn)
     return_room = if conn.cookies["last_room"], do: Chat.room(user, conn.cookies["last_room"])
 
     return_room =
       return_room ||
-        DB.one(
+        DB.cached_one(
           "SELECT r.* FROM rooms r JOIN memberships m ON m.room_id=r.id WHERE m.user_id=? ORDER BY r.created_at LIMIT 1",
-          [user["id"]]
+          [user["id"]],
+          ~w(rooms memberships)
         )
 
     links =

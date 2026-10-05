@@ -120,9 +120,10 @@ defmodule Campfire.RoomPage do
     # The invitation shows only in the original room while it has at most 40 messages, so the
     # count stops at 41 and is skipped for every other room.
     if account["page.original_room_id"] == room["id"] &&
-         DB.one(
+         DB.cached_one(
            "SELECT count(*) AS count FROM (SELECT 1 FROM messages WHERE room_id=? LIMIT 41)",
-           [room["id"]]
+           [room["id"]],
+           ~w(messages)
          )["count"] <= 40 do
       url = Auth.base(conn) <> "/join/" <> account["join_code"]
 

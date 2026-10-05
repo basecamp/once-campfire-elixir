@@ -44,9 +44,10 @@ defmodule Campfire.Chat do
 
   def room(user, id),
     do:
-      DB.one(
+      DB.cached_one(
         "SELECT r.* FROM rooms r JOIN memberships m ON m.room_id=r.id WHERE r.id=? AND m.user_id=?",
-        [integer(id), user["id"]]
+        [integer(id), user["id"]],
+        ~w(rooms memberships)
       )
 
   def can_administer?(user, message), do: user["role"] == 1 or user["id"] == message["creator_id"]
@@ -60,9 +61,10 @@ defmodule Campfire.Chat do
         page(room, params["after"], ">", "ASC")
 
       true ->
-        DB.query(
+        DB.cached(
           "SELECT * FROM messages WHERE room_id=? ORDER BY created_at DESC LIMIT 40",
-          [room["id"]]
+          [room["id"]],
+          ~w(messages)
         )
         |> Enum.reverse()
     end
@@ -74,9 +76,10 @@ defmodule Campfire.Chat do
     params = [room["id"], integer(id)]
 
     result =
-      DB.query(
+      DB.cached(
         "WITH anchor AS (SELECT created_at FROM messages WHERE room_id=?1 AND id=?2) SELECT m.* FROM messages m, anchor WHERE m.room_id=?1 AND m.created_at #{op} anchor.created_at ORDER BY m.created_at #{order} LIMIT 40",
-        params
+        params,
+        ~w(messages)
       )
 
     cond do

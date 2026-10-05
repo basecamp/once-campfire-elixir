@@ -280,6 +280,9 @@ defmodule Campfire.Front do
 
   @doc "A websocket upgrade ends the front's part of the request."
   def upgraded do
+    # A websocket outlives the request: Campfire.DB checks for outside commits on every lookup.
+    Process.delete(:campfire_request)
+
     case Process.delete(@key) do
       %{log: log} = front when not is_nil(log) -> log(front, 101, [], 0)
       _ -> :ok
