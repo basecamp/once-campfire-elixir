@@ -17,7 +17,17 @@ defmodule Campfire.Front.Gzip do
   def accepts?("HEAD", _), do: false
   def accepts?(_, nil), do: false
 
-  def accepts?(_, accept_encoding) do
+  def accepts?(_, accept_encoding) when byte_size(accept_encoding) <= 256 do
+    # The parse is kept per header value; true and false are both kept.
+    Campfire.FragmentCache.memo({:front_accepts_gzip, accept_encoding}, 64, fn ->
+      {accepts_gzip?(accept_encoding)}
+    end)
+    |> elem(0)
+  end
+
+  def accepts?(_, accept_encoding), do: accepts_gzip?(accept_encoding)
+
+  defp accepts_gzip?(accept_encoding) do
     accept_encoding
     |> String.split(",")
     |> Enum.find_value(0.0, fn part ->

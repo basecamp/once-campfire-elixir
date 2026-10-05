@@ -29,7 +29,8 @@ defmodule Campfire.HttpCompression do
               conn.state == :set_file -> nil
               compressed = conn.assigns[:precompressed] -> compressed
               parts = conn.assigns[:page_parts] -> gzip_parts(parts)
-              true -> gzip(IO.iodata_to_binary(body), conn.assigns[:gzip_chunks])
+              chunks = conn.assigns[:gzip_chunks] -> gzip(IO.iodata_to_binary(body), chunks)
+              true -> gzip_body(IO.iodata_to_binary(body), conn.assigns[:body_digest])
             end
 
           %{conn | resp_body: compressed}
@@ -65,7 +66,16 @@ defmodule Campfire.HttpCompression do
     end
   end
 
-  def encoding(raw) do
+  # Accept-Encoding values repeat across requests; a (bounded) header's choice is kept.
+  def encoding(raw) when byte_size(raw) <= 256,
+    do:
+      Campfire.FragmentCache.memo({:accept_encoding, raw}, 64 + byte_size(raw), fn ->
+        negotiate(raw)
+      end)
+
+  def encoding(raw), do: negotiate(raw)
+
+  defp negotiate(raw) do
     available = ["gzip", "identity"]
 
     parsed =
@@ -260,6 +270,16 @@ defmodule Campfire.HttpCompression do
     after
       :zlib.close(z)
     end
+  end
+
+  # A whole body's deflate output is kept by the body's digest (shared with its ETag when one
+  # was computed); only the gzip header's mtime is stamped per response.
+  defp gzip_body(body, digest) do
+    digest = digest || :crypto.hash(:sha256, body)
+
+    {:gzip_body, digest}
+    |> Campfire.FragmentCache.memo(fn -> gzip(body, nil) end)
+    |> timestamp_header()
   end
 
   defp gzip(body, chunks) do

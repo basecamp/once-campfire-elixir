@@ -32,11 +32,16 @@ defmodule Campfire.HttpResponse do
       if conn.assigns[:rails_exception] do
         if conn.resp_body == "", do: conn, else: Campfire.HttpCompression.apply(conn)
       else
+        # The security headers a response doesn't already set, appended in order in one pass.
         conn =
-          Enum.reduce(if(conn.state == :set_file, do: [], else: @security), conn, fn {key, value},
-                                                                                     c ->
-            if get_resp_header(c, key) == [], do: put_resp_header(c, key, value), else: c
-          end)
+          if conn.state == :set_file,
+            do: conn,
+            else: %{
+              conn
+              | resp_headers:
+                  conn.resp_headers ++
+                    Enum.reject(@security, &List.keymember?(conn.resp_headers, elem(&1, 0), 0))
+            }
 
         conn =
           if conn.request_path in ["/up", "/cable"] ||
@@ -162,12 +167,8 @@ defmodule Campfire.HttpResponse do
          get_resp_header(conn, "last-modified") == [] &&
          (is_binary(conn.resp_body) || is_list(conn.resp_body)) &&
          IO.iodata_length(conn.resp_body) > 0 do
-      {conn, digested} = digested(conn)
-
-      digest =
-        :crypto.hash(:sha256, digested)
-        |> Base.encode16(case: :lower)
-        |> binary_part(0, 32)
+      {conn, digest} = digest(conn)
+      digest = digest |> Base.encode16(case: :lower) |> binary_part(0, 32)
 
       conn = put_resp_header(conn, "etag", ~s(W/"#{digest}"))
 
@@ -182,12 +183,18 @@ defmodule Campfire.HttpResponse do
   # Rack::ETag digests the whole body. A page spliced from cached message fragments (about
   # 450 KB for a room) is digested from its parts' digests: each fragment's is computed once and
   # kept with the fragment, and the per-request text's is kept on the parts for gzip to reuse.
-  defp digested(%{assigns: %{page_parts: parts}} = conn) do
+  defp digest(%{assigns: %{page_parts: parts}} = conn) do
     parts = Campfire.HttpCompression.with_digests(parts)
-    {assign(conn, :page_parts, parts), Enum.map(parts, &Campfire.HttpCompression.digest/1)}
+
+    {assign(conn, :page_parts, parts),
+     :crypto.hash(:sha256, Enum.map(parts, &Campfire.HttpCompression.digest/1))}
   end
 
-  defp digested(conn), do: {conn, conn.resp_body}
+  # A whole body's digest is also the key of its kept gzip (Campfire.HttpCompression).
+  defp digest(conn) do
+    digest = :crypto.hash(:sha256, conn.resp_body)
+    {assign(conn, :body_digest, digest), digest}
+  end
 
   defp fresh?(conn) do
     case get_req_header(conn, "if-none-match") do

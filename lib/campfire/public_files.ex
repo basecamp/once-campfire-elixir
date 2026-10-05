@@ -6,7 +6,15 @@ defmodule Campfire.PublicFiles do
   @files ~w(robots.txt 404.html 422.html 500.html 502.html)
   def init(opts), do: opts
 
-  def call(%{method: method} = conn, _) when method in ["GET", "HEAD"] do
+  # Only a path naming a public file or the assets folder, or one with escapes that could
+  # decode to one, can resolve to a public document; any other path passes straight through.
+  def call(%{method: method, request_path: path} = conn, opts) when method in ["GET", "HEAD"] do
+    if String.contains?(path, ["%", "assets" | @files]), do: serve_public(conn, opts), else: conn
+  end
+
+  def call(conn, _), do: conn
+
+  defp serve_public(conn, _) do
     decoded = URI.decode(conn.request_path)
 
     parts =
@@ -40,8 +48,6 @@ defmodule Campfire.PublicFiles do
       end
     end
   end
-
-  def call(conn, _), do: conn
 
   defp serve(conn, path, type) do
     method = conn.method
