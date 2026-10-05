@@ -134,7 +134,9 @@ for a in apps + (["rust-identity"] if identity else []):
            if h["errors"] or any(int(k) >= 400 for k in h["statuses"])]
     print(f"- {a}: " + ("; ".join(bad) if bad else "none"))
 
-header("Action Cable fan-out (one room; chatter.js subscriptions per client)")
+header("Action Cable fan-out (one room; chatter.js subscriptions per client)", note=(
+    "Wire MB/s is measured only by the deflate client; – means unmeasured. "
+    "Historical non-deflate captures stored 0 instead; that does not mean zero network traffic."))
 for i, c in enumerate(first["cable"]):
     n = c["clients"]
     g = lambda i=i: (lambda r: r["cable"][i])

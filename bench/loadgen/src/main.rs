@@ -863,7 +863,7 @@ async fn cable(a: &Args) -> Res<Value> {
         "complete": tcomplete,
         "delivered_msgs_per_sec": ((tcomplete as f64 / span) * 10.0).round() / 10.0,
         "frames_per_sec": (receipts as f64 / span).round(),
-        "wire_mb_per_sec": (wire_bytes as f64 / span / 1e6 * 10.0).round() / 10.0,
+        "wire_mb_per_sec": deflate.then(|| (wire_bytes as f64 / span / 1e6 * 10.0).round() / 10.0),
         "drain_secs": ((span - posting_secs) * 100.0).round() / 100.0,
         "post": summary(&tpost_h),
         "per_client": summary(&tclient_h),

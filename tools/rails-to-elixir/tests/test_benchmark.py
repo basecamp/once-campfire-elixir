@@ -79,6 +79,19 @@ class BenchmarkValidationTest(unittest.TestCase):
         self.assertEqual(report.returncode, 0, report.stderr)
         self.assertIn("saturated POST attempts", report.stdout)
 
+    def test_unmeasured_wire_rate_is_distinct_from_measured_zero(self):
+        for app, rate in (("baseline", 0.0), ("candidate", None)):
+            sample = json.loads((self.root / f"{app}-1.json").read_text())
+            sample["cable"][0]["throughput"]["wire_mb_per_sec"] = rate
+            self.write(f"{app}-1.json", sample)
+            self.write(f"raw/{app}-1-cable-3.json", sample["cable"][0])
+        result = self.run_validator()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        report = subprocess.run([sys.executable, str(REPORT), str(self.root)], capture_output=True, text=True)
+        self.assertEqual(report.returncode, 0, report.stderr)
+        self.assertIn("| 3 clients: wire MB/s | 0.00 | – | – |", report.stdout)
+        self.assertIn("– means unmeasured", report.stdout)
+
     def test_plausible_http_error_is_rejected(self):
         sample = json.loads((self.root / "candidate-1.json").read_text())
         sample["http"][0].update(errors=1, statuses={"200": 7, "500": 1})
