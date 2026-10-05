@@ -12,6 +12,16 @@ defmodule Campfire.DB do
     defstruct [:kind, :reason, :stacktrace]
   end
 
+  defmodule Reader do
+    @moduledoc false
+    # Readonly connection plus the prepared statements it owns. A cached statement is
+    # always idle: multi_step resets it at DONE/BUSY/error and any other failure
+    # releases it, so no cached statement holds a WAL read snapshot.
+    defstruct [:db, :limit, statements: %{}, uses: 0]
+  end
+
+  @statement_cache_size 64
+
   def start_link(opts) do
     server_opts =
       case Keyword.get(opts, :name, __MODULE__) do
@@ -24,10 +34,13 @@ defmodule Campfire.DB do
 
   def init(opts) do
     path = Keyword.fetch!(opts, :path)
-    if Keyword.get(opts, :read_only, false), do: init_reader(path), else: init_writer(path)
+    if Keyword.get(opts, :read_only, false), do: init_reader(path, opts), else: init_writer(path)
   end
 
-  defp init_reader(path) do
+  defp init_reader(path, opts) do
+    limit = Keyword.get(opts, :statement_cache_size, @statement_cache_size)
+    true = is_integer(limit) and limit > 0
+
     {:ok, db} = SQL.open(path, mode: :readonly)
 
     :ok =
@@ -37,7 +50,9 @@ defmodule Campfire.DB do
       )
 
     :ok = SQL.set_busy_timeout(db, 5000)
-    {:ok, db}
+    # Supervisor shutdown then runs terminate/2, which finalizes cached statements.
+    Process.flag(:trap_exit, true)
+    {:ok, %Reader{db: db, limit: limit}}
   end
 
   defp init_writer(path) do
@@ -152,6 +167,35 @@ defmodule Campfire.DB do
     {:reply, :ok, db}
   end
 
+  def handle_call({:query, sql, params}, _, %Reader{} = reader) when is_list(params) do
+    {cached, statements} = Map.pop(reader.statements, sql)
+    reader = %{reader | statements: statements}
+
+    try do
+      stmt =
+        case cached do
+          {stmt, _} -> stmt
+          nil -> SQL.prepare(reader.db, sql) |> value!()
+        end
+
+      rows = read(reader.db, stmt, params)
+      {:reply, rows, cache(reader, sql, stmt)}
+    rescue
+      error in Error ->
+        {:reply, {:error, error}, reader}
+
+      error ->
+        {:reply,
+         {:raise, %CallerException{kind: :error, reason: error, stacktrace: __STACKTRACE__}},
+         reader}
+    end
+  end
+
+  def handle_call({:query, sql, params}, from, %Reader{db: db} = reader) do
+    {:reply, result, ^db} = handle_call({:query, sql, params}, from, db)
+    {:reply, result, reader}
+  end
+
   def handle_call({:query, sql, params}, _, db) do
     result =
       try do
@@ -236,6 +280,32 @@ defmodule Campfire.DB do
     end
   end
 
+  # Every parameter is rebound on each use (Sqlite3.bind/2 requires the full positional
+  # count), and columns are read after stepping, so an automatic re-prepare after a
+  # schema change cannot leave stale names. Any failure finalizes the statement, which
+  # also ends a read transaction left open by an incomplete step.
+  defp read(db, stmt, params) do
+    SQL.bind(stmt, params) |> ok!()
+    rows = SQL.fetch_all(db, stmt) |> value!()
+    columns = if rows == [], do: [], else: SQL.columns(db, stmt) |> value!()
+    Enum.map(rows, &Map.new(Enum.zip(columns, &1)))
+  rescue
+    error ->
+      SQL.release(db, stmt)
+      reraise error, __STACKTRACE__
+  end
+
+  defp cache(%Reader{statements: statements, limit: limit} = reader, sql, stmt)
+       when map_size(statements) >= limit do
+    {lru, {evicted, _}} = Enum.min_by(statements, fn {_, {_, used}} -> used end)
+    SQL.release(reader.db, evicted)
+    cache(%{reader | statements: Map.delete(statements, lru)}, sql, stmt)
+  end
+
+  defp cache(%Reader{statements: statements, uses: uses} = reader, sql, stmt) do
+    %{reader | statements: Map.put(statements, sql, {stmt, uses + 1}), uses: uses + 1}
+  end
+
   defp select?(sql), do: sql |> String.trim_leading() |> String.starts_with?("SELECT")
 
   defp execute!(db, sql), do: SQL.execute(db, sql) |> ok!()
@@ -247,6 +317,11 @@ defmodule Campfire.DB do
   defp sqlite_error(reason), do: %Error{reason: reason, message: inspect(reason)}
 
   defp sqlite_error!(reason), do: raise(sqlite_error(reason))
+
+  def terminate(_, %Reader{db: db, statements: statements}) do
+    for {_, {stmt, _}} <- statements, do: SQL.release(db, stmt)
+    SQL.close(db)
+  end
 
   def terminate(_, db), do: SQL.close(db)
 end
