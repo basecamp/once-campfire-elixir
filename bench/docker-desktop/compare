@@ -8,12 +8,12 @@ def med(runs,fn):
     v=[fn(r) for r in runs]; v=[x for x in v if x is not None]; return statistics.median(v) if v else None
 def http(route,c,k):
     def f(r):
-        for h in r['http']:
+        for h in r.get('http') or []:
             if h['route']==route and h['conc']==c: return h['rps'] if k=='rps' else h.get('cpu_us_per_success') if k=='cpu' else h['latency'].get(k)
     return f
 def cable(n,k):
     def f(r):
-        for c in r['cable']:
+        for c in r.get('cable') or []:
             if c['clients']==n:
                 return c['throughput']['complete']/c['throughput'].get('secs',15) if k=='tput' else c['latency']['all_clients'].get(k)
     return f
@@ -22,7 +22,7 @@ for route in ['room_show','messages_page','sidebar','search','post_message','ava
     rows.append((f'{route} c=16 req/s',http(route,16,'rps')))
     rows.append((f'{route} c=64 p99 ms',http(route,64,'p99_ms')))
     rows.append((f'{route} c=16 CPU µs/request',http(route,16,'cpu')))
-rows.append(('cable 1000 complete broadcasts/s',lambda r:[c for c in r['cable'] if c['clients']==1000][0]['throughput']['delivered_msgs_per_sec']))
+rows.append(('cable 1000 complete broadcasts/s',lambda r:next((c['throughput']['delivered_msgs_per_sec'] for c in r.get('cable') or [] if c['clients']==1000),None)))
 rows.append(('cable 1000 paced p50 ms',cable(1000,'p50_ms')))
 rows.append(('cable 1000 paced p99 ms',cable(1000,'p99_ms')))
 rows.append(('upload median ms',lambda r:(r.get('upload') or {}).get('median_total_ms')))
