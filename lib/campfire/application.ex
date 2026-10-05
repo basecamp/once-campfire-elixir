@@ -7,6 +7,7 @@ defmodule Campfire.Application do
       {Registry, keys: :duplicate, name: Campfire.Connections},
       Campfire.RateLimiter,
       Campfire.FragmentCache,
+      Campfire.Front.Cache,
       {Campfire.DB, path: System.get_env("DATABASE_PATH", "var/production.sqlite3")}
     ]
 
@@ -18,19 +19,7 @@ defmodule Campfire.Application do
     children =
       if System.get_env("CAMPFIRE_NO_SERVER") == "1",
         do: children,
-        else:
-          children ++
-            [
-              {Bandit,
-               plug: Campfire.Endpoint,
-               http_options: [compress: false],
-               port: String.to_integer(System.get_env("PORT", "7070")),
-               ip:
-                 if(System.get_env("CAMPFIRE_BIND") == "loopback",
-                   do: {127, 0, 0, 1},
-                   else: {0, 0, 0, 0}
-                 )}
-            ]
+        else: children ++ Campfire.Front.Server.children(Campfire.Front.Config.load())
 
     Supervisor.start_link(children, strategy: :one_for_one, name: Campfire.Supervisor)
   end

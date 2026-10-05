@@ -1,6 +1,11 @@
 defmodule Campfire.HttpCompression do
   @moduledoc "Rack-compatible gzip selection and response framing."
   import Plug.Conn
+  # Rack::Deflater uses zlib's default level 6. Level 1 deflates a 450 KB room page about three
+  # times faster; the decoded body is unchanged, the gzip bytes are not (a known difference).
+  @level 1
+
+  def level, do: @level
 
   def apply(conn) do
     body = conn.resp_body
@@ -184,7 +189,7 @@ defmodule Campfire.HttpCompression do
     z = :zlib.open()
 
     try do
-      :ok = :zlib.deflateInit(z, :default, :deflated, -15, 8, :default)
+      :ok = :zlib.deflateInit(z, @level, :deflated, -15, 8, :default)
       dictionary = IO.iodata_to_binary(before)
       size = byte_size(dictionary)
 
@@ -206,7 +211,7 @@ defmodule Campfire.HttpCompression do
     z = :zlib.open()
 
     try do
-      :ok = :zlib.deflateInit(z, :default, :deflated, 31, 8, :default)
+      :ok = :zlib.deflateInit(z, @level, :deflated, 31, 8, :default)
       chunks = chunks || if(body == "", do: [], else: [body])
       parts = Enum.map(chunks, &:zlib.deflate(z, &1, :sync))
       bytes = IO.iodata_to_binary([parts, :zlib.deflate(z, "", :finish)])

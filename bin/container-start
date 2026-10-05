@@ -1,7 +1,4 @@
 #!/bin/sh
 set -eu
-HTTP_PORT=${HTTP_PORT:-${PORT:-80}}
-THRUSTER_STORAGE_PATH=${THRUSTER_STORAGE_PATH:-/rails/storage/thruster}
-CAMPFIRE_BIND=loopback
-export HTTP_PORT THRUSTER_STORAGE_PATH CAMPFIRE_BIND
-exec /usr/local/bin/thrust /campfire/bin/campfire start
+# Bandit serves HTTP_PORT itself (and HTTPS_PORT with TLS_DOMAIN); see Campfire.Front.
+exec /campfire/bin/campfire start

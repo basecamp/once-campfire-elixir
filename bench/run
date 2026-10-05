@@ -29,7 +29,7 @@
 # The apps run with --network host: PORT and PORT+1 (and 6379, for the reference's Redis) must be
 # free on the host. NETWORK=bridge measures as the preliminary run did instead: the container on
 # Docker's bridge, reached through a published port (docker-proxy), with no DNS resolver.
-#   LOAD_MAX=1.5 LOAD_WAIT_SECS=900 PROCMEM_CPUS=0 SUITES="http cable upload"
+#   LOAD_MAX=1.5 LOAD_WAIT_SECS=900 PROCMEM_CPUS=0 SUITES="http cable upload" APP_LOG_REQUESTS=false
 set -euo pipefail
 
 ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
@@ -58,6 +58,9 @@ LOAD_MAX=${LOAD_MAX:-1.5}
 LOAD_WAIT_SECS=${LOAD_WAIT_SECS:-900}
 PROCMEM_CPUS=${PROCMEM_CPUS:-0}
 SUITES=${SUITES:-http cable upload}
+# Request logging in every app's front server (Thruster, or the Rust/Elixir built-in one). Off by
+# default so that no app pays for writing a log line per request; set true to measure it.
+APP_LOG_REQUESTS=${APP_LOG_REQUESTS:-false}
 suite() { [[ " $SUITES " = *" $1 "* ]]; }
 # Extra environment for the Rust container only (space-separated K=V). The preliminary run
 # (results/prelim-20260926) used RAILS_MAX_THREADS=128 to dodge a writer/reader-pool deadlock that
@@ -123,7 +126,7 @@ env_args() {
   local ncpu; ncpu=$(taskset -c "$SERVER_CPUS" nproc)
   local workers=$(( (ncpu * 666 + 999) / 1000 ))
   grep -Ev '^(#|$|WEB_CONCURRENCY|JOB_CONCURRENCY|RAILS_MAX_THREADS|RAILS_LOG_LEVEL)' "$ENV_FILE" | sed 's/^/-e\n/'
-  printf '%s\n' -e "WEB_CONCURRENCY=$workers" -e "JOB_CONCURRENCY=$workers" -e RAILS_MAX_THREADS=5 -e RAILS_LOG_LEVEL=warn
+  printf '%s\n' -e "WEB_CONCURRENCY=$workers" -e "JOB_CONCURRENCY=$workers" -e RAILS_MAX_THREADS=5 -e RAILS_LOG_LEVEL=warn -e "LOG_REQUESTS=$APP_LOG_REQUESTS"
   if [[ "${1:-}" = rust* ]]; then local e; for e in $RUST_EXTRA_ENV; do printf '%s\n' -e "$e"; done; fi
 }
 
@@ -293,6 +296,7 @@ PY
   echo "elixir source digest: $(python3 "$BENCH/validate.py" digest)"
   echo "rust extra env: $RUST_EXTRA_ENV"
   echo "workload: suites=$SUITES HTTP_SECS=$HTTP_SECS HTTP_CONCS=$HTTP_CONCS CABLE_CLIENTS=$CABLE_CLIENTS CABLE_TPUT_SECS=$CABLE_TPUT_SECS CABLE_POSTERS=$CABLE_POSTERS UPLOAD_REPS=$UPLOAD_REPS REPS=$REPS"
+  echo "request logging (LOG_REQUESTS): $APP_LOG_REQUESTS"
   echo "quiet wait: LOAD_MAX=$LOAD_MAX LOAD_WAIT_SECS=$LOAD_WAIT_SECS"
   echo "user agent: ${USER_AGENT_ARGS[1]:-(none)}"
   for app in ${APPS//,/ }; do echo "$app image: $(image_for "$app") $(docker image inspect -f '{{.Id}} {{.Created}} unpacked_bytes={{.Size}}' "$(image_for "$app")")"; done

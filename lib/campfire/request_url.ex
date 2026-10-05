@@ -1,8 +1,9 @@
 defmodule Campfire.RequestURL do
-  @moduledoc "Rails URL context from the local Thruster upstream connection only."
+  @moduledoc "Rails URL context from the front server's loopback upstream request only (`Campfire.Front`)."
   import Plug.Conn
   def init(opts), do: opts
-  # Production binds the upstream to loopback. Other peers cannot supply proxy context.
+  # `Campfire.Front` presents every request as Thruster's loopback upstream did. Other peers
+  # cannot supply proxy context.
   def call(%{remote_ip: peer} = conn, _) when peer in [{127, 0, 0, 1}, {0, 0, 0, 0, 0, 0, 0, 1}],
     do: local_proxy(conn)
 

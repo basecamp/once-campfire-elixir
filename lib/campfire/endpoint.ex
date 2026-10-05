@@ -3,7 +3,10 @@ defmodule Campfire.Endpoint do
   def init(options), do: Campfire.Router.init(options)
 
   def call(conn, options) do
-    Campfire.Router.call(conn, options)
+    case Campfire.Front.call(conn) do
+      %Plug.Conn{halted: true} = conn -> conn
+      conn -> Campfire.Router.call(conn, options)
+    end
   rescue
     error in Plug.Conn.WrapperError ->
       respond(error.conn, error.reason)
