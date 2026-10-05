@@ -13,6 +13,7 @@ defmodule Campfire.MixProject do
         {:plug, "~> 1.18"},
         {:jason, "~> 1.4"},
         {:exqlite, "~> 0.33"},
+        {:db_connection, "~> 2.10"},
         {:bcrypt_elixir, "~> 3.3"},
         {:floki, "~> 0.38"},
         {:redix, "~> 1.5"},

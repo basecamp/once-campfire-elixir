@@ -1,22 +1,103 @@
 defmodule Campfire.DB do
-  use GenServer
+  @moduledoc "Pooled SQLite access; bootstrap and fixture restore use a raw connection."
   alias Exqlite.Sqlite3, as: SQL
-  def start_link(opts), do: GenServer.start_link(__MODULE__, opts, name: __MODULE__)
 
-  def init(opts) do
+  @pragmas "PRAGMA foreign_keys=ON; PRAGMA journal_mode=WAL; PRAGMA synchronous=NORMAL; PRAGMA cache_size=2000; PRAGMA mmap_size=134217728;"
+
+  def child_spec(opts),
+    do: %{id: __MODULE__, type: :supervisor, start: {__MODULE__, :start_link, [opts]}}
+
+  # SQLite allows one writer. Writers queue on a single connection in DBConnection
+  # rather than in SQLite's busy handler, which would hold dirty IO schedulers.
+  def start_link(opts) do
     path = Keyword.fetch!(opts, :path)
     File.mkdir_p!(Path.dirname(path))
-    {:ok, db} = SQL.open(path)
+    :persistent_term.put({__MODULE__, :path}, path)
+    with_raw(path, &initialize/1)
 
-    :ok =
-      SQL.execute(
-        db,
-        "PRAGMA foreign_keys=ON; PRAGMA journal_mode=WAL; PRAGMA synchronous=NORMAL; PRAGMA cache_size=2000; PRAGMA mmap_size=134217728;"
+    pool = fn name, size ->
+      DBConnection.child_spec(
+        Exqlite.Connection,
+        name: name,
+        pool_size: size,
+        database: path,
+        foreign_keys: :on,
+        journal_mode: :wal,
+        synchronous: :normal,
+        cache_size: 2000,
+        custom_pragmas: [mmap_size: 134_217_728],
+        busy_timeout: 5000,
+        default_transaction_mode: :immediate,
+        # Queue like the former single process instead of shedding load after 50 ms.
+        queue_target: 5000,
+        queue_interval: 5000
       )
+      |> Supervisor.child_spec(id: name)
+    end
 
-    :ok = SQL.set_busy_timeout(db, 5000)
-    initialize(db)
-    {:ok, db}
+    Supervisor.start_link(
+      [
+        pool.(__MODULE__.Write, 1),
+        pool.(__MODULE__.Read, Keyword.get(opts, :pool_size, System.schedulers_online()))
+      ],
+      strategy: :one_for_one,
+      name: __MODULE__
+    )
+  end
+
+  def query(sql, params \\ []) do
+    pool = if String.starts_with?(sql, "SELECT"), do: __MODULE__.Read, else: __MODULE__.Write
+    run!(pool, sql, params)
+  rescue
+    e -> {:error, e}
+  end
+
+  def one(sql, params \\ []), do: List.first(query(sql, params))
+
+  def transaction(fun) do
+    case DBConnection.transaction(__MODULE__.Write, fn conn ->
+           fun.(fn sql, params -> run!(conn, sql, params) end)
+         end) do
+      {:ok, result} -> result
+      error -> error
+    end
+  rescue
+    e -> {:error, e}
+  end
+
+  def restore_fixture(fixture) do
+    with_raw(:persistent_term.get({__MODULE__, :path}), fn db ->
+      :ok = SQL.execute(db, "PRAGMA foreign_keys=OFF")
+
+      existing =
+        run(
+          db,
+          "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'",
+          []
+        )
+
+      for %{"name" => name} <- existing, not String.starts_with?(name, "message_search_index_") do
+        :ok = SQL.execute(db, "DROP TABLE IF EXISTS \"#{name}\"")
+      end
+
+      for sql <- fixture["schema"], do: :ok = SQL.execute(db, sql)
+      :ok = SQL.execute(db, "BEGIN IMMEDIATE")
+
+      for {table, rows} <- fixture["tables"], row <- rows do
+        fields = Map.keys(row)
+        names = Enum.map_join(fields, ",", &("\"" <> &1 <> "\""))
+        placeholders = Enum.map_join(fields, ",", fn _ -> "?" end)
+
+        run(
+          db,
+          "INSERT INTO \"#{table}\" (#{names}) VALUES (#{placeholders})",
+          Enum.map(fields, &row[&1])
+        )
+      end
+
+      :ok = SQL.execute(db, "COMMIT; PRAGMA foreign_keys=ON")
+      :ok
+    end)
   end
 
   defp initialize(db) do
@@ -56,69 +137,21 @@ defmodule Campfire.DB do
     end
   end
 
-  def query(sql, params \\ []), do: GenServer.call(__MODULE__, {:query, sql, params})
-  def one(sql, params \\ []), do: List.first(query(sql, params))
-  def transaction(fun), do: GenServer.call(__MODULE__, {:transaction, fun}, 30_000)
-
-  def restore_fixture(fixture),
-    do: GenServer.call(__MODULE__, {:restore_fixture, fixture}, 30_000)
-
-  def handle_call({:restore_fixture, fixture}, _, db) do
-    :ok = SQL.execute(db, "PRAGMA foreign_keys=OFF")
-
-    existing =
-      run(
-        db,
-        "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'",
-        []
-      )
-
-    for %{"name" => name} <- existing, not String.starts_with?(name, "message_search_index_") do
-      :ok = SQL.execute(db, "DROP TABLE IF EXISTS \"#{name}\"")
-    end
-
-    for sql <- fixture["schema"], do: :ok = SQL.execute(db, sql)
-    :ok = SQL.execute(db, "BEGIN IMMEDIATE")
-
-    for {table, rows} <- fixture["tables"], row <- rows do
-      fields = Map.keys(row)
-      names = Enum.map_join(fields, ",", &("\"" <> &1 <> "\""))
-      placeholders = Enum.map_join(fields, ",", fn _ -> "?" end)
-
-      run(
-        db,
-        "INSERT INTO \"#{table}\" (#{names}) VALUES (#{placeholders})",
-        Enum.map(fields, &row[&1])
-      )
-    end
-
-    :ok = SQL.execute(db, "COMMIT; PRAGMA foreign_keys=ON")
-    {:reply, :ok, db}
-  end
-
-  def handle_call({:query, sql, params}, _, db) do
-    result =
-      try do
-        run(db, sql, params)
-      rescue
-        e -> {:error, e}
-      end
-
-    {:reply, result, db}
-  end
-
-  def handle_call({:transaction, fun}, _, db) do
-    :ok = SQL.execute(db, "BEGIN IMMEDIATE")
+  defp with_raw(path, fun) do
+    {:ok, db} = SQL.open(path)
 
     try do
-      result = fun.(fn sql, params -> run(db, sql, params) end)
-      :ok = SQL.execute(db, "COMMIT")
-      {:reply, result, db}
-    rescue
-      e ->
-        SQL.execute(db, "ROLLBACK")
-        {:reply, {:error, e}, db}
+      :ok = SQL.execute(db, @pragmas)
+      :ok = SQL.set_busy_timeout(db, 5000)
+      fun.(db)
+    after
+      SQL.close(db)
     end
+  end
+
+  defp run!(conn, sql, params) do
+    %{columns: columns, rows: rows} = Exqlite.query!(conn, sql, params)
+    Enum.map(rows, &Map.new(Enum.zip(columns, &1)))
   end
 
   defp run(db, sql, params) do
@@ -133,6 +166,4 @@ defmodule Campfire.DB do
       SQL.release(db, stmt)
     end
   end
-
-  def terminate(_, db), do: SQL.close(db)
 end
