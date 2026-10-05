@@ -2,14 +2,21 @@ defmodule Campfire.Auth do
   alias Campfire.{DB, Rails, Chat}
   import Plug.Conn
 
+  @session_columns ~w(id created_at ip_address last_active_at token updated_at user_agent user_id)
+  @session_keys Enum.map(@session_columns, &("session." <> &1))
+  # The session and its user in one query; session columns are prefixed to keep them apart.
+  @session_user_sql "SELECT u.*, " <>
+                      Enum.map_join(@session_columns, ", ", &~s(s."#{&1}" AS "session.#{&1}")) <>
+                      " FROM sessions s JOIN users u ON u.id=s.user_id WHERE s.token=?"
+
   def session_lookup(conn) do
     conn = fetch_cookies(conn)
 
     with raw when is_binary(raw) <- conn.cookies["session_token"],
          token when is_binary(token) <- Rails.verify_cookie("session_token", URI.decode(raw)),
-         session when is_map(session) <- DB.one("SELECT * FROM sessions WHERE token=?", [token]),
-         user when is_map(user) <- DB.one("SELECT * FROM users WHERE id=?", [session["user_id"]]) do
-      {conn, user, session}
+         row when is_map(row) <- DB.one(@session_user_sql, [token]) do
+      {session, user} = Map.split(row, @session_keys)
+      {conn, user, Map.new(session, fn {"session." <> key, value} -> {key, value} end)}
     else
       _ -> {conn, nil, nil}
     end
@@ -20,17 +27,30 @@ defmodule Campfire.Auth do
     do: {conn, user, session}
 
   def session_user(conn) do
-    {conn, user, session} =
+    {conn, user, session, current} =
       case session_lookup(conn) do
-        {conn, nil, nil} -> {conn, nil, nil}
-        {conn, user, session} -> {conn, user, resume_session(conn, session)}
+        {conn, nil, nil} ->
+          {conn, nil, nil, false}
+
+        {conn, user, session} ->
+          resumed = resume_session(conn, session)
+          {conn, user, resumed, resumed == session}
       end
 
-    {put_private(conn, :campfire_session_user, {user, session}), user, session}
+    conn =
+      conn
+      |> put_private(:campfire_session_user, {user, session})
+      |> put_private(:campfire_session_cookie_current, current)
+
+    {conn, user, session}
   end
 
   defp forget_session_user(conn),
-    do: %{conn | private: Map.delete(conn.private, :campfire_session_user)}
+    do: %{
+      conn
+      | private:
+          Map.drop(conn.private, [:campfire_session_user, :campfire_session_cookie_current])
+    }
 
   def start_session(conn, user) do
     now = Chat.timestamp()
@@ -52,6 +72,20 @@ defmodule Campfire.Auth do
 
     conn |> forget_session_user() |> set_auth_cookie(session)
   end
+
+  # The signed session_token cookie is re-issued (with its 20-year expiry) when a session starts
+  # and when its hourly activity refresh runs, not on every request: the client already holds
+  # a valid cookie for this session otherwise.
+  def set_auth_cookie(
+        %{
+          private: %{
+            campfire_session_user: {_, %{"id" => id}},
+            campfire_session_cookie_current: true
+          }
+        } = conn,
+        %{"id" => id}
+      ),
+      do: conn
 
   def set_auth_cookie(conn, session) do
     expires = permanent_expiry() |> DateTime.to_iso8601()

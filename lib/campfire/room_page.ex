@@ -67,9 +67,7 @@ defmodule Campfire.RoomPage do
 
           conn
           |> Auth.set_auth_cookie(session)
-          |> put_resp_cookie("last_room", to_string(room["id"]),
-            max_age: DateTime.diff(Auth.permanent_expiry(), Campfire.Clock.now())
-          )
+          |> put_last_room(room)
           |> put_resp_content_type("text/html")
           |> send_page(html, marker, fragments)
         else
@@ -81,6 +79,17 @@ defmodule Campfire.RoomPage do
   rescue
     Campfire.Pwa.MissingAsset ->
       Campfire.HttpResponse.exception(conn, 500, Campfire.Assets.read("public/500.html"))
+  end
+
+  defp put_last_room(conn, room) do
+    id = to_string(room["id"])
+
+    if conn.cookies["last_room"] == id,
+      do: conn,
+      else:
+        put_resp_cookie(conn, "last_room", id,
+          max_age: DateTime.diff(Auth.permanent_expiry(), Campfire.Clock.now())
+        )
   end
 
   defp send_page(conn, html, marker, fragments) do

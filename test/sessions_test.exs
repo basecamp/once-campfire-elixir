@@ -172,6 +172,29 @@ defmodule Campfire.SessionsTest do
     assert updated["last_active_at"] == "2026-03-02 16:00:00"
   end
 
+  test "session_token is re-signed only when the session starts or its activity refreshes" do
+    user = DB.one("SELECT * FROM users WHERE id=127326141")
+    raw = (conn(:get, "/") |> Auth.start_session(user)).resp_cookies["session_token"][:value]
+    session = DB.one("SELECT * FROM sessions ORDER BY id DESC LIMIT 1")
+
+    resign = fn ->
+      {conn, ^user, session} =
+        conn(:get, "/") |> put_req_cookie("session_token", raw) |> Auth.session_user()
+
+      Auth.set_auth_cookie(conn, session).resp_cookies["session_token"]
+    end
+
+    refute resign.()
+
+    DB.query("UPDATE sessions SET last_active_at=? WHERE id=?", [
+      "2026-03-02 14:59:59",
+      session["id"]
+    ])
+
+    assert %{value: value} = resign.()
+    assert Rails.verify_cookie("session_token", URI.decode(value)) == session["token"]
+  end
+
   test "login rate limit rejects the eleventh same-origin attempt" do
     for _ <- 1..10,
         do:
