@@ -3,6 +3,9 @@ defmodule Campfire.MediaTest do
   alias Campfire.Media
 
   @vectors Jason.decode!(File.read!("vectors/storage.json"))
+  @arm64_oracle Jason.decode!(File.read!("vectors/storage-arm64.json"))
+  @arm64 String.starts_with?(to_string(:erlang.system_info(:system_architecture)), "aarch64")
+
   for item <- @vectors["messages"] ++ @vectors["avatars"] ++ @vectors["logos"],
       variant <- item["variants"] || [],
       File.regular?("reference/test/fixtures/files/" <> item["fixture"]) do
@@ -18,6 +21,12 @@ defmodule Campfire.MediaTest do
 
           on_exit(fn -> File.rm(preview) end)
           assert :ok = Media.preview(input, preview)
+
+          expected = expected_preview(@item["fixture"], @item["preview_image"]["blob"])
+          bytes = File.read!(preview)
+          assert byte_size(bytes) == expected["byte_size"]
+          assert Base.encode64(:crypto.hash(:md5, bytes)) == expected["checksum"]
+
           preview
         else
           input
@@ -41,8 +50,9 @@ defmodule Campfire.MediaTest do
       end
 
       bytes = File.read!(output)
-      assert byte_size(bytes) == @variant["blob"]["byte_size"]
-      assert Base.encode64(:crypto.hash(:md5, bytes)) == @variant["blob"]["checksum"]
+      expected = expected_blob(@variant["label"], @variant["blob"])
+      assert byte_size(bytes) == expected["byte_size"]
+      assert Base.encode64(:crypto.hash(:md5, bytes)) == expected["checksum"]
       metadata = Jason.decode!(@variant["blob"]["metadata"])
 
       assert {:ok, %{"width" => metadata["width"], "height" => metadata["height"]}} ==
@@ -52,5 +62,13 @@ defmodule Campfire.MediaTest do
 
   test "invalid images have no image metadata" do
     assert {:ok, %{}} = Media.image_metadata("reference/test/fixtures/files/alpha-centuri.mov")
+  end
+
+  defp expected_preview(fixture, default) do
+    if @arm64 and fixture == @arm64_oracle["fixture"], do: @arm64_oracle["preview"], else: default
+  end
+
+  defp expected_blob(label, default) do
+    if @arm64, do: Map.get(@arm64_oracle["variants"], label, default), else: default
   end
 end

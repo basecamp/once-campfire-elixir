@@ -5,8 +5,14 @@ defmodule Campfire.FragmentCache do
   def start_link(_) do
     Agent.start_link(
       fn ->
-        :ets.new(Campfire.DecodedFragments, [:named_table, :set, :public, read_concurrency: true])
-        %{}
+        :ets.new(__MODULE__, [
+          :named_table,
+          :set,
+          :protected,
+          read_concurrency: true
+        ])
+
+        :ok
       end,
       name: __MODULE__
     )
@@ -16,71 +22,21 @@ defmodule Campfire.FragmentCache do
   @digests Jason.decode!(File.read!(@external_resource))
 
   def record(kind, record, render) do
-    {key, version} = identity(kind, record)
-
-    if Process.whereis(Campfire.Redis) do
-      case Redix.command(Campfire.Redis, ["GET", key]) do
-        {:ok, data} ->
-          case load(key, data, version) do
-            {:ok, html} -> html <> "\n"
-            :miss -> write(key, version, render)
-          end
-
-        _ ->
-          render.()
-      end
-    else
-      fetch({kind, record}, render)
-    end
+    fetch(identity(kind, record), render)
   end
 
   def records(_kind, [], _render), do: []
 
   def records(kind, records, render) do
-    if Process.whereis(Campfire.Redis) do
-      identities = Enum.map(records, &identity(kind, &1))
-
-      case Redix.command(Campfire.Redis, ["MGET" | Enum.map(identities, &elem(&1, 0))]) do
-        {:ok, values} ->
-          Enum.zip([records, identities, values])
-          |> Enum.map(fn {record, {key, version}, data} ->
-            case load(key, data, version) do
-              {:ok, html} -> html <> "\n"
-              :miss -> write(key, version, fn -> render.(record) end)
-            end
-          end)
-
-        _ ->
-          Enum.map(records, render)
-      end
-    else
-      Enum.map(records, &record(kind, &1, fn -> render.(&1) end))
-    end
+    Enum.map(records, &record(kind, &1, fn -> render.(&1) end))
   end
 
-  # Redis remains authoritative: reuse only an identical nonexpiring entry.
-  defp load(key, <<0, 17, _flag, expires::little-float-size(64), _::binary>> = data, version)
-       when expires < 0 and byte_size(data) <= 262_144 do
-    case :ets.lookup(Campfire.DecodedFragments, key) do
-      [{^key, ^data, ^version, html}] ->
-        {:ok, html}
-
-      _ ->
-        case Campfire.Rails.Cache.load(data, version) do
-          {:ok, html} = result ->
-            if :ets.info(Campfire.DecodedFragments, :size) >= 2048,
-              do: :ets.delete_all_objects(Campfire.DecodedFragments)
-
-            :ets.insert(Campfire.DecodedFragments, {key, data, version, html})
-            result
-
-          :miss ->
-            :miss
-        end
-    end
+  def clear do
+    Agent.get_and_update(__MODULE__, fn state ->
+      :ets.delete_all_objects(__MODULE__)
+      {:ok, state}
+    end)
   end
-
-  defp load(_key, data, version), do: Campfire.Rails.Cache.load(data, version)
 
   defp identity(kind, record) do
     table = if kind == :message, do: "messages", else: "boosts"
@@ -94,33 +50,25 @@ defmodule Campfire.FragmentCache do
     {key, version}
   end
 
-  defp write(key, version, render) do
-    html = render.()
-
-    Redix.command(Campfire.Redis, [
-      "SET",
-      key,
-      Campfire.Rails.Cache.dump(String.trim_trailing(html, "\n"), version)
-    ])
-
-    html
-  end
-
   def fetch(key, render) do
-    case Agent.get(__MODULE__, &Map.fetch(&1, key)) do
-      {:ok, html} ->
+    case :ets.lookup(__MODULE__, key) do
+      [{^key, html}] ->
         html
 
-      :error ->
+      [] ->
         html = render.()
 
-        Agent.get_and_update(__MODULE__, fn cache ->
-          case Map.fetch(cache, key) do
-            {:ok, existing} ->
-              {existing, cache}
+        Agent.get_and_update(__MODULE__, fn state ->
+          case :ets.lookup(__MODULE__, key) do
+            [{^key, existing}] ->
+              {existing, state}
 
-            :error ->
-              {html, Map.put(if(map_size(cache) >= 4096, do: %{}, else: cache), key, html)}
+            [] ->
+              if :ets.info(__MODULE__, :size) >= 4096,
+                do: :ets.delete_all_objects(__MODULE__)
+
+              :ets.insert(__MODULE__, {key, html})
+              {html, state}
           end
         end)
     end

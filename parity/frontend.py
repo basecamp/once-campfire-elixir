@@ -4,8 +4,13 @@ import hashlib,json,os,shutil,subprocess,time
 from sessions import ROOT
 from http_shutdown import seed
 BASE=ROOT/'var/frontend';NAME='campfire-elixir-frontend';BASE.mkdir(parents=True,exist_ok=True)
-BINARY='/usr/local/bundle/ruby/3.4.0/gems/thruster-0.1.23-x86_64-linux/exe/x86_64-linux/thrust'
+CPUS=os.environ.get('PARITY_CPUS',','.join(map(str,sorted(os.sched_getaffinity(0)))))
 def run(args):return subprocess.check_output(list(map(str,args)),text=True)
+ARCH=run(['docker','image','inspect','campfire-reference:app','--format','{{.Architecture}}']).strip()
+BINARY,PROXY_SHA256={
+ 'amd64':('/usr/local/bundle/ruby/3.4.0/gems/thruster-0.1.23-x86_64-linux/exe/x86_64-linux/thrust','0dc6606e316dff1c44212797b02f03ff339098ff20cca240e26802d342d0244e'),
+ 'arm64':('/usr/local/bundle/ruby/3.4.0/gems/thruster-0.1.23-aarch64-linux/exe/aarch64-linux/thrust','e92e38da9e12bd3fd8ff1e05ea8d5fbcca2b5a28b7c59c45c543d0026f7d3639')
+}[ARCH]
 def query(folder,path,secure=True,h2=True):
  body=folder/'body';head=folder/'headers'
  args=['curl','--silent','--show-error','--noproxy','*','--max-time','10','-H','Host: campfire.test','--resolve',f'campfire.test:{47077 if secure else 47076}:127.0.0.1','--cacert',BASE/'cert.pem','--http2' if h2 else '--http1.1','-D',head,'-o',body,'-w','%{json}',f'{"https" if secure else "http"}://campfire.test:{47077 if secure else 47076}{path}']
@@ -19,7 +24,7 @@ def one(side):
  folder=BASE/side;seed(folder);(folder/'db').mkdir();shutil.copyfile(folder/'production.sqlite3',folder/'db/production.sqlite3');cache=folder/'thruster';cache.mkdir();(cache/'campfire.test').write_bytes((BASE/'key.pem').read_bytes()+(BASE/'cert.pem').read_bytes())
  image='campfire-reference:app' if side=='reference' else 'campfire-elixir:release'
  subprocess.run(['docker','rm','-f',NAME],capture_output=True)
- run(['docker','run','-d','--name',NAME,'--cpuset-cpus','8-11','--user',f'{os.getuid()}:{os.getgid()}','--env-file',ROOT/'parity/reference.env','-e','TLS_DOMAIN=campfire.test','-e','H2C_ENABLED=true','-e','LOG_REQUESTS=false','-p','127.0.0.1:47076:80','-p','127.0.0.1:47077:443','-v',f'{folder}:/rails/storage',image])
+ run(['docker','run','-d','--name',NAME,'--cpuset-cpus',CPUS,'--user',f'{os.getuid()}:{os.getgid()}','--env-file',ROOT/'parity/reference.env','-e','TLS_DOMAIN=campfire.test','-e','H2C_ENABLED=true','-e','LOG_REQUESTS=false','-p','127.0.0.1:47076:80','-p','127.0.0.1:47077:443','-v',f'{folder}:/rails/storage',image])
  try:
   for _ in range(120):
    try:
@@ -40,7 +45,7 @@ def one(side):
   assert result['http_redirect']['status'] in [301,302,307,308]
   path=BINARY if side=='reference' else '/usr/local/bin/thrust'
   result['proxy_sha256']=run(['docker','exec',NAME,'sha256sum',path]).split()[0]
-  assert result['proxy_sha256']=='0dc6606e316dff1c44212797b02f03ff339098ff20cca240e26802d342d0244e'
+  assert result['proxy_sha256']==PROXY_SHA256
   return result
  finally:
   log=subprocess.run(['docker','logs',NAME],capture_output=True,text=True);(ROOT/f'parity/frontend-{side}.log').write_text(log.stdout+log.stderr);subprocess.run(['docker','rm','-f',NAME],capture_output=True)

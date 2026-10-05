@@ -11,7 +11,7 @@ defmodule Campfire.IPPolicy do
   end
 
   def public?(ip) when is_tuple(ip) and tuple_size(ip) == 8 do
-    if Enum.all?(Tuple.to_list(ip), &(is_integer(&1) && &1 in 0..65535)) do
+    if Enum.all?(Tuple.to_list(ip), &(is_integer(&1) && &1 in 0..65_535)) do
       value = Tuple.to_list(ip) |> Enum.reduce(0, fn part, acc -> (acc <<< 16) + part end)
 
       cond do

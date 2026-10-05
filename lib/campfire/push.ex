@@ -3,17 +3,19 @@ defmodule Campfire.Push do
 
   @hosts ~w(jmt17.google.com fcm.googleapis.com updates.push.services.mozilla.com web.push.apple.com notify.windows.com)
   def valid_endpoint?(endpoint) when is_binary(endpoint) do
-    with {:ok, uri} <- Campfire.HttpURL.parse(endpoint) do
-      permitted =
-        uri.scheme == "https" && uri.port == 443 && is_binary(uri.host) &&
-          Enum.any?(@hosts, fn host ->
-            String.downcase(uri.host) == host ||
-              String.ends_with?(String.downcase(uri.host), "." <> host)
-          end)
+    case Campfire.HttpURL.parse(endpoint) do
+      {:ok, uri} ->
+        permitted =
+          uri.scheme == "https" && uri.port == 443 && is_binary(uri.host) &&
+            Enum.any?(@hosts, fn host ->
+              String.downcase(uri.host) == host ||
+                String.ends_with?(String.downcase(uri.host), "." <> host)
+            end)
 
-      permitted && match?({:ok, _}, Network.resolve(uri.host))
-    else
-      _ -> false
+        permitted && match?({:ok, _}, Network.resolve(uri.host))
+
+      _ ->
+        false
     end
   end
 

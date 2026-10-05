@@ -20,7 +20,7 @@ def run(side,port):
  unread,status=sock.subscribe({'channel':'UnreadRoomsChannel'});assert status=='confirm_subscription'
  results={}
  def receive():
-  event=sock.receive();assert event['identifier']==channel;return event['message']
+  event=sock.receive();assert event['identifier']==channel,event;return event['message']
  def mutate(path,method,attrs):
   status,body,headers=request(port,path,method,{'authenticity_token':token,**attrs},cookies,headers={'Accept':'text/html' if method=='PATCH' or '/boosts' in path and method=='POST' else 'text/vnd.turbo-stream.html'});assert status in [200,204,302],(side,status,body[:200]);return {'status':status,'body':body,'location':headers.get('location')}
  path=f'/rooms/{room}/messages'

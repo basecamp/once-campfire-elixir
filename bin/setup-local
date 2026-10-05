@@ -1,0 +1,28 @@
+#!/bin/sh
+# Native development setup; does not require Docker or write into reference/.
+set -eu
+ROOT=$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)
+cd "$ROOT"
+
+for command in git elixir mix ruby bundle cc make pkg-config ffmpeg ffprobe; do
+  command -v "$command" >/dev/null || { echo "Missing $command; see README's local development prerequisites" >&2; exit 1; }
+done
+pkg-config --exists vips || { echo "Missing libvips development files; on macOS: brew install vips pkg-config" >&2; exit 1; }
+
+git submodule update --init reference
+bin/export-assets --local
+
+mkdir -p var/bin
+cc -O2 -Wall -Wextra -Werror native/vips.c $(pkg-config --cflags --libs vips) -o var/bin/campfire-vips
+
+mix local.hex --force
+mix local.rebar --force
+mix deps.get
+
+cat <<'EOF'
+Local setup complete. In each shell, from the repository root, run:
+  export PATH="$PWD/var/bin:$PATH"
+  export CAMPFIRE_NO_SERVER=1 CAMPFIRE_JOBS_ADAPTER=disabled
+  export DATABASE_PATH="$PWD/var/test.sqlite3"
+Then use ordinary mix compile/test/credo/dialyzer commands (see README).
+EOF

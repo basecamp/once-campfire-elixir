@@ -25,7 +25,7 @@ defmodule Campfire.Rails.Cache do
 
     with true <- (flag &&& 127) in [2, 3, 4],
          true <- expires < 0 || expires > DateTime.to_unix(Campfire.Clock.now()),
-         <<stored::binary-size(size), payload::binary>> <- rest,
+         <<stored::binary-size(^size), payload::binary>> <- rest,
          true <- if(length < 0, do: nil, else: stored) == version do
       value = if (flag &&& 128) != 0, do: :zlib.uncompress(payload), else: payload
       {:ok, value}

@@ -192,41 +192,39 @@ defmodule Campfire.Storage do
       if File.regular?(file) do
         range = List.first(get_req_header(conn, "range"))
 
-        cond do
-          is_nil(range) || range == "" ->
-            conn
-            |> put_resp_header("cache-control", "max-age=3155695200, public, immutable")
-            |> send_file(200, file)
+        if is_nil(range) || range == "" do
+          conn
+          |> put_resp_header("cache-control", "max-age=3155695200, public, immutable")
+          |> send_file(200, file)
+        else
+          case Rack.ranges(range, blob["byte_size"]) do
+            nil ->
+              head(conn, 416)
 
-          true ->
-            case Rack.ranges(range, blob["byte_size"]) do
-              nil ->
-                head(conn, 416)
+            [] ->
+              head(conn, 416)
 
-              [] ->
-                head(conn, 416)
+            [[start, finish]] ->
+              conn
+              |> put_resp_header(
+                "content-range",
+                "bytes #{start}-#{finish}/#{blob["byte_size"]}"
+              )
+              |> send_file(206, file, start, finish - start + 1)
 
-              [[start, finish]] ->
-                conn
-                |> put_resp_header(
-                  "content-range",
-                  "bytes #{start}-#{finish}/#{blob["byte_size"]}"
-                )
-                |> send_file(206, file, start, finish - start + 1)
+            ranges ->
+              boundary = Base.encode16(:crypto.strong_rand_bytes(16), case: :lower)
 
-              ranges ->
-                boundary = Base.encode16(:crypto.strong_rand_bytes(16), case: :lower)
+              body =
+                for [start, finish] <- ranges do
+                  "\r\n--#{boundary}\r\nContent-Type: #{type}\r\nContent-Range: bytes #{start}-#{finish}/#{blob["byte_size"]}\r\n\r\n" <>
+                    read_range(file, start, finish - start + 1)
+                end
 
-                body =
-                  for [start, finish] <- ranges do
-                    "\r\n--#{boundary}\r\nContent-Type: #{type}\r\nContent-Range: bytes #{start}-#{finish}/#{blob["byte_size"]}\r\n\r\n" <>
-                      read_range(file, start, finish - start + 1)
-                  end
-
-                conn
-                |> put_resp_header("content-type", "multipart/byteranges; boundary=#{boundary}")
-                |> send_resp(206, IO.iodata_to_binary([body, "\r\n--#{boundary}--\r\n"]))
-            end
+              conn
+              |> put_resp_header("content-type", "multipart/byteranges; boundary=#{boundary}")
+              |> send_resp(206, IO.iodata_to_binary([body, "\r\n--#{boundary}--\r\n"]))
+          end
         end
       else
         conn |> put_resp_header("cache-control", "no-cache") |> head(404)

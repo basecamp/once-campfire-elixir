@@ -5,23 +5,7 @@ defmodule Campfire.RateLimiter do
   def clear, do: GenServer.call(__MODULE__, :clear)
 
   def allowed?(key, limit, seconds) do
-    if Process.whereis(Campfire.Redis) do
-      script =
-        "local n=redis.call('INCR',KEYS[1]); if n==1 then redis.call('EXPIRE',KEYS[1],ARGV[1]); end; return n"
-
-      case Redix.command(Campfire.Redis, [
-             "EVAL",
-             script,
-             "1",
-             "rate-limit:" <> key,
-             to_string(seconds)
-           ]) do
-        {:ok, count} -> count <= limit
-        {:error, _} -> true
-      end
-    else
-      GenServer.call(__MODULE__, {:hit, key, limit, seconds})
-    end
+    GenServer.call(__MODULE__, {:hit, key, limit, seconds})
   end
 
   def handle_call(:clear, _, _), do: {:reply, :ok, %{}}

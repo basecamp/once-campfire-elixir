@@ -2,7 +2,7 @@
 
 All nine compatibility contracts are verified against Rails
 `90b330024dec3e757c79b6a7e6568f93da8e3148`. The complete tuned run passes
-65 gates and 1,896 tests. Raw scopes, logs, runtime results and the source digest are
+65 gates and 1,929 tests. Raw scopes, logs, runtime results and the source digest are
 in `parity/results/verification.json` and `contracts.json`.
 
 The project follows rails-to-rust: immutable reference, source inventory, live
@@ -41,5 +41,13 @@ results are in `bench/results/baseline-20261004/` and
 `bench/TUNING.md`. The aborted latest-frame-only attempt is retained separately
 and is rejected by benchmark reports.
 
-All authorized conversion, verification, benchmark and tuning work is complete.
+The later frozen `b6b82e5` → `7c1ed67` comparison records four balanced rounds on
+native x86_64 Linux and native ARM64 Linux under OrbStack. The clean x86_64 run
+regressed populated dynamic HTTP throughput 16–47% at concurrency 16 and Cable
+throughput 5–20%. The ARM64 response observations were mostly faster but are not a
+clean performance result: unrelated shared-host contention occurred and one candidate
+round retained 1,125 queued jobs. Both complete platform tables and all raw rounds are
+retained under `bench/results/`; no universal performance improvement is claimed.
+
+All authorized conversion, verification, benchmark and tuning evidence is recorded.
 The port does not match Rust's measured capacity. No production deployment was requested.

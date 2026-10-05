@@ -1,6 +1,7 @@
 defmodule Campfire.HttpResponse do
   @moduledoc "Rails default headers, Rack ETags and conditional GET behavior."
   import Plug.Conn
+  alias Plug.Conn.Status
 
   @security [
     {"x-frame-options", "SAMEORIGIN"},
@@ -103,7 +104,7 @@ defmodule Campfire.HttpResponse do
         413 => "Content Too Large",
         422 => "Unprocessable Content",
         500 => "Internal Server Error"
-      }[status] || Plug.Conn.Status.reason_phrase(status)
+      }[status] || Status.reason_phrase(status)
 
     cond do
       List.first(formats) == "json" ->

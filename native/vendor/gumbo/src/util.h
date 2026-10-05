@@ -19,6 +19,7 @@ char* gumbo_strdup(const char* str) XMALLOC NONNULL_ARGS;
 void* gumbo_alloc(size_t size) XMALLOC;
 void* gumbo_realloc(void* ptr, size_t size) RETURNS_NONNULL;
 void gumbo_free(void* ptr);
+void gumbo_set_allocation_limit(size_t size);
 
 // Debug wrapper for printf
 #ifdef GUMBO_DEBUG

@@ -134,7 +134,7 @@ defmodule Campfire.Chat do
 
   def update_message(message, body, attrs \\ %{}) do
     body_present = !is_nil(body) || Map.has_key?(attrs, "body")
-    body = if !is_nil(body), do: RichText.serialize(to_string(body)), else: nil
+    body = if is_nil(body), do: nil, else: RichText.serialize(to_string(body))
 
     old_text =
       DB.one(

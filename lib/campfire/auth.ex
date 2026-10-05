@@ -1,5 +1,5 @@
 defmodule Campfire.Auth do
-  alias Campfire.{DB, Rails, Chat}
+  alias Campfire.{Chat, DB, Rails}
   import Plug.Conn
 
   def session_lookup(conn) do

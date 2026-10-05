@@ -8,6 +8,8 @@ defmodule Campfire.MixProject do
       elixir: "~> 1.19",
       start_permanent: Mix.env() == :prod,
       test_ignore_filters: [~r/test\/support\//],
+      compilers: [:elixir_make] ++ Mix.compilers(),
+      make_cwd: "native",
       deps: [
         {:bandit, "~> 1.8"},
         {:plug, "~> 1.18"},
@@ -16,7 +18,10 @@ defmodule Campfire.MixProject do
         {:bcrypt_elixir, "~> 3.3"},
         {:floki, "~> 0.38"},
         {:redix, "~> 1.5"},
-        {:qqr, "0.2.0"}
+        {:qqr, "0.2.0"},
+        {:elixir_make, "~> 0.9", runtime: false},
+        {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+        {:dialyxir, "~> 1.4", only: :dev, runtime: false}
       ]
     ]
   end

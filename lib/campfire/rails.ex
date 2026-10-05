@@ -194,16 +194,17 @@ defmodule Campfire.Rails do
   defp unexpired?(nil, _), do: true
 
   defp unexpired?(expires, now) do
-    with {:ok, time, _} <- DateTime.from_iso8601(expires),
-         do: DateTime.compare(time, now) == :gt,
-         else: (_ -> false)
+    case DateTime.from_iso8601(expires) do
+      {:ok, time, _} -> DateTime.compare(time, now) == :gt
+      _ -> false
+    end
   end
 
   defp legacy(value, purpose, expires),
     do:
-      "{\"_rails\":{\"message\":" <>
+      ~s({"_rails":{"message":) <>
         json(Base.encode64(json(value))) <>
-        ",\"exp\":" <> json(expires) <> ",\"pur\":" <> json(purpose) <> "}}"
+        ~s(,"exp":) <> json(expires) <> ~s(,"pur":) <> json(purpose) <> "}}"
 
   def csrf_token, do: Base.url_encode64(:crypto.strong_rand_bytes(32), padding: false)
 

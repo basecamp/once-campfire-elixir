@@ -15,13 +15,48 @@
  limitations under the License.
 */
 
+#include <errno.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "util.h"
 #include "nokogiri_gumbo.h"
 
+typedef union {
+  size_t size;
+  long double align;
+  void* pointer;
+} GumboAllocationHeader;
+
+static size_t allocation_limit = 0;
+static size_t allocated = 0;
+
+static void allocation_failed(void) {
+  errno = ENOMEM;
+  perror("gumbo_alloc");
+  abort();
+}
+
+void gumbo_set_allocation_limit(size_t size) {
+  if (allocated != 0) abort();
+  allocation_limit = size;
+}
+
 void* gumbo_alloc(size_t size) {
+  if (allocation_limit != 0) {
+    if (size > SIZE_MAX - sizeof(GumboAllocationHeader)) allocation_failed();
+    const size_t total = sizeof(GumboAllocationHeader) + size;
+    if (total > allocation_limit - allocated) {
+      allocation_failed();
+    }
+    GumboAllocationHeader* header = malloc(total);
+    if (unlikely(header == NULL)) allocation_failed();
+    header->size = total;
+    allocated += total;
+    return header + 1;
+  }
+
   void* ptr = malloc(size);
   if (unlikely(ptr == NULL)) {
     perror(__func__);
@@ -31,6 +66,22 @@ void* gumbo_alloc(size_t size) {
 }
 
 void* gumbo_realloc(void* ptr, size_t size) {
+  if (allocation_limit != 0) {
+    if (ptr == NULL) return gumbo_alloc(size);
+    GumboAllocationHeader* header = (GumboAllocationHeader*)ptr - 1;
+    const size_t previous = header->size;
+    if (size > SIZE_MAX - sizeof(*header)) allocation_failed();
+    const size_t total = sizeof(*header) + size;
+    if (total > allocation_limit - (allocated - previous)) {
+      allocation_failed();
+    }
+    header = realloc(header, total);
+    if (unlikely(header == NULL)) allocation_failed();
+    header->size = total;
+    allocated = allocated - previous + total;
+    return header + 1;
+  }
+
   ptr = realloc(ptr, size);
   if (unlikely(ptr == NULL)) {
     perror(__func__);
@@ -40,6 +91,12 @@ void* gumbo_realloc(void* ptr, size_t size) {
 }
 
 void gumbo_free(void* ptr) {
+  if (allocation_limit != 0 && ptr != NULL) {
+    GumboAllocationHeader* header = (GumboAllocationHeader*)ptr - 1;
+    allocated -= header->size;
+    free(header);
+    return;
+  }
   free(ptr);
 }
 
