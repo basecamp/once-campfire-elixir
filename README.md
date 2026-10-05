@@ -4,10 +4,11 @@ An Elixir implementation of [ONCE Campfire](https://github.com/basecamp/once-cam
 It keeps the existing SQLite database, storage layout, signed/encrypted cookies and
 Action Cable protocol, so existing installs can retain their data and sessions.
 
-The application runs on Elixir 1.19.5 / OTP 28 with Bandit and Plug. Redis and a
-native Resque-compatible worker handle jobs and broadcasts; the same Thruster
-binary as Rails handles TLS, HTTP/2 and proxy caching. libvips and FFmpeg process
-media. The Rails frontend is preserved, including Turbo and the composer.
+The application runs on Elixir 1.20.4 / OTP 29 with Bandit and Plug. Local OTP
+registries handle broadcasts, ETS holds rendered fragments, and a persistent Redis
+queue feeds the native Resque-compatible worker. The same Thruster binary as Rails
+handles TLS, HTTP/2 and proxy caching. libvips and FFmpeg process media. The Rails
+frontend is preserved, including Turbo and the composer.
 
 ## Running it
 
@@ -27,6 +28,19 @@ bin/export-assets
 docker build -t campfire-elixir:release .
 ```
 
+On an Apple Silicon Mac building `linux/amd64` images through Rosetta, OTP's JIT may
+fail during the build because userspace emulation cannot use its default dual memory
+mapping. Opt in to single-mapped JIT memory for that local image only:
+
+```sh
+docker build --platform linux/amd64 -f Dockerfile.dev \
+  --build-arg ERL_FLAGS='+JMsingle true' -t campfire-elixir:toolchain .
+```
+
+The build argument is empty by default, so native Linux production images retain
+OTP's normal JIT configuration. Record this flag and the emulated architecture in
+benchmark metadata; use the same flag for every compared arm.
+
 Then run Docker:
 
 ```sh
@@ -43,17 +57,56 @@ docker run -d --name campfire -p 80:80 -p 443:443 \
   installations must retain their storage and secrets.
 - Web Push requires a valid P-256 VAPID key pair in URL-safe Base64. Use your own
   production secrets; `parity/reference.env` contains public test keys.
-- Redis starts inside the container by default. `REDIS_URL` selects an external
-  Redis. The native job worker starts automatically; `bin/jobs` can also run it
-  against the same database, Redis and storage environment.
+- Redis starts inside the container by default with AOF persistence under
+  `/rails/storage/redis`. `REDIS_URL` selects an external Redis, whose durability is
+  then the operator's responsibility. Redis transports jobs only; request fragment
+  caching and single-node Cable fanout remain in the BEAM. The native job worker
+  starts automatically; `bin/jobs` can also run it against the same database, Redis
+  and storage environment. During a rolling Rails-to-Elixir cutover,
+  `CAMPFIRE_CABLE_REDIS_BRIDGE=1` temporarily bridges Action Cable broadcasts through
+  the shared Redis instance; normal single-node operation should leave it disabled.
 - The app listener binds loopback behind Thruster. Forwarded URL headers are
-  trusted from the local proxy. The current Dockerfile packages the amd64
-  Thruster binary.
+  trusted from the local proxy. The Dockerfile selects the pinned Thruster binary
+  for amd64/x86_64 or arm64/aarch64 release images.
 - The image includes ONCE backup/restore hooks. Fresh installation, backup/restore
   and Rails → Elixir → Rails rollback have passed on disposable volumes. A hosted
   image and automated release publishing are not configured in this repository.
 
 ## Performance
+
+The latest matched comparison freezes upstream baseline `b6b82e5` and candidate
+`7c1ed67` on Elixir 1.20.4 / OTP 29.1.1 with four server and four load-generator
+CPUs, the same populated seed, four balanced rounds, and validated HTTP, Cable and
+upload responses. Results are platform-specific; they do **not** establish a general
+performance improvement.
+
+The native x86_64 Linux run is the authoritative clean benchmark: all eight rounds
+ended with empty job queues and zero failed jobs. At 16 HTTP connections the
+candidate regressed on every populated dynamic route and on Cable fanout:
+
+| Native x86_64 Linux metric | Baseline | Candidate | Change |
+|---|---:|---:|---:|
+| Room page | 305.4 req/s | 255.8 req/s | −16.3% |
+| Messages page | 429.5 req/s | 330.3 req/s | −23.1% |
+| Sidebar | 462.0 req/s | 243.5 req/s | −47.3% |
+| Search | 448.8 req/s | 318.9 req/s | −28.9% |
+| Post a message | 287.6 req/s | 174.1 req/s | −39.5% |
+| Cable, 1,000 clients | 34.85 msg/s | 33.20 msg/s | −4.7% |
+
+Native ARM64 Linux containers under OrbStack on an M4 Pro showed different response
+rates: room, messages, search and posting improved at 16 connections, while sidebar
+regressed 6.8%. Those are qualified shared-workstation observations, not a clean
+benchmark result: unrelated macOS activity drove host load as high as 29.06, and one
+candidate round retained 1,125 queued jobs. All rounds remain in the evidence; none
+was removed or replaced after seeing its result.
+
+See the [clean Linux report](bench/results/native-linux-b6b82e5-7c1ed67-20261005-nofile65536/README.md)
+and [qualified M4 report](bench/results/m4-arm64-b6b82e5-7c1ed67-20261005/README.md)
+for medians, complete ranges, raw interleaved records, immutable image/runtime
+identities, fixture provenance and limitations. No cause for the cross-platform
+performance difference was isolated.
+
+### October 4 four-language comparison
 
 Production images, the same populated seed and four pinned hardware threads per app
 on an AMD Ryzen AI MAX+ 395. These are medians of two runs per version on October 4,
@@ -137,7 +190,71 @@ ledger and reusable migration tooling in [`tools/rails-to-elixir/`](tools/rails-
 The Rails reference is pinned to
 [`90b3300`](https://github.com/basecamp/once-campfire/commit/90b330024dec3e757c79b6a7e6568f93da8e3148).
 
-Use the Docker toolchain above, then run:
+### Local macOS development (no Docker)
+
+The pinned Docker toolchain uses Elixir 1.20.4 / OTP 29; native development is also
+tested with Elixir 1.19.5 / OTP 28. Use Ruby 3.4.10 (the version in
+`reference/.ruby-version`) on your `PATH`. Ruby is only needed to build the genuine
+Rails frontend, not to compile or run Elixir afterward. Install Xcode Command Line
+Tools (`xcode-select --install`), Bundler, and the native media dependencies:
+
+```sh
+brew install vips ffmpeg pkg-config
+gem install bundler -v 4.0.13
+bin/setup-local
+```
+
+`bin/setup-local` initializes the pinned submodule, runs `bin/export-assets --local`,
+compiles the libvips helper into `var/bin`, and fetches Hex dependencies. Mix compiles
+the vendored Gumbo helper during the first Elixir build. Asset export installs the frozen
+Rails bundle and precompiles assets in a disposable copy under `var/`; it never runs
+Bundler or Rails inside `reference/`. The first run needs network access to public
+GitHub, RubyGems and Hex sources. No reference/toolchain Docker images, Redis service
+or Rails secrets are required.
+
+In each shell, from the repository root:
+
+```sh
+export PATH="$PWD/var/bin:$PATH"
+export CAMPFIRE_NO_SERVER=1 CAMPFIRE_JOBS_ADAPTER=disabled
+export DATABASE_PATH="$PWD/var/test.sqlite3"
+
+mix format --check-formatted
+mix compile --warnings-as-errors
+mix credo --strict
+mix dialyzer
+mix test --warnings-as-errors
+```
+
+The database must be disposable: tests restore fixtures into it. These environment
+variables reproduce the test isolation supplied by `bin/mix`, which remains a
+**Docker wrapper**. Use plain `mix` for native development. Do not reuse `_build/`
+or `deps/` between host and Docker builds; remove those generated directories and
+fetch dependencies again when switching toolchains. Dialyzer builds its PLT on
+the first run, so expect that run to take longer.
+
+**Media parity is platform-dependent.** The full local test command intentionally
+keeps the exact Linux byte/checksum assertions in `media_test.exs` and
+`transformations_test.exs`. Homebrew libvips/FFmpeg and their codecs can produce
+different bytes; these failures do not indicate a missing bootstrap step. On macOS
+with libvips 8.18.7, 33 such assertions failed while all other tests passed. Use the
+pinned Docker toolchain for authoritative byte-level media parity; do not regenerate
+the Rails vectors or weaken these assertions to accommodate host codec versions.
+
+Native development also uses Exqlite's bundled SQLite build, while the pinned Docker
+toolchain sets `EXQLITE_USE_SYSTEM=1` and links the image's SQLite library. Both must
+pass the same database behavior tests, but record this engine difference alongside
+codec versions when comparing local results; pinned Docker remains authoritative for
+matched parity and benchmark evidence.
+
+If only the asset manifest is missing, `bin/export-assets --local` is sufficient
+(with the pinned submodule, Ruby and Bundler installed). No placeholder manifest is
+used. Without `--local`, export still requires the revision-matched
+`campfire-reference:app` image from the production build instructions above.
+
+### Pinned Docker parity workflow
+
+Build the Docker toolchain and reference image above, then run:
 
 ```sh
 bin/mix format --check-formatted
@@ -150,7 +267,7 @@ bin/rails-to-elixir doctor
 bin/parity-services stop
 ```
 
-The complete verified run passes **65 gates and 1,896 tests**, including actual
+The complete verified run passes **65 gates and 1,929 tests**, including actual
 Chromium flows, all-table/FTS/storage mutation snapshots, injected transaction
 failures, media operations, cross-runtime Cable delivery and session revocation,
 worker claims/failures/drain, webhook replies and encrypted HTTPS push delivery,
@@ -160,9 +277,24 @@ and [conversion state](plans/elixir-conversion.md).
 
 The fixture services use isolated data, Redis and ports 47070/47071/47079. Frozen
 Rails comparisons additionally require the `campfire-reference:latest` image from
-the Rust parity harness, built from the same pinned reference. Live gates reset
-their fixture data and must run sequentially. Unit tests disable the HTTP server
-and external job adapter.
+the public Rust parity harness. Its initial self-contained Docker resources are at
+[`95af38b`](https://github.com/basecamp/once-campfire-rust/commit/95af38bcc90f0ab06f703007ca25aa9e199536f1),
+which pins the same Rails revision. Build both reference tags from a separate clone:
+
+```sh
+git clone --recurse-submodules https://github.com/basecamp/once-campfire-rust.git
+cd once-campfire-rust
+git checkout 95af38bcc90f0ab06f703007ca25aa9e199536f1
+git submodule update --init reference
+PARITY_RUNTIME=docker parity/bin/reference build
+```
+
+This produces `campfire-reference:app` and the parity wrapper
+`campfire-reference:latest`. On Apple Silicon, use architecture-matched ARM64 images
+and the recorded ARM64 media oracle, or run the benchmark's documented `linux/amd64`
+environment consistently; do not mix native and emulated images within a comparison.
+Live gates reset their fixture data and must run sequentially. Unit tests disable the
+HTTP server and external job adapter.
 
 For the full gate run, start a disposable Chromium instance on port 47080 with a
 separate profile, then start the fixture services:
@@ -195,14 +327,33 @@ The compatibility checks retain explicit rich-text comparison rules:
   the intended empty string. Failed plain-text extraction renders the Rails
   failed-message partial.
 
-The corpus covers 1,058 stored-content cases. The native parser uses unmodified
-Gumbo sources from Rails' Nokogiri 1.19.4. Expected oracle output is retained;
-raw differences and the comparison rules are documented in
+The corpus covers 1,058 stored-content cases. Four supervised, persistent helper
+processes run Gumbo from Rails' Nokogiri 1.19.4 outside the BEAM. Expected oracle
+output is retained; raw differences and the comparison rules are documented in
 [`plans/richtext-comparison.md`](plans/richtext-comparison.md).
+
+Each helper limits Gumbo allocations to 256 MiB and enforces a 25-second parse and
+serialization deadline without restricting platform runtime or emulator memory.
+Native allocator failures, assertions, pathological expansion and timeouts terminate
+and replace only that helper; they fail the parser call rather than the application VM.
+Helpers also recycle after returning at least 1 MiB of serialized output to release
+platform allocator high-water memory.
+
+Serialized parser output intentionally remains uncapped so valid large documents keep
+Rails behavior. A compact adversarial fragment can therefore expand into a large port
+packet and decoded BEAM terms; the helper allocation limit does not bound that caller
+memory. This is a known residual resource-exhaustion risk rather than a claimed fix or
+an undocumented compatibility limit.
 
 Elixir retains Redis and Resque-compatible jobs, while Rust uses integrated
 queues and a different frontend/server implementation. Their actual process
 models, response sizes and compression ratios are recorded with the benchmarks.
+The current SQLite design keeps one serialized writer and uses WAL-backed pooled
+readers; Redis remains only for cross-process job transport. A new matched benchmark
+of those changes is recorded above: it regressed dynamic HTTP and Cable throughput on
+native x86_64 Linux, while the qualified M4 observations were mixed and failed the
+fully-drained-job audit. Replacing Redis entirely would require a durable transactional
+outbox or an explicitly accepted loss of queued work.
 No production cutover has been performed.
 
 ## License
