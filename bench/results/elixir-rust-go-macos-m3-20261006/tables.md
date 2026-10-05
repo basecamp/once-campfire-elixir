@@ -30,3 +30,13 @@ Medians of 3 alternating rounds at 16 concurrent connections. Each cell is throu
 | Search | 26,790 req/s (146 µs) | 3,669 req/s (991 µs) | 7.30× |
 | Post a message | 1,995 req/s (1,461 µs) | 4,948 req/s (590 µs) | 0.40× |
 
+### Elixir and Rust ccece30
+
+| Route | Elixir | Rust ccece30 | Elixir ÷ Rust (req/s) |
+|---|---:|---:|---:|
+| Room page | 17,237 req/s (228 µs) | 26,796 req/s (130 µs) | 0.64× |
+| Messages page | 25,238 req/s (157 µs) | 28,335 req/s (121 µs) | 0.89× |
+| Sidebar | 32,121 req/s (122 µs) | 27,538 req/s (126 µs) | 1.17× |
+| Search | 26,790 req/s (146 µs) | 25,488 req/s (125 µs) | 1.05× |
+| Post a message | 1,995 req/s (1,461 µs) | 6,101 req/s (431 µs) | 0.33× |
+
