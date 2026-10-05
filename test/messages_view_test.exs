@@ -20,6 +20,47 @@ defmodule Campfire.MessagesViewTest do
     refute second =~ "first-session-token"
   end
 
+  test "batch rendering preserves current escaped tokens and tokenless broadcasts" do
+    messages = DB.query("SELECT * FROM messages ORDER BY id DESC LIMIT 2")
+    assert length(messages) == 2
+    base = "https://campfire.test"
+
+    for {token, escaped} <- [
+          {"first-\"&<>'", "first-&quot;&amp;&lt;&gt;&#39;"},
+          {"second-'>&\"<", "second-&#39;&gt;&amp;&quot;&lt;"}
+        ] do
+      html = MessagesView.render_many(messages, base, token)
+      assert html == Enum.map_join(messages, &MessagesView.render(&1, base, token))
+
+      values = Regex.scan(~r/name="authenticity_token" value="([^"]*)"/, html, capture: [1])
+      assert Enum.uniq(values) == [[escaped]]
+      refute html =~ "campfire-csrf-input"
+
+      broadcast = MessagesView.render_many(messages, base, nil)
+      assert broadcast == Enum.map_join(messages, &MessagesView.render(&1, base))
+      refute broadcast =~ ~s(name="authenticity_token")
+      refute broadcast =~ "campfire-csrf-input"
+    end
+
+    assert MessagesView.render_many([], base, "unused-token") == ""
+  end
+
+  test "batch rendering preserves tokenless cached items and isolates a failed item" do
+    [first, second] = DB.query("SELECT * FROM messages ORDER BY id LIMIT 2")
+    base = "https://campfire.test"
+    token = "batch-session-token"
+    broadcast = MessagesView.render(first, base)
+    failed = MessagesView.render(%{second | "creator_id" => -1}, base, token)
+    assert failed =~ "Failed to load message content"
+
+    html =
+      MessagesView.render_many([first, %{second | "creator_id" => -1}, second], base, token)
+
+    assert html == broadcast <> failed <> MessagesView.render(second, base, token)
+    assert html =~ ~s(value="batch-session-token")
+    refute html =~ "campfire-csrf-input"
+  end
+
   test "broadcast-cached messages preserve Rails' tokenless fragment behavior", %{
     message: message
   } do
