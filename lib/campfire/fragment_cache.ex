@@ -72,6 +72,27 @@ defmodule Campfire.FragmentCache do
     end
   end
 
+  @doc """
+  A value that depends only on `key`, such as a deterministic signature or the gzip piece of a
+  page's per-request text keyed by its digest, computed on first use. It shares the
+  fragments' byte bound, counting `size` bytes (the value's own size when it is a binary).
+  """
+  def memo(key, compute) do
+    case :ets.lookup(@table, key) do
+      [{_, :memo, value, _}] ->
+        value
+
+      _ ->
+        value = compute.()
+        store(key, :memo, value, memo_size(value), %{})
+        value
+    end
+  end
+
+  defp memo_size(value) when is_binary(value), do: byte_size(value)
+  defp memo_size({piece, _crc, _size}) when is_binary(piece), do: byte_size(piece)
+  defp memo_size(_), do: 64
+
   defp fetch(key, version, render) do
     case :ets.lookup(@table, key) do
       [{_, ^version, html, _}] ->
@@ -79,17 +100,19 @@ defmodule Campfire.FragmentCache do
 
       _ ->
         html = render.()
-        size = byte_size(html)
-
-        # The default covers a concurrent wipe, which briefly removes the counter.
-        if :ets.update_counter(@table, :bytes, size, {:bytes, 0}) > @max_bytes do
-          :ets.delete_all_objects(@table)
-          :ets.insert(@table, {:bytes, size})
-        end
-
-        :ets.insert(@table, {key, version, html, %{}})
+        store(key, version, html, byte_size(html), %{})
         html
     end
+  end
+
+  defp store(key, version, value, size, derived) do
+    # The default covers a concurrent wipe, which briefly removes the counter.
+    if :ets.update_counter(@table, :bytes, size, {:bytes, 0}) > @max_bytes do
+      :ets.delete_all_objects(@table)
+      :ets.insert(@table, {:bytes, size})
+    end
+
+    :ets.insert(@table, {key, version, value, derived})
   end
 
   defp identity(:message, record), do: {{:message, record["id"]}, record["updated_at"]}

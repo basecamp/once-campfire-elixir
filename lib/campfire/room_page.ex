@@ -29,7 +29,7 @@ defmodule Campfire.RoomPage do
           marker =
             "<!--campfire-messages-" <> Base.encode16(:crypto.strong_rand_bytes(16)) <> "-->"
 
-          account = DB.one("SELECT * FROM accounts LIMIT 1")
+          account = Campfire.Page.account()
           gid = Base.url_encode64("gid://campfire/#{room["type"]}/#{room["id"]}", padding: false)
           name = display_name(room, user)
 
@@ -46,9 +46,9 @@ defmodule Campfire.RoomPage do
             namespace: namespace(room),
             room_updated: MessagesView.epoch(room["updated_at"]),
             base: Assets.html_escape(Auth.base(conn)),
-            vapid: Assets.html_escape(System.get_env("VAPID_PUBLIC_KEY", "")),
+            vapid: Campfire.Release.vapid_public_key(),
             account_version:
-              account["updated_at"] |> String.replace(~r/[^0-9]/, "") |> String.slice(0, 14),
+              account["updated_at"] |> Campfire.Chat.digits() |> String.slice(0, 14),
             stream: Rails.sign_stream(gid <> ":messages"),
             invitation: invitation_for(conn, user, account, room),
             messages: marker
@@ -56,6 +56,7 @@ defmodule Campfire.RoomPage do
 
           {conn, html} =
             Campfire.Page.render(conn, user, data,
+              account: account,
               title: Assets.html_escape(name),
               body_class: "sidebar",
               head: head(assigns),
@@ -112,8 +113,7 @@ defmodule Campfire.RoomPage do
 
       invitation(
         admin: user["role"] == 1,
-        account_version:
-          account["updated_at"] |> String.replace(~r/[^0-9]/, "") |> String.slice(0, 14),
+        account_version: account["updated_at"] |> Campfire.Chat.digits() |> String.slice(0, 14),
         join_url: Assets.html_escape(url),
         qr: Base.url_encode64(url)
       )

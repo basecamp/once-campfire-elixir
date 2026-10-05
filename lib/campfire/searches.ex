@@ -94,6 +94,10 @@ defmodule Campfire.Searches do
         ~s(      <a class="align-center gap room btn txt-nowrap" href="/searches?q=#{Assets.html_escape(URI.encode_www_form(search["query"]))}">\n        <span class="overflow-ellipsis">“#{Assets.html_escape(search["query"])}”</span>\n</a>)
       end) <> if(recents == [], do: "", else: "\n")
 
+    # Messages are spliced in after layout so their cached gzip pieces are reused.
+    marker = "<!--campfire-messages-" <> Base.encode16(:crypto.strong_rand_bytes(16)) <> "-->"
+    fragments = MessagesView.render_parts(messages, Auth.base(conn))
+
     assigns = [
       query: if(Chat.present?(q), do: Assets.html_escape(q)),
       raw_query: if(raw, do: Assets.html_escape(raw)),
@@ -102,7 +106,7 @@ defmodule Campfire.Searches do
       has_recents: recents != [],
       recent_links: links,
       return_room: return_room["id"],
-      messages: MessagesView.render_many(messages, Auth.base(conn))
+      messages: marker
     ]
 
     {conn, html} =
@@ -115,6 +119,11 @@ defmodule Campfire.Searches do
         sidebar: sidebar(assigns)
       )
 
-    conn |> put_resp_content_type("text/html") |> send_resp(200, html)
+    {body, parts} = Campfire.HttpCompression.splice(html, marker, fragments)
+
+    conn
+    |> put_resp_content_type("text/html")
+    |> assign(:page_parts, parts)
+    |> send_resp(200, body)
   end
 end

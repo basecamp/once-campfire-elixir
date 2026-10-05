@@ -39,7 +39,7 @@ defmodule Campfire.AccountPage do
 
       {administrators, members} = Enum.split_with(users, &(&1["role"] == 1))
       invitation = Auth.base(conn) <> "/join/" <> account["join_code"]
-      version = String.replace(account["updated_at"], ~r/[^0-9]/, "") |> String.slice(0, 14)
+      version = Campfire.Chat.digits(account["updated_at"]) |> String.slice(0, 14)
       settings = Jason.decode!(account["settings"] || "{}")
       restriction = settings["restrict_room_creation_to_administrators"]
 
@@ -68,7 +68,7 @@ defmodule Campfire.AccountPage do
             do: logo_delete(account_version: version),
             else: ""
           ),
-        version: Assets.html_escape(System.get_env("APP_VERSION", "dev"))
+        version: Assets.html_escape(Campfire.Release.version())
       ]
 
       content = if admin, do: account(assigns), else: readonly(assigns)

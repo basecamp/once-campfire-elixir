@@ -24,12 +24,21 @@ defmodule Campfire.Sidebar do
 
       {directs, others} = Enum.split_with(rows, &(&1["type"] == "Rooms::Direct"))
 
-      excludes =
+      # Every member of the user's direct rooms in one query, in each room's
+      # index_memberships_on_room_id_and_user_id order: they are excluded from the
+      # placeholders, and each listed direct room shows its members.
+      direct_members =
         DB.query(
-          "SELECT DISTINCT user_id FROM memberships WHERE room_id IN (SELECT r.id FROM rooms r JOIN memberships m ON m.room_id=r.id WHERE m.user_id=? AND r.type='Rooms::Direct')",
+          ~s{SELECT m.room_id AS "sidebar.room_id", u.* FROM memberships m JOIN users u ON u.id=m.user_id WHERE m.room_id IN (SELECT r.id FROM rooms r JOIN memberships mm ON mm.room_id=r.id WHERE mm.user_id=? AND r.type='Rooms::Direct') ORDER BY m.room_id, m.user_id},
           [user["id"]]
         )
-        |> Enum.map(& &1["user_id"])
+        |> Enum.group_by(& &1["sidebar.room_id"], &Map.delete(&1, "sidebar.room_id"))
+
+      excludes =
+        direct_members
+        |> Map.values()
+        |> List.flatten()
+        |> Enum.map(& &1["id"])
         |> then(&Enum.uniq([user["id"] | &1]))
 
       users =
@@ -37,7 +46,7 @@ defmodule Campfire.Sidebar do
         |> Enum.reject(&(&1["id"] in excludes))
         |> Enum.take(max(20 - length(excludes), 0))
 
-      account = DB.one("SELECT settings FROM accounts LIMIT 1")
+      account = Campfire.Page.account()
       settings = Jason.decode!(account["settings"] || "{}")
 
       content =
@@ -54,7 +63,12 @@ defmodule Campfire.Sidebar do
           directs:
             directs
             |> Enum.sort_by(& &1["updated_at"], :desc)
-            |> Enum.map_join(&render_direct(&1, user)),
+            |> Enum.map_join(fn room ->
+              members =
+                Enum.reject(Map.get(direct_members, room["id"], []), &(&1["id"] == user["id"]))
+
+              render_direct(room, user, members)
+            end),
           shared:
             Enum.map_join(others, fn room ->
               "          " <>
@@ -75,7 +89,7 @@ defmodule Campfire.Sidebar do
             end)
         )
 
-      {conn, html} = Campfire.Page.render(conn, user, data, content: content)
+      {conn, html} = Campfire.Page.render(conn, user, data, account: account, content: content)
 
       conn
       |> Auth.set_auth_cookie(session)
@@ -88,8 +102,8 @@ defmodule Campfire.Sidebar do
 
   def avatar_path(user),
     do:
-      "/users/#{Rails.signed_id("User", user["id"], "avatar")}/avatar?v=" <>
-        (user["updated_at"] |> String.replace(~r/[^0-9]/, "") |> String.slice(0, 14))
+      "/users/#{Campfire.Mentions.avatar_token(user)}/avatar?v=" <>
+        (user["updated_at"] |> Campfire.Chat.digits() |> String.slice(0, 14))
 
   defp first_name(user), do: user["name"] |> String.split() |> List.first() || ""
 
@@ -102,12 +116,13 @@ defmodule Campfire.Sidebar do
     )
   end
 
-  def render_direct(room, user) do
+  def render_direct(room, user, members \\ nil) do
     members =
-      DB.query(
-        "SELECT u.* FROM users u JOIN memberships m ON m.user_id=u.id WHERE m.room_id=? AND u.id!=?",
-        [room["id"], user["id"]]
-      )
+      members ||
+        DB.query(
+          "SELECT u.* FROM users u JOIN memberships m ON m.user_id=u.id WHERE m.room_id=? AND u.id!=?",
+          [room["id"], user["id"]]
+        )
 
     members = if members == [], do: [user], else: members
 

@@ -49,12 +49,14 @@ defmodule Campfire.Messages do
             Rails.json(Enum.map(messages, &Chat.present_message(&1, Auth.base(conn))))
           )
         else
-          body = MessagesView.render_many(messages, Auth.base(conn))
+          # Fragment parts, so the response reuses each message's cached gzip piece.
+          parts = [{:raw, "\n"} | MessagesView.render_parts(messages, Auth.base(conn))]
 
           conn
           |> Auth.set_csrf_session(data)
           |> put_resp_content_type("text/html")
-          |> send_resp(200, "\n" <> body)
+          |> assign(:page_parts, parts)
+          |> send_resp(200, Campfire.HttpCompression.body(parts))
         end
     end
   end

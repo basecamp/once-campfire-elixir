@@ -69,8 +69,8 @@ defmodule Campfire.ProfilePage do
   end
 
   def avatar_path(user) do
-    version = user["updated_at"] |> String.replace(~r/[^0-9]/, "") |> String.slice(0, 14)
-    "/users/#{Rails.signed_id("User", user["id"], "avatar")}/avatar?v=#{version}"
+    version = user["updated_at"] |> Campfire.Chat.digits() |> String.slice(0, 14)
+    "/users/#{Campfire.Mentions.avatar_token(user)}/avatar?v=#{version}"
   end
 
   EEx.function_from_file(:defp, :self_label, "priv/templates/transfer_label_self.html.eex", [

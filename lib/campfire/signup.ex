@@ -37,8 +37,7 @@ defmodule Campfire.Signup do
       form(
         path: Assets.html_escape(conn.request_path),
         account_name: Assets.html_escape(account["name"]),
-        account_version:
-          account["updated_at"] |> String.replace(~r/[^0-9]/, "") |> String.slice(0, 14),
+        account_version: account["updated_at"] |> Campfire.Chat.digits() |> String.slice(0, 14),
         help: Campfire.Sessions.help()
       )
 

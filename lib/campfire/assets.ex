@@ -19,18 +19,16 @@ defmodule Campfire.Assets do
   def file(relative), do: Application.app_dir(:campfire, "priv/" <> relative)
   def read(relative), do: relative |> file() |> File.read!()
 
-  def path(logical) do
-    "/assets/" <> Map.fetch!(@manifest, logical)["digested_path"]
+  # One clause per manifest entry, so a template's asset path is a literal rather than a map
+  # lookup and concatenation (a room page asks for over 200).
+  for {logical, %{"digested_path" => digested}} <- @manifest do
+    def path(unquote(logical)), do: unquote("/assets/" <> digested)
   end
 
-  def html_escape(text),
-    do:
-      text
-      |> String.replace("&", "&amp;")
-      |> String.replace("<", "&lt;")
-      |> String.replace(">", "&gt;")
-      |> String.replace("\"", "&quot;")
-      |> String.replace("'", "&#39;")
+  def path(logical), do: raise(KeyError, key: logical, term: @manifest)
+
+  # The same five entities as before, escaped in one pass.
+  def html_escape(text), do: Plug.HTML.html_escape(text)
 
   def manifest(base) do
     account = Campfire.DB.one("SELECT * FROM accounts LIMIT 1")
@@ -38,7 +36,7 @@ defmodule Campfire.Assets do
 
     version =
       if account,
-        do: account["updated_at"] |> String.replace(~r/[^0-9]/, "") |> String.slice(0, 14),
+        do: account["updated_at"] |> Campfire.Chat.digits() |> String.slice(0, 14),
         else: nil
 
     logo = "/account/logo" <> if(version, do: "?v=#{version}", else: "")

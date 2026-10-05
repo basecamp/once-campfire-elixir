@@ -52,7 +52,7 @@ defmodule Campfire.ModelCache do
     version = record["updated_at"] || record["created_at"]
 
     if version do
-      stamp = version |> String.replace(~r/[^0-9]/, "") |> String.pad_trailing(20, "0")
+      stamp = version |> Campfire.Chat.digits() |> String.pad_trailing(20, "0")
       "#{table}/#{record["id"]}-#{stamp}"
     else
       "#{table}/#{record["id"]}"

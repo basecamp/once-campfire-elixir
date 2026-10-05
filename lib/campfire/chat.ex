@@ -12,6 +12,10 @@ defmodule Campfire.Chat do
   def integer(_), do: 0
   def present?(v), do: is_binary(v) and String.trim(v) != ""
 
+  @doc "The ASCII digits of a timestamp, as `String.replace(value, ~r/[^0-9]/, \"\")` gave."
+  def digits(value) when is_binary(value),
+    do: for(<<c <- value>>, c in ?0..?9, into: "", do: <<c>>)
+
   def bot(key) do
     case String.split(String.trim(key), "-") do
       [id, token | _] ->
@@ -346,7 +350,7 @@ defmodule Campfire.Chat do
 
   def present_user(user, base) do
     avatar = Rails.signed_id("User", user["id"], "avatar")
-    version = user["updated_at"] |> String.replace(~r/[^0-9]/, "") |> String.slice(0, 14)
+    version = user["updated_at"] |> Campfire.Chat.digits() |> String.slice(0, 14)
 
     %{
       "id" => user["id"],

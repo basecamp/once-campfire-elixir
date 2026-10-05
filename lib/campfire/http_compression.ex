@@ -136,6 +136,9 @@ defmodule Campfire.HttpCompression do
     end
   end
 
+  @doc "The response body of page parts built without a marker."
+  def body(parts), do: Enum.map(parts, &part_data/1)
+
   defp part_data({:raw, data}), do: data
   defp part_data({:fragment, _, _, html}), do: html
 
@@ -167,10 +170,44 @@ defmodule Campfire.HttpCompression do
     ]
   end
 
+  @doc """
+  The SHA-256 of a page part: computed for per-request text, and computed once and kept with
+  the fragment for a cached fragment.
+  """
+  def digest({:raw, data}), do: :crypto.hash(:sha256, data)
+  def digest({:raw, _, digest}), do: digest
+
+  def digest({:fragment, key, version, html}),
+    do: Campfire.FragmentCache.derived(key, version, html, :digest, &:crypto.hash(:sha256, &1))
+
+  @doc "Page parts with each per-request text's digest attached, for `digest/1` and gzip reuse."
+  def with_digests(parts),
+    do:
+      Enum.map(parts, fn
+        {:raw, data} = part -> {:raw, data, digest(part)}
+        part -> part
+      end)
+
   defp identity({:raw, data}), do: {nil, data}
+  defp identity({:raw, data, _}), do: {nil, data}
   defp identity({:fragment, key, version, html}), do: {{key, version}, html}
 
   defp packed({:raw, data}, {_, before}), do: pack(data, before)
+
+  # Per-request text is the same on every visit to a page now that pages carry no token (a
+  # room page's layout is about 45 KB). Its piece is kept by the text's digest and the digest
+  # of the fragment primed as its dictionary, which together fix the bytes the piece encodes.
+  defp packed({:raw, data, digest}, {previous, before}) when byte_size(data) >= 1024 do
+    primed =
+      case previous do
+        nil -> nil
+        {key, version} -> digest({:fragment, key, version, before})
+      end
+
+    Campfire.FragmentCache.memo({:raw_piece, digest, primed}, fn -> pack(data, before) end)
+  end
+
+  defp packed({:raw, data, _}, {_, before}), do: pack(data, before)
 
   # A fragment's piece depends on the bytes primed as its dictionary, so it is
   # cached per predecessor: after another fragment (whose identity fixes those
