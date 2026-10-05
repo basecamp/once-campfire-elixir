@@ -1,5 +1,5 @@
 defmodule Campfire.Page do
-  alias Campfire.{Assets, Auth, DB, Rails}
+  alias Campfire.{Assets, Auth, DB}
   require EEx
   EEx.function_from_file(:defp, :layout, "priv/templates/application.html.eex", [:assigns])
 
@@ -24,7 +24,6 @@ defmodule Campfire.Page do
       content: "",
       footer: "        \n",
       sidebar: "      \n",
-      meta_token: Rails.csrf_mask(Rails.csrf_global(data["_csrf_token"])),
       vapid: Assets.html_escape(System.get_env("VAPID_PUBLIC_KEY", "")),
       account_version:
         (account["updated_at"] || "") |> String.replace(~r/[^0-9]/, "") |> String.slice(0, 14)
@@ -41,7 +40,7 @@ defmodule Campfire.Page do
             do: String.replace_prefix(content, "      ", "    "),
             else: "    " <> content
 
-        "<html>\n  <head>\n    <meta name=\"csrf-param\" content=\"authenticity_token\" />\n<meta name=\"csrf-token\" content=\"#{merged[:meta_token]}\" />\n#{merged[:head]}\n  </head>\n  <body>\n#{content}  </body>\n</html>\n"
+        "<html>\n  <head>\n    <meta name=\"csrf-param\" content=\"authenticity_token\" />\n<meta name=\"csrf-token\" content=\"\" />\n#{merged[:head]}\n  </head>\n  <body>\n#{content}  </body>\n</html>\n"
       else
         layout(merged)
       end

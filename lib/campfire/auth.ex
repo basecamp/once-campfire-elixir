@@ -81,47 +81,85 @@ defmodule Campfire.Auth do
       ]) != nil
   end
 
+  # The `_campfire_session` cookie's data, decrypted at most once per request (cached by raw
+  # value in the process dictionary, which Campfire.HttpResponse clears per request). Forgery
+  # protection no longer needs a session, so a request without the cookie gets empty data and
+  # none is written unless something is stored in it.
   def csrf_session(conn) do
     conn = fetch_cookies(conn)
-
-    data =
-      case conn.cookies["_campfire_session"] do
-        raw when is_binary(raw) -> Rails.decrypt_cookie("_campfire_session", URI.decode(raw))
-        _ -> nil
-      end
-
-    if is_map(data),
-      do: {conn, data},
-      else:
-        {conn,
-         %{
-           "session_id" => Base.encode16(:crypto.strong_rand_bytes(16), case: :lower),
-           "_csrf_token" => Rails.csrf_token()
-         }}
+    {conn, decrypt_session(conn.cookies["_campfire_session"])}
   end
 
-  def set_csrf_session(conn, data),
-    do:
-      put_resp_cookie(
-        conn,
+  defp decrypt_session(raw) when is_binary(raw) do
+    case Process.get(:campfire_session) do
+      {^raw, data} ->
+        data
+
+      _ ->
+        data =
+          case Rails.decrypt_cookie("_campfire_session", URI.decode(raw)) do
+            data when is_map(data) -> data
+            _ -> %{}
+          end
+
+        Process.put(:campfire_session, {raw, data})
+        data
+    end
+  end
+
+  defp decrypt_session(_), do: %{}
+
+  # Writes the session cookie only when its data differs from what the client already holds
+  # (or what this response already set).
+  def set_csrf_session(conn, data) do
+    current =
+      case conn.private do
+        %{campfire_session_written: written} -> written
+        _ -> elem(csrf_session(conn), 1)
+      end
+
+    if Map.delete(data, "session_id") == Map.delete(current, "session_id") do
+      conn
+    else
+      data =
+        Map.put_new_lazy(data, "session_id", fn ->
+          current["session_id"] || Base.encode16(:crypto.strong_rand_bytes(16), case: :lower)
+        end)
+
+      conn
+      |> put_private(:campfire_session_written, data)
+      |> put_resp_cookie(
         "_campfire_session",
         URI.encode(Rails.encrypt_cookie("_campfire_session", data), &URI.char_unreserved?/1),
         http_only: true,
         same_site: "Lax",
         max_age: DateTime.diff(permanent_expiry(), Campfire.Clock.now())
       )
+    end
+  end
 
-  def csrf_valid?(conn, params) do
-    {_, data} = csrf_session(conn)
+  # Forgery protection by `Sec-Fetch-Site` instead of tokens, as in Rails main's
+  # `protect_from_forgery using: :header_only` and the Rust port. Browsers send the header on
+  # every request to a secure origin; without it (plain HTTP, or an old browser) a write is
+  # allowed only over plain HTTP, where the SameSite=Lax session cookie and the Origin check
+  # protect it. Callers apply this to non-GET/HEAD requests.
+  def csrf_valid?(conn, _params) do
     origin = List.first(get_req_header(conn, "origin"))
-    origin_ok = is_nil(origin) or origin == base(conn)
-    tokens = [params["authenticity_token"], List.first(get_req_header(conn, "x-csrf-token"))]
 
-    origin_ok &&
-      Enum.any?(
-        tokens,
-        &Rails.csrf_valid?(&1, data["_csrf_token"], conn.request_path, conn.method)
-      )
+    cond do
+      origin == "null" ->
+        false
+
+      not is_nil(origin) and origin != base(conn) ->
+        false
+
+      true ->
+        case List.first(get_req_header(conn, "sec-fetch-site")) do
+          site when site in ["same-origin", "same-site"] -> true
+          nil -> conn.scheme != :https
+          _ -> false
+        end
+    end
   end
 
   def request_authentication(conn) do

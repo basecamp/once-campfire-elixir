@@ -12,6 +12,8 @@ defmodule Campfire.HttpResponse do
   def init(opts), do: opts
 
   def call(conn, _) do
+    # The per-request session cache kept by Campfire.Auth.
+    Process.delete(:campfire_session)
     conn = delete_resp_header(conn, "cache-control")
 
     conn =

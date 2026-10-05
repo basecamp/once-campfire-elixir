@@ -1,4 +1,4 @@
-      <form data-controller="form" action="/account/users/<%= @id %>" accept-charset="UTF-8" method="post"><input type="hidden" name="_method" value="patch" /><input type="hidden" name="authenticity_token" value="<%= @token %>" />
+      <form data-controller="form" action="/account/users/<%= @id %>" accept-charset="UTF-8" method="post"><input type="hidden" name="_method" value="patch" />
         <label class="btn txt-small flex-item-no-shrink" for="role_user_<%= @id %>">
           <span class="for-screen-reader">Role: <%= @role %></span>
           <img aria-hidden="true" src="<%= Campfire.Assets.path("crown.svg") %>" width="20" height="20" />

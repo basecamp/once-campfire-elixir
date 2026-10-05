@@ -2,7 +2,7 @@
 
 <section class="panel txt-align-center" style="view-transition-name: new-room">
   
-  <form action="/rooms/closeds" accept-charset="UTF-8" method="post"><input type="hidden" name="authenticity_token" value="<%= @token %>" />
+  <form action="/rooms/closeds" accept-charset="UTF-8" method="post">
   <div class="flex align-center gap">
       <details class="position-relative" data-controller="popup" data-action="keydown.esc-&gt;popup#close toggle-&gt;popup#toggle click@document-&gt;popup#closeOnClickOutside" data-popup-orientation-top-class="popup-orientation-top"><summary class="btn" tabindex="-1"><img aria-hidden="true" class="color-icon" src="<%= Assets.path("globe.svg") %>" width="20" height="20" /><span class="for-screen-reader">Translate</span></summary><div class="language-list-menu shadow" data-popup-target="menu"><dl class="language-list"><dt>🇺🇸</dt><dd class="margin-none">Name the room</dd><dt>🇪🇸</dt><dd class="margin-none">Nombrar la sala</dd><dt>🇫🇷</dt><dd class="margin-none">Nommez la salle</dd><dt>🇮🇳</dt><dd class="margin-none">कमरे का नाम दें</dd><dt>🇩🇪</dt><dd class="margin-none">Geben Sie dem Raum einen Namen</dd><dt>🇧🇷</dt><dd class="margin-none">Dê um nome a essa sala</dd><dt>🇯🇵</dt><dd class="margin-none">ルームに名前を付ける</dd></dl></div></details>
 

@@ -2,14 +2,14 @@
 
 <section class="panel flex flex-column gap" style="view-transition-name: avatar-<%= @id %>">
 <%= @pwa %>  <div class="align-center center avatar__form gap" data-controller="upload-preview">
-    <form class="txt-medium" data-controller="form" enctype="multipart/form-data" action="/users/me/profile" accept-charset="UTF-8" method="post"><input type="hidden" name="_method" value="patch" /><input type="hidden" name="authenticity_token" value="<%= @token %>" />
+    <form class="txt-medium" data-controller="form" enctype="multipart/form-data" action="/users/me/profile" accept-charset="UTF-8" method="post"><input type="hidden" name="_method" value="patch" />
       <label class="btn input--file">
         <img aria-hidden="true" src="<%= Assets.path("camera.svg") %>" width="20" height="20" />
         <input id="file" class="input" accept="image/*" data-upload-preview-target="input" data-action="upload-preview#previewImage change-&gt;form#submit" type="file" name="user[avatar]" />
         <span class="for-screen-reader">Upload avatar</span>
       </label>
 </form>
-    <form data-controller="form" enctype="multipart/form-data" action="/users/me/profile" accept-charset="UTF-8" method="post"><input type="hidden" name="_method" value="patch" /><input type="hidden" name="authenticity_token" value="<%= @token %>" />
+    <form data-controller="form" enctype="multipart/form-data" action="/users/me/profile" accept-charset="UTF-8" method="post"><input type="hidden" name="_method" value="patch" />
       <label class="btn avatar input--file txt-xx-large">
         <img aria-hidden="true" data-upload-preview-target="image" src="<%= @avatar_src %>" width="300" height="300" />
         <input id="file" class="input" accept="image/*" data-upload-preview-target="input" data-action="upload-preview#previewImage change-&gt;form#submit" type="file" name="user[avatar]" />
@@ -18,7 +18,7 @@
 </form>
 <%= @delete_avatar %>  </div>
 
-  <form data-controller="form" action="/users/me/profile" accept-charset="UTF-8" method="post"><input type="hidden" name="_method" value="patch" /><input type="hidden" name="authenticity_token" value="<%= @token %>" />
+  <form data-controller="form" action="/users/me/profile" accept-charset="UTF-8" method="post"><input type="hidden" name="_method" value="patch" />
     <div class="flex flex-column gap">
       <div class="flex align-center gap">
         <details class="position-relative" data-controller="popup" data-action="keydown.esc-&gt;popup#close toggle-&gt;popup#toggle click@document-&gt;popup#closeOnClickOutside" data-popup-orientation-top-class="popup-orientation-top"><summary class="btn" tabindex="-1"><img aria-hidden="true" class="color-icon" src="<%= Assets.path("globe.svg") %>" width="20" height="20" /><span class="for-screen-reader">Translate</span></summary><div class="language-list-menu shadow" data-popup-target="menu"><dl class="language-list"><dt>🇺🇸</dt><dd class="margin-none">Enter your name</dd><dt>🇪🇸</dt><dd class="margin-none">Introduce tu nombre</dd><dt>🇫🇷</dt><dd class="margin-none">Entrez votre nom</dd><dt>🇮🇳</dt><dd class="margin-none">अपना नाम दर्ज करें</dd><dt>🇩🇪</dt><dd class="margin-none">Geben Sie Ihren Namen ein</dd><dt>🇧🇷</dt><dd class="margin-none">Insira seu nome</dd><dt>🇯🇵</dt><dd class="margin-none">お名前を入力してください</dd></dl></div></details>

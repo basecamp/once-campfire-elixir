@@ -1,6 +1,6 @@
 defmodule Campfire.Signup do
   import Plug.Conn
-  alias Campfire.{Assets, Auth, DB, Page, People, Rails}
+  alias Campfire.{Assets, Auth, DB, Page, People}
   require EEx
   EEx.function_from_file(:defp, :form, "priv/templates/signup.html.eex", [:assigns])
   EEx.function_from_file(:defp, :nav, "priv/templates/signup_nav.html.eex", [:_assigns])
@@ -36,8 +36,6 @@ defmodule Campfire.Signup do
     content =
       form(
         path: Assets.html_escape(conn.request_path),
-        form_token:
-          Rails.csrf_mask(Rails.csrf_form(data["_csrf_token"], conn.request_path, "POST")),
         account_name: Assets.html_escape(account["name"]),
         account_version:
           account["updated_at"] |> String.replace(~r/[^0-9]/, "") |> String.slice(0, 14),

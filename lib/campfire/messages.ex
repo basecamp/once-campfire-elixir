@@ -40,7 +40,6 @@ defmodule Campfire.Messages do
       messages ->
         conn = Campfire.ModelCache.collection(conn, messages)
         {conn, data} = Auth.csrf_session(conn)
-        token = Rails.csrf_mask(Rails.csrf_global(data["_csrf_token"]))
 
         if json?(conn) do
           conn
@@ -50,7 +49,7 @@ defmodule Campfire.Messages do
             Rails.json(Enum.map(messages, &Chat.present_message(&1, Auth.base(conn))))
           )
         else
-          body = MessagesView.render_many(messages, Auth.base(conn), token)
+          body = MessagesView.render_many(messages, Auth.base(conn))
 
           conn
           |> Auth.set_csrf_session(data)
@@ -127,8 +126,7 @@ defmodule Campfire.Messages do
 
       conn.method == "GET" ->
         {conn, data} = Auth.csrf_session(conn)
-        token = Rails.csrf_mask(Rails.csrf_global(data["_csrf_token"]))
-        content = "      \n" <> MessagesView.render(message, Auth.base(conn), token) <> "\n\n"
+        content = "      \n" <> MessagesView.render(message, Auth.base(conn)) <> "\n\n"
         {conn, html} = Campfire.Page.render(conn, user, data, content: content)
         conn |> put_resp_content_type("text/html") |> send_resp(200, html)
 
@@ -156,7 +154,6 @@ defmodule Campfire.Messages do
           )
 
         body = if text, do: text["body"] || "", else: ""
-        path = "/rooms/#{room["id"]}/messages/#{message["id"]}"
         {conn, data} = Auth.csrf_session(conn)
 
         content =
@@ -165,9 +162,7 @@ defmodule Campfire.Messages do
             room_id: room["id"],
             client_id: Campfire.Assets.html_escape(message["client_message_id"]),
             base: Auth.base(conn),
-            body: Campfire.Assets.html_escape(body),
-            patch_token: Rails.csrf_mask(Rails.csrf_form(data["_csrf_token"], path, "PATCH")),
-            delete_token: Rails.csrf_mask(Rails.csrf_form(data["_csrf_token"], path, "DELETE"))
+            body: Campfire.Assets.html_escape(body)
           )
 
         {conn, html} = Campfire.Page.render(conn, user, data, content: content)

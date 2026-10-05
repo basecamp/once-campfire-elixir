@@ -1,6 +1,6 @@
 defmodule Campfire.Boosts do
   import Plug.Conn
-  alias Campfire.{Assets, Auth, Broadcasts, Chat, DB, Mentions, MessagesView, Page, Rails}
+  alias Campfire.{Assets, Auth, Broadcasts, Chat, DB, Mentions, MessagesView, Page}
   require EEx
   EEx.function_from_file(:defp, :new_form, "priv/templates/new_boost.html.eex", [:assigns])
 
@@ -66,11 +66,7 @@ defmodule Campfire.Boosts do
         id: message["id"],
         key: message["client_message_id"],
         avatar: Mentions.avatar(user, :page),
-        name: Assets.html_escape(user["name"]),
-        token:
-          Rails.csrf_mask(
-            Rails.csrf_form(data["_csrf_token"], "/messages/#{message["id"]}/boosts", "POST")
-          )
+        name: Assets.html_escape(user["name"])
       )
 
     {conn, html} = Page.render(conn, user, data, content: content)
@@ -79,8 +75,7 @@ defmodule Campfire.Boosts do
 
   defp action(%{method: "GET"} = conn, user, message, nil) do
     {conn, data} = Auth.csrf_session(conn)
-    token = Rails.csrf_mask(Rails.csrf_global(data["_csrf_token"]))
-    content = "      " <> MessagesView.render_boosts(message, token) <> "\n\n\n"
+    content = "      " <> MessagesView.render_boosts(message) <> "\n\n\n"
     {conn, html} = Page.render(conn, user, data, content: content)
 
     conn

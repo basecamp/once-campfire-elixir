@@ -1,6 +1,6 @@
       <turbo-frame id="new_boost_message_<%= @key %>">
   <div class="boost flex-inline postion--relative max-width fill-white" style="--column-gap: var(--inline-space-half)">
-    <form class="boost__form flex align-center gap expanded" data-controller="form scroll-into-view" data-turbo-frame="boosting_message_<%= @key %>" data-action="keydown.esc-&gt;form#cancel" action="/messages/<%= @id %>/boosts" accept-charset="UTF-8" method="post"><input type="hidden" name="authenticity_token" value="<%= @token %>" />
+    <form class="boost__form flex align-center gap expanded" data-controller="form scroll-into-view" data-turbo-frame="boosting_message_<%= @key %>" data-action="keydown.esc-&gt;form#cancel" action="/messages/<%= @id %>/boosts" accept-charset="UTF-8" method="post">
       <label class="boost__form-label flex gap" style="--column-gap: 0.7ch;" role="button" tabindex="0" aria-label="Add a boost">
         <figure class="avatar boost__avatar flex-item-no-shrink">
           <%= @avatar %>

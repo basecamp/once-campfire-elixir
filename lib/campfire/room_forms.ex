@@ -1,6 +1,6 @@
 defmodule Campfire.RoomForms do
   import Plug.Conn
-  alias Campfire.{Assets, Auth, Chat, DB, Flash, Mentions, Page, Rails, RoomPage}
+  alias Campfire.{Assets, Auth, Chat, DB, Flash, Mentions, Page, RoomPage}
   require EEx
 
   for branch <-
@@ -9,7 +9,8 @@ defmodule Campfire.RoomForms do
       :defp,
       String.to_atom(branch),
       "priv/templates/form_#{branch}.html.eex",
-      [:assigns]
+      # The new-direct-room form uses no assigns.
+      [if(branch == "direct_new", do: :_assigns, else: :assigns)]
     )
 
     defp content(unquote(branch), assigns), do: unquote(String.to_atom(branch))(assigns)
@@ -84,8 +85,6 @@ defmodule Campfire.RoomForms do
           render_user(target, user, kind, edit, admin, selected)
         end
 
-        path = "/rooms/#{kind}s" <> if(edit, do: "/#{room["id"]}", else: "")
-
         back_room =
           (conn.cookies["last_room"] && Chat.room(user, conn.cookies["last_room"])) ||
             DB.one(
@@ -97,13 +96,6 @@ defmodule Campfire.RoomForms do
           id: room["id"],
           name: Assets.html_escape(room["name"] || ""),
           base: Assets.html_escape(Auth.base(conn)),
-          token:
-            token(
-              data,
-              path,
-              if(edit, do: if(kind == "direct", do: "DELETE", else: "PATCH"), else: "POST")
-            ),
-          delete_token: token(data, "/rooms/#{room["id"]}", "DELETE"),
           users:
             Enum.map_join(
               if(kind == "direct", do: direct_users, else: users),
@@ -163,9 +155,6 @@ defmodule Campfire.RoomForms do
     do:
       ~s(    <input type="search" id="search" autocorrect="off" autocomplete="off" data-1p-ignore="true" class="input input--transparent full-width" placeholder="Filter…" data-action="input-&gt;filter#filter">) <>
         "\n"
-
-  defp token(data, path, method),
-    do: Rails.csrf_mask(Rails.csrf_form(data["_csrf_token"], path, method))
 
   defp head(conn, status),
     do: conn |> put_resp_header("content-type", "text/html") |> send_resp(status, "")

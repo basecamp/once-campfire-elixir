@@ -40,10 +40,9 @@ defmodule Campfire.ProfilePage do
             email: Assets.html_escape(user["email_address"] || ""),
             bio: Assets.html_escape(user["bio"] || ""),
             avatar_src: avatar_path(user),
-            token: token(data, "/users/me/profile", "PATCH"),
-            delete_avatar: delete_avatar(user, data),
-            shared: Enum.map_join(shared, &render_membership(&1, user, data)),
-            direct: Enum.map_join(direct, &render_membership(&1, user, data)),
+            delete_avatar: delete_avatar(user),
+            shared: Enum.map_join(shared, &render_membership(&1, user)),
+            direct: Enum.map_join(direct, &render_membership(&1, user)),
             separator: shared != [] && direct != [],
             transfer: transfer_link(conn, user)
           )
@@ -58,7 +57,7 @@ defmodule Campfire.ProfilePage do
         {conn, html} =
           Page.render(conn, user, data,
             title: Assets.html_escape(user["name"]),
-            nav: nav(back: Assets.html_escape(back), token: token(data, "/session", "DELETE")),
+            nav: nav(back: Assets.html_escape(back)),
             content: content
           )
 
@@ -100,24 +99,21 @@ defmodule Campfire.ProfilePage do
     )
   end
 
-  defp render_membership(room, user, data) do
+  defp render_membership(room, user) do
     membership(
       id: room["id"],
       name: Assets.html_escape(RoomPage.display_name(room, user)),
-      involvement: Involvement.profile_frame(room, room["involvement"], data)
+      involvement: Involvement.profile_frame(room, room["involvement"])
     )
   end
 
-  defp delete_avatar(user, data) do
+  defp delete_avatar(user) do
     if Attachments.find("User", user["id"], "avatar") do
       path = "/users/#{user["id"]}/avatar"
 
-      ~s(      <form class="button_to" method="post" action="#{path}"><input type="hidden" name="_method" value="delete" /><button class="btn btn--negative txt-small avatar__delete-btn" type="submit">\n        <img aria-hidden="true" src="#{Assets.path("minus.svg")}" width="20" height="20" />\n        <span class="for-screen-reader">Delete avatar</span>\n</button><input type="hidden" name="authenticity_token" value="#{token(data, path, "DELETE")}" /></form>)
+      ~s(      <form class="button_to" method="post" action="#{path}"><input type="hidden" name="_method" value="delete" /><button class="btn btn--negative txt-small avatar__delete-btn" type="submit">\n        <img aria-hidden="true" src="#{Assets.path("minus.svg")}" width="20" height="20" />\n        <span class="for-screen-reader">Delete avatar</span>\n</button></form>)
     else
       ""
     end
   end
-
-  defp token(data, path, method),
-    do: Rails.csrf_mask(Rails.csrf_form(data["_csrf_token"], path, method))
 end

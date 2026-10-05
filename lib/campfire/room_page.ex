@@ -23,9 +23,8 @@ defmodule Campfire.RoomPage do
       true ->
         if room = Chat.room(user, room_id) do
           {conn, data} = Auth.csrf_session(conn)
-          token = Rails.csrf_mask(Rails.csrf_global(data["_csrf_token"]))
           messages = messages(room, message_id)
-          fragments = MessagesView.render_parts(messages, Auth.base(conn), token)
+          fragments = MessagesView.render_parts(messages, Auth.base(conn))
           # Messages are spliced in after layout so their cached gzip pieces are reused.
           marker =
             "<!--campfire-messages-" <> Base.encode16(:crypto.strong_rand_bytes(16)) <> "-->"
@@ -47,16 +46,11 @@ defmodule Campfire.RoomPage do
             namespace: namespace(room),
             room_updated: MessagesView.epoch(room["updated_at"]),
             base: Assets.html_escape(Auth.base(conn)),
-            meta_token: token,
-            form_token:
-              Rails.csrf_mask(
-                Rails.csrf_form(data["_csrf_token"], "/rooms/#{room["id"]}/messages", "POST")
-              ),
             vapid: Assets.html_escape(System.get_env("VAPID_PUBLIC_KEY", "")),
             account_version:
               account["updated_at"] |> String.replace(~r/[^0-9]/, "") |> String.slice(0, 14),
             stream: Rails.sign_stream(gid <> ":messages"),
-            invitation: invitation_for(conn, user, data, account, room),
+            invitation: invitation_for(conn, user, account, room),
             messages: marker
           ]
 
@@ -95,7 +89,7 @@ defmodule Campfire.RoomPage do
     end
   end
 
-  defp invitation_for(conn, user, data, account, room) do
+  defp invitation_for(conn, user, account, room) do
     original = DB.one("SELECT id FROM rooms ORDER BY created_at LIMIT 1")
 
     count =
@@ -109,9 +103,7 @@ defmodule Campfire.RoomPage do
         account_version:
           account["updated_at"] |> String.replace(~r/[^0-9]/, "") |> String.slice(0, 14),
         join_url: Assets.html_escape(url),
-        qr: Base.url_encode64(url),
-        join_token:
-          Rails.csrf_mask(Rails.csrf_form(data["_csrf_token"], "/account/join_code", "POST"))
+        qr: Base.url_encode64(url)
       )
     else
       "    \n"
