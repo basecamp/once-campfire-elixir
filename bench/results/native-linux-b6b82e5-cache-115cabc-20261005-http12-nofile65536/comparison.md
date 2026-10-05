@@ -48,7 +48,7 @@ Each arm cell is median [min–max] over four rounds. Paired changes compare can
 
 These are integer-truncated mean body bytes from each load-generator cell, with gzip requested. Headers/framing/TCP/TLS are excluded. Full per-cell numbers are in http-cells.csv; the table covers all 12 cells per route and arm. This is not independently decoded per-response content evidence.
 
-All eight retained preflights have equal decoded lengths for each route, including search (165,534 bytes), room (463,753 bytes), messages (430,965 bytes) and sidebar (31,427 bytes). Search wire bodies are about 2.6% smaller in the candidate; no compression setting was changed in this run. The capture does not establish the cause or normalized byte equality of the differing body hashes.
+All eight retained preflights have equal decoded lengths for each route, including search (165,534 bytes), room (463,753 bytes), messages (430,965 bytes) and sidebar (31,427 bytes). Search wire bodies are about 2.6% smaller in the candidate; no compression setting was changed in this run. These full-run captures alone do not establish normalized equality. A [separate same-image follow-up](README.md#follow-up-tails-persist-without-the-proxy) found identical decoded search content outside validated CSRF values and reproduced the gzip size difference from those values; the original measurements below are unchanged.
 
 | Route | Baseline min–max bytes | Candidate min–max bytes |
 |---|---:|---:|

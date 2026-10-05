@@ -96,13 +96,34 @@ bench/report "$RESULT" > /tmp/campfire-cache-report.md
 cmp "$RESULT/report.md" /tmp/campfire-cache-report.md
 ```
 
+## Follow-up: tails persist without the proxy
+
+A separate same-image diagnostic retained 24 cells, 134,707 successful responses
+and zero errors, with two balanced samples per case. Through direct Bandit, candidate
+room64 p99 still worsened 41.7–50.8% and messages64 p99 70.9–73.0%; sidebar16 throughput
+improved 58.9–61.3%. Bypassing Thruster does not remove the regression. It also changes
+connection topology, buffering and scheduling, so this does not establish a specific
+application-side cause or justify removing the production proxy.
+
+Twelve separate search captures were byte-identical after normalizing only 108
+independently validated CSRF values per response (165,534 decoded bytes). Baseline
+used six distinct masks versus four in the candidate. Exact-framing recompression
+reproduced every original gzip body and one common 9,629-byte normalized body;
+the captured size difference is explained by token values, not missing content.
+This checks the original single-session workload, not every timed response.
+
+Raw CPU counter pairs reconstruct all 24 diagnostic CPU/success values. These do not
+repair the earlier full run's missing counters. The diagnostic, all failed probes and
+audits are retained locally in `linux-proxy-path-search-all-attempts-evidence.tar.gz`,
+SHA-256 `2fedbbe2df581fa72177e5b8dd12cbb98aae58e6a1925a3dabb1b31d652092cd`.
+
 ## Limits of the evidence
 
 - Raw per-cell cgroup before/after CPU counters were not saved. Derived CPU/success
   values are retained, but their deltas cannot be independently reconstructed.
 - Default non-deflate Cable wire rate is null because it is unmeasured, not zero.
-- Search compressed bodies are about 2.6% smaller despite equal decoded preflight
-  length (165,534 bytes). The cause and normalized byte equality were not established.
+- Search compressed bodies in the full run were about 2.6% smaller. Only the separate
+  follow-up captures above establish normalized equality and explain that difference.
 - Four-round ranges are descriptive, not confidence intervals. Reported median
   p99 is the median of four cell p99s, not a pooled percentile.
 - Loopback, one authenticated user and one Cable room do not establish distinct-user
