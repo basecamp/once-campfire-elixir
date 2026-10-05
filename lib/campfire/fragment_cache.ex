@@ -6,7 +6,8 @@ defmodule Campfire.FragmentCache do
   Entries are keyed by record identity and validated against the record's
   `updated_at`, matching Rails' `cache [message, "presentation-v3"]` versioning:
   touching a record invalidates its fragment. The table is bounded by total
-  fragment bytes and is emptied when it exceeds the limit.
+  fragment bytes; past the limit, entries are evicted until it is back to three
+  quarters of it.
 
   Each fragment can also retain values derived from its HTML, such as its
   precompressed gzip pieces (see `Campfire.HttpCompression`), so cached
@@ -15,31 +16,43 @@ defmodule Campfire.FragmentCache do
   use GenServer
 
   @table __MODULE__
-  @max_bytes 64 * 1024 * 1024
   # Memoized values (page shells, compressed page text, finished responses, parsed headers) are
-  # bounded separately, so their churn never wipes the message fragments, nor the reverse.
+  # bounded separately, so their churn never evicts the message fragments, nor the reverse.
   @memo Module.concat(__MODULE__, Memo)
-  @max_memo_bytes 64 * 1024 * 1024
+  @default_bytes 64 * 1024 * 1024
+
+  # Accounting: each entry is {key, version, value, derived, size} and records the bytes it was
+  # counted for. The :bytes counter is raised before an entry becomes visible and lowered only by
+  # whoever takes that entry out, by its recorded size, so it never undercounts the table, even
+  # with concurrent writers and evictors. Past the limit, entries are taken until the counter is
+  # back to three quarters of it.
 
   def start_link(_), do: GenServer.start_link(__MODULE__, nil, name: __MODULE__)
 
   @impl GenServer
   def init(nil) do
-    :ets.new(@table, [
-      :named_table,
-      :set,
-      :public,
-      read_concurrency: true,
-      write_concurrency: true
-    ])
+    for table <- [@table, @memo] do
+      :ets.new(table, [
+        :named_table,
+        :set,
+        :public,
+        read_concurrency: true,
+        write_concurrency: true
+      ])
 
-    :ets.insert(@table, {:bytes, 0})
+      :ets.insert(table, {:bytes, 0})
+      :persistent_term.put({__MODULE__, table}, @default_bytes)
+    end
 
-    :ets.new(@memo, [:named_table, :set, :public, read_concurrency: true, write_concurrency: true])
-
-    :ets.insert(@memo, {:bytes, 0})
     {:ok, nil}
   end
+
+  @doc false
+  # The byte limit of `table` (this module or its memo table), for tests.
+  def set_limit(table, bytes), do: :persistent_term.put({__MODULE__, table}, bytes)
+
+  @doc false
+  def bytes(table), do: :ets.lookup_element(table, :bytes, 2, 0)
 
   def record(kind, record, render) do
     {key, version} = identity(kind, record)
@@ -63,16 +76,33 @@ defmodule Campfire.FragmentCache do
 
   @doc """
   A value derived from a cached fragment's HTML, such as its precompressed
-  gzip piece, computed on first use and retained with the fragment.
+  gzip piece, computed on first use and retained (and counted) with the fragment.
   """
   def derived(key, version, html, name, compute) do
     case :ets.lookup(@table, key) do
-      [{_, ^version, _, %{^name => value}}] ->
+      [{_, ^version, _, %{^name => value}, _}] ->
         value
 
-      [{_, ^version, _, derived}] when map_size(derived) < 8 ->
+      [{_, ^version, _, derived, size}] when map_size(derived) < 8 ->
         value = compute.(html)
-        :ets.insert(@table, {key, version, html, Map.put(derived, name, value)})
+        extra = derived_size(value)
+        :ets.update_counter(@table, :bytes, extra, {:bytes, 0})
+
+        # Only the entry as it was read gets the value; if a concurrent store or eviction
+        # replaced it, the count is given back.
+        replaced =
+          :ets.select_replace(@table, [
+            {{key, version, :"$1", :"$2", size}, [{:"=:=", :"$2", {:const, derived}}],
+             [
+               {{{:const, key}, {:const, version}, :"$1", {:const, Map.put(derived, name, value)},
+                 size + extra}}
+             ]}
+          ])
+
+        if replaced == 0,
+          do: :ets.update_counter(@table, :bytes, -extra, {:bytes, 0}),
+          else: evict(@table)
+
         value
 
       _ ->
@@ -82,8 +112,8 @@ defmodule Campfire.FragmentCache do
 
   @doc """
   A value that depends only on `key`, such as a deterministic signature or the gzip piece of a
-  page's per-request text keyed by its digest, computed on first use. It shares the
-  fragments' byte bound, counting `size` bytes (the value's own size when it is a binary).
+  page's per-request text keyed by its digest, computed on first use. It is bounded with the
+  other memoized values, counting `size` bytes (the value's own size when it is a binary).
   """
   def memo(key, compute), do: memo(key, nil, compute)
 
@@ -93,7 +123,7 @@ defmodule Campfire.FragmentCache do
   """
   def memo(key, size, compute) do
     case :ets.lookup(@memo, key) do
-      [{_, :memo, value, _}] ->
+      [{_, :memo, value, _, _}] ->
         value
 
       _ ->
@@ -102,7 +132,7 @@ defmodule Campfire.FragmentCache do
             nil
 
           value ->
-            store(@memo, @max_memo_bytes, key, :memo, value, size_of(size, value), %{})
+            store(@memo, {key, :memo, value, %{}, size_of(size, value)})
             value
         end
     end
@@ -116,26 +146,58 @@ defmodule Campfire.FragmentCache do
   defp memo_size({piece, _crc, _size}) when is_binary(piece), do: byte_size(piece)
   defp memo_size(_), do: 64
 
+  defp derived_size(value) when is_binary(value), do: byte_size(value)
+  defp derived_size({piece, _crc, _size}) when is_binary(piece), do: byte_size(piece)
+  defp derived_size(_), do: 64
+
   defp fetch(key, version, render) do
     case :ets.lookup(@table, key) do
-      [{_, ^version, html, _}] ->
+      [{_, ^version, html, _, _}] ->
         html
 
       _ ->
         html = render.()
-        store(@table, @max_bytes, key, version, html, byte_size(html), %{})
+        store(@table, {key, version, html, %{}, byte_size(html)})
         html
     end
   end
 
-  defp store(table, max_bytes, key, version, value, size, derived) do
-    # The default covers a concurrent wipe, which briefly removes the counter.
-    if :ets.update_counter(table, :bytes, size, {:bytes, 0}) > max_bytes do
-      :ets.delete_all_objects(table)
-      :ets.insert(table, {:bytes, size})
+  # Counted first, then inserted. An entry already under the key (an older version, or a
+  # concurrent writer's) is taken out with its own recorded size before retrying.
+  defp store(table, entry) do
+    :ets.update_counter(table, :bytes, elem(entry, 4), {:bytes, 0})
+    insert(table, entry)
+    evict(table)
+  end
+
+  defp insert(table, entry) do
+    unless :ets.insert_new(table, entry) do
+      take(table, elem(entry, 0))
+      insert(table, entry)
+    end
+  end
+
+  defp take(table, key) do
+    for {_, _, _, _, size} <- :ets.take(table, key),
+        do: :ets.update_counter(table, :bytes, -size, {:bytes, 0})
+  end
+
+  defp evict(table) do
+    limit = :persistent_term.get({__MODULE__, table})
+
+    if bytes(table) > limit do
+      target = div(limit * 3, 4)
+      evict(table, :ets.select(table, [{{:"$1", :_, :_, :_, :_}, [], [:"$1"]}], 64), target)
     end
 
-    :ets.insert(table, {key, version, value, derived})
+    :ok
+  end
+
+  defp evict(_table, :"$end_of_table", _target), do: :ok
+
+  defp evict(table, {keys, continuation}, target) do
+    Enum.each(keys, &take(table, &1))
+    if bytes(table) > target, do: evict(table, :ets.select(continuation), target)
   end
 
   defp identity(:message, record), do: {{:message, record["id"]}, record["updated_at"]}

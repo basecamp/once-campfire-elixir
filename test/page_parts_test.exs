@@ -50,11 +50,11 @@ defmodule Campfire.PagePartsTest do
   end
 
   test "a room page's per-request text is compressed once and reused", %{cookie: cookie} do
-    :ets.match_delete(Campfire.FragmentCache.Memo, {{:raw_piece, :_, :_}, :_, :_, :_})
+    :ets.match_delete(Campfire.FragmentCache.Memo, {{:raw_piece, :_, :_}, :_, :_, :_, :_})
     assert_spliced("/rooms/#{@room}", cookie, "message__body")
 
     assert :ets.select_count(Campfire.FragmentCache.Memo, [
-             {{{:raw_piece, :_, :_}, :_, :_, :_}, [], [true]}
+             {{{:raw_piece, :_, :_}, :_, :_, :_, :_}, [], [true]}
            ]) > 0
   end
 
