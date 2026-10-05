@@ -162,10 +162,10 @@ and findings in [`plans/performance-fork.md`](plans/performance-fork.md).
 
 The steps, cumulative:
 
-1. **gzip level** (`step1-gzip`): zlib level 1 instead of 6 gave 14–22% on dynamic
-   pages. Once responses were cached the level made no measurable difference, so the
-   default is back at 6 and the wire bytes match Rails again; `CAMPFIRE_GZIP_LEVEL`
-   keeps the option.
+1. **gzip level** (`step1-gzip`): an experiment, not a change. zlib level 1 instead of
+   6 gave 14–22% on dynamic pages before caching and nothing after, so the code still
+   compresses at level 6 like Rails and Rust; `CAMPFIRE_GZIP_LEVEL` is kept as an
+   opt-in.
 2. **Response cache** (`step2-cache`): complete compressed room, messages, search and
    sidebar responses with their ETags, keyed on the user, CSRF session, route inputs,
    base URL, User-Agent, Turbo-Frame header and a database write generation; static
