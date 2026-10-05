@@ -1,0 +1,37 @@
+2026-10-05T08:26:32+00:00
+7c1ed67d062f5e241d37e3eb0e9a3d97a2324636
+90b330024dec3e757c79b6a7e6568f93da8e3148
+bench/validate.py ledger: PASS
+211c7482047fcd69224c168ee21d81f689bd991d7267acae74039122a85553a6
+sha256:7cb5658090eee9c77c4d19572766434bb4a2b6654b80334bb8f43df02f922182 linux/amd64 unpacked_bytes=2542179488
+%{
+  emulator: :jit,
+  otp: "29.1.1",
+  schedulers: 4,
+  elixir: "1.20.4",
+  architecture: "x86_64-pc-linux-gnu",
+  erl_flags: nil
+}
+ffmpeg	7:7.1.5-0+deb13u1
+libsqlite3-0:amd64	3.46.1-7+deb13u2
+libvips-dev	8.16.1-1+deb13u1
+Max open files            65536                65536                files     
+sha256:3cab19b9a0cc8416e94c9e91585eb4036a190d68a013df98726cbfb34fc344bc linux/amd64 unpacked_bytes=2540411548
+%{
+  emulator: :jit,
+  otp: "29.1.1",
+  schedulers: 4,
+  elixir: "1.20.4",
+  architecture: "x86_64-pc-linux-gnu",
+  erl_flags: ""
+}
+ffmpeg	7:7.1.5-0+deb13u1
+libsqlite3-0:amd64	3.46.1-7+deb13u2
+libvips-dev	8.16.1-1+deb13u1
+Max open files            65536                65536                files     
+bda9a5cd61d78d53f377cf07ee9268741caebc19b94a6efe782cafe827efc8db  var/linux-benchmark-setup/seed/default/db/production.sqlite3
+6c55f4fd8c7accb05c7f7ad211fd1892fd4efcf4304f8560d5c65b58df3d9c0f  target/bench/release/loadgen
+d0c0b2708846c2f261e7bf6c8a4d7b220b9df71ba21190a172ffcb5acf38b963  -
+Running containers:
+Tracked changes outside parity evidence:
+Reference changes:

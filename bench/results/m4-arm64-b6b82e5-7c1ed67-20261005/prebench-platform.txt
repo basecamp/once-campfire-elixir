@@ -1,0 +1,57 @@
+Mon Oct  5 08:07:40 UTC 2026
+ProductName:		macOS
+ProductVersion:		27.0
+BuildVersion:		26A428
+hw.model: Mac16,11
+hw.memsize: 68719476736
+hw.ncpu: 14
+machdep.cpu.brand_string: Apple M4 Pro
+vm.loadavg: { 5.92 6.54 10.05 }
+vm.swapusage: total = 10240.00M  used = 8949.62M  free = 1290.38M  (encrypted)
+Docker 29.4.0 / linux aarch64 / CPUs=14 Memory=16818978816 / 7.0.14-orbstack-00380-ga7e0a2dc9535
+campfire-reference:app,campfire-reference:arm64-app sha256:19cc14aedfa860c294570811c4013682e4197911bc0ffb958b44056bbfb5e3da arm64 bytes=345590403
+campfire-elixir:arm64-toolchain,campfire-elixir:toolchain sha256:0f731b7f043af8790cc1853d24638026655839349623b7add3e78640ddd45d0d arm64 bytes=620610884
+campfire-elixir:arm64-baseline sha256:2c20e000614331f2078e86e78b0397995ee23157e910cd4428f9d3ea988e993e arm64 bytes=671674566
+campfire-elixir:release sha256:220de109e37da43cf7a94a1ad269b6a3c293d9985366159bb677975c99f3ab83 arm64 bytes=671447728
+rust:1.98.1-slim sha256:4cd829461bd5c4d511c32e269da9cb8929223b666519d8004e35fc8d1d771ab7 arm64 bytes=281976846
+Linux orbstack 7.0.14-orbstack-00380-ga7e0a2dc9535 #1 SMP PREEMPT Fri Aug  7 03:48:40 UTC 2026 aarch64 GNU/Linux
+CPU CORE SOCKET ONLINE
+  0    0      0    yes
+  1    1      0    yes
+  2    2      0    yes
+  3    3      0    yes
+  4    4      0    yes
+  5    5      0    yes
+  6    6      0    yes
+  7    7      0    yes
+  8    8      0    yes
+  9    9      0    yes
+ 10   10      0    yes
+ 11   11      0    yes
+ 12   12      0    yes
+ 13   13      0    yes
+               total        used        free      shared  buff/cache   available
+Mem:            15Gi       1.5Gi        12Gi        43Mi       1.6Gi        14Gi
+Swap:           16Gi          0B        16Gi
+loadgen nofile soft/hard: 20480
+1048576
+2.63 2.93 2.38 3/623 344969
+Filename				Type		Size		Used		Priority
+/dev/zram0                              partition	16424780	0		32767
+/dev/vdc                                partition	1048572		0		1
+campfire-elixir:arm64-baseline
+runtime nofile soft/hard: 20480
+1048576
+ERL_FLAGS=
+29.1.1
+ffmpeg	7:7.1.5-0+deb13u1
+libsqlite3-0:arm64	3.46.1-7+deb13u2
+libvips42t64:arm64	8.16.1-1+deb13u1
+campfire-elixir:release
+runtime nofile soft/hard: 20480
+1048576
+ERL_FLAGS=
+29.1.1
+ffmpeg	7:7.1.5-0+deb13u1
+libsqlite3-0:arm64	3.46.1-7+deb13u2
+libvips42t64:arm64	8.16.1-1+deb13u1

@@ -1,0 +1,31 @@
+{
+  "passed": true,
+  "order": [
+    "baseline1",
+    "candidate1",
+    "candidate2",
+    "baseline2",
+    "baseline3",
+    "candidate3",
+    "candidate4",
+    "baseline4"
+  ],
+  "counts": {
+    "runs": 8,
+    "preflights": 8,
+    "http_samples": 192,
+    "http_successes": 4279362,
+    "http_errors": 0,
+    "http_invalid": 0,
+    "cable_cases": 24,
+    "cable_paced_messages": 720,
+    "cable_saturated_messages": 26421,
+    "cable_client_deliveries": 9561200,
+    "uploads": 40,
+    "jobs_queued": 0,
+    "jobs_failed": 0
+  },
+  "parity_gates_passed": 65,
+  "source_digest": "211c7482047fcd69224c168ee21d81f689bd991d7267acae74039122a85553a6",
+  "quiet_start_loads_below": 1.5
+}

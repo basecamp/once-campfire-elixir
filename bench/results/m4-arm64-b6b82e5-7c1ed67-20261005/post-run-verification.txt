@@ -1,0 +1,34 @@
+Mon Oct  5 08:51:20 UTC 2026
+7c1ed67d062f5e241d37e3eb0e9a3d97a2324636
+ledger=passed
+cf87f7de83295e1cb2510ed2e0f3287ac476f42cd2aee31dcb12653304af611b
+bda9a5cd61d78d53f377cf07ee9268741caebc19b94a6efe782cafe827efc8db  parity/.seed/default/db/production.sqlite3
+1f42704c27a8ee84fb4f59967d57dd0bb24c6aaf1a0af017229c068037cedec8  target/bench/release/loadgen
+ M parity/fresh-install-candidate.log
+ M parity/fresh-install-reference.log
+ M parity/frontend-candidate.log
+ M parity/frontend-reference.log
+ M parity/http-shutdown-candidate.log
+ M parity/http-shutdown-reference.log
+ M parity/push-candidate-bad_certificate.log
+ M parity/push-candidate-manual_bad_certificate.log
+ M parity/results/attachments.candidate.json
+ M parity/results/attachments.reference.json
+ M parity/results/browser-flows.candidate.png
+ M parity/results/browser-flows.json
+ M parity/results/browser-flows.reference.png
+ M parity/results/frontend.candidate.json
+ M parity/results/frontend.reference.json
+ M parity/results/http-shutdown.json
+ M parity/results/room-deletion.candidate.json
+ M parity/results/room-deletion.reference.json
+ M parity/results/verification.json
+ M parity/verify-frontend.log
+ M parity/verify-push_delivery.log
+ M parity/verify-release.log
+ M parity/verify-toolkit.log
+ M parity/verify-unit.log
+ M parity/worker-candidate.log
+ M parity/worker-reference.log
+?? bench/results/m4-arm64-b6b82e5-7c1ed67-20261005/
+?? parity/.seed/

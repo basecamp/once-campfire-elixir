@@ -1,0 +1,27 @@
+{
+  "archive_sha256": "668a9e9b5a3f0e132a3be77503446af71887289d539ea8c053e12057a18c0a52",
+  "archive_regular_files": 16,
+  "linux_regular_files": 18,
+  "missing_files": [],
+  "changed_archive_files": [],
+  "extra_linux_files": {
+    "db/production.sqlite3-shm": {
+      "sha256": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb",
+      "bytes": 32768
+    },
+    "db/production.sqlite3-wal": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  },
+  "manifest_format": "SHA256 + two spaces + ./relative/path + LF, sorted by relative path",
+  "linux_full_tree_sha256": "d0c0b2708846c2f261e7bf6c8a4d7b220b9df71ba21190a172ffcb5acf38b963",
+  "archive_tree_sha256": "c58532c20db34e3df10e5c39969cd328f4bd815e5beb1dabfdfa2af5805e29c5",
+  "linux_archive_files_only_tree_sha256": "c58532c20db34e3df10e5c39969cd328f4bd815e5beb1dabfdfa2af5805e29c5",
+  "sqlite_header_write_read_versions": [
+    2,
+    2
+  ],
+  "all_16_archive_files_byte_identical": true,
+  "seed_opened_with_sqlite": false
+}

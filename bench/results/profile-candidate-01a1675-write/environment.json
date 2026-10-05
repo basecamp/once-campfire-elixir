@@ -1,0 +1,6 @@
+{
+  "image": "campfire-elixir:candidate-01a1675",
+  "server_cpus": "0",
+  "loadgen_cpus": "1",
+  "seed_db_sha256": "bda9a5cd61d78d53f377cf07ee9268741caebc19b94a6efe782cafe827efc8db"
+}
