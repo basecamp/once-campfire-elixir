@@ -43,7 +43,7 @@ defmodule Campfire.FrontTLSTest do
     :ssl.close(socket)
   end
 
-  test "HTTP redirects configured hosts to HTTPS and refuses others", %{http: http} do
+  test "HTTP redirects configured hosts to HTTPS and refuses others", %{http: http, https: https} do
     request = fn host ->
       {:ok, socket} = :gen_tcp.connect(~c"127.0.0.1", http, [:binary, active: false])
       :ok = :gen_tcp.send(socket, "GET /rooms/1?x=2 HTTP/1.1\r\nHost: #{host}\r\n\r\n")
@@ -54,7 +54,15 @@ defmodule Campfire.FrontTLSTest do
 
     response = request.("campfire.test")
     assert response =~ "HTTP/1.1 301"
-    assert response =~ "location: https://campfire.test/rooms/1?x=2"
+    assert response =~ "location: https://campfire.test:#{https}/rooms/1?x=2"
     assert request.("other.test") =~ "HTTP/1.1 421"
+  end
+
+  test "the redirect names the HTTPS port only when it is not the default" do
+    conn = Plug.Test.conn(:get, "http://campfire.test/rooms/1?x=2")
+    redirect = Campfire.Front.Redirect
+
+    assert redirect.https_url(conn, 443) == "https://campfire.test/rooms/1?x=2"
+    assert redirect.https_url(conn, 8443) == "https://campfire.test:8443/rooms/1?x=2"
   end
 end

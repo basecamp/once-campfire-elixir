@@ -98,6 +98,15 @@ defmodule Campfire.Front.Redirect do
 
   def init(opts), do: opts
 
+  @doc false
+  # The same URL on the HTTPS listener, whose port is named unless it is the default.
+  def https_url(conn, https_port) do
+    "https://" <>
+      conn.host <>
+      if(https_port == 443, do: "", else: ":#{https_port}") <>
+      conn.request_path <> if(conn.query_string == "", do: "", else: "?" <> conn.query_string)
+  end
+
   def call(%Plug.Conn{request_path: "/.well-known/acme-challenge/" <> _} = conn, _),
     do: SiteEncrypt.AcmeChallenge.call(conn, Campfire.Front.TLS)
 
@@ -105,11 +114,10 @@ defmodule Campfire.Front.Redirect do
     host = conn.host |> String.trim_trailing(".") |> String.downcase()
     conn = put_resp_header(conn, "connection", "close")
 
-    if host in Campfire.Front.Config.get().tls_domains do
-      url =
-        "https://" <>
-          conn.host <>
-          conn.request_path <> if(conn.query_string == "", do: "", else: "?" <> conn.query_string)
+    config = Campfire.Front.Config.get()
+
+    if host in config.tls_domains do
+      url = https_url(conn, config.https_port)
 
       body =
         if conn.method == "GET",
