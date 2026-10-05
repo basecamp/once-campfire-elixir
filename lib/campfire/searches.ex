@@ -101,8 +101,9 @@ defmodule Campfire.Searches do
       end) <> if(recents == [], do: "", else: "\n")
 
     # Messages are spliced in after layout so their cached gzip pieces are reused.
-    marker = "<!--campfire-messages-" <> Base.encode16(:crypto.strong_rand_bytes(16)) <> "-->"
+    marker = Campfire.HttpCompression.marker()
     fragments = MessagesView.render_parts(messages, Auth.base(conn))
+    account = Campfire.Page.account()
 
     assigns = [
       query: if(Chat.present?(q), do: Assets.html_escape(q)),
@@ -115,21 +116,40 @@ defmodule Campfire.Searches do
       messages: marker
     ]
 
-    {conn, html} =
-      Campfire.Page.render(conn, user, data,
-        title: "Search",
-        body_class: "sidebar searches",
-        nav: nav(assigns),
-        content: content(assigns),
-        footer: footer(assigns),
-        sidebar: sidebar(assigns)
+    # The templates are pure functions of these inputs, so the rendered shell around the
+    # messages, with its parts' digests, is kept by a digest of them.
+    frame? = get_req_header(conn, "turbo-frame") != []
+    inputs = {assigns, user, account, data["flash"], frame?}
+    key = :crypto.hash(:sha256, :erlang.term_to_binary(inputs, [:deterministic]))
+
+    {before, rest} =
+      Campfire.FragmentCache.memo(
+        {:search_shell, key},
+        fn {{_, b, _}, {_, a, _}} -> byte_size(b) + byte_size(a) end,
+        fn ->
+          {_conn, html} =
+            Campfire.Page.render(conn, user, data,
+              account: account,
+              title: "Search",
+              body_class: "sidebar searches",
+              nav: nav(assigns),
+              content: content(assigns),
+              footer: footer(assigns),
+              sidebar: sidebar(assigns)
+            )
+
+          [before, rest] = :binary.split(html, marker)
+          [before, rest] = Campfire.HttpCompression.with_digests([{:raw, before}, {:raw, rest}])
+          {before, rest}
+        end
       )
 
-    {body, parts} = Campfire.HttpCompression.splice(html, marker, fragments)
+    parts = [before | fragments] ++ [rest]
 
     conn
+    |> Campfire.Page.finish_session(data)
     |> put_resp_content_type("text/html")
     |> assign(:page_parts, parts)
-    |> send_resp(200, body)
+    |> send_resp(200, Campfire.HttpCompression.body(parts))
   end
 end

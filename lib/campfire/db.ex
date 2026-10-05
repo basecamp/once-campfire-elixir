@@ -96,7 +96,11 @@ defmodule Campfire.DB do
 
   def cached_one(sql, params, tables), do: List.first(cached(sql, params, tables))
 
-  defp generations(tables) do
+  @doc """
+  The current generations of `tables` (and of everything). Equal generations mean none of the
+  tables changed, so a value derived only from them, under the same key, is still current.
+  """
+  def generations(tables) do
     outside_commits()
     [generation(:all) | Enum.map(tables, &generation/1)]
   end

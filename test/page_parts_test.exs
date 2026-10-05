@@ -146,4 +146,33 @@ defmodule Campfire.PagePartsTest do
                for(<<c <- value>>, c in ?0..?9, into: "", do: <<c>>)
     end
   end
+
+  test "the kept sidebar is replaced when a room it lists is renamed", %{cookie: cookie} do
+    first = body(get("/users/me/sidebar", cookie, "identity"))
+    assert body(get("/users/me/sidebar", cookie, "identity")) == first
+
+    room =
+      DB.one(
+        "SELECT r.* FROM rooms r JOIN memberships m ON m.room_id=r.id WHERE m.user_id=? AND r.type!='Rooms::Direct' LIMIT 1",
+        [@user]
+      )
+
+    DB.query("UPDATE rooms SET name=? WHERE id=?", ["Sidebar rename", room["id"]])
+    assert body(get("/users/me/sidebar", cookie, "identity")) =~ "Sidebar rename"
+  end
+
+  test "the kept search shell is replaced when a recent search is added", %{cookie: cookie} do
+    first = body(get("/searches?q=sure", cookie, "identity"))
+    assert body(get("/searches?q=sure", cookie, "identity")) == first
+    refute first =~ "a brand new query"
+
+    now = "2026-03-02 16:00:00"
+
+    DB.query(
+      "INSERT INTO searches (user_id,query,created_at,updated_at) VALUES (?,?,?,?)",
+      [@user, "a brand new query", now, now]
+    )
+
+    assert body(get("/searches?q=sure", cookie, "identity")) =~ "a brand new query"
+  end
 end
