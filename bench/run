@@ -269,7 +269,9 @@ run_rep() {
   fi
 
   sleep 0.5
-  local peak; peak=$(cat "$OUT/.$app-$rep.mem")
+  # The sampler replaces the file by rename every 0.2s; on Docker Desktop's file sharing a reader
+  # can briefly miss it, so retry.
+  local peak; peak=$(cat "$OUT/.$app-$rep.mem" 2>/dev/null || { sleep 0.5; cat "$OUT/.$app-$rep.mem"; })
   local cg_peak; cg_peak=$(( $(cat "$cg/memory.peak" 2>/dev/null || echo 0) / 1048576 ))
   python3 "$BENCH/job-state.py" > "$OUT/$app-$rep-jobs.json"
   kill "$SAMPLER" 2>/dev/null || true; SAMPLER=""
