@@ -1,13 +1,15 @@
 defmodule Campfire.OpengraphEmbed do
+  import Kernel, except: [sigil_r: 2]
+  import Campfire.Sigils
   alias Campfire.{Assets, RichText}
   require EEx
   EEx.function_from_file(:defp, :markup, "priv/templates/opengraph_embed.html.eex", [:assigns])
-  @content_type ~r/application\/vnd.actiontext.opengraph-embed/
+  defp content_type, do: ~r/application\/vnd.actiontext.opengraph-embed/
 
   def resolve(attrs, host \\ Process.get(:campfire_request_host)) do
     attrs = Map.new(attrs)
 
-    if Regex.match?(@content_type, attrs["content-type"] || "") do
+    if Regex.match?(content_type(), attrs["content-type"] || "") do
       raw =
         if Campfire.Chat.present?(attrs["filename"]) do
           %{

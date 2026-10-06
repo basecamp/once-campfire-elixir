@@ -1,11 +1,18 @@
 defmodule Campfire.Autolink do
+  import Kernel, except: [sigil_r: 2]
+  import Campfire.Sigils
   alias Campfire.Assets
 
-  @urls ~r/(?:(?i:((?:ed2k|ftp|http|https|irc|mailto|news|gopher|nntp|telnet|webcal|xmpp|callto|feed|svn|urn|aim|rsync|tag|ssh|sftp|rtsp|afs|file):))\/\/|(?i:www)\.[a-zA-Z0-9_])[^\x09-\x0d <\x{A0}"]+/u
-  @emails ~r/(?<![a-zA-Z0-9_.!#$%&'*\/=?^`{|}~+-])[a-zA-Z0-9_.!#$%+-]\.?[a-zA-Z0-9_.!#$%&'*\/=?^`{|}~+-]*@[a-zA-Z0-9_-]+(?:\.[a-zA-Z0-9_-]+)+/
+  defp urls,
+    do:
+      ~r/(?:(?i:((?:ed2k|ftp|http|https|irc|mailto|news|gopher|nntp|telnet|webcal|xmpp|callto|feed|svn|urn|aim|rsync|tag|ssh|sftp|rtsp|afs|file):))\/\/|(?i:www)\.[a-zA-Z0-9_])[^\x09-\x0d <\x{A0}"]+/u
+
+  defp emails,
+    do:
+      ~r/(?<![a-zA-Z0-9_.!#$%&'*\/=?^`{|}~+-])[a-zA-Z0-9_.!#$%+-]\.?[a-zA-Z0-9_.!#$%&'*\/=?^`{|}~+-]*@[a-zA-Z0-9_-]+(?:\.[a-zA-Z0-9_-]+)+/
 
   def render(html) do
-    html |> replace(@urls, &url/1) |> replace(@emails, &email/1)
+    html |> replace(urls(), &url/1) |> replace(emails(), &email/1)
   end
 
   defp replace(text, pattern, fun) do

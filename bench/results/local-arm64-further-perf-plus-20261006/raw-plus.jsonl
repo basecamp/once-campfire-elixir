@@ -1,0 +1,108 @@
+{"label": "pr5", "round": 1, "workload": "room", "conc": 1, "rps": 2463.5, "p50_ms": 0.384, "p99_ms": 0.724, "avg_bytes": 38163, "cpu_us_by_role": {"beam": 347.7}}
+{"label": "pr5", "round": 1, "workload": "room", "conc": 16, "rps": 11200.3, "p50_ms": 0.995, "p99_ms": 25.391, "avg_bytes": 38163, "cpu_us_by_role": {"beam": 359.5}}
+{"label": "pr5", "round": 1, "workload": "messages", "conc": 1, "rps": 2923.4, "p50_ms": 0.331, "p99_ms": 0.658, "avg_bytes": 29868, "cpu_us_by_role": {"beam": 278.8}}
+{"label": "pr5", "round": 1, "workload": "messages", "conc": 16, "rps": 13210.3, "p50_ms": 0.818, "p99_ms": 26.175, "avg_bytes": 29868, "cpu_us_by_role": {"beam": 305.0}}
+{"label": "pr5", "round": 1, "workload": "sidebar", "conc": 1, "rps": 3339.9, "p50_ms": 0.282, "p99_ms": 0.546, "avg_bytes": 6720, "cpu_us_by_role": {"beam": 259.5}}
+{"label": "pr5", "round": 1, "workload": "sidebar", "conc": 16, "rps": 14827.4, "p50_ms": 0.721, "p99_ms": 23.471, "avg_bytes": 6720, "cpu_us_by_role": {"beam": 271.0}}
+{"label": "pr5", "round": 1, "workload": "search", "conc": 1, "rps": 3522.3, "p50_ms": 0.273, "p99_ms": 0.475, "avg_bytes": 7832, "cpu_us_by_role": {"beam": 247.0}}
+{"label": "pr5", "round": 1, "workload": "search", "conc": 16, "rps": 15241.5, "p50_ms": 0.687, "p99_ms": 20.767, "avg_bytes": 7832, "cpu_us_by_role": {"beam": 262.7}}
+{"label": "pr5", "round": 1, "workload": "up", "conc": 1, "rps": 5019.0, "p50_ms": 0.178, "p99_ms": 0.351, "avg_bytes": 88, "cpu_us_by_role": {"beam": 101.3}}
+{"label": "pr5", "round": 1, "workload": "up", "conc": 16, "rps": 38616.2, "p50_ms": 0.379, "p99_ms": 1.06, "avg_bytes": 88, "cpu_us_by_role": {"beam": 76.8}}
+{"label": "pr5", "round": 1, "workload": "post", "conc": 1, "rps": 633.3, "p50_ms": 1.486, "p99_ms": 4.247, "avg_bytes": 2268, "cpu_us_by_role": {"beam": 3038.7, "campfire": 115.8}}
+{"label": "pr5", "round": 1, "workload": "post", "conc": 16, "rps": 1438.7, "p50_ms": 10.295, "p99_ms": 33.759, "avg_bytes": 2271, "cpu_us_by_role": {"beam": 2522.6, "campfire": 50.9}}
+{"label": "plus", "round": 1, "workload": "room", "conc": 1, "rps": 3187.9, "p50_ms": 0.304, "p99_ms": 0.512, "avg_bytes": 38163, "cpu_us_by_role": {"beam": 199.2}}
+{"label": "plus", "round": 1, "workload": "room", "conc": 16, "rps": 22967.5, "p50_ms": 0.658, "p99_ms": 1.279, "avg_bytes": 38163, "cpu_us_by_role": {"beam": 173.3}}
+{"label": "plus", "round": 1, "workload": "messages", "conc": 1, "rps": 3630.6, "p50_ms": 0.269, "p99_ms": 0.43, "avg_bytes": 29868, "cpu_us_by_role": {"beam": 191.9}}
+{"label": "plus", "round": 1, "workload": "messages", "conc": 16, "rps": 29683.0, "p50_ms": 0.486, "p99_ms": 1.274, "avg_bytes": 29868, "cpu_us_by_role": {"beam": 130.6}}
+{"label": "plus", "round": 1, "workload": "sidebar", "conc": 1, "rps": 4229.2, "p50_ms": 0.232, "p99_ms": 0.373, "avg_bytes": 6720, "cpu_us_by_role": {"beam": 140.3}}
+{"label": "plus", "round": 1, "workload": "sidebar", "conc": 16, "rps": 34664.6, "p50_ms": 0.42, "p99_ms": 1.253, "avg_bytes": 6720, "cpu_us_by_role": {"beam": 111.8}}
+{"label": "plus", "round": 1, "workload": "search", "conc": 1, "rps": 4245.3, "p50_ms": 0.23, "p99_ms": 0.381, "avg_bytes": 7832, "cpu_us_by_role": {"beam": 133.9}}
+{"label": "plus", "round": 1, "workload": "search", "conc": 16, "rps": 35706.4, "p50_ms": 0.409, "p99_ms": 1.279, "avg_bytes": 7832, "cpu_us_by_role": {"beam": 109.5}}
+{"label": "plus", "round": 1, "workload": "up", "conc": 1, "rps": 5611.1, "p50_ms": 0.172, "p99_ms": 0.284, "avg_bytes": 88, "cpu_us_by_role": {"beam": 99.8}}
+{"label": "plus", "round": 1, "workload": "up", "conc": 16, "rps": 42667.7, "p50_ms": 0.359, "p99_ms": 0.749, "avg_bytes": 88, "cpu_us_by_role": {"beam": 76.2}}
+{"label": "plus", "round": 1, "workload": "post", "conc": 1, "rps": 845.4, "p50_ms": 1.104, "p99_ms": 3.607, "avg_bytes": 2269, "cpu_us_by_role": {"beam": 1687.4, "campfire": 116.3}}
+{"label": "plus", "round": 1, "workload": "post", "conc": 16, "rps": 1657.3, "p50_ms": 8.983, "p99_ms": 20.207, "avg_bytes": 2271, "cpu_us_by_role": {"beam": 1522.5, "campfire": 62.2}}
+{"label": "plus-off", "round": 1, "workload": "room", "conc": 1, "rps": 3191.3, "p50_ms": 0.303, "p99_ms": 0.527, "avg_bytes": 38163, "cpu_us_by_role": {"beam": 209.9}}
+{"label": "plus-off", "round": 1, "workload": "room", "conc": 16, "rps": 22828.3, "p50_ms": 0.662, "p99_ms": 1.315, "avg_bytes": 38163, "cpu_us_by_role": {"beam": 174.5}}
+{"label": "plus-off", "round": 1, "workload": "messages", "conc": 1, "rps": 3733.3, "p50_ms": 0.262, "p99_ms": 0.418, "avg_bytes": 29868, "cpu_us_by_role": {"beam": 158.9}}
+{"label": "plus-off", "round": 1, "workload": "messages", "conc": 16, "rps": 29270.6, "p50_ms": 0.507, "p99_ms": 1.342, "avg_bytes": 29868, "cpu_us_by_role": {"beam": 134.9}}
+{"label": "plus-off", "round": 1, "workload": "sidebar", "conc": 1, "rps": 4391.5, "p50_ms": 0.222, "p99_ms": 0.355, "avg_bytes": 6720, "cpu_us_by_role": {"beam": 134.7}}
+{"label": "plus-off", "round": 1, "workload": "sidebar", "conc": 16, "rps": 35031.2, "p50_ms": 0.421, "p99_ms": 1.041, "avg_bytes": 6720, "cpu_us_by_role": {"beam": 109.4}}
+{"label": "plus-off", "round": 1, "workload": "search", "conc": 1, "rps": 4390.5, "p50_ms": 0.223, "p99_ms": 0.362, "avg_bytes": 7832, "cpu_us_by_role": {"beam": 139.7}}
+{"label": "plus-off", "round": 1, "workload": "search", "conc": 16, "rps": 33909.3, "p50_ms": 0.423, "p99_ms": 1.284, "avg_bytes": 7832, "cpu_us_by_role": {"beam": 110.7}}
+{"label": "plus-off", "round": 1, "workload": "up", "conc": 1, "rps": 5517.0, "p50_ms": 0.175, "p99_ms": 0.286, "avg_bytes": 88, "cpu_us_by_role": {"beam": 98.5}}
+{"label": "plus-off", "round": 1, "workload": "up", "conc": 16, "rps": 42464.5, "p50_ms": 0.357, "p99_ms": 0.851, "avg_bytes": 88, "cpu_us_by_role": {"beam": 75.9}}
+{"label": "plus-off", "round": 1, "workload": "post", "conc": 1, "rps": 671.2, "p50_ms": 1.416, "p99_ms": 3.945, "avg_bytes": 2266, "cpu_us_by_role": {"beam": 2706.1, "campfire": 121.6}}
+{"label": "plus-off", "round": 1, "workload": "post", "conc": 16, "rps": 1623.6, "p50_ms": 9.455, "p99_ms": 17.151, "avg_bytes": 2270, "cpu_us_by_role": {"beam": 2243.3, "campfire": 53.3}}
+{"label": "plus-off", "round": 2, "workload": "room", "conc": 1, "rps": 3180.5, "p50_ms": 0.305, "p99_ms": 0.523, "avg_bytes": 38163, "cpu_us_by_role": {"beam": 203.3}}
+{"label": "plus-off", "round": 2, "workload": "room", "conc": 16, "rps": 22844.6, "p50_ms": 0.661, "p99_ms": 1.313, "avg_bytes": 38163, "cpu_us_by_role": {"beam": 174.3}}
+{"label": "plus-off", "round": 2, "workload": "messages", "conc": 1, "rps": 3710.9, "p50_ms": 0.264, "p99_ms": 0.431, "avg_bytes": 29868, "cpu_us_by_role": {"beam": 163.5}}
+{"label": "plus-off", "round": 2, "workload": "messages", "conc": 16, "rps": 28456.9, "p50_ms": 0.506, "p99_ms": 1.736, "avg_bytes": 29868, "cpu_us_by_role": {"beam": 138.4}}
+{"label": "plus-off", "round": 2, "workload": "sidebar", "conc": 1, "rps": 4327.2, "p50_ms": 0.223, "p99_ms": 0.376, "avg_bytes": 6720, "cpu_us_by_role": {"beam": 139.8}}
+{"label": "plus-off", "round": 2, "workload": "sidebar", "conc": 16, "rps": 34392.4, "p50_ms": 0.427, "p99_ms": 1.181, "avg_bytes": 6720, "cpu_us_by_role": {"beam": 112.0}}
+{"label": "plus-off", "round": 2, "workload": "search", "conc": 1, "rps": 4269.4, "p50_ms": 0.228, "p99_ms": 0.389, "avg_bytes": 7832, "cpu_us_by_role": {"beam": 142.5}}
+{"label": "plus-off", "round": 2, "workload": "search", "conc": 16, "rps": 37061.9, "p50_ms": 0.404, "p99_ms": 0.844, "avg_bytes": 7832, "cpu_us_by_role": {"beam": 103.5}}
+{"label": "plus-off", "round": 2, "workload": "up", "conc": 1, "rps": 5564.6, "p50_ms": 0.174, "p99_ms": 0.284, "avg_bytes": 88, "cpu_us_by_role": {"beam": 100.0}}
+{"label": "plus-off", "round": 2, "workload": "up", "conc": 16, "rps": 42704.7, "p50_ms": 0.363, "p99_ms": 0.625, "avg_bytes": 88, "cpu_us_by_role": {"beam": 71.9}}
+{"label": "plus-off", "round": 2, "workload": "post", "conc": 1, "rps": 674.5, "p50_ms": 1.379, "p99_ms": 4.223, "avg_bytes": 2267, "cpu_us_by_role": {"beam": 2700.1, "campfire": 121.0}}
+{"label": "plus-off", "round": 2, "workload": "post", "conc": 16, "rps": 1655.5, "p50_ms": 9.159, "p99_ms": 16.303, "avg_bytes": 2271, "cpu_us_by_role": {"beam": 2165.5, "campfire": 50.3}}
+{"label": "plus", "round": 2, "workload": "room", "conc": 1, "rps": 3233.6, "p50_ms": 0.3, "p99_ms": 0.498, "avg_bytes": 38163, "cpu_us_by_role": {"beam": 202.0}}
+{"label": "plus", "round": 2, "workload": "room", "conc": 16, "rps": 19548.6, "p50_ms": 0.759, "p99_ms": 2.195, "avg_bytes": 38163, "cpu_us_by_role": {"beam": 204.4}}
+{"label": "plus", "round": 2, "workload": "messages", "conc": 1, "rps": 3590.8, "p50_ms": 0.27, "p99_ms": 0.43, "avg_bytes": 29868, "cpu_us_by_role": {"beam": 202.8}}
+{"label": "plus", "round": 2, "workload": "messages", "conc": 16, "rps": 26232.4, "p50_ms": 0.539, "p99_ms": 2.014, "avg_bytes": 29868, "cpu_us_by_role": {"beam": 150.4}}
+{"label": "plus", "round": 2, "workload": "sidebar", "conc": 1, "rps": 4510.4, "p50_ms": 0.215, "p99_ms": 0.392, "avg_bytes": 6720, "cpu_us_by_role": {"beam": 144.5}}
+{"label": "plus", "round": 2, "workload": "sidebar", "conc": 16, "rps": 33741.1, "p50_ms": 0.424, "p99_ms": 1.411, "avg_bytes": 6720, "cpu_us_by_role": {"beam": 116.9}}
+{"label": "plus", "round": 2, "workload": "search", "conc": 1, "rps": 4437.6, "p50_ms": 0.217, "p99_ms": 0.375, "avg_bytes": 7832, "cpu_us_by_role": {"beam": 140.8}}
+{"label": "plus", "round": 2, "workload": "search", "conc": 16, "rps": 35175.2, "p50_ms": 0.397, "p99_ms": 1.543, "avg_bytes": 7832, "cpu_us_by_role": {"beam": 110.7}}
+{"label": "plus", "round": 2, "workload": "up", "conc": 1, "rps": 7180.4, "p50_ms": 0.132, "p99_ms": 0.258, "avg_bytes": 88, "cpu_us_by_role": {"beam": 79.1}}
+{"label": "plus", "round": 2, "workload": "up", "conc": 16, "rps": 42894.4, "p50_ms": 0.35, "p99_ms": 0.909, "avg_bytes": 88, "cpu_us_by_role": {"beam": 79.6}}
+{"label": "plus", "round": 2, "workload": "post", "conc": 1, "rps": 901.4, "p50_ms": 1.014, "p99_ms": 3.393, "avg_bytes": 2269, "cpu_us_by_role": {"beam": 1593.6, "campfire": 112.8}}
+{"label": "plus", "round": 2, "workload": "post", "conc": 16, "rps": 1690.5, "p50_ms": 8.927, "p99_ms": 18.895, "avg_bytes": 2271, "cpu_us_by_role": {"beam": 1591.8, "campfire": 60.1}}
+{"label": "pr5", "round": 2, "workload": "room", "conc": 1, "rps": 3136.9, "p50_ms": 0.3, "p99_ms": 0.628, "avg_bytes": 38163, "cpu_us_by_role": {"beam": 287.4}}
+{"label": "pr5", "round": 2, "workload": "room", "conc": 16, "rps": 11580.8, "p50_ms": 0.943, "p99_ms": 27.487, "avg_bytes": 38163, "cpu_us_by_role": {"beam": 347.6}}
+{"label": "pr5", "round": 2, "workload": "messages", "conc": 1, "rps": 3101.2, "p50_ms": 0.309, "p99_ms": 0.556, "avg_bytes": 29868, "cpu_us_by_role": {"beam": 282.7}}
+{"label": "pr5", "round": 2, "workload": "messages", "conc": 16, "rps": 13492.7, "p50_ms": 0.767, "p99_ms": 27.631, "avg_bytes": 29868, "cpu_us_by_role": {"beam": 295.7}}
+{"label": "pr5", "round": 2, "workload": "sidebar", "conc": 1, "rps": 3357.6, "p50_ms": 0.28, "p99_ms": 0.508, "avg_bytes": 6720, "cpu_us_by_role": {"beam": 254.1}}
+{"label": "pr5", "round": 2, "workload": "sidebar", "conc": 16, "rps": 14824.7, "p50_ms": 0.698, "p99_ms": 26.671, "avg_bytes": 6720, "cpu_us_by_role": {"beam": 269.6}}
+{"label": "pr5", "round": 2, "workload": "search", "conc": 1, "rps": 3490.4, "p50_ms": 0.272, "p99_ms": 0.494, "avg_bytes": 7832, "cpu_us_by_role": {"beam": 245.0}}
+{"label": "pr5", "round": 2, "workload": "search", "conc": 16, "rps": 15453.6, "p50_ms": 0.664, "p99_ms": 24.863, "avg_bytes": 7832, "cpu_us_by_role": {"beam": 258.9}}
+{"label": "pr5", "round": 2, "workload": "up", "conc": 1, "rps": 5686.4, "p50_ms": 0.17, "p99_ms": 0.283, "avg_bytes": 88, "cpu_us_by_role": {"beam": 101.7}}
+{"label": "pr5", "round": 2, "workload": "up", "conc": 16, "rps": 42855.0, "p50_ms": 0.359, "p99_ms": 0.693, "avg_bytes": 88, "cpu_us_by_role": {"beam": 74.8}}
+{"label": "pr5", "round": 2, "workload": "post", "conc": 1, "rps": 646.8, "p50_ms": 1.443, "p99_ms": 4.335, "avg_bytes": 2267, "cpu_us_by_role": {"beam": 2963.2, "campfire": 113.4}}
+{"label": "pr5", "round": 2, "workload": "post", "conc": 16, "rps": 1506.7, "p50_ms": 9.991, "p99_ms": 18.959, "avg_bytes": 2271, "cpu_us_by_role": {"beam": 2509.9, "campfire": 50.8}}
+{"label": "pr5", "round": 3, "workload": "room", "conc": 1, "rps": 2712.2, "p50_ms": 0.351, "p99_ms": 0.669, "avg_bytes": 38163, "cpu_us_by_role": {"beam": 312.2}}
+{"label": "pr5", "round": 3, "workload": "room", "conc": 16, "rps": 11434.3, "p50_ms": 0.946, "p99_ms": 29.647, "avg_bytes": 38163, "cpu_us_by_role": {"beam": 349.4}}
+{"label": "pr5", "round": 3, "workload": "messages", "conc": 1, "rps": 3030.2, "p50_ms": 0.312, "p99_ms": 0.57, "avg_bytes": 29868, "cpu_us_by_role": {"beam": 280.5}}
+{"label": "pr5", "round": 3, "workload": "messages", "conc": 16, "rps": 13651.3, "p50_ms": 0.747, "p99_ms": 30.111, "avg_bytes": 29868, "cpu_us_by_role": {"beam": 294.0}}
+{"label": "pr5", "round": 3, "workload": "sidebar", "conc": 1, "rps": 3460.9, "p50_ms": 0.276, "p99_ms": 0.525, "avg_bytes": 6720, "cpu_us_by_role": {"beam": 250.9}}
+{"label": "pr5", "round": 3, "workload": "sidebar", "conc": 16, "rps": 15202.0, "p50_ms": 0.671, "p99_ms": 27.087, "avg_bytes": 6720, "cpu_us_by_role": {"beam": 264.0}}
+{"label": "pr5", "round": 3, "workload": "search", "conc": 1, "rps": 3275.3, "p50_ms": 0.296, "p99_ms": 0.55, "avg_bytes": 7832, "cpu_us_by_role": {"beam": 241.7}}
+{"label": "pr5", "round": 3, "workload": "search", "conc": 16, "rps": 15302.1, "p50_ms": 0.655, "p99_ms": 25.711, "avg_bytes": 7832, "cpu_us_by_role": {"beam": 261.2}}
+{"label": "pr5", "round": 3, "workload": "up", "conc": 1, "rps": 5578.2, "p50_ms": 0.172, "p99_ms": 0.3, "avg_bytes": 88, "cpu_us_by_role": {"beam": 98.6}}
+{"label": "pr5", "round": 3, "workload": "up", "conc": 16, "rps": 42884.1, "p50_ms": 0.352, "p99_ms": 0.897, "avg_bytes": 88, "cpu_us_by_role": {"beam": 78.9}}
+{"label": "pr5", "round": 3, "workload": "post", "conc": 1, "rps": 640.3, "p50_ms": 1.46, "p99_ms": 4.067, "avg_bytes": 2267, "cpu_us_by_role": {"beam": 3006.2, "campfire": 114.5}}
+{"label": "pr5", "round": 3, "workload": "post", "conc": 16, "rps": 1540.5, "p50_ms": 9.599, "p99_ms": 21.343, "avg_bytes": 2271, "cpu_us_by_role": {"beam": 2544.8, "campfire": 48.6}}
+{"label": "plus", "round": 3, "workload": "room", "conc": 1, "rps": 3176.4, "p50_ms": 0.3, "p99_ms": 0.606, "avg_bytes": 38163, "cpu_us_by_role": {"beam": 193.1}}
+{"label": "plus", "round": 3, "workload": "room", "conc": 16, "rps": 22223.5, "p50_ms": 0.678, "p99_ms": 1.412, "avg_bytes": 38163, "cpu_us_by_role": {"beam": 178.5}}
+{"label": "plus", "round": 3, "workload": "messages", "conc": 1, "rps": 3594.7, "p50_ms": 0.265, "p99_ms": 0.458, "avg_bytes": 29868, "cpu_us_by_role": {"beam": 190.6}}
+{"label": "plus", "round": 3, "workload": "messages", "conc": 16, "rps": 28479.0, "p50_ms": 0.512, "p99_ms": 1.767, "avg_bytes": 29868, "cpu_us_by_role": {"beam": 139.8}}
+{"label": "plus", "round": 3, "workload": "sidebar", "conc": 1, "rps": 4494.4, "p50_ms": 0.214, "p99_ms": 0.356, "avg_bytes": 6720, "cpu_us_by_role": {"beam": 137.6}}
+{"label": "plus", "round": 3, "workload": "sidebar", "conc": 16, "rps": 35564.8, "p50_ms": 0.415, "p99_ms": 1.027, "avg_bytes": 6720, "cpu_us_by_role": {"beam": 108.6}}
+{"label": "plus", "round": 3, "workload": "search", "conc": 1, "rps": 4309.5, "p50_ms": 0.225, "p99_ms": 0.392, "avg_bytes": 7832, "cpu_us_by_role": {"beam": 135.7}}
+{"label": "plus", "round": 3, "workload": "search", "conc": 16, "rps": 38302.0, "p50_ms": 0.392, "p99_ms": 0.735, "avg_bytes": 7832, "cpu_us_by_role": {"beam": 100.9}}
+{"label": "plus", "round": 3, "workload": "up", "conc": 1, "rps": 5587.0, "p50_ms": 0.171, "p99_ms": 0.292, "avg_bytes": 88, "cpu_us_by_role": {"beam": 99.6}}
+{"label": "plus", "round": 3, "workload": "up", "conc": 16, "rps": 43485.2, "p50_ms": 0.354, "p99_ms": 0.652, "avg_bytes": 88, "cpu_us_by_role": {"beam": 73.5}}
+{"label": "plus", "round": 3, "workload": "post", "conc": 1, "rps": 889.4, "p50_ms": 1.029, "p99_ms": 3.413, "avg_bytes": 2269, "cpu_us_by_role": {"beam": 1573.6, "campfire": 108.7}}
+{"label": "plus", "round": 3, "workload": "post", "conc": 16, "rps": 1794.7, "p50_ms": 8.599, "p99_ms": 15.247, "avg_bytes": 2272, "cpu_us_by_role": {"beam": 1431.9, "campfire": 55.6}}
+{"label": "plus-off", "round": 3, "workload": "room", "conc": 1, "rps": 3086.0, "p50_ms": 0.305, "p99_ms": 0.588, "avg_bytes": 38163, "cpu_us_by_role": {"beam": 197.1}}
+{"label": "plus-off", "round": 3, "workload": "room", "conc": 16, "rps": 22220.0, "p50_ms": 0.675, "p99_ms": 1.519, "avg_bytes": 38163, "cpu_us_by_role": {"beam": 178.3}}
+{"label": "plus-off", "round": 3, "workload": "messages", "conc": 1, "rps": 3695.8, "p50_ms": 0.262, "p99_ms": 0.423, "avg_bytes": 29868, "cpu_us_by_role": {"beam": 197.1}}
+{"label": "plus-off", "round": 3, "workload": "messages", "conc": 16, "rps": 29379.6, "p50_ms": 0.5, "p99_ms": 1.665, "avg_bytes": 29868, "cpu_us_by_role": {"beam": 135.5}}
+{"label": "plus-off", "round": 3, "workload": "sidebar", "conc": 1, "rps": 4368.9, "p50_ms": 0.224, "p99_ms": 0.362, "avg_bytes": 6720, "cpu_us_by_role": {"beam": 137.7}}
+{"label": "plus-off", "round": 3, "workload": "sidebar", "conc": 16, "rps": 36450.5, "p50_ms": 0.407, "p99_ms": 0.867, "avg_bytes": 6720, "cpu_us_by_role": {"beam": 105.5}}
+{"label": "plus-off", "round": 3, "workload": "search", "conc": 1, "rps": 4255.7, "p50_ms": 0.224, "p99_ms": 0.387, "avg_bytes": 7832, "cpu_us_by_role": {"beam": 140.6}}
+{"label": "plus-off", "round": 3, "workload": "search", "conc": 16, "rps": 37247.9, "p50_ms": 0.399, "p99_ms": 0.886, "avg_bytes": 7832, "cpu_us_by_role": {"beam": 103.6}}
+{"label": "plus-off", "round": 3, "workload": "up", "conc": 1, "rps": 5445.6, "p50_ms": 0.174, "p99_ms": 0.315, "avg_bytes": 88, "cpu_us_by_role": {"beam": 100.4}}
+{"label": "plus-off", "round": 3, "workload": "up", "conc": 16, "rps": 43400.4, "p50_ms": 0.351, "p99_ms": 0.768, "avg_bytes": 88, "cpu_us_by_role": {"beam": 75.4}}
+{"label": "plus-off", "round": 3, "workload": "post", "conc": 1, "rps": 699.4, "p50_ms": 1.345, "p99_ms": 3.873, "avg_bytes": 2267, "cpu_us_by_role": {"beam": 2570.9, "campfire": 114.4}}
+{"label": "plus-off", "round": 3, "workload": "post", "conc": 16, "rps": 1705.7, "p50_ms": 8.887, "p99_ms": 15.823, "avg_bytes": 2271, "cpu_us_by_role": {"beam": 2180.9, "campfire": 48.8}}

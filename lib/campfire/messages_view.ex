@@ -1,4 +1,6 @@
 defmodule Campfire.MessagesView do
+  import Kernel, except: [sigil_r: 2]
+  import Campfire.Sigils
   alias Campfire.{Assets, DB, Mentions, RichText}
   require EEx
   EEx.function_from_file(:defp, :item, "priv/templates/message.html.eex", [:assigns])

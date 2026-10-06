@@ -1,4 +1,6 @@
 defmodule Campfire.Assets do
+  import Kernel, except: [sigil_r: 2]
+  import Campfire.Sigils
   @external_resource "priv/static/assets/.manifest.json"
   @manifest Jason.decode!(File.read!(@external_resource))
   @preloads Regex.scan(

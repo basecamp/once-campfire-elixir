@@ -1,4 +1,7 @@
 defmodule Campfire.RequestURL do
+  import Kernel, except: [sigil_r: 2]
+  import Campfire.Sigils
+
   @moduledoc "Rails URL context from the front server's loopback upstream request only (`Campfire.Front`)."
   import Plug.Conn
   def init(opts), do: opts

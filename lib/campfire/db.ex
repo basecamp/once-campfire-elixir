@@ -1,4 +1,7 @@
 defmodule Campfire.DB do
+  import Kernel, except: [sigil_r: 2]
+  import Campfire.Sigils
+
   @moduledoc """
   SQLite access through pooled connections.
 
@@ -12,6 +15,10 @@ defmodule Campfire.DB do
   table's generation after it commits, so a result is only ever stored under generations at
   least as old as any write it missed. Commits by other processes (another SQLite client) are
   seen through the WAL index's change counter, and invalidate everything.
+
+  A read first tries `Campfire.DB.Native`, which runs the whole statement in one call on the
+  calling scheduler, with one connection per scheduler. Whatever it refuses, including every
+  error, runs on a pooled reader as before. `CAMPFIRE_DB_NATIVE_READS=0` disables it.
   """
   use Supervisor
   alias Exqlite.Sqlite3, as: SQL
@@ -36,6 +43,8 @@ defmodule Campfire.DB do
     ])
 
     :persistent_term.put({__MODULE__, :wal_index}, path <> "-shm")
+    :persistent_term.put({__MODULE__, :path}, path)
+    :persistent_term.erase({__MODULE__, :native})
 
     children = [
       Supervisor.child_spec(
@@ -64,7 +73,10 @@ defmodule Campfire.DB do
     end
 
     if read?(sql) do
-      checkout(@readers, 5_000, run_safely)
+      case native(sql, params) do
+        {:ok, rows} -> rows
+        _ -> checkout(@readers, 5_000, run_safely)
+      end
     else
       checkout(@writer, 5_000, fn conn ->
         result = run_safely.(conn)
@@ -75,6 +87,41 @@ defmodule Campfire.DB do
   end
 
   def one(sql, params \\ []), do: List.first(query(sql, params))
+
+  defp native(sql, params) do
+    case native_connections() do
+      {} ->
+        nil
+
+      connections ->
+        index = rem(:erlang.system_info(:scheduler_id) - 1, tuple_size(connections))
+        Campfire.DB.Native.query(elem(connections, index), sql, params)
+    end
+  end
+
+  # Opened on first use, once the writer has created the database.
+  defp native_connections do
+    case :persistent_term.get({__MODULE__, :native}, nil) do
+      nil ->
+        path = :persistent_term.get({__MODULE__, :path})
+
+        opened =
+          if System.get_env("CAMPFIRE_DB_NATIVE_READS") != "0" and path != ":memory:",
+            do: for(_ <- 1..System.schedulers_online(), do: Campfire.DB.Native.open(path)),
+            else: []
+
+        connections =
+          if opened != [] and Enum.all?(opened, &match?({:ok, _}, &1)),
+            do: opened |> Enum.map(&elem(&1, 1)) |> List.to_tuple(),
+            else: {}
+
+        :persistent_term.put({__MODULE__, :native}, connections)
+        connections
+
+      connections ->
+        connections
+    end
+  end
 
   @doc """
   `query/2` for a read whose rows are kept until one of `tables` (every table it reads) is
@@ -134,7 +181,17 @@ defmodule Campfire.DB do
   end
 
   defp wal_state do
-    with path when is_binary(path) <- :persistent_term.get({__MODULE__, :wal_index}, nil),
+    path = :persistent_term.get({__MODULE__, :wal_index}, nil)
+
+    case is_binary(path) and Campfire.DB.Native.wal_header(path) do
+      header when is_binary(header) -> header
+      nil -> :none
+      _ -> wal_state(path)
+    end
+  end
+
+  defp wal_state(path) do
+    with path when is_binary(path) <- path,
          {:ok, file} <- :file.open(path, [:read, :raw, :binary]) do
       try do
         case :file.pread(file, 0, 48) do
@@ -273,6 +330,23 @@ defmodule Campfire.DB do
         :ets.insert(statements, {sql, stmt})
         stmt
     end
+  end
+
+  defmodule Native do
+    @moduledoc false
+    @on_load :load
+
+    # Without the library the stubs stay in place and the pooled readers do all the work.
+    def load do
+      path = :campfire |> :code.priv_dir() |> Path.join("native/campfire_sqlite")
+      _ = :erlang.load_nif(String.to_charlist(path), 0)
+      :ok
+    end
+
+    def open(_path), do: unavailable()
+    def query(_connection, _sql, _params), do: unavailable()
+    def wal_header(_path), do: unavailable()
+    defp unavailable, do: :erlang.binary_to_term(:erlang.term_to_binary(:unavailable))
   end
 
   defmodule Connection do

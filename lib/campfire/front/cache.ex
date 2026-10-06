@@ -1,4 +1,7 @@
 defmodule Campfire.Front.Cache do
+  import Kernel, except: [sigil_r: 2]
+  import Campfire.Sigils
+
   @moduledoc """
   Thruster's response cache (`cache_handler.go`, `memory_cache.go`, `variant.go`) in ETS.
 

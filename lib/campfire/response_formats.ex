@@ -1,4 +1,6 @@
 defmodule Campfire.ResponseFormats do
+  import Kernel, except: [sigil_r: 2]
+  import Campfire.Sigils
   @moduledoc "Pinned controller templates and explicit respond_to format boundaries."
   import Plug.Conn
 

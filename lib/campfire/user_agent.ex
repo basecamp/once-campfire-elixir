@@ -1,6 +1,9 @@
 defmodule Campfire.UserAgent do
+  import Kernel, except: [sigil_r: 2]
+  import Campfire.Sigils
   @moduledoc "Native port of the pinned useragent 0.16.11 product parser."
-  @matcher ~r/\A['"]*([^\/\s]+)\/?([^\s,]*)(\s\(([^\)]*)\)|,gzip\(gfe\))?/
+  defp matcher, do: ~r/\A['"]*([^\/\s]+)\/?([^\s,]*)(\s\(([^\)]*)\)|,gzip\(gfe\))?/
+
   @windows %{
     "10.0" => "Windows 10",
     "6.3" => "Windows 8.1",
@@ -120,7 +123,7 @@ defmodule Campfire.UserAgent do
   end
 
   defp products(raw, acc) do
-    case Regex.run(@matcher, raw) do
+    case Regex.run(matcher(), raw) do
       nil ->
         Enum.reverse(acc)
 

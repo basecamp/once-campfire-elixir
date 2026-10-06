@@ -1,4 +1,6 @@
 defmodule Campfire.Rails do
+  import Kernel, except: [sigil_r: 2]
+  import Campfire.Sigils
   @moduledoc "Rails signing and encryption, validated against reference-produced vectors."
   def json(value),
     do:

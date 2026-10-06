@@ -1,4 +1,6 @@
 defmodule Campfire.Sounds do
+  import Kernel, except: [sigil_r: 2]
+  import Campfire.Sigils
   alias Campfire.Assets
   @external_resource "vectors/sounds.json"
   @sounds Jason.decode!(File.read!(@external_resource))

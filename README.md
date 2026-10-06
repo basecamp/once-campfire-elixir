@@ -220,6 +220,12 @@ The affected contracts are pending in `plans/contracts.json` until they are re-v
   their tables after commit. Commits by any other SQLite client are seen through the WAL index
   (`-shm`) header and invalidate everything, so tools that edit the database while the app runs
   remain safe.
+- **Regexes and native reads:** literal regexes are compiled once and kept
+  (`Campfire.Sigils`), since OTP 28+ re-imports an inline `~r` at every evaluation. Short reads
+  run in one NIF call on the calling scheduler (`native/sqlite_read.c`, linked against the
+  same system SQLite as Exqlite and only built with `EXQLITE_USE_SYSTEM`) and fall back to
+  the pooled readers; `CAMPFIRE_DB_NATIVE_READS=0` turns that off. The WAL index header is read through one kept
+  descriptor. None of these change responses.
 - **Jobs and Cable:** in-process queues and fan-out replace Redis/Resque, so
   queued jobs are lost on a crash and there is no cross-runtime pub/sub.
 - **Front server:** Bandit replaces Thruster. Responses gzip at zlib level 1
