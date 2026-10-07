@@ -113,6 +113,8 @@ label() { python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))[sys.ar
 lg() {
   if [ "$1" = http ]; then
     taskset -c "$LOADGEN_CPUS" "$LOADGEN" "$@" "${USER_AGENT_ARGS[@]}" | ruby "$BENCH/check_sample.rb"
+  elif [ "$1" = cable ]; then
+    taskset -c "$LOADGEN_CPUS" "$LOADGEN" "$@" "${USER_AGENT_ARGS[@]}" | ruby "$BENCH/check_sample.rb" cable
   else
     taskset -c "$LOADGEN_CPUS" "$LOADGEN" "$@" "${USER_AGENT_ARGS[@]}"
   fi

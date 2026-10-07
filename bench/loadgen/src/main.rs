@@ -682,7 +682,7 @@ async fn post_marked(
     let t0 = Instant::now();
     delivery.sent.lock().unwrap().insert(seq, t0);
     match send(sender.as_mut()?, addr, "POST", &format!("/rooms/{room}/messages"), &h, b).await {
-        Ok(r) if valid_message_post(r.status, &r.body) => Some(t0.elapsed().as_micros() as u64),
+        Ok(r) if valid_message_post(r.status, &r.body, &format!("fanout bmk{seq}z")) => Some(t0.elapsed().as_micros() as u64),
         _ => {
             *sender = None;
             None
@@ -690,8 +690,19 @@ async fn post_marked(
     }
 }
 
-fn valid_message_post(status: u16, body: &[u8]) -> bool {
-    status == 200 && body.windows(b"<turbo-stream".len()).any(|part| part == b"<turbo-stream")
+fn valid_message_post(status: u16, body: &[u8], expected: &str) -> bool {
+    let Ok(text) = std::str::from_utf8(body) else { return false };
+    static IDS: std::sync::OnceLock<regex::Regex> = std::sync::OnceLock::new();
+    let ids = IDS.get_or_init(|| regex::Regex::new(r#"data-message-id="([0-9]+)""#).unwrap());
+    let mut messages = ids.captures_iter(text);
+    status == 200
+        && text.starts_with("<turbo-stream")
+        && text.trim_end().ends_with("</turbo-stream>")
+        && text.contains("<template>")
+        && text.contains("</template>")
+        && text.contains(expected)
+        && messages.next().is_some_and(|id| id[1].parse::<u64>().is_ok_and(|id| id > 0))
+        && messages.next().is_none()
 }
 
 async fn wait_drain(delivery: &Delivery, seqs: &[u64], clients: usize, timeout: Duration) {
@@ -1161,12 +1172,16 @@ mod tests {
     use super::valid_message_post;
 
     #[test]
-    fn message_post_requires_200_and_turbo_stream_body() {
-        assert!(valid_message_post(200, b"<turbo-stream action=\"append\"></turbo-stream>"));
-        assert!(!valid_message_post(201, b"<turbo-stream></turbo-stream>"));
-        assert!(!valid_message_post(302, b"<turbo-stream></turbo-stream>"));
-        assert!(!valid_message_post(500, b"<turbo-stream></turbo-stream>"));
-        assert!(!valid_message_post(200, b""));
-        assert!(!valid_message_post(200, b"an error page"));
+    fn message_post_requires_a_complete_response_with_its_actual_message() {
+        let valid = br#"<turbo-stream action="append" target="messages_room_1"><template><div data-message-id="42">fanout bmk1z</div></template></turbo-stream>"#;
+        assert!(valid_message_post(200, valid, "fanout bmk1z"));
+        for status in [201, 302, 500] {
+            assert!(!valid_message_post(status, valid, "fanout bmk1z"));
+        }
+        assert!(!valid_message_post(200, valid, "fanout bmk2z"));
+        assert!(!valid_message_post(200, &valid[..valid.len() - 1], "fanout bmk1z"));
+        assert!(!valid_message_post(200, b"<turbo-stream></turbo-stream>", "fanout bmk1z"));
+        assert!(!valid_message_post(200, b"an error page", "fanout bmk1z"));
+        assert!(!valid_message_post(200, &[0xff], "fanout bmk1z"));
     }
 }
