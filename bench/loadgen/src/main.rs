@@ -21,6 +21,8 @@
 //! desktop Chrome: `--user-agent 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36
 //! (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36'` (one line).
 
+mod validation;
+
 use std::collections::{HashMap, HashSet};
 use std::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
 use std::sync::{Arc, Mutex, OnceLock};
@@ -270,6 +272,12 @@ async fn http_load(a: &Args) -> Res<Value> {
     let accept_encoding = if gzip { "gzip" } else { "identity" };
     let limit: u64 = a.num("requests", u64::MAX);
     let trace_path = a.opt("trace");
+    let validation_path = a.opt("validate");
+    let audit_path = a.opt("audit-writes");
+    if audit_path.is_some() && (validation_path.is_none() || post_room.is_none()) {
+        return Err("--audit-writes requires POST and --validate".into());
+    }
+    let audit = Arc::new(Mutex::new(Vec::<(u64, String)>::new()));
     let trace = Arc::new(Mutex::new(Vec::<(u128, u64, u16)>::new()));
     let issued = Arc::new(AtomicU64::new(0));
 
@@ -277,6 +285,8 @@ async fn http_load(a: &Args) -> Res<Value> {
     let statuses = Arc::new(Mutex::new(HashMap::<u16, u64>::new()));
     let errors = Arc::new(AtomicU64::new(0));
     let invalid_responses = Arc::new(AtomicU64::new(0));
+    let successful = Arc::new(AtomicU64::new(0));
+    let invalid_reasons = Arc::new(Mutex::new(HashMap::<String, u64>::new()));
     let bytes_total = Arc::new(AtomicU64::new(0));
     let start = Instant::now();
     let deadline = start + duration;
@@ -284,15 +294,23 @@ async fn http_load(a: &Args) -> Res<Value> {
     for _ in 0..conc {
         let (addr, cookie, path, post_room, csrf) = (addr.clone(), cookie.clone(), path.clone(), post_room.clone(), csrf.clone());
         let invalid_responses = invalid_responses.clone();
+        let successful = successful.clone();
+        let invalid_reasons = invalid_reasons.clone();
         let (hist_all, statuses, errors, bytes_total, issued, trace) =
             (hist_all.clone(), statuses.clone(), errors.clone(), bytes_total.clone(), issued.clone(), trace.clone());
+        let mut validator =
+            validation_path.as_ref().map(|path| validation::Validator::from_file(std::path::Path::new(path))).transpose()?;
+        let audit = audit.clone();
+        let auditing = audit_path.is_some();
         let tracing = trace_path.is_some();
         tasks.push(tokio::spawn(async move {
             let mut h = hist();
             let mut local = HashMap::<u16, u64>::new();
             let mut conn: Option<SendRequest<Full<Bytes>>> = None;
-            let mut i = 0u64;
+            let mut successful_local = 0;
+            let mut invalid_reason = None;
             let mut local_trace = Vec::new();
+            let mut local_audit = Vec::new();
             while Instant::now() < deadline && issued.fetch_add(1, Ordering::Relaxed) < limit {
                 if conn.is_none() {
                     match connect(&addr).await {
@@ -304,10 +322,10 @@ async fn http_load(a: &Args) -> Res<Value> {
                         }
                     }
                 }
+                let posted = post_room.as_ref().map(|_| format!("bench write {}", nonce()));
                 let (method, p, headers, body) = match &post_room {
                     Some(room) => {
-                        i += 1;
-                        let (mut h, b) = message_request(&cookie, &csrf, &format!("bench write {i}"));
+                        let (mut h, b) = message_request(&cookie, &csrf, posted.as_deref().unwrap());
                         h.push(("accept-encoding", accept_encoding.into()));
                         ("POST", format!("/rooms/{room}/messages"), h, b)
                     }
@@ -322,8 +340,28 @@ async fn http_load(a: &Args) -> Res<Value> {
                     if tracing { std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_micros() } else { 0 };
                 match send(conn.as_mut().unwrap(), &addr, method, &p, &headers, body).await {
                     Ok(r) => {
-                        if r.status != 200 || r.body.is_empty() { invalid_responses.fetch_add(1, Ordering::Relaxed); }
                         h.record(t0.elapsed().as_micros() as u64).ok();
+                        let valid = if let Some(v) = &mut validator {
+                            v.check(r.status, &r.headers, &r.body, posted.as_deref())
+                        } else if r.status == 200 && !r.body.is_empty() {
+                            Ok(())
+                        } else {
+                            Err("unsuccessful or empty response")
+                        };
+                        if valid.is_ok() {
+                            successful_local += 1;
+                        }
+                        if auditing
+                            && valid.is_ok()
+                            && let Some(id) = validator.as_ref().and_then(validation::Validator::message_id)
+                        {
+                            local_audit.push((id, posted.as_ref().unwrap().clone()));
+                        }
+                        if let Err(reason) = valid {
+                            invalid_responses.fetch_add(1, Ordering::Relaxed);
+                            invalid_reason.get_or_insert(reason);
+                            *invalid_reasons.lock().unwrap().entry(reason.to_owned()).or_default() += 1;
+                        }
                         if tracing {
                             local_trace.push((wall0, t0.elapsed().as_micros() as u64, r.status));
                         }
@@ -339,6 +377,11 @@ async fn http_load(a: &Args) -> Res<Value> {
                     }
                 }
             }
+            if let Some(reason) = invalid_reason {
+                eprintln!("invalid response: {reason}");
+            }
+            successful.fetch_add(successful_local, Ordering::Relaxed);
+            audit.lock().unwrap().extend(local_audit);
             hist_all.lock().unwrap().add(&h).unwrap();
             trace.lock().unwrap().extend(local_trace);
             let mut s = statuses.lock().unwrap();
@@ -358,9 +401,18 @@ async fn http_load(a: &Args) -> Res<Value> {
         let lines: String = t.iter().map(|(s, l, st)| format!("{s} {l} {st}\n")).collect();
         std::fs::write(path, lines)?;
     }
+    if let Some(path) = audit_path {
+        use std::io::Write;
+        let mut file = std::io::BufWriter::new(std::fs::File::create(path)?);
+        for (id, token) in audit.lock().unwrap().iter() {
+            serde_json::to_writer(&mut file, &json!({"id":id,"token":token}))?;
+            file.write_all(b"\n")?;
+        }
+        file.flush()?;
+    }
     let h = hist_all.lock().unwrap();
     let st = statuses.lock().unwrap();
-    let ok: u64 = st.iter().filter(|(k, _)| **k == 200).map(|(_, v)| v).sum();
+    let ok = successful.load(Ordering::Relaxed);
     Ok(json!({
         "path": if let Some(r) = &post_room { format!("POST /rooms/{r}/messages") } else { path },
         "conc": conc,
@@ -371,6 +423,8 @@ async fn http_load(a: &Args) -> Res<Value> {
         "statuses": st.iter().map(|(k, v)| (k.to_string(), json!(v))).collect::<serde_json::Map<_, _>>(),
         "errors": errors.load(Ordering::Relaxed),
         "invalid_responses": invalid_responses.load(Ordering::Relaxed),
+        "invalid_reasons": *invalid_reasons.lock().unwrap(),
+        "validation": if validation_path.is_some() { "route-contract-v1" } else { "status-only" },
         "avg_bytes": if !h.is_empty() { bytes_total.load(Ordering::Relaxed) / h.len() } else { 0 },
         "latency": summary(&h),
     }))
@@ -1046,6 +1100,62 @@ async fn main() {
     }
 }
 
+#[cfg(test)]
+mod validation_integration_tests {
+    use super::*;
+    use tokio::io::{AsyncReadExt, AsyncWriteExt};
+
+    #[tokio::test]
+    async fn intermittent_200_error_page_invalidates_a_loaded_run() {
+        let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+        let addr = listener.local_addr().unwrap();
+        let server = tokio::spawn(async move {
+            for i in 0..8 {
+                let (mut socket, _) = listener.accept().await.unwrap();
+                let mut request = Vec::new();
+                while !request.ends_with(b"\r\n\r\n") {
+                    let mut byte = [0];
+                    socket.read_exact(&mut byte).await.unwrap();
+                    request.push(byte[0]);
+                }
+                let body = if i == 3 {
+                    "<!DOCTYPE html><html>Internal server error</html>"
+                } else {
+                    "<!DOCTYPE html><html><div data-message-id=\"42\">coffee</div></html>"
+                };
+                socket
+                    .write_all(
+                        format!(
+                            "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{body}",
+                            body.len()
+                        )
+                        .as_bytes(),
+                    )
+                    .await
+                    .unwrap();
+            }
+        });
+        let path = std::env::temp_dir().join(format!("campfire-validation-{}.json", nonce()));
+        std::fs::write(&path, json!({"kind":"room_show","content_type":"text/html","required":[],"message_ids":[42]}).to_string()).unwrap();
+        let args = Args(HashMap::from([
+            ("base".into(), format!("http://{addr}")),
+            ("path".into(), "/rooms/1".into()),
+            ("validate".into(), path.to_str().unwrap().into()),
+            ("requests".into(), "8".into()),
+            ("conc".into(), "1".into()),
+            ("duration".into(), "5".into()),
+        ]));
+        let result = http_load(&args).await.unwrap();
+        server.await.unwrap();
+        std::fs::remove_file(path).unwrap();
+        assert_eq!(result["errors"], 0);
+        assert_eq!(result["statuses"]["200"], 8);
+        assert_eq!(result["ok"], 7);
+        assert_eq!(result["invalid_responses"], 1);
+        assert_eq!(result["invalid_reasons"]["incorrect message window"], 1);
+        assert_eq!(result["validation"], "route-contract-v1");
+    }
+}
 #[cfg(test)]
 mod tests {
     use super::valid_message_post;

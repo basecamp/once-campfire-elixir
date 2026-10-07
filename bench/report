@@ -28,7 +28,7 @@ for f in sorted(glob.glob(os.path.join(out, "*-*.json"))):
     r = json.load(open(f))
     if "app" in r:
         for h in r.get("http", []):
-            assert h["errors"] == 0 and h.get("invalid_responses", 0) == 0 and set(h["statuses"]) == {"200"}, f
+            assert h["errors"] == 0 and h.get("invalid_responses") == 0 and (legacy or h.get("validation") == "route-contract-v1") and set(h["statuses"]) == {"200"}, f
         for c in r.get("cable", []):
             assert c["ready"] == c["clients"] and c["failed"] == 0 and c["latency"]["complete"] == c["latency"]["messages"] and c["throughput"]["complete"] == c["throughput"]["posted"], f
         runs.setdefault(r["app"], []).append(r)

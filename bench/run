@@ -34,7 +34,7 @@ set -euo pipefail
 
 ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 BENCH=$ROOT/bench
-RUST_ROOT=${RUST_ROOT:-/home/dhh/Work/basecamp/once-campfire-rust}
+RUST_ROOT=${RUST_ROOT:-$(dirname "$ROOT")/once-campfire-rust}
 SEED=${SEED:-$ROOT/parity/.seed/default}
 LABELS=$SEED/labels.json
 ENV_FILE=$ROOT/parity/reference.env
@@ -70,7 +70,7 @@ suite() { [[ " $SUITES " = *" $1 "* ]]; }
 # 1c22a94 fixed; the app now runs as configured.
 RUST_EXTRA_ENV=${RUST_EXTRA_ENV-}
 BASE=http://127.0.0.1:$PORT
-LOADGEN=$ROOT/target/bench/release/loadgen
+LOADGEN=${LOADGEN:-$ROOT/target/bench/release/loadgen}
 LOADGEN_BUILD_IMAGE=${LOADGEN_BUILD_IMAGE:-rust:1.98.1-slim}
 LOADGEN_CARGO_HOME=${LOADGEN_CARGO_HOME:-/tmp/campfire-bench-cargo}
 
@@ -110,7 +110,13 @@ PY
 
 log() { echo "[$(date +%T)] $*" >&2; }
 label() { python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))[sys.argv[2]])' "$LABELS" "$1"; }
-lg() { taskset -c "$LOADGEN_CPUS" "$LOADGEN" "$@" "${USER_AGENT_ARGS[@]}"; }
+lg() {
+  if [ "$1" = http ]; then
+    taskset -c "$LOADGEN_CPUS" "$LOADGEN" "$@" "${USER_AGENT_ARGS[@]}" | ruby "$BENCH/check_sample.rb"
+  else
+    taskset -c "$LOADGEN_CPUS" "$LOADGEN" "$@" "${USER_AGENT_ARGS[@]}"
+  fi
+}
 
 teardown() {
   local status=$?
@@ -142,11 +148,13 @@ for port in ports:
   try:s.bind(('127.0.0.1',port))
   except OSError:raise SystemExit(f'Benchmark port {port} is already occupied')
 PYPORT
+if [ "$LOADGEN" = "$ROOT/target/bench/release/loadgen" ]; then
 mkdir -p "$LOADGEN_CARGO_HOME"
 docker run --rm --user "$(id -u):$(id -g)" \
   -e CARGO_HOME=/cargo -e CARGO_TARGET_DIR=/app/target/bench \
   -v "$LOADGEN_CARGO_HOME:/cargo" -v "$ROOT:/app" -w /app/bench/loadgen \
   "$LOADGEN_BUILD_IMAGE" cargo build --release --locked
+fi
 
 ROOM=$(label rooms.watercooler)        # the busy room (131 messages)
 WRITE_ROOM=$(label rooms.hq)           # writes and uploads go here, so the busy room stays put
@@ -266,6 +274,9 @@ run_rep() {
   streams=$(python3 -c 'import json,sys; print(",".join(json.loads(sys.argv[1])["streams"]))' "$scrape")
   css=$(python3 -c 'import json,sys; print(json.loads(sys.argv[1])["css"])' "$scrape")
 
+  local contract_dir=$WORK/$app/contracts
+  ruby "$BENCH/contracts.rb" "$BASE" "$cookie" "$WORK/$app/db/production.sqlite3" "$LABELS" "$css" "$contract_dir" >/dev/null
+
   local routes=(
     "room_show|/rooms/$ROOM"
     "messages_page|/rooms/$ROOM/messages?before=$BEFORE"
@@ -277,24 +288,38 @@ run_rep() {
     "post_message|POST"
   )
   python3 "$BENCH/validate.py" preflight "$BASE" "$cookie" "$ROOM" "$BEFORE" "$AVATAR" "$css" "$WORK/$app/db/production.sqlite3" "$OUT/$app-$rep-validation.json"
-  local http_json="[]" r name path args enc=()
+  local http_json="[]" r name path args enc=() acknowledged=0 audits=()
   [ "$app" = rust-identity ] && enc=(--gzip 0)
   suite http || routes=()
   for r in "${routes[@]}"; do
     name=${r%%|*}; path=${r#*|}
     if [ "$path" = POST ]; then args=(--post-room "$WRITE_ROOM" --csrf "$csrf"); else args=(--path "$path"); fi
-    args+=("${enc[@]}")
-    lg http --base "$BASE" --cookie "$cookie" "${args[@]}" --conc 4 --duration 2 >/dev/null # warm up
+    args+=("${enc[@]}" --validate "$contract_dir/$name.json")
+    local warm_audit=()
+    if [ "$path" = POST ]; then
+      audits+=("$contract_dir/post-warmup.jsonl")
+      warm_audit=(--audit-writes "$contract_dir/post-warmup.jsonl")
+    fi
+    local warmup; warmup=$(lg http --base "$BASE" --cookie "$cookie" "${args[@]}" "${warm_audit[@]}" --conc 4 --duration 2)
+    if [ "$path" = POST ]; then acknowledged=$((acknowledged + $(ruby -rjson -e 'puts JSON.parse(ARGV[0]).fetch("ok")' "$warmup"))); fi
     for c in $HTTP_CONCS; do
       local cpu_before; cpu_before=$(awk '$1=="usage_usec" {print $2}' "$cg/cpu.stat")
-      local res; res=$(lg http --base "$BASE" --cookie "$cookie" "${args[@]}" --conc "$c" --duration "$HTTP_SECS")
+      local timed_audit=()
+      if [ "$path" = POST ]; then
+        audits+=("$contract_dir/post-$c.jsonl")
+        timed_audit=(--audit-writes "$contract_dir/post-$c.jsonl")
+      fi
+      local res; res=$(lg http --base "$BASE" --cookie "$cookie" "${args[@]}" "${timed_audit[@]}" --conc "$c" --duration "$HTTP_SECS")
+      if [ "$path" = POST ]; then acknowledged=$((acknowledged + $(ruby -rjson -e 'puts JSON.parse(ARGV[0]).fetch("ok")' "$res"))); fi
       local cpu_after; cpu_after=$(awk '$1=="usage_usec" {print $2}' "$cg/cpu.stat")
       printf '%s\n' "$res" > "$OUT/raw/$app-$rep-http-$name-c$c.json"
-      res=$(python3 -c 'import json,sys; r=json.loads(sys.argv[1]); assert r["errors"]==0 and r.get("invalid_responses",0)==0 and set(r["statuses"])=={"200"}, r; r["cpu_us_per_success"]=(int(sys.argv[3])-int(sys.argv[2]))/r["ok"]; print(json.dumps(r))' "$res" "$cpu_before" "$cpu_after")
+      res=$(python3 -c 'import json,sys; r=json.loads(sys.argv[1]); assert r["errors"]==0 and r["invalid_responses"]==0 and r["validation"]=="route-contract-v1" and set(r["statuses"])=={"200"}, r; r["cpu_us_per_success"]=(int(sys.argv[3])-int(sys.argv[2]))/r["ok"]; print(json.dumps(r))' "$res" "$cpu_before" "$cpu_after")
       http_json=$(python3 -c 'import json,sys; a=json.loads(sys.argv[1]); r=json.loads(sys.argv[2]); r["route"]=sys.argv[3]; a.append(r); print(json.dumps(a))' "$http_json" "$res" "$name")
       log "$app rep $rep: $name c=$c $(python3 -c 'import json,sys; r=json.loads(sys.argv[1]); print(r["rps"], "rps p50", r["latency"].get("p50_ms"), "p99", r["latency"].get("p99_ms"), r["statuses"], "err", r["errors"])' "$res")"
     done
   done
+
+  ruby "$BENCH/validate_acks.rb" "$WORK/$app/db/production.sqlite3" "$WRITE_ROOM" "$acknowledged" "${audits[@]}" > "$OUT/$app-$rep-write-audit.json"
 
   local cable_json="[]" n upload_json='{}'
   if [ "$app" = rust-identity ] || ! suite cable; then CABLE_CLIENTS_RUN=""; else CABLE_CLIENTS_RUN=$CABLE_CLIENTS; fi

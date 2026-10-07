@@ -45,6 +45,7 @@ def validate_http(sample, expected):
     require(len(actual) == len(sample["http"]), "duplicate HTTP workload")
     require(set(actual) == expected, f"HTTP workloads differ: expected {sorted(expected)}, got {sorted(actual)}")
     for key, row in actual.items():
+        require(row.get("validation") == "route-contract-v1", f"{key}: missing every-response contract")
         require(row.get("ok", 0) > 0, f"{key}: zero successful HTTP work")
         require(row.get("errors") == 0 and row.get("invalid_responses") == 0, f"{key}: HTTP errors")
         require(row.get("statuses") == {"200": row["ok"]}, f"{key}: non-200 HTTP response")
@@ -151,6 +152,11 @@ def validate(root, require_complete):
             require(preflight.get("passed") is True, f"{app}-{rep}: preflight failed")
             expected_http = {(route, conc) for route in routes for conc in concs} if "http" in app_suites else set()
             validate_http(sample, expected_http)
+            if expected_http:
+                writes = load(root / f"{app}-{rep}-write-audit.json")
+                posts = sum(row["ok"] for row in sample["http"] if row["route"] == "post_message")
+                require(writes.get("verified") is True and writes.get("acknowledged", -1) >= posts,
+                        f"{app}-{rep}: exact persistent-write audit missing")
             for row in sample["http"]:
                 route, conc = row["route"], row["conc"]
                 raw = root / "raw" / f"{app}-{rep}-http-{route}-c{conc}.json"

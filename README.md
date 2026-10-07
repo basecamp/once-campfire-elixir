@@ -125,6 +125,8 @@ for the workload, validation and reproduction commands.
 
 ## Known differences
 
+- Search selects the newest 100 matching messages by insertion ID, then displays them in ID order. Backdated messages can appear in a different order from the original Rails app.
+
 The compatibility checks retain explicit rich-text comparison rules:
 
 - Attribute values escape `<` and `>` to prevent stored XSS, following the Rust

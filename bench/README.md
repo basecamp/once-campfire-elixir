@@ -12,8 +12,12 @@ Cable throughput sampling is fifteen seconds, and upload sampling uses five runs
 `HTTP_SECS`, `HTTP_CONCS`, `CABLE_CLIENTS`, `SUITES`, and other documented environment
 variables can select a workload; record any overrides with the result.
 
-Preflight rejects redirects, errors, empty bodies, and unpopulated room/search
-responses. Timed HTTP counts only successful 200 responses. Raw results retain
+Every warmup and timed HTTP response must pass its route contract: status, MIME,
+valid gzip, complete UTF-8 markup, exact seeded message IDs and contents, visible rooms,
+and stable static/avatar bytes. Each POST must render its unique request body into the
+correct room; its exact ID, room, stored rich text and FTS entry are audited afterward.
+Invalid responses and missing or duplicate acknowledgements fail the whole run.
+Identical response bytes reuse a prior full validation by exact equality. Raw results retain
 status/error counts, throughput, latency, CPU per successful HTTP response, cold
 readiness, cgroup memory, process PSS/anonymous memory, fixture digest, source digest,
 image IDs, descriptor limits, benchmark/runtime identities, workload validation, and
