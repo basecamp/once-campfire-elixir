@@ -1,4 +1,6 @@
 defmodule Campfire.Autolink do
+  import Kernel, except: [sigil_r: 2]
+  import Campfire.Sigils
   alias Campfire.Assets
 
   @urls ~r/(?:(?i:((?:ed2k|ftp|http|https|irc|mailto|news|gopher|nntp|telnet|webcal|xmpp|callto|feed|svn|urn|aim|rsync|tag|ssh|sftp|rtsp|afs|file):))\/\/|(?i:www)\.[a-zA-Z0-9_])[^\x09-\x0d <\x{A0}"]+/u

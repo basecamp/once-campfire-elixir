@@ -1,4 +1,6 @@
 defmodule Campfire.Assets do
+  import Kernel, except: [sigil_r: 2]
+  import Campfire.Sigils
   @manifest_file "priv/static/assets/.manifest.json"
   @layout_file "priv/templates/application.html.eex"
   @external_resource @manifest_file

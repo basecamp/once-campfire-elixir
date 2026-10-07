@@ -1,4 +1,6 @@
 defmodule Campfire.Mentions do
+  import Kernel, except: [sigil_r: 2]
+  import Campfire.Sigils
   alias Campfire.{Assets, DB, Rails, RichText}
 
   def resolve(attrs) do

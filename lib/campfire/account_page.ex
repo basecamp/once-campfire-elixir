@@ -1,4 +1,6 @@
 defmodule Campfire.AccountPage do
+  import Kernel, except: [sigil_r: 2]
+  import Campfire.Sigils
   import Plug.Conn
   alias Campfire.{Assets, Attachments, Auth, Chat, DB, Mentions, Page, Rails}
   require EEx

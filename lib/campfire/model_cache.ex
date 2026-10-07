@@ -1,4 +1,6 @@
 defmodule Campfire.ModelCache do
+  import Kernel, except: [sigil_r: 2]
+  import Campfire.Sigils
   @moduledoc "Active Record cache keys and controller model validators."
   import Plug.Conn
   @external_resource "vectors/image-etags.json"

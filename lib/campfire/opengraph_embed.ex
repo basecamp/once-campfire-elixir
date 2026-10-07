@@ -1,4 +1,6 @@
 defmodule Campfire.OpengraphEmbed do
+  import Kernel, except: [sigil_r: 2]
+  import Campfire.Sigils
   alias Campfire.{Assets, RichText}
   require EEx
   EEx.function_from_file(:defp, :markup, "priv/templates/opengraph_embed.html.eex", [:assigns])

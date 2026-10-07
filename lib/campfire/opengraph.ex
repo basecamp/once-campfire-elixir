@@ -1,4 +1,6 @@
 defmodule Campfire.Opengraph do
+  import Kernel, except: [sigil_r: 2]
+  import Campfire.Sigils
   alias Campfire.{HtmlParser, Network, RichText}
   @fields ~w(title url image description)
   @media ~r/\bhttps?:\/\/\S+\.(?:zip|tar|tar\.gz|tar\.bz2|tar\.xz|gz|bz2|rar|7z|dmg|exe|msi|pkg|deb|iso|jpg|jpeg|png|gif|bmp|mp4|mov|avi|mkv|wmv|flv|heic|heif|mp3|wav|ogg|aac|wma|webm|ogv|mpg|mpeg)\b/

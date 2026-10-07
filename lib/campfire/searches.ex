@@ -1,4 +1,6 @@
 defmodule Campfire.Searches do
+  import Kernel, except: [sigil_r: 2]
+  import Campfire.Sigils
   import Plug.Conn
   alias Campfire.{Assets, Auth, Chat, DB, MessagesView, Rails}
   require EEx

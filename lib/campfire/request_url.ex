@@ -1,4 +1,6 @@
 defmodule Campfire.RequestURL do
+  import Kernel, except: [sigil_r: 2]
+  import Campfire.Sigils
   @moduledoc "Rails URL context from the local Thruster upstream connection only."
   import Plug.Conn
   def init(opts), do: opts

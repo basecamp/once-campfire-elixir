@@ -1,4 +1,6 @@
 defmodule Campfire.HttpCompression do
+  import Kernel, except: [sigil_r: 2]
+  import Campfire.Sigils
   @moduledoc "Rack-compatible gzip selection and response framing."
   import Plug.Conn
 

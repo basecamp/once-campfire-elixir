@@ -1,4 +1,6 @@
 defmodule Campfire.Chat do
+  import Kernel, except: [sigil_r: 2]
+  import Campfire.Sigils
   alias Campfire.{DB, Rails, RichText}
   def integer(n) when is_integer(n), do: n
 

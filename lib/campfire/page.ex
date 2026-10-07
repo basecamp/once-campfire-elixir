@@ -1,4 +1,6 @@
 defmodule Campfire.Page do
+  import Kernel, except: [sigil_r: 2]
+  import Campfire.Sigils
   alias Campfire.{Assets, Auth, DB, Rails}
   require EEx
   EEx.function_from_file(:defp, :layout, "priv/templates/application.html.eex", [:assigns])

@@ -1,4 +1,6 @@
 defmodule Campfire.RoomPage do
+  import Kernel, except: [sigil_r: 2]
+  import Campfire.Sigils
   import Plug.Conn
   alias Campfire.{Assets, Auth, Broadcasts, Chat, DB, MessagesView, Rails}
   require EEx

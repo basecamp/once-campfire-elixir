@@ -1,4 +1,6 @@
 defmodule Campfire.Storage do
+  import Kernel, except: [sigil_r: 2]
+  import Campfire.Sigils
   import Plug.Conn
   alias Campfire.{Auth, Chat, Clock, DB, Filename, Rack, Rails}
   @prefix "/rails/active_storage"

@@ -1,4 +1,6 @@
 defmodule Campfire.UserAgent do
+  import Kernel, except: [sigil_r: 2]
+  import Campfire.Sigils
   @moduledoc "Native port of the pinned useragent 0.16.11 product parser."
   @matcher ~r/\A['"]*([^\/\s]+)\/?([^\s,]*)(\s\(([^\)]*)\)|,gzip\(gfe\))?/
   @windows %{

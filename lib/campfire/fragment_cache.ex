@@ -1,4 +1,6 @@
 defmodule Campfire.FragmentCache do
+  import Kernel, except: [sigil_r: 2]
+  import Campfire.Sigils
   @moduledoc "Bounded application fragments shared by request and broadcast rendering."
   use Agent
 

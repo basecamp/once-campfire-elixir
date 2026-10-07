@@ -1,4 +1,6 @@
 defmodule Campfire.Cable do
+  import Kernel, except: [sigil_r: 2]
+  import Campfire.Sigils
   @behaviour WebSock
   import Plug.Conn
   alias Campfire.{Auth, Chat, Clock, Presence, Rails}
