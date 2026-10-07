@@ -129,6 +129,15 @@ for the workload, validation and reproduction commands.
 
 ## Known differences
 
+- Room, messages, search and sidebar responses are cached per user and session with
+  their ETag and gzip body. Room, search and sidebar entries key on SQLite's
+  `PRAGMA data_version`, so any committed write by any connection or process, including
+  a separate job node or a Rails process during rollback, invalidates them; messages
+  pages key on the ids and versions of the messages they render. Repeated requests
+  therefore get stable ETags and 304 responses where Rails produced a new ETag every
+  time. Cached fragments keep Rails' staleness: a renamed user shows in old messages
+  only once the message itself changes.
+
 - Session-transfer auto-submit forms explicitly close their form tag; the pinned Rails
   reference omitted it.
 - Background sidebar refreshes preserve an open New Ping form and selected recipients.
