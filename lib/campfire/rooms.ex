@@ -176,17 +176,13 @@ defmodule Campfire.Rooms do
   end
 
   defp find_direct(ids) do
-    rooms = DB.query("SELECT * FROM rooms WHERE type='Rooms::Direct' ORDER BY id")
-    expected = MapSet.new(ids)
-
-    Enum.find(rooms, fn room ->
-      MapSet.new(
-        Enum.map(
-          DB.query("SELECT user_id FROM memberships WHERE room_id=?", [room["id"]]),
-          & &1["user_id"]
-        )
-      ) == expected
-    end)
+    DB.one(
+      "SELECT r.* FROM rooms r JOIN memberships m ON m.room_id=r.id " <>
+        "WHERE r.type='Rooms::Direct' GROUP BY r.id " <>
+        "HAVING COUNT(*)=? AND SUM(m.user_id IN (SELECT value FROM json_each(?)))=? " <>
+        "ORDER BY r.id LIMIT 1",
+      [length(ids), Jason.encode!(ids), length(ids)]
+    )
   end
 
   defp grant(query, room, ids, _now) do

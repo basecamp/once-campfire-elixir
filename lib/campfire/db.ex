@@ -67,7 +67,19 @@ defmodule Campfire.DB do
 
     :ok = SQL.set_busy_timeout(db, 5000)
     initialize(db)
+
+    ensure_refresh_index(db)
     {:ok, db}
+  end
+
+  defp ensure_refresh_index(db) do
+    if run(db, "SELECT name FROM sqlite_master WHERE type='table' AND name='messages'", []) != [] do
+      :ok =
+        SQL.execute(
+          db,
+          "CREATE INDEX IF NOT EXISTS index_messages_on_room_id_and_updated_at ON messages(room_id,updated_at)"
+        )
+    end
   end
 
   defp initialize(db) do
@@ -164,6 +176,7 @@ defmodule Campfire.DB do
     end
 
     :ok = SQL.execute(db, "COMMIT; PRAGMA foreign_keys=ON")
+    ensure_refresh_index(db)
     {:reply, :ok, db}
   end
 

@@ -30,6 +30,47 @@ defmodule Campfire.Searches do
   def query(nil), do: nil
   def query(value), do: String.replace(value, ~r/[^\p{L}\p{M}\p{N}\p{Pc}]/u, " ")
 
+  def messages(user_id, query) do
+    terms =
+      query
+      |> String.split()
+      |> Enum.map_join(" ", &("\"" <> String.replace(&1, "\"", "\"\"") <> "\""))
+
+    if terms == "" do
+      []
+    else
+      probe =
+        DB.query(
+          "SELECT m.id, mm.user_id IS NOT NULL AS reachable FROM message_search_index idx " <>
+            "JOIN messages m ON m.id=idx.rowid LEFT JOIN memberships mm ON mm.room_id=m.room_id AND mm.user_id=? " <>
+            "WHERE idx.body MATCH ? ORDER BY idx.rowid DESC LIMIT 1000",
+          [user_id, terms]
+        )
+
+      ids =
+        probe |> Enum.filter(&(&1["reachable"] == 1)) |> Enum.take(100) |> Enum.map(& &1["id"])
+
+      ids =
+        if length(ids) < 100 && length(probe) == 1000 do
+          DB.query(
+            "SELECT m.id FROM messages m JOIN message_search_index idx ON idx.rowid=m.id " <>
+              "JOIN memberships mm ON mm.room_id=m.room_id WHERE mm.user_id=? AND idx.body MATCH ? " <>
+              "ORDER BY m.id DESC LIMIT 100",
+            [user_id, terms]
+          )
+          |> Enum.map(& &1["id"])
+        else
+          ids
+        end
+
+      DB.query(
+        "SELECT m.* FROM messages m JOIN memberships mm ON mm.room_id=m.room_id " <>
+          "WHERE mm.user_id=? AND m.id IN (SELECT value FROM json_each(?)) ORDER BY m.id",
+        [user_id, Jason.encode!(ids)]
+      )
+    end
+  end
+
   defp action(%{method: "DELETE"} = conn, user) do
     DB.query("DELETE FROM searches WHERE user_id=?", [user["id"]])
     Auth.redirect(conn, "/searches")
@@ -69,14 +110,7 @@ defmodule Campfire.Searches do
     raw = conn.params["q"]
     q = query(raw)
 
-    messages =
-      if Chat.present?(q),
-        do:
-          DB.query(
-            "SELECT * FROM (SELECT m.* FROM messages m JOIN message_search_index idx ON m.id=idx.rowid JOIN memberships mm ON mm.room_id=m.room_id WHERE mm.user_id=? AND idx.body MATCH ? ORDER BY m.created_at DESC LIMIT 100) ORDER BY created_at",
-            [user["id"], q]
-          ),
-        else: []
+    messages = if Chat.present?(q), do: messages(user["id"], q), else: []
 
     recents =
       DB.query("SELECT * FROM searches WHERE user_id=? ORDER BY updated_at DESC", [user["id"]])

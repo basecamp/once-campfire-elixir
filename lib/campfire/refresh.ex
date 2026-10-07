@@ -28,11 +28,9 @@ defmodule Campfire.Refresh do
 
           updated =
             DB.query(
-              "SELECT * FROM messages WHERE room_id=? AND updated_at>? ORDER BY created_at DESC",
-              [room["id"], since]
+              "SELECT * FROM messages WHERE room_id=? AND updated_at>? AND id NOT IN (SELECT value FROM json_each(?)) ORDER BY +created_at DESC LIMIT 40",
+              [room["id"], since, Jason.encode!(excluded)]
             )
-            |> Enum.reject(&(&1["id"] in excluded))
-            |> Enum.take(40)
             |> Enum.reverse()
 
           {conn, data} = Auth.csrf_session(conn)
