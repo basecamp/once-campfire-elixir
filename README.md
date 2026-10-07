@@ -125,6 +125,8 @@ for the workload, validation and reproduction commands.
 
 ## Known differences
 
+- Direct-ping autocomplete explicitly requests JSON, repairing the inherited fetch-header bug.
+
 - Sidebar connection refresh waits for the current Turbo frame to finish loading,
   preventing an aborted response on startup or reconnect. Obsolete connections and removed frames do not reload.
 
