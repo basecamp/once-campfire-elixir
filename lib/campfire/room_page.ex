@@ -25,56 +25,26 @@ defmodule Campfire.RoomPage do
       true ->
         if room = Chat.room(user, room_id) do
           {conn, data} = Auth.csrf_session(conn)
-          token = Rails.csrf_mask(Rails.csrf_global(data["_csrf_token"]))
-          messages = messages(room, message_id)
-          account = DB.one("SELECT * FROM accounts LIMIT 1")
-          gid = Base.url_encode64("gid://campfire/#{room["type"]}/#{room["id"]}", padding: false)
-          name = display_name(room, user)
 
-          assigns = [
-            pwa: Campfire.Pwa.render(conn, :room),
-            user_id: user["id"],
-            user_avatar: Campfire.Mentions.avatar(user, :page),
-            user_name: Assets.html_escape(user["name"]),
-            admin: user["role"] == 1,
-            direct: room["type"] == "Rooms::Direct",
-            room_id: room["id"],
-            room_key: Broadcasts.room_key(room),
-            room_name: Assets.html_escape(name),
-            namespace: namespace(room),
-            room_updated: MessagesView.epoch(room["updated_at"]),
-            base: Assets.html_escape(Auth.base(conn)),
-            meta_token: token,
-            form_token:
-              Rails.csrf_mask(
-                Rails.csrf_form(data["_csrf_token"], "/rooms/#{room["id"]}/messages", "POST")
-              ),
-            vapid: Assets.html_escape(System.get_env("VAPID_PUBLIC_KEY", "")),
-            account_version:
-              account["updated_at"] |> String.replace(~r/[^0-9]/, "") |> String.slice(0, 14),
-            stream: Rails.sign_stream(gid <> ":messages"),
-            invitation: invitation_for(conn, user, data, account, room),
-            messages: MessagesView.render_many(messages, Auth.base(conn), token)
-          ]
-
-          {conn, html} =
-            Campfire.Page.render(conn, user, data,
-              title: Assets.html_escape(name),
-              body_class: "sidebar",
-              head: head(assigns),
-              nav: nav(assigns),
-              content: content(assigns),
-              footer: footer(assigns),
-              sidebar: sidebar(assigns)
+          conn =
+            conn
+            |> Auth.set_auth_cookie(session)
+            |> put_resp_cookie("last_room", to_string(room["id"]),
+              max_age: DateTime.diff(Auth.permanent_expiry(), Campfire.Clock.now())
             )
+            |> Auth.set_csrf_session(Map.delete(data, "flash"))
+            |> put_resp_content_type("text/html")
 
-          conn
-          |> Auth.set_auth_cookie(session)
-          |> put_resp_cookie("last_room", to_string(room["id"]),
-            max_age: DateTime.diff(Auth.permanent_expiry(), Campfire.Clock.now())
-          )
-          |> put_resp_content_type("text/html")
-          |> send_resp(200, html)
+          terms =
+            if data["flash"],
+              do: nil,
+              else:
+                {:room, user["id"], room["id"], message_id,
+                 Campfire.Page.cache_context(conn, data), Campfire.ResponseCache.generation()}
+
+          Campfire.ResponseCache.send(conn, terms, fn ->
+            html(conn, user, data, room, message_id)
+          end)
         else
           conn
           |> Campfire.Flash.put("alert", "Room not found or inaccessible")
@@ -84,6 +54,50 @@ defmodule Campfire.RoomPage do
   rescue
     Campfire.Pwa.MissingAsset ->
       Campfire.HttpResponse.exception(conn, 500, Campfire.Assets.read("public/500.html"))
+  end
+
+  defp html(conn, user, data, room, message_id) do
+    token = Rails.csrf_mask(Rails.csrf_global(data["_csrf_token"]))
+    messages = messages(room, message_id)
+    account = DB.one("SELECT * FROM accounts LIMIT 1")
+    gid = Base.url_encode64("gid://campfire/#{room["type"]}/#{room["id"]}", padding: false)
+    name = display_name(room, user)
+
+    assigns = [
+      pwa: Campfire.Pwa.render(conn, :room),
+      user_id: user["id"],
+      user_avatar: Campfire.Mentions.avatar(user, :page),
+      user_name: Assets.html_escape(user["name"]),
+      admin: user["role"] == 1,
+      direct: room["type"] == "Rooms::Direct",
+      room_id: room["id"],
+      room_key: Broadcasts.room_key(room),
+      room_name: Assets.html_escape(name),
+      namespace: namespace(room),
+      room_updated: MessagesView.epoch(room["updated_at"]),
+      base: Assets.html_escape(Auth.base(conn)),
+      meta_token: token,
+      form_token:
+        Rails.csrf_mask(
+          Rails.csrf_form(data["_csrf_token"], "/rooms/#{room["id"]}/messages", "POST")
+        ),
+      vapid: Assets.html_escape(System.get_env("VAPID_PUBLIC_KEY", "")),
+      account_version:
+        account["updated_at"] |> String.replace(~r/[^0-9]/, "") |> String.slice(0, 14),
+      stream: Rails.sign_stream(gid <> ":messages"),
+      invitation: invitation_for(conn, user, data, account, room),
+      messages: MessagesView.render_many(messages, Auth.base(conn), token)
+    ]
+
+    Campfire.Page.html(conn, user, data,
+      title: Assets.html_escape(name),
+      body_class: "sidebar",
+      head: head(assigns),
+      nav: nav(assigns),
+      content: content(assigns),
+      footer: footer(assigns),
+      sidebar: sidebar(assigns)
+    )
   end
 
   defp invitation_for(conn, user, data, account, room) do

@@ -43,11 +43,19 @@ defmodule Campfire.HttpResponse do
                |> put_resp_header("x-version", System.get_env("APP_VERSION", "dev"))
                |> put_resp_header("x-rev", System.get_env("GIT_REVISION", "dev"))
 
+        hit = conn.assigns[:response_cache_hit]
+
+        preload? =
+          if hit,
+            do: hit.preload,
+            else:
+              is_binary(conn.resp_body) &&
+                String.contains?(conn.resp_body, ~s(<link rel="stylesheet"))
+
         conn =
-          if is_binary(conn.resp_body) &&
-               String.contains?(conn.resp_body, ~s(<link rel="stylesheet")),
-             do: put_resp_header(conn, "link", Campfire.Assets.preload_header()),
-             else: conn
+          if preload?,
+            do: put_resp_header(conn, "link", Campfire.Assets.preload_header()),
+            else: conn
 
         conn = etag(conn)
 
@@ -83,7 +91,25 @@ defmodule Campfire.HttpResponse do
               conn |> delete_resp_header("content-type") |> delete_resp_header("content-length"),
             else: conn
 
-        Campfire.HttpCompression.apply(conn)
+        raw = conn.resp_body
+        conn = Campfire.HttpCompression.apply(conn)
+
+        if (key = conn.assigns[:response_cache_store]) && conn.status == 200 && is_binary(raw) do
+          gzip =
+            if get_resp_header(conn, "content-encoding") == ["gzip"],
+              do: conn.resp_body,
+              else: nil
+
+          Campfire.ResponseCache.store(
+            key,
+            raw,
+            List.first(get_resp_header(conn, "etag")),
+            gzip,
+            preload?
+          )
+        end
+
+        conn
       end
     end)
   end
@@ -141,6 +167,18 @@ defmodule Campfire.HttpResponse do
 
     conn = if head?, do: put_resp_header(conn, "content-length", "0"), else: conn
     if body != "", do: put_resp_header(conn, "vary", "Accept-Encoding"), else: conn
+  end
+
+  defp etag(%{assigns: %{response_cache_hit: %{etag: etag}}} = conn) when is_binary(etag) do
+    if conn.status in [200, 201] && get_resp_header(conn, "etag") == [] do
+      conn = put_resp_header(conn, "etag", etag)
+
+      if get_resp_header(conn, "cache-control") == [],
+        do: put_resp_header(conn, "cache-control", "max-age=0, private, must-revalidate"),
+        else: conn
+    else
+      conn
+    end
   end
 
   defp etag(conn) do

@@ -45,14 +45,18 @@ defmodule Campfire.PublicFiles do
 
   defp serve(conn, path, type) do
     method = conn.method
-    data = File.read!(path)
+
+    {data, modified} =
+      Campfire.ResponseCache.static({:file, path}, fn ->
+        {File.read!(path),
+         DateTime.from_unix!(File.stat!(path, time: :posix).mtime)
+         |> Calendar.strftime("%a, %d %b %Y %H:%M:%S GMT")}
+      end)
 
     modified =
       if System.get_env("CAMPFIRE_CLOCK"),
-        do: Campfire.Clock.now(),
-        else: DateTime.from_unix!(File.stat!(path, time: :posix).mtime)
-
-    modified = Calendar.strftime(modified, "%a, %d %b %Y %H:%M:%S GMT")
+        do: Calendar.strftime(Campfire.Clock.now(), "%a, %d %b %Y %H:%M:%S GMT"),
+        else: modified
 
     if List.first(get_req_header(conn, "if-modified-since")) == modified do
       conn
@@ -72,7 +76,12 @@ defmodule Campfire.PublicFiles do
       {conn, status, body} =
         case Campfire.Rack.ranges(List.first(get_req_header(conn, "range")), size) do
           nil ->
-            {assign(conn, :gzip_chunks, chunks(data)), 200, data}
+            gzip =
+              Campfire.ResponseCache.static({:gzip, path}, fn ->
+                Campfire.HttpCompression.compress(data, chunks(data))
+              end)
+
+            {assign(conn, :precompressed_gzip, gzip), 200, data}
 
           [] ->
             {conn

@@ -29,7 +29,7 @@ defmodule Campfire.Messages do
     end
   end
 
-  defp action(%{method: "GET"} = conn, _user, room, nil) do
+  defp action(%{method: "GET"} = conn, user, room, nil) do
     case Chat.messages(room, conn.params) do
       {:error, :not_found} ->
         head(conn, 404)
@@ -50,12 +50,18 @@ defmodule Campfire.Messages do
             Rails.json(Enum.map(messages, &Chat.present_message(&1, Auth.base(conn))))
           )
         else
-          body = MessagesView.render_many(messages, Auth.base(conn), token)
+          conn = conn |> Auth.set_csrf_session(data) |> put_resp_content_type("text/html")
 
-          conn
-          |> Auth.set_csrf_session(data)
-          |> put_resp_content_type("text/html")
-          |> send_resp(200, "\n" <> body)
+          terms =
+            if data["flash"],
+              do: nil,
+              else:
+                {:messages, user["id"], Campfire.Page.cache_context(conn, data),
+                 Enum.map(messages, &{&1["id"], &1["updated_at"]})}
+
+          Campfire.ResponseCache.send(conn, terms, fn ->
+            "\n" <> MessagesView.render_many(messages, Auth.base(conn), token)
+          end)
         end
     end
   end

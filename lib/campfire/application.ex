@@ -10,7 +10,8 @@ defmodule Campfire.Application do
       Campfire.RateLimiter,
       Campfire.FragmentCache,
       Campfire.CableFrames,
-      {Campfire.DB, path: database_path}
+      {Campfire.DB, path: database_path},
+      {Campfire.ResponseCache, path: database_path}
     ]
 
     children =

@@ -108,6 +108,24 @@ defmodule Campfire.Searches do
 
   defp action(%{method: "GET"} = conn, user) do
     raw = conn.params["q"]
+    {conn, data} = Auth.csrf_session(conn)
+
+    conn =
+      conn
+      |> Auth.set_csrf_session(Map.delete(data, "flash"))
+      |> put_resp_content_type("text/html")
+
+    terms =
+      if data["flash"],
+        do: nil,
+        else:
+          {:search, user["id"], raw, conn.cookies["last_room"],
+           Campfire.Page.cache_context(conn, data), Campfire.ResponseCache.generation()}
+
+    Campfire.ResponseCache.send(conn, terms, fn -> html(conn, user, data, raw) end)
+  end
+
+  defp html(conn, user, data, raw) do
     q = query(raw)
 
     messages = if Chat.present?(q), do: messages(user["id"], q), else: []
@@ -115,7 +133,6 @@ defmodule Campfire.Searches do
     recents =
       DB.query("SELECT * FROM searches WHERE user_id=? ORDER BY updated_at DESC", [user["id"]])
 
-    {conn, data} = Auth.csrf_session(conn)
     token = Rails.csrf_mask(Rails.csrf_global(data["_csrf_token"]))
     return_room = if conn.cookies["last_room"], do: Chat.room(user, conn.cookies["last_room"])
 
@@ -145,16 +162,13 @@ defmodule Campfire.Searches do
       search_token: Rails.csrf_mask(Rails.csrf_form(data["_csrf_token"], "/searches", "POST"))
     ]
 
-    {conn, html} =
-      Campfire.Page.render(conn, user, data,
-        title: "Search",
-        body_class: "sidebar searches",
-        nav: nav(assigns),
-        content: content(assigns),
-        footer: footer(assigns),
-        sidebar: sidebar(assigns)
-      )
-
-    conn |> put_resp_content_type("text/html") |> send_resp(200, html)
+    Campfire.Page.html(conn, user, data,
+      title: "Search",
+      body_class: "sidebar searches",
+      nav: nav(assigns),
+      content: content(assigns),
+      footer: footer(assigns),
+      sidebar: sidebar(assigns)
+    )
   end
 end

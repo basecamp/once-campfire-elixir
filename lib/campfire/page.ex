@@ -5,7 +5,11 @@ defmodule Campfire.Page do
   require EEx
   EEx.function_from_file(:defp, :layout, "priv/templates/application.html.eex", [:assigns])
 
-  def render(conn, user, data, assigns) do
+  def render(conn, user, data, assigns),
+    do: {Auth.set_csrf_session(conn, Map.delete(data, "flash")), html(conn, user, data, assigns)}
+
+  @doc "The page body alone; `render/4` also sets the CSRF session cookie."
+  def html(conn, user, data, assigns) do
     account = DB.one("SELECT * FROM accounts LIMIT 1") || %{}
 
     defaults = [
@@ -34,21 +38,24 @@ defmodule Campfire.Page do
 
     merged = Keyword.merge(defaults, assigns)
 
-    html =
-      if Plug.Conn.get_req_header(conn, "turbo-frame") != [] do
-        content = String.replace_suffix(merged[:content], "\n\n", "\n")
+    if Plug.Conn.get_req_header(conn, "turbo-frame") != [] do
+      content = String.replace_suffix(merged[:content], "\n\n", "\n")
 
-        content =
-          if String.starts_with?(content, "      "),
-            do: String.replace_prefix(content, "      ", "    "),
-            else: "    " <> content
+      content =
+        if String.starts_with?(content, "      "),
+          do: String.replace_prefix(content, "      ", "    "),
+          else: "    " <> content
 
-        "<html>\n  <head>\n    <meta name=\"csrf-param\" content=\"authenticity_token\" />\n<meta name=\"csrf-token\" content=\"#{merged[:meta_token]}\" />\n#{merged[:head]}\n  </head>\n  <body>\n#{content}  </body>\n</html>\n"
-      else
-        layout(merged)
-      end
+      "<html>\n  <head>\n    <meta name=\"csrf-param\" content=\"authenticity_token\" />\n<meta name=\"csrf-token\" content=\"#{merged[:meta_token]}\" />\n#{merged[:head]}\n  </head>\n  <body>\n#{content}  </body>\n</html>\n"
+    else
+      layout(merged)
+    end
+  end
 
-    {Auth.set_csrf_session(conn, Map.delete(data, "flash")), html}
+  @doc "Request facts a cached page depends on besides its route and database inputs."
+  def cache_context(conn, data) do
+    {data["_csrf_token"], Auth.base(conn), Plug.Conn.get_req_header(conn, "turbo-frame"),
+     Plug.Conn.get_req_header(conn, "user-agent")}
   end
 
   def custom_styles(account) do
