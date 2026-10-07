@@ -71,6 +71,16 @@ defmodule Campfire.DBNativeTest do
     assert :file.pread(file, 0, 48) == {:ok, before}
     :file.close(file)
     DB.query("INSERT INTO schema_migrations (version) VALUES (?)", ["wal"])
-    assert DB.Native.wal_header(path) != before
+    after_commit = DB.Native.wal_header(path)
+    assert after_commit != before
+
+    # The kept descriptor belongs to a path; another path is read on its own.
+    other = Path.join(System.tmp_dir!(), "campfire-native-#{System.unique_integer([:positive])}")
+    File.write!(other, :binary.copy(<<7>>, 48))
+    assert DB.Native.wal_header(other) == :binary.copy(<<7>>, 48)
+    assert DB.Native.wal_header(path) == after_commit
+    assert DB.Native.wal_header(other <> ".missing") == nil
+    File.rm!(other)
+    assert DB.Native.wal_header(other) == nil
   end
 end

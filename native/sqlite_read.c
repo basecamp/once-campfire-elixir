@@ -282,8 +282,24 @@ static ERL_NIF_TERM nif_query(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[
 
 // The descriptor is shared by every scheduler; pread needs no position. It is reopened when
 // the file it names was unlinked (SQLite removes the index when its last connection closes).
-static _Atomic int wal_fd = -1;
+// The open descriptor and the path it was opened for. Replaced, never freed or closed: a
+// reader may still be using the old one, and closing any descriptor of the index file would
+// drop every POSIX lock this process holds on it, including SQLite's own.
+typedef struct {
+    int fd;
+    size_t length;
+    char name[];
+} wal_t;
+
+static _Atomic(wal_t*) wal_current;
 static atomic_flag wal_opening = ATOMIC_FLAG_INIT;
+
+static int wal_matches(const wal_t* wal, const ErlNifBinary* path)
+{
+    struct stat info;
+    return wal && wal->length == path->size && !memcmp(wal->name, path->data, path->size) &&
+        fstat(wal->fd, &info) == 0 && info.st_nlink > 0;
+}
 
 static ERL_NIF_TERM nif_wal_header(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 {
@@ -291,26 +307,27 @@ static ERL_NIF_TERM nif_wal_header(ErlNifEnv* env, int argc, const ERL_NIF_TERM 
     ErlNifBinary path;
     if (!enif_inspect_binary(env, argv[0], &path) || path.size > 4095) return enif_make_badarg(env);
 
-    int fd = atomic_load(&wal_fd);
-    struct stat info;
-    if (fd < 0 || fstat(fd, &info) != 0 || info.st_nlink == 0) {
+    wal_t* wal = atomic_load(&wal_current);
+    if (!wal_matches(wal, &path)) {
         if (atomic_flag_test_and_set(&wal_opening)) return am_busy;
-        char name[4096];
-        memcpy(name, path.data, path.size);
-        name[path.size] = 0;
-        int opened = open(name, O_RDONLY | O_CLOEXEC);
-        int old = atomic_exchange(&wal_fd, opened);
-        // A reader may still be inside pread on the old descriptor; it is left open rather
-        // than closed under it. This happens only when the index file is replaced.
-        (void)old;
+        wal = enif_alloc(sizeof(wal_t) + path.size + 1);
+        memcpy(wal->name, path.data, path.size);
+        wal->name[path.size] = 0;
+        wal->length = path.size;
+        wal->fd = open(wal->name, O_RDONLY | O_CLOEXEC);
+        if (wal->fd >= 0) {
+            atomic_store(&wal_current, wal);
+        } else {
+            enif_free(wal);
+            wal = NULL;
+        }
         atomic_flag_clear(&wal_opening);
-        fd = opened;
-        if (fd < 0) return am_nil;
+        if (!wal) return am_nil;
     }
 
     ERL_NIF_TERM header;
     unsigned char* data = enif_make_new_binary(env, 48, &header);
-    if (pread(fd, data, 48, 0) != 48) return am_nil;
+    if (pread(wal->fd, data, 48, 0) != 48) return am_nil;
     return header;
 }
 
