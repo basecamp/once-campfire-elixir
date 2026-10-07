@@ -54,6 +54,8 @@ case "${1:---docker}" in
   *) echo "Usage: bin/export-assets [--docker|--local]" >&2; exit 1 ;;
 esac
 
+python3 "$ROOT/bin/apply-asset-overrides" "$STAGED"
+
 mkdir -p "$ROOT/priv/pwa" "$ROOT/priv/images/logos"
 cp "$SOURCE/app/views/pwa/manifest.json.erb" "$SOURCE/app/views/pwa/service_worker.js" "$ROOT/priv/pwa/"
 cp "$SOURCE/app/assets/images/logos/app-icon.png" "$SOURCE/app/assets/images/logos/app-icon-192.png" "$ROOT/priv/images/logos/"

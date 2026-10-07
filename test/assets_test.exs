@@ -9,6 +9,7 @@ defmodule Campfire.AssetsTest do
     File.mkdir_p!(assets)
     File.mkdir_p!(Path.join(project, "bin"))
     File.cp!("bin/export-assets", Path.join(project, "bin/export-assets"))
+    File.cp!("bin/apply-asset-overrides", Path.join(project, "bin/apply-asset-overrides"))
     File.ln_s!(Path.expand("reference"), Path.join(project, "reference"))
     {revision, 0} = System.cmd("git", ["-C", "reference", "rev-parse", "HEAD"])
     revision = String.trim(revision)
@@ -111,6 +112,39 @@ defmodule Campfire.AssetsTest do
     assert File.stat!(assets).mode |> Bitwise.band(0o777) == 0o755
     assert File.exists?(Path.join(tmp, "container-removed"))
     assert Path.wildcard(assets <> ".*") == []
+  end
+
+  test "port-owned controller overrides get new digests and replace stale bodies", %{
+    tmp: tmp,
+    assets: assets
+  } do
+    logical = "controllers/rooms_list_controller.js"
+    previous = "controllers/rooms_list_controller-original.js"
+    override = Path.join(tmp, "project/assets/overrides/" <> logical)
+    File.mkdir_p!(Path.dirname(override))
+    File.cp!("assets/overrides/" <> logical, override)
+    File.mkdir_p!(Path.join(assets, "controllers"))
+    File.write!(Path.join(assets, previous), "original")
+    File.write!(Path.join(assets, previous <> ".gz"), "obsolete compressed body")
+
+    File.write!(
+      Path.join(assets, ".manifest.json"),
+      Jason.encode!(%{logical => %{"digested_path" => previous, "integrity" => nil}})
+    )
+
+    script = Path.join(tmp, "project/bin/apply-asset-overrides")
+    {output, status} = System.cmd("python3", [script, assets], stderr_to_stdout: true)
+    assert status == 0, output
+    manifest = File.read!(Path.join(assets, ".manifest.json")) |> Jason.decode!()
+    digested = manifest[logical]["digested_path"]
+    assert digested == "controllers/rooms_list_controller-dc8f619b.js"
+    assert File.read!(Path.join(assets, digested)) == File.read!(override)
+    refute File.exists?(Path.join(assets, previous))
+    refute File.exists?(Path.join(assets, previous <> ".gz"))
+
+    {output, status} = System.cmd("python3", [script, assets], stderr_to_stdout: true)
+    assert status == 0, output
+    assert File.read!(Path.join(assets, digested)) == File.read!(override)
   end
 
   test "a failed export preserves the previous asset directory", %{

@@ -1,0 +1,32 @@
+#!/usr/bin/env python3
+"""Apply port-owned controller overrides to an exported Propshaft asset tree."""
+import hashlib
+import json
+import pathlib
+import re
+import sys
+
+ROOT = pathlib.Path(__file__).resolve().parents[1]
+assets = pathlib.Path(sys.argv[1])
+manifest_file = assets / ".manifest.json"
+manifest = json.loads(manifest_file.read_text())
+initializer = (ROOT / "reference/config/initializers/assets.rb").read_text()
+version = re.search(r'''assets\.version\s*=\s*["']([^"']*)''', initializer)[1].encode()
+overrides = ROOT / "assets/overrides"
+for source in sorted(overrides.rglob("*.js")):
+    logical = source.relative_to(overrides).as_posix()
+    body = source.read_bytes()
+    if b"RAILS_ASSET_URL(" in body:
+        raise ValueError("Referenced assets need full Propshaft compilation")
+    previous = assets / manifest[logical]["digested_path"]
+    digest = hashlib.sha1(body + version).hexdigest()[:8]
+    destination = source.with_name(source.stem + "-" + digest + source.suffix)
+    digested = destination.relative_to(overrides).as_posix()
+    (assets / digested).parent.mkdir(parents=True, exist_ok=True)
+    (assets / digested).write_bytes(body)
+    if previous != assets / digested:
+        previous.unlink()
+    for suffix in [".gz", ".br"]:
+        previous.with_name(previous.name + suffix).unlink(missing_ok=True)
+    manifest[logical]["digested_path"] = digested
+manifest_file.write_text(json.dumps(manifest, separators=(",", ":")))
