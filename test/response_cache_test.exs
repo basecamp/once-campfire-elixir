@@ -12,7 +12,7 @@ defmodule Campfire.ResponseCacheTest do
     System.put_env("CAMPFIRE_RESPONSE_CACHE_MB", "64")
 
     on_exit(fn ->
-      ResponseCache.finish()
+      ResponseCache.cleanup()
       System.delete_env("CAMPFIRE_CLOCK")
       System.delete_env("CAMPFIRE_RESPONSE_CACHE_MB")
     end)
@@ -94,6 +94,90 @@ defmodule Campfire.ResponseCacheTest do
     ])
 
     assert get(context, path).resp_body =~ "local response-cache text"
+  end
+
+  test "wildcard HTML requests invalidate timestamp-only fragments after foreign writes",
+       context do
+    message = Chat.create_message(context.user, context.room, "before wildcard cache text")
+    path = "/rooms/#{context.room["id"]}"
+    headers = [{"accept", "*/*"}]
+    assert get(context, path, headers).resp_body =~ "before wildcard cache text"
+    assert get(context, path, headers).assigns[:response_cache_hit]
+
+    :ok =
+      SQL.execute(
+        context.foreign,
+        "UPDATE action_text_rich_texts SET body='foreign wildcard cache text' WHERE record_id=#{message["id"]}"
+      )
+
+    changed = get(context, path, headers)
+    assert changed.resp_body =~ "foreign wildcard cache text"
+    refute changed.resp_body =~ "before wildcard cache text"
+  end
+
+  test "foreign edits invalidate native fragments with the page cache disabled or conditional",
+       context do
+    message = Chat.create_message(context.user, context.room, "before native fragment text")
+    path = "/rooms/#{context.room["id"]}"
+    System.put_env("CAMPFIRE_RESPONSE_CACHE_MB", "0")
+    assert get(context, path).resp_body =~ "before native fragment text"
+
+    :ok =
+      SQL.execute(
+        context.foreign,
+        "UPDATE action_text_rich_texts SET body='foreign disabled fragment text' WHERE record_id=#{message["id"]}"
+      )
+
+    assert get(context, path).resp_body =~ "foreign disabled fragment text"
+
+    System.put_env("CAMPFIRE_RESPONSE_CACHE_MB", "64")
+    conditional = [{"if-none-match", "unmatched"}]
+    assert get(context, path, conditional).resp_body =~ "foreign disabled fragment text"
+
+    :ok =
+      SQL.execute(
+        context.foreign,
+        "UPDATE action_text_rich_texts SET body='foreign conditional fragment text' WHERE record_id=#{message["id"]}"
+      )
+
+    changed = get(context, path, conditional)
+    assert changed.resp_body =~ "foreign conditional fragment text"
+    refute changed.resp_body =~ "foreign disabled fragment text"
+  end
+
+  test "an older render cannot populate the newer fragment namespace", context do
+    parent = self()
+
+    task =
+      Task.async(fn ->
+        request(context, "/rooms/#{context.room["id"]}", [{"if-none-match", "unmatched"}])
+        |> fetch_cookies()
+        |> ResponseCache.call([])
+
+        html =
+          Campfire.FragmentCache.fetch(:inflight_fragment, fn ->
+            send(parent, :old_render_started)
+
+            receive do
+              :finish_old_render -> "old snapshot"
+            end
+          end)
+
+        ResponseCache.cleanup()
+        html
+      end)
+
+    assert_receive :old_render_started
+    :ok = SQL.execute(context.foreign, "UPDATE accounts SET name='new fragment generation'")
+
+    assert Campfire.FragmentCache.fetch(:inflight_fragment, fn -> "new snapshot" end) ==
+             "new snapshot"
+
+    send(task.pid, :finish_old_render)
+    assert Task.await(task) == "old snapshot"
+
+    assert Campfire.FragmentCache.fetch(:inflight_fragment, fn -> "should be cached" end) ==
+             "new snapshot"
   end
 
   test "warm bodies never replace current membership or authentication", context do

@@ -92,7 +92,7 @@ bin/rails-to-elixir doctor
 bin/parity-services stop
 ```
 
-The native suite passes **1,952 tests**. A full **65-gate** parity run covers the
+The native suite passes **1,955 tests**. A full **65-gate** parity run covers the
 reviewed backend; fresh shared browser checks cover the current frontend.
 Verification includes actual
 Chromium flows, all-table/FTS/storage mutation snapshots, injected transaction
@@ -132,7 +132,9 @@ for the workload, validation and reproduction commands.
 - Authenticated room, message-list, sidebar and search HTML bodies use a bounded
   cache: 64 MiB per app, disabled with `CAMPFIRE_RESPONSE_CACHE_MB=0`.
   Authorization, CSRF and cookies stay fresh; SQLite commits from any writer
-  invalidate cached bodies. JSON and conditional requests retain their native paths.
+  invalidate cached bodies. Fragment keys also retain the pre-render SQLite epoch and
+  request host, including conditional requests and when response caching is disabled.
+  JSON and conditional requests retain their native paths.
 
 - Session-transfer auto-submit forms explicitly close their form tag; the pinned Rails
   reference omitted it.

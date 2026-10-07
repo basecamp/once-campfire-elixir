@@ -5,6 +5,7 @@ defmodule Campfire.ResponseCache do
   alias Campfire.{Auth, Chat, Rails}
   alias Exqlite.Sqlite3, as: SQL
   @capture {__MODULE__, :capture}
+  @fragment_epoch {__MODULE__, :fragment_epoch}
 
   def start_link(opts), do: GenServer.start_link(__MODULE__, opts, name: __MODULE__)
 
@@ -18,7 +19,10 @@ defmodule Campfire.ResponseCache do
   end
 
   def call(conn, _) do
-    epoch = if eligible?(conn), do: epoch()
+    # Every render, including flash/conditional and cache-disabled paths, must
+    # namespace timestamp-only fragments before its first authenticated read.
+    Process.put(@fragment_epoch, snapshot())
+    epoch = if eligible?(conn) && limit() > 0, do: fragment_epoch()
 
     if epoch do
       # Capture before authentication; a commit during auth must prevent reuse/admission.
@@ -37,8 +41,9 @@ defmodule Campfire.ResponseCache do
             :erlang.term_to_binary(
               {conn.scheme, conn.host, conn.port, conn.request_path, conn.query_string,
                conn.req_headers
-               |> Enum.filter(fn {key, _} -> key in ["accept", "turbo-frame", "user-agent"] end),
-               user["id"], session["id"], data, conn.cookies["last_room"],
+               |> Enum.filter(fn {key, _} ->
+                 key in ["accept", "turbo-frame", "user-agent", "x-requested-with"]
+               end), user["id"], session["id"], data, conn.cookies["last_room"],
                System.get_env("SECRET_KEY_BASE"), System.get_env("VAPID_PUBLIC_KEY")}
             )
           )
@@ -119,6 +124,18 @@ defmodule Campfire.ResponseCache do
 
   def capturing?, do: Process.get(@capture) != nil
 
+  def fragment_epoch do
+    case Process.get(@fragment_epoch, :uncaptured) do
+      :uncaptured -> snapshot()
+      epoch -> epoch
+    end
+  end
+
+  def cleanup do
+    finish()
+    Process.delete(@fragment_epoch)
+  end
+
   def finish do
     case Process.delete(@capture) do
       {_, slots} -> slots
@@ -135,7 +152,7 @@ defmodule Campfire.ResponseCache do
   defp eligible?(conn) do
     conn.method == "GET" && get_req_header(conn, "if-none-match") == [] &&
       get_req_header(conn, "if-modified-since") == [] &&
-      List.first(Campfire.ResponseFormats.requested(conn)) == "html" &&
+      List.first(Campfire.ResponseFormats.requested(conn)) in ["html", "all"] &&
       Regex.match?(
         ~r{^/(?:rooms/\d+(?:/@\d+|/messages)?|users/(?:me|\d+)/sidebar|searches)$},
         conn.request_path
@@ -149,10 +166,16 @@ defmodule Campfire.ResponseCache do
     end
   end
 
+  def snapshot, do: GenServer.call(__MODULE__, :snapshot)
   def epoch, do: GenServer.call(__MODULE__, :epoch)
   def get(key, epoch), do: GenServer.call(__MODULE__, {:get, key, epoch})
   def put(key, epoch, entry), do: GenServer.call(__MODULE__, {:put, key, epoch, entry})
   def clear, do: GenServer.call(__MODULE__, :clear)
+
+  def handle_call(:snapshot, _, state) do
+    state = observe(state)
+    {:reply, if(state.version != nil, do: {state.incarnation, state.version}), state}
+  end
 
   def handle_call(:epoch, _, state) do
     state = observe(state)
@@ -197,7 +220,8 @@ defmodule Campfire.ResponseCache do
   end
 
   defp observe(state) do
-    version = if limit() > 0, do: database_version(state.db)
+    version = database_version(state.db)
+    state = if limit() == 0, do: clear_state(state), else: state
 
     if version == state.version && version != nil,
       do: state,
