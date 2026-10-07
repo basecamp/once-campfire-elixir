@@ -162,6 +162,59 @@ defmodule Campfire.ResponseCacheTest do
     assert get(cookies, path).resp_body == first.resp_body
   end
 
+  test "messages page also follows the data version, so a room rename is not stale" do
+    cookies = login()
+
+    before =
+      DB.query("SELECT id FROM messages WHERE room_id=? ORDER BY created_at", [@room])
+      |> Enum.at(59)
+
+    path = "/rooms/#{@room}/messages?before=#{before["id"]}"
+    assert get(cookies, path).status == 200
+    assert hit?(get(cookies, path))
+
+    DB.query("UPDATE rooms SET name='All Renamed', updated_at='2026-03-02 17:00:00' WHERE id=?", [
+      @room
+    ])
+
+    # The response cache misses. The room name inside each message fragment still comes from
+    # the fragment cache keyed on the message version, as in Rails' `cache message`.
+    refute hit?(get(cookies, path))
+    assert hit?(get(cookies, path))
+  end
+
+  test "a boost invalidates the cached messages page that shows it" do
+    cookies = login()
+    ordered = DB.query("SELECT * FROM messages WHERE room_id=? ORDER BY created_at", [@room])
+    path = "/rooms/#{@room}/messages?before=#{List.last(ordered)["id"]}"
+    assert get(cookies, path).status == 200
+    assert hit?(get(cookies, path))
+
+    user = DB.one("SELECT * FROM users WHERE id=127326141")
+    earlier = Enum.at(ordered, length(ordered) - 5)
+    assert is_map(Chat.create_boost(user, earlier, "🔥"))
+
+    boosted = get(cookies, path)
+    refute hit?(boosted)
+    assert boosted.resp_body =~ "🔥"
+  end
+
+  test "search results are cached until the next write" do
+    cookies = login()
+    first = get(cookies, "/searches?q=coffee")
+    assert first.status == 200
+    assert first.resp_body =~ "data-message-id"
+    assert hit?(get(cookies, "/searches?q=coffee"))
+    refute hit?(get(cookies, "/searches?q=lunch"))
+
+    room = DB.one("SELECT * FROM rooms WHERE id=?", [@room])
+    user = DB.one("SELECT * FROM users WHERE id=127326141")
+    assert is_map(Chat.create_message(user, room, "<p>coffee machine is fixed</p>"))
+    updated = get(cookies, "/searches?q=coffee")
+    refute hit?(updated)
+    assert updated.resp_body =~ "coffee machine is fixed"
+  end
+
   test "flash messages bypass the cache" do
     cookies = login()
     assert get(cookies, "/rooms/#{@room}").status == 200
@@ -177,6 +230,23 @@ defmodule Campfire.ResponseCacheTest do
     assert page.status == 200
     refute hit?(page)
     assert page.resp_body =~ "Room not found or inaccessible"
+  end
+
+  test "byte accounting counts each key once across stores and gzip additions" do
+    ResponseCache.clear()
+    key = :crypto.hash(:sha256, "accounting")
+    body = String.duplicate("a", 1000)
+    ResponseCache.store(key, body, ~s(W/"x"), nil, false)
+    ResponseCache.store(key, body, ~s(W/"x"), nil, false)
+    assert ResponseCache.stats() == %{entries: 1, bytes: 1000}
+
+    [{^key, entry}] = :ets.lookup(ResponseCache, key)
+    ResponseCache.put_gzip(entry, String.duplicate("g", 100))
+    ResponseCache.put_gzip(entry, String.duplicate("g", 100))
+    assert ResponseCache.stats() == %{entries: 1, bytes: 1100}
+
+    ResponseCache.store(key, body <> body, ~s(W/"y"), String.duplicate("g", 50), false)
+    assert ResponseCache.stats() == %{entries: 1, bytes: 2050}
   end
 
   test "static assets are served identically from the compressed cache" do

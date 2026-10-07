@@ -57,7 +57,8 @@ defmodule Campfire.Messages do
               do: nil,
               else:
                 {:messages, user["id"], Campfire.Page.cache_context(conn, data),
-                 Enum.map(messages, &{&1["id"], &1["updated_at"]})}
+                 Enum.map(messages, &{&1["id"], &1["updated_at"]}),
+                 Campfire.ResponseCache.generation()}
 
           Campfire.ResponseCache.send(conn, terms, fn ->
             "\n" <> MessagesView.render_many(messages, Auth.base(conn), token)

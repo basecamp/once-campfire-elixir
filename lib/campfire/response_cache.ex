@@ -12,6 +12,7 @@ defmodule Campfire.ResponseCache do
   """
   use GenServer
   import Plug.Conn
+  require Logger
   alias Exqlite.Sqlite3, as: SQL
   @table __MODULE__
   @static Campfire.ResponseCache.Static
@@ -33,9 +34,22 @@ defmodule Campfire.ResponseCache do
   @doc "The database's data version: advanced by every commit from any other connection."
   def generation, do: GenServer.call(__MODULE__, :generation)
 
+  # The statement is reset right after its row is read so this connection never holds a
+  # WAL read snapshot between requests, which would block checkpoints by other writers.
+  # Anything but a row yields a unique value, so the request misses rather than risk a
+  # stale hit.
   def handle_call(:generation, _, %{db: db, statement: stmt} = state) do
-    :ok = SQL.reset(stmt)
-    {:row, [version]} = SQL.step(db, stmt)
+    version =
+      case SQL.step(db, stmt) do
+        {:row, [version]} ->
+          version
+
+        other ->
+          Logger.warning("response cache could not read PRAGMA data_version: #{inspect(other)}")
+          :erlang.unique_integer([:positive])
+      end
+
+    SQL.reset(stmt)
     {:reply, version, state}
   end
 
@@ -45,6 +59,14 @@ defmodule Campfire.ResponseCache do
   end
 
   defp bytes, do: :persistent_term.get({__MODULE__, :bytes}, nil)
+
+  @doc "Entry count and accounted body bytes, for operators and tests."
+  def stats do
+    %{
+      entries: :ets.info(@table, :size),
+      bytes: if(ref = bytes(), do: :atomics.get(ref, 1), else: 0)
+    }
+  end
 
   def clear do
     :ets.delete_all_objects(@table)
@@ -74,27 +96,58 @@ defmodule Campfire.ResponseCache do
   end
 
   def store(key, body, etag, gzip, preload) when is_binary(body) do
-    ref = bytes()
-    size = byte_size(body) + if(gzip, do: byte_size(gzip), else: 0)
+    entry = %{key: key, body: body, etag: etag, gzip: gzip, preload: preload}
 
-    if :ets.info(@table, :size) >= @max_entries ||
-         (ref && :atomics.get(ref, 1) + size > @max_bytes),
-       do: clear()
-
-    if ref, do: :atomics.add(ref, 1, size)
-
-    :ets.insert(
-      @table,
-      {key, %{key: key, body: body, etag: etag, gzip: gzip, preload: preload}}
-    )
+    if within_budget?(key, size(entry)) do
+      :ets.insert(@table, {key, entry})
+    end
 
     :ok
   end
 
-  def put_gzip(%{key: key} = entry, gzip) do
-    :ets.insert(@table, {key, %{entry | gzip: gzip}})
-    if ref = bytes(), do: :atomics.add(ref, 1, byte_size(gzip))
-    :ok
+  @doc "Add the compressed body to an entry first stored for an identity-encoding client."
+  def put_gzip(%{key: key}, gzip) when is_binary(gzip) do
+    case :ets.lookup(@table, key) do
+      [{^key, %{gzip: nil} = current}] ->
+        entry = %{current | gzip: gzip}
+        if within_budget?(key, size(entry)), do: :ets.insert(@table, {key, entry})
+        :ok
+
+      _ ->
+        :ok
+    end
+  end
+
+  defp size(%{body: body, gzip: gzip}),
+    do: byte_size(body) + if(gzip, do: byte_size(gzip), else: 0)
+
+  # Accounts for the bytes `entry_size` will occupy under `key`, replacing whatever that key
+  # holds now. When the table would exceed its limits everything is dropped instead and the
+  # caller skips its insert; the next miss stores it afresh.
+  defp within_budget?(key, entry_size) do
+    ref = bytes()
+
+    current =
+      case :ets.lookup(@table, key) do
+        [{^key, existing}] -> size(existing)
+        [] -> 0
+      end
+
+    total = if ref, do: :atomics.get(ref, 1), else: 0
+
+    cond do
+      current == 0 and :ets.info(@table, :size) >= @max_entries ->
+        clear()
+        false
+
+      total - current + entry_size > @max_bytes ->
+        clear()
+        false
+
+      true ->
+        if ref, do: :atomics.add(ref, 1, entry_size - current)
+        true
+    end
   end
 
   @doc "Remember an immutable static file derivative under `key`."
