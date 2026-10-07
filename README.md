@@ -92,8 +92,9 @@ bin/rails-to-elixir doctor
 bin/parity-services stop
 ```
 
-The full verification run passed **65 gates**. The current native suite passes
-**1,946 tests**. Verification includes actual
+The native suite passes **1,946 tests**. A full **65-gate** parity run covers the
+reviewed backend; fresh shared browser checks cover the current frontend.
+Verification includes actual
 Chromium flows, all-table/FTS/storage mutation snapshots, injected transaction
 failures, media operations, cross-runtime Cable delivery and session revocation,
 worker claims/failures/drain, webhook replies and encrypted HTTPS push delivery,
