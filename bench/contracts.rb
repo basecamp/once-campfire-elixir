@@ -9,6 +9,13 @@ require_relative "comparison_support"
 # Expected result windows come from the seed, independently of the implementation.
 module BenchmarkContracts
   extend BenchmarkSupport
+  def self.validate_avatar(body)
+    output, errors, status = Open3.capture3(ENV.fetch("FFPROBE", "ffprobe"), "-v", "error", "-count_frames", "-show_entries", "stream=width,height,nb_read_frames", "-of", "json", "-i", "pipe:0", stdin_data: body, binmode: true)
+    streams = JSON.parse(output).fetch("streams", [])
+    valid = status.success? && errors.empty? && streams.any? { |stream| stream.fetch("width", 0).positive? && stream.fetch("height", 0).positive? && stream.fetch("nb_read_frames", "0").to_i.positive? }
+    raise "invalid avatar image: #{errors}" unless valid
+  end
+
   def self.prepare(base, cookie, database, labels, css, destination)
     room = Integer(labels.fetch("rooms.watercooler"))
     write_room = Integer(labels.fetch("rooms.hq"))
@@ -41,6 +48,7 @@ module BenchmarkContracts
         raise "#{name}: unpopulated" if %w[room_show messages_page search].include?(name) && !body.match?(/data-message-id="\d+"/)
         raise "sidebar missing room" if name == "sidebar" && !(body.include?("shared_rooms") && body.include?(room.to_s))
         raise "invalid avatar" if name == "avatar" && !(response["content-type"].start_with?("image/") && body.bytesize > 100)
+        validate_avatar(body) if name == "avatar"
         raise "invalid CSS" if name == "static_css" && !(response["content-type"].start_with?("text/css") && body.include?("{"))
         raise "invalid health" if name == "up" && !body.include?("background-color: green")
         if %w[room_show messages_page search].include?(name)
