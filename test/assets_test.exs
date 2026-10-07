@@ -137,7 +137,7 @@ defmodule Campfire.AssetsTest do
     assert status == 0, output
     manifest = File.read!(Path.join(assets, ".manifest.json")) |> Jason.decode!()
     digested = manifest[logical]["digested_path"]
-    assert digested == "controllers/rooms_list_controller-dc8f619b.js"
+    assert digested == "controllers/rooms_list_controller-8fe7485c.js"
     assert File.read!(Path.join(assets, digested)) == File.read!(override)
     refute File.exists?(Path.join(assets, previous))
     refute File.exists?(Path.join(assets, previous <> ".gz"))
