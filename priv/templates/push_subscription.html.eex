@@ -10,10 +10,10 @@
       <form class="button_to" method="post" action="/users/me/push_subscriptions/<%= @id %>/test_notifications"><button class="btn btn--reversed" type="submit">
         <img aria-hidden="true" src="<%= Campfire.Assets.path("notification-bell-everything.svg") %>" width="20" height="20" />
         <span class="for-screen-reader">Send test notification</span>
-</button><input type="hidden" name="authenticity_token" value="<%= @test_token %>" /></form>
+</button></form>
       <form class="button_to" method="post" action="/users/me/push_subscriptions/<%= @id %>"><input type="hidden" name="_method" value="delete" /><button class="btn btn--negative" type="submit">
         <img aria-hidden="true" src="<%= Campfire.Assets.path("minus.svg") %>" width="20" height="20" />
         <span class="for-screen-reader">Delete subscription</span>
-</button><input type="hidden" name="authenticity_token" value="<%= @delete_token %>" /></form>    </span>
+</button></form>    </span>
   </span>
 </li>

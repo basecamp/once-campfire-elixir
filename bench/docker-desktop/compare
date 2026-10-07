@@ -1,0 +1,35 @@
+#!/usr/bin/env python3
+"""Median metrics across result directories: bench/docker-desktop/compare BASE[:APP] DIR[:APP]... (APP defaults to elixir)."""
+import json,glob,statistics,sys
+def load(d):
+    d,_,app=d.partition(':'); return [json.load(open(f)) for f in sorted(glob.glob(f"{d}/{app or 'elixir'}-[0-9].json"))]
+dirs=sys.argv[1:]; data=[load(d) for d in dirs]
+def med(runs,fn):
+    v=[fn(r) for r in runs]; v=[x for x in v if x is not None]; return statistics.median(v) if v else None
+def http(route,c,k):
+    def f(r):
+        for h in r.get('http') or []:
+            if h['route']==route and h['conc']==c: return h['rps'] if k=='rps' else h.get('cpu_us_per_success') if k=='cpu' else h['latency'].get(k)
+    return f
+def cable(n,k):
+    def f(r):
+        for c in r.get('cable') or []:
+            if c['clients']==n:
+                return c['throughput']['complete']/c['throughput'].get('secs',15) if k=='tput' else c['latency']['all_clients'].get(k)
+    return f
+rows=[]
+for route in ['room_show','messages_page','sidebar','search','post_message','avatar','static_css','up']:
+    rows.append((f'{route} c=16 req/s',http(route,16,'rps')))
+    rows.append((f'{route} c=64 p99 ms',http(route,64,'p99_ms')))
+    rows.append((f'{route} c=16 CPU µs/request',http(route,16,'cpu')))
+rows.append(('cable 1000 complete broadcasts/s',lambda r:next((c['throughput']['delivered_msgs_per_sec'] for c in r.get('cable') or [] if c['clients']==1000),None)))
+rows.append(('cable 1000 paced p50 ms',cable(1000,'p50_ms')))
+rows.append(('cable 1000 paced p99 ms',cable(1000,'p99_ms')))
+rows.append(('upload median ms',lambda r:(r.get('upload') or {}).get('median_total_ms')))
+rows.append(('cold start ms',lambda r:r['cold_start_ms']))
+rows.append(('peak anon MiB',lambda r:r['memory'].get('peak_anon_mb')))
+print('| metric | '+' | '.join(d.rstrip('/').split('/')[-1] for d in dirs)+' | change |'); print('|---|'+'---:|'*(len(dirs)+1))
+for name,fn in rows:
+    v=[med(d,fn) for d in data]
+    ch=f'{v[-1]/v[0]:.2f}x' if v[0] and v[-1] else ''
+    print(f'| {name} | '+' | '.join(f'{x:,.1f}' if isinstance(x,float) else str(x) for x in v)+f' | {ch} |')

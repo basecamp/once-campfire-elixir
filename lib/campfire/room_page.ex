@@ -23,9 +23,12 @@ defmodule Campfire.RoomPage do
       true ->
         if room = Chat.room(user, room_id) do
           {conn, data} = Auth.csrf_session(conn)
-          token = Rails.csrf_mask(Rails.csrf_global(data["_csrf_token"]))
           messages = messages(room, message_id)
-          account = DB.one("SELECT * FROM accounts LIMIT 1")
+          fragments = MessagesView.render_parts(messages, Auth.base(conn))
+          # Messages are spliced in after layout so their cached gzip pieces are reused.
+          marker = Campfire.HttpCompression.marker()
+
+          account = Campfire.Page.account()
           gid = Base.url_encode64("gid://campfire/#{room["type"]}/#{room["id"]}", padding: false)
           name = display_name(room, user)
 
@@ -42,37 +45,55 @@ defmodule Campfire.RoomPage do
             namespace: namespace(room),
             room_updated: MessagesView.epoch(room["updated_at"]),
             base: Assets.html_escape(Auth.base(conn)),
-            meta_token: token,
-            form_token:
-              Rails.csrf_mask(
-                Rails.csrf_form(data["_csrf_token"], "/rooms/#{room["id"]}/messages", "POST")
-              ),
-            vapid: Assets.html_escape(System.get_env("VAPID_PUBLIC_KEY", "")),
+            vapid: Campfire.Release.vapid_public_key(),
             account_version:
-              account["updated_at"] |> String.replace(~r/[^0-9]/, "") |> String.slice(0, 14),
+              account["updated_at"] |> Campfire.Chat.digits() |> String.slice(0, 14),
             stream: Rails.sign_stream(gid <> ":messages"),
-            invitation: invitation_for(conn, user, data, account, room),
-            messages: MessagesView.render_many(messages, Auth.base(conn), token)
+            invitation: invitation_for(conn, user, account, room),
+            messages: marker
           ]
 
-          {conn, html} =
-            Campfire.Page.render(conn, user, data,
-              title: Assets.html_escape(name),
-              body_class: "sidebar",
-              head: head(assigns),
-              nav: nav(assigns),
-              content: content(assigns),
-              footer: footer(assigns),
-              sidebar: sidebar(assigns)
+          # The templates are pure functions of these inputs, so the rendered shell around the
+          # messages, with its parts' digests, is kept by a digest of them.
+          frame? = get_req_header(conn, "turbo-frame") != []
+          inputs = {assigns, name, user, account, data["flash"], frame?}
+          key = :crypto.hash(:sha256, :erlang.term_to_binary(inputs, [:deterministic]))
+
+          {before, rest} =
+            Campfire.FragmentCache.memo(
+              {:room_shell, key},
+              fn {{_, b, _}, {_, a, _}} -> byte_size(b) + byte_size(a) end,
+              fn ->
+                {_conn, html} =
+                  Campfire.Page.render(conn, user, data,
+                    account: account,
+                    title: Assets.html_escape(name),
+                    body_class: "sidebar",
+                    head: head(assigns),
+                    nav: nav(assigns),
+                    content: content(assigns),
+                    footer: footer(assigns),
+                    sidebar: sidebar(assigns)
+                  )
+
+                [before, rest] = :binary.split(html, marker)
+
+                [before, rest] =
+                  Campfire.HttpCompression.with_digests([{:raw, before}, {:raw, rest}])
+
+                {before, rest}
+              end
             )
 
+          parts = [before | fragments] ++ [rest]
+
           conn
+          |> Campfire.Page.finish_session(data)
           |> Auth.set_auth_cookie(session)
-          |> put_resp_cookie("last_room", to_string(room["id"]),
-            max_age: DateTime.diff(Auth.permanent_expiry(), Campfire.Clock.now())
-          )
+          |> put_last_room(room)
           |> put_resp_content_type("text/html")
-          |> send_resp(200, html)
+          |> assign(:page_parts, parts)
+          |> send_resp(200, Campfire.HttpCompression.body(parts))
         else
           conn
           |> Campfire.Flash.put("alert", "Room not found or inaccessible")
@@ -84,23 +105,33 @@ defmodule Campfire.RoomPage do
       Campfire.HttpResponse.exception(conn, 500, Campfire.Assets.read("public/500.html"))
   end
 
-  defp invitation_for(conn, user, data, account, room) do
-    original = DB.one("SELECT id FROM rooms ORDER BY created_at LIMIT 1")
+  defp put_last_room(conn, room) do
+    id = to_string(room["id"])
 
-    count =
-      DB.one("SELECT count(*) AS count FROM messages WHERE room_id=?", [room["id"]])["count"]
+    if conn.cookies["last_room"] == id,
+      do: conn,
+      else:
+        put_resp_cookie(conn, "last_room", id,
+          max_age: DateTime.diff(Auth.permanent_expiry(), Campfire.Clock.now())
+        )
+  end
 
-    if original["id"] == room["id"] && count <= 40 do
+  defp invitation_for(conn, user, account, room) do
+    # The invitation shows only in the original room while it has at most 40 messages, so the
+    # count stops at 41 and is skipped for every other room.
+    if account["page.original_room_id"] == room["id"] &&
+         DB.cached_one(
+           "SELECT count(*) AS count FROM (SELECT 1 FROM messages WHERE room_id=? LIMIT 41)",
+           [room["id"]],
+           ~w(messages)
+         )["count"] <= 40 do
       url = Auth.base(conn) <> "/join/" <> account["join_code"]
 
       invitation(
         admin: user["role"] == 1,
-        account_version:
-          account["updated_at"] |> String.replace(~r/[^0-9]/, "") |> String.slice(0, 14),
+        account_version: account["updated_at"] |> Campfire.Chat.digits() |> String.slice(0, 14),
         join_url: Assets.html_escape(url),
-        qr: Base.url_encode64(url),
-        join_token:
-          Rails.csrf_mask(Rails.csrf_form(data["_csrf_token"], "/account/join_code", "POST"))
+        qr: Base.url_encode64(url)
       )
     else
       "    \n"

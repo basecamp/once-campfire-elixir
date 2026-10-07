@@ -1,0 +1,48 @@
+parity ledger gate SKIPPED
+date: 2026-10-05T06:46:09+00:00
+host: 7.0.12-linuxkit, , 8 threads, 7GB
+server cpus: 0-3 (nproc 4); loadgen cpus: 4-7; network: host
+env: WEB_CONCURRENCY=3 JOB_CONCURRENCY=3 RAILS_MAX_THREADS=5 
+seed sha256: 58e6bb4498a188b33a52bbb79d82499d96a531f9afb9fc736a801532ddba1817  /Users/lau/oss/once-campfire-rust/parity/.seed/default/db/production.sqlite3
+elixir source digest: 141846cc585feee0f58f7cd818f2d149bd88733e32a97cea0aecf7c2bbd0cbab
+rust extra env: 
+workload: suites=http cable HTTP_SECS=4 HTTP_CONCS=1 16 64 CABLE_CLIENTS=100 500 1000 CABLE_TPUT_SECS=15 CABLE_POSTERS=4 UPLOAD_REPS=5 REPS=3
+request logging (LOG_REQUESTS): false
+parity ledger gate: skipped; runner: bench/docker-desktop
+quiet wait: LOAD_MAX=1.5 LOAD_WAIT_SECS=120
+user agent: (none)
+elixir image: campfire-elixir:further-perf sha256:abd593206313ece079b2c7eab5e08ac4ab2a15a07457a9bcd47c180fabb668ad 2026-10-05T06:40:56.318629754Z unpacked_bytes=1746080140
+reference image: campfire-elixir:pr1-fix sha256:c7990410b3a75316f15728b53c3afa96a9a2736790af278f91ff4d1b8ca3cafe 2026-10-05T06:43:26.780188796Z unpacked_bytes=1756645283
+rust HEAD: 64f8635 (dirty: 0 files)
+[06:48:10] load before run: 1.53 6.24 6.69 (waited 120s)
+[06:48:10] elixir rep 1: starting (load: 1.53 6.24 6.69)
+[06:48:22] elixir rep 1: cold start 1747ms, idle 161MB (anon 127MB)
+[06:48:28] elixir rep 1: room_show c=1 1179.7 rps p50 0.701 p99 2.097 {'200': 4720} err 0
+[06:48:32] elixir rep 1: room_show c=16 4082.2 rps p50 3.743 p99 7.607 {'200': 16350} err 0
+[06:48:36] elixir rep 1: room_show c=64 3741.9 rps p50 16.295 p99 32.895 {'200': 15035} err 0
+[06:48:42] elixir rep 1: messages_page c=1 930.4 rps p50 1.005 p99 2.187 {'200': 3722} err 0
+[06:48:46] elixir rep 1: messages_page c=16 2926.1 rps p50 5.263 p99 10.839 {'200': 11719} err 0
+[06:48:51] elixir rep 1: messages_page c=64 2309.6 rps p50 22.559 p99 139.263 {'200': 9359} err 0
+[06:48:57] elixir rep 1: sidebar c=1 1075.8 rps p50 0.807 p99 3.085 {'200': 4304} err 0
+[06:49:01] elixir rep 1: sidebar c=16 3144.5 rps p50 4.599 p99 12.159 {'200': 12591} err 0
+[06:49:05] elixir rep 1: sidebar c=64 3280.4 rps p50 18.463 p99 29.743 {'200': 13172} err 0
+[06:49:11] elixir rep 1: search c=1 1281.0 rps p50 0.725 p99 1.678 {'200': 5125} err 0
+[06:49:15] elixir rep 1: search c=16 4066.9 rps p50 3.729 p99 7.543 {'200': 16284} err 0
+[06:49:19] elixir rep 1: search c=64 3515.4 rps p50 17.471 p99 30.191 {'200': 14148} err 0
+[06:49:25] elixir rep 1: avatar c=1 13915.7 rps p50 0.051 p99 0.359 {'200': 55678} err 0
+[06:49:29] elixir rep 1: avatar c=16 81672.5 rps p50 0.142 p99 0.87 {'200': 326960} err 0
+[06:49:33] elixir rep 1: avatar c=64 103545.0 rps p50 0.45 p99 2.903 {'200': 416022} err 0
+[06:49:39] elixir rep 1: static_css c=1 14448.9 rps p50 0.06 p99 0.266 {'200': 57798} err 0
+[06:49:44] elixir rep 1: static_css c=16 103067.6 rps p50 0.122 p99 0.594 {'200': 412410} err 0
+[06:49:48] elixir rep 1: static_css c=64 132874.9 rps p50 0.344 p99 2.405 {'200': 532024} err 0
+[06:49:54] elixir rep 1: up c=1 9059.6 rps p50 0.098 p99 0.29 {'200': 36240} err 0
+[06:49:58] elixir rep 1: up c=16 47436.4 rps p50 0.279 p99 1.326 {'200': 189807} err 0
+[06:50:02] elixir rep 1: up c=64 51217.6 rps p50 1.072 p99 4.163 {'200': 205011} err 0
+[06:50:08] elixir rep 1: post_message c=1 703.1 rps p50 1.096 p99 6.607 {'200': 2813} err 0
+[06:50:12] elixir rep 1: post_message c=16 1682.1 rps p50 8.043 p99 22.831 {'200': 6751} err 0
+[06:50:16] elixir rep 1: post_message c=64 1692.5 rps p50 33.695 p99 89.215 {'200': 6813} err 0
+[06:50:39] elixir rep 1: cable 100 clients ready 100 lat all p50 8.391 p99 21.647 tput 1060.2 msg/s 15906 / 15906
+[06:51:04] elixir rep 1: cable 500 clients ready 500 lat all p50 16.911 p99 22.415 tput 350.5 msg/s 5262 / 5262
+[06:51:29] elixir rep 1: cable 1000 clients ready 1000 lat all p50 20.511 p99 25.231 tput 151.4 msg/s 2274 / 2274
+cat: bench/results/further-perf-vs-pr1-macos-m3-20261005/.elixir-1.mem: No such file or directory
+EXIT 1

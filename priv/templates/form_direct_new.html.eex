@@ -1,6 +1,6 @@
       <turbo-frame id="direct_rooms_control" target="_top">
   <div class="directs directs--new flex flex-column gap">
-    <form class="flex gap flex-item-grow" data-controller="form" data-action="keydown.esc-&gt;form#cancel" action="/rooms/directs" accept-charset="UTF-8" method="post"><input type="hidden" name="authenticity_token" value="<%= @token %>" />
+    <form class="flex gap flex-item-grow" data-controller="form" data-action="keydown.esc-&gt;form#cancel" action="/rooms/directs" accept-charset="UTF-8" method="post">
       <a class="btn flex-item-no-shrink" data-turbo-frame="user_sidebar" data-form-target="cancel" href="/users/me/sidebar">
         <img aria-hidden="true" src="<%= Assets.path("arrow-left.svg") %>" />
         <span class="for-screen-reader">Cancel changes</span>

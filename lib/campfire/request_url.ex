@@ -1,14 +1,37 @@
 defmodule Campfire.RequestURL do
-  @moduledoc "Rails URL context from the local Thruster upstream connection only."
+  import Kernel, except: [sigil_r: 2]
+  import Campfire.Sigils
+
+  @moduledoc "Rails URL context from the front server's loopback upstream request only (`Campfire.Front`)."
   import Plug.Conn
   def init(opts), do: opts
-  # Production binds the upstream to loopback. Other peers cannot supply proxy context.
+  # `Campfire.Front` presents every request as Thruster's loopback upstream did. Other peers
+  # cannot supply proxy context.
   def call(%{remote_ip: peer} = conn, _) when peer in [{127, 0, 0, 1}, {0, 0, 0, 0, 0, 0, 0, 1}],
     do: local_proxy(conn)
 
   def call(conn, _), do: conn
 
+  # The URL context is a pure function of these headers and the scheme, which repeat across
+  # requests, so it is kept per (bounded) set of values.
   defp local_proxy(conn) do
+    inputs =
+      {conn.scheme, header(conn, "forwarded"), header(conn, "x-forwarded-proto"),
+       header(conn, "x-forwarded-scheme"), header(conn, "x-forwarded-ssl"),
+       header(conn, "x-forwarded-host"), header(conn, "host")}
+
+    context =
+      if :erlang.external_size(inputs) <= 1024,
+        do: Campfire.FragmentCache.memo({:request_url, inputs}, 256, fn -> context(conn) end),
+        else: context(conn)
+
+    case context do
+      {scheme, host, port} -> %{conn | scheme: scheme, host: host, port: port}
+      {scheme} -> %{conn | scheme: scheme}
+    end
+  end
+
+  defp context(conn) do
     proto = forwarded(header(conn, "forwarded") || "") |> Map.get("proto", []) |> List.last()
     proto = if proto in ~w(http https ws wss), do: proto, else: nil
     proto = proto || scheme(conn, "x-forwarded-proto") || scheme(conn, "x-forwarded-scheme")
@@ -23,14 +46,11 @@ defmodule Campfire.RequestURL do
 
     if authority do
       case Regex.run(~r/^(.*):(\d+)$/, authority) do
-        [_, host, port] ->
-          %{conn | scheme: scheme, host: host, port: String.to_integer(port)}
-
-        _ ->
-          %{conn | scheme: scheme, host: authority, port: if(scheme == :https, do: 443, else: 80)}
+        [_, host, port] -> {scheme, host, String.to_integer(port)}
+        _ -> {scheme, authority, if(scheme == :https, do: 443, else: 80)}
       end
     else
-      %{conn | scheme: scheme}
+      {scheme}
     end
   end
 

@@ -1,0 +1,12 @@
+16:25:07 elixir rep 1 start:  16:25:07 up 2 days, 11:57,  0 users,  load average: 5.16, 5.75, 4.83
+16:28:38 elixir rep 1 end:    16:28:38 up 2 days, 12:00,  0 users,  load average: 7.14, 5.46, 4.81
+16:28:38 reference rep 1 start:  16:28:38 up 2 days, 12:00,  0 users,  load average: 7.14, 5.46, 4.81
+16:32:23 reference rep 1 end:    16:32:23 up 2 days, 12:04,  0 users,  load average: 8.12, 5.54, 4.86
+16:32:23 reference rep 2 start:  16:32:23 up 2 days, 12:04,  0 users,  load average: 8.12, 5.54, 4.86
+16:36:19 reference rep 2 end:    16:36:19 up 2 days, 12:08,  0 users,  load average: 8.99, 5.88, 5.00
+16:36:19 elixir rep 2 start:  16:36:19 up 2 days, 12:08,  0 users,  load average: 8.99, 5.88, 5.00
+16:40:15 elixir rep 2 end:    16:40:15 up 2 days, 12:12,  0 users,  load average: 6.60, 5.00, 4.73
+16:40:15 elixir rep 3 start:  16:40:15 up 2 days, 12:12,  0 users,  load average: 6.60, 5.00, 4.73
+16:43:50 elixir rep 3 end:    16:43:50 up 2 days, 12:16,  0 users,  load average: 8.58, 5.50, 4.87
+16:43:50 reference rep 3 start:  16:43:50 up 2 days, 12:16,  0 users,  load average: 8.58, 5.50, 4.87
+16:47:49 reference rep 3 end:    16:47:49 up 2 days, 12:20,  0 users,  load average: 7.60, 5.17, 4.75

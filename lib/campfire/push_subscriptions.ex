@@ -1,6 +1,6 @@
 defmodule Campfire.PushSubscriptions do
   import Plug.Conn
-  alias Campfire.{Assets, Auth, Chat, DB, Page, Push, Rails, UserAgent}
+  alias Campfire.{Assets, Auth, Chat, DB, Page, Push, UserAgent}
   require EEx
   EEx.function_from_file(:defp, :page, "priv/templates/push_subscriptions.html.eex", [:assigns])
   EEx.function_from_file(:defp, :row, "priv/templates/push_subscription.html.eex", [:assigns])
@@ -79,19 +79,13 @@ defmodule Campfire.PushSubscriptions do
       DB.query("SELECT * FROM push_subscriptions WHERE user_id=?", [user["id"]])
       |> Enum.map_join(fn subscription ->
         agent = UserAgent.parse(subscription["user_agent"])
-        path = "/users/me/push_subscriptions/#{subscription["id"]}"
 
         row(
           id: subscription["id"],
           endpoint: Assets.html_escape(subscription["endpoint"] || ""),
           browser: Assets.html_escape(to_string(UserAgent.browser(agent))),
           version: Assets.html_escape(to_string(UserAgent.version(agent))),
-          platform: Assets.html_escape(to_string(UserAgent.platform(agent))),
-          test_token:
-            Rails.csrf_mask(
-              Rails.csrf_form(data["_csrf_token"], path <> "/test_notifications", "POST")
-            ),
-          delete_token: Rails.csrf_mask(Rails.csrf_form(data["_csrf_token"], path, "DELETE"))
+          platform: Assets.html_escape(to_string(UserAgent.platform(agent)))
         )
       end)
 

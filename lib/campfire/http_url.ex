@@ -1,4 +1,6 @@
 defmodule Campfire.HttpURL do
+  import Kernel, except: [sigil_r: 2]
+  import Campfire.Sigils
   @moduledoc "URI::HTTP input grammar before any resolver or transport side effects."
 
   def parse(url) when is_binary(url) do

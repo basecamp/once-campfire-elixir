@@ -1,4 +1,6 @@
 defmodule Campfire.QR do
+  import Kernel, except: [sigil_r: 2]
+  import Campfire.Sigils
   @moduledoc "Pinned RQRCode mask scoring and SVG output over a native Elixir encoder."
   alias QQR.Encoder.{Data, Format, Mask, Matrix}
   import Plug.Conn

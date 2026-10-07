@@ -1,0 +1,40 @@
+#!/bin/sh
+# Run bench/run on Docker Desktop (macOS), whose apps run in a Linux VM with cgroupfs layout.
+#
+#   bench/docker-desktop/run [bench/run options]
+#
+# The harness runs in a Linux runner container sharing the VM's network, pids and cgroups. The
+# copy it runs differs from bench/run in three ways: containers live under /sys/fs/cgroup/docker/ID,
+# RUST_ROOT defaults to the sibling checkout, each run's database and storage live on a VM-local
+# volume rather than macOS file sharing, and the parity ledger gate is skipped when
+# SKIP_LEDGER=1 (the result's env.txt records that). Preflight and per-request validation remain.
+# Defaults for an 8-CPU VM: SERVER_CPUS=0-3 LOADGEN_CPUS=4-7 PROCMEM_CPUS=7.
+set -eu
+ROOT=$(CDPATH= cd -- "$(dirname "$0")/../.." && pwd)
+PARENT=$(dirname "$ROOT")
+docker build -q -t campfire-bench-runner "$ROOT/bench/docker-desktop" >/dev/null
+# VM-local volumes: the crate cache, and each run's database and storage (kept off macOS file sharing).
+for v in campfire-bench-cargo campfire-bench-work; do
+  docker volume inspect "$v" >/dev/null 2>&1 || { docker volume create "$v" >/dev/null && docker run --rm -v "$v:/v" campfire-bench-runner chmod 777 /v; }
+done
+COPY=$ROOT/bench/.work/run-docker-desktop
+mkdir -p "$ROOT/bench/.work"
+sed -e "s#^RUST_ROOT=.*#RUST_ROOT=\${RUST_ROOT:-$PARENT/once-campfire-rust}#" \
+    -e 's#^python3 "\$BENCH/validate.py" ledger$#if [ "${SKIP_LEDGER:-}" = 1 ]; then echo "parity ledger gate SKIPPED" >\&2; else python3 "$BENCH/validate.py" ledger; fi#' \
+    -e 's#^cgroup_dir() .*#cgroup_dir() { echo "/sys/fs/cgroup/docker/$(docker inspect -f "{{.Id}}" "$CONTAINER")"; }#' \
+    -e 's#^WORK=\$BENCH/.work$#WORK=/work#' \
+    -e 's#-v "\$dir/db:/rails/storage/db" -v "\$dir/storage:/rails/storage/files"#--mount "type=volume,src=campfire-bench-work,dst=/rails/storage/db,volume-subpath=$app/db" --mount "type=volume,src=campfire-bench-work,dst=/rails/storage/files,volume-subpath=$app/storage"#' \
+    -e 's#^ROOT=.*#ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." \&\& pwd)#' \
+    -e 's#^  echo "quiet wait: #  echo "parity ledger gate: $([ \"${SKIP_LEDGER:-}\" = 1 ] \&\& echo skipped || echo required); runner: bench/docker-desktop"\n  echo "quiet wait: #' \
+    "$ROOT/bench/run" > "$COPY"
+chmod +x "$COPY"
+ENVS=""
+for v in SKIP_LEDGER RUST_ROOT ELIXIR_IMAGE RUST_IMAGE REFERENCE_IMAGE GO_IMAGE HTTP_SECS HTTP_CONCS CABLE_CLIENTS \
+  CABLE_TPUT_SECS CABLE_POSTERS UPLOAD_REPS PORT NETWORK LOAD_MAX LOAD_WAIT_SECS SUITES RUST_EXTRA_ENV APP_LOG_REQUESTS; do
+  eval "[ -n \"\${$v+x}\" ]" && ENVS="$ENVS -e $v"
+done
+exec docker run --rm -i --privileged --network host --pid host --cgroupns host \
+  --user "$(id -u):$(id -g)" --group-add 0 -e HOME=/tmp/home -v campfire-bench-cargo:/opt/cargo/registry -v campfire-bench-work:/work \
+  -e SERVER_CPUS="${SERVER_CPUS:-0-3}" -e LOADGEN_CPUS="${LOADGEN_CPUS:-4-7}" -e PROCMEM_CPUS="${PROCMEM_CPUS:-7}" $ENVS \
+  -v /var/run/docker.sock:/var/run/docker.sock -v /sys/fs/cgroup:/sys/fs/cgroup -v "$PARENT:$PARENT" \
+  -w "$ROOT" campfire-bench-runner bash -c 'mkdir -p "$HOME" && (cd bench/loadgen && mise exec rust@1.98.1 -- cargo fetch -q) && exec "$0" "$@"' "$COPY" "$@"

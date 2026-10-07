@@ -1,6 +1,6 @@
 defmodule Campfire.AccountPage do
   import Plug.Conn
-  alias Campfire.{Assets, Attachments, Auth, Chat, DB, Mentions, Page, Rails}
+  alias Campfire.{Assets, Attachments, Auth, Chat, DB, Mentions, Page}
   require EEx
 
   for {function, file} <- [
@@ -39,8 +39,7 @@ defmodule Campfire.AccountPage do
 
       {administrators, members} = Enum.split_with(users, &(&1["role"] == 1))
       invitation = Auth.base(conn) <> "/join/" <> account["join_code"]
-      path = "/account.#{account["id"]}"
-      version = String.replace(account["updated_at"], ~r/[^0-9]/, "") |> String.slice(0, 14)
+      version = Campfire.Chat.digits(account["updated_at"]) |> String.slice(0, 14)
       settings = Jason.decode!(account["settings"] || "{}")
       restriction = settings["restrict_room_creation_to_administrators"]
 
@@ -60,20 +59,16 @@ defmodule Campfire.AccountPage do
         back: if(back, do: "/rooms/#{back["id"]}", else: "/"),
         restricted: restriction,
         next_restriction: if(restriction, do: "false", else: "true"),
-        administrators: Enum.map_join(administrators, &render_user(&1, user, data)),
-        members: Enum.map_join(members, &render_user(&1, user, data)),
+        administrators: Enum.map_join(administrators, &render_user(&1, user)),
+        members: Enum.map_join(members, &render_user(&1, user)),
         separator: administrators != [] && members != [],
         next_page: if(length(users) > 500, do: next_page(2), else: ""),
-        patch_token: token(data, path, "PATCH"),
-        put_token: token(data, path, "PUT"),
-        join_token: token(data, "/account/join_code", "POST"),
         delete_logo:
           if(Attachments.find("Account", account["id"], "logo"),
-            do:
-              logo_delete(account_version: version, token: token(data, "/account/logo", "DELETE")),
+            do: logo_delete(account_version: version),
             else: ""
           ),
-        version: Assets.html_escape(System.get_env("APP_VERSION", "dev"))
+        version: Assets.html_escape(Campfire.Release.version())
       ]
 
       content = if admin, do: account(assigns), else: readonly(assigns)
@@ -110,7 +105,7 @@ defmodule Campfire.AccountPage do
             [(page - 1) * 500]
           )
 
-        rows = Enum.map_join(records, &render_user(&1, user, data))
+        rows = Enum.map_join(records, &render_user(&1, user))
 
         body =
           ~s(<turbo-stream action="replace" target="next_page_container"><template>#{rows}</template></turbo-stream>\n\n) <>
@@ -148,10 +143,9 @@ defmodule Campfire.AccountPage do
     do:
       ~s(<turbo-frame loading="lazy" class="flex center" id="next_page_container" src="/account/users.turbo_stream?page=#{page}">\n  <div class="spinner center"></div>\n</turbo-frame>)
 
-  def render_user(target, current, data) do
+  def render_user(target, current) do
     self = target["id"] == current["id"]
     admin = target["role"] == 1
-    path = "/account/users/#{target["id"]}"
 
     attrs = [
       id: target["id"],
@@ -163,8 +157,8 @@ defmodule Campfire.AccountPage do
 
     controls =
       if current["role"] == 1 && target["status"] == 0 do
-        role_form(attrs ++ [token: token(data, path, "PATCH")]) <>
-          if(self, do: "", else: delete_form(attrs ++ [token: token(data, path, "DELETE")]))
+        role_form(attrs) <>
+          if(self, do: "", else: delete_form(attrs))
       else
         ""
       end
@@ -184,7 +178,4 @@ defmodule Campfire.AccountPage do
         ]
     )
   end
-
-  defp token(data, path, method),
-    do: Rails.csrf_mask(Rails.csrf_form(data["_csrf_token"], path, method))
 end

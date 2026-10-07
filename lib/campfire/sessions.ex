@@ -4,7 +4,7 @@ defmodule Campfire.Sessions do
   require EEx
   EEx.function_from_file(:defp, :layout_html, "priv/templates/session.html.eex", [:assigns])
   EEx.function_from_file(:defp, :login_html, "priv/templates/login.html.eex", [:assigns])
-  EEx.function_from_file(:defp, :setup_html, "priv/templates/first_run.html.eex", [:assigns])
+  EEx.function_from_file(:defp, :setup_html, "priv/templates/first_run.html.eex", [:_assigns])
 
   EEx.function_from_file(:defp, :transfer_html, "priv/templates/transfer.html.eex", [:assigns])
 
@@ -12,10 +12,7 @@ defmodule Campfire.Sessions do
     {conn, data} = Auth.csrf_session(conn)
 
     content =
-      transfer_html(
-        path: Assets.html_escape(conn.request_path),
-        token: Rails.csrf_mask(Rails.csrf_form(data["_csrf_token"], conn.request_path, "PUT"))
-      )
+      transfer_html(path: Assets.html_escape(conn.request_path))
 
     {conn, html} = Campfire.Page.render(conn, nil, data, content: content)
     conn |> put_resp_content_type("text/html") |> send_resp(200, html)
@@ -27,12 +24,10 @@ defmodule Campfire.Sessions do
 
     assigns =
       [
-        meta_token: Rails.csrf_mask(Rails.csrf_global(data["_csrf_token"])),
-        form_token: Rails.csrf_mask(Rails.csrf_form(data["_csrf_token"], "/session", "POST")),
         base: Auth.base(conn),
         account_version: version(account["updated_at"]),
         account_name: Assets.html_escape(account["name"] || "Campfire"),
-        vapid: Assets.html_escape(System.get_env("VAPID_PUBLIC_KEY", "")),
+        vapid: Campfire.Release.vapid_public_key(),
         rejected: status != 200,
         email: if(params["email_address"], do: Assets.html_escape(params["email_address"])),
         account_has_logo: !!Campfire.Attachments.find("Account", account["id"], "logo"),
@@ -61,11 +56,9 @@ defmodule Campfire.Sessions do
       {conn, data} = Auth.csrf_session(conn)
 
       assigns = [
-        meta_token: Rails.csrf_mask(Rails.csrf_global(data["_csrf_token"])),
-        form_token: Rails.csrf_mask(Rails.csrf_form(data["_csrf_token"], "/first_run", "POST")),
         base: Auth.base(conn),
         account_version: "",
-        vapid: Assets.html_escape(System.get_env("VAPID_PUBLIC_KEY", "")),
+        vapid: Campfire.Release.vapid_public_key(),
         account_has_logo: false,
         custom_styles: "",
         title: "Set up Campfire",
@@ -169,7 +162,7 @@ defmodule Campfire.Sessions do
   end
 
   defp version(nil), do: ""
-  defp version(value), do: value |> String.replace(~r/[^0-9]/, "") |> String.slice(0, 14)
+  defp version(value), do: value |> Campfire.Chat.digits() |> String.slice(0, 14)
 
   defp head(conn, status),
     do: conn |> put_resp_header("content-type", "text/html") |> send_resp(status, "")
@@ -179,7 +172,7 @@ defmodule Campfire.Sessions do
       name = Assets.html_escape(owner["name"])
       email = Assets.html_escape(owner["email_address"] || "")
 
-      "  <div class=\"txt-align-center margin-block-double full-width\">\n    <a class=\"btn center\" title=\"Email #{name}\" href=\"mailto:&quot;#{name}&quot; &lt;#{email}&gt;\">\n      <img aria-hidden=\"true\" src=\"#{Assets.path("lifebuoy.svg")}\" />\n      <span>#{email}</span>\n</a>\n    <div class=\"txt-align-center center margin-block txt-subtle\">Campfire&trade; version <span class=\"version-badge\">#{Assets.html_escape(System.get_env("APP_VERSION", "dev"))}</span></div>\n  </div>\n\n"
+      "  <div class=\"txt-align-center margin-block-double full-width\">\n    <a class=\"btn center\" title=\"Email #{name}\" href=\"mailto:&quot;#{name}&quot; &lt;#{email}&gt;\">\n      <img aria-hidden=\"true\" src=\"#{Assets.path("lifebuoy.svg")}\" />\n      <span>#{email}</span>\n</a>\n    <div class=\"txt-align-center center margin-block txt-subtle\">Campfire&trade; version <span class=\"version-badge\">#{Assets.html_escape(Campfire.Release.version())}</span></div>\n  </div>\n\n"
     else
       ""
     end

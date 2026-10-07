@@ -16,68 +16,105 @@ defmodule Campfire.Sidebar do
     if user do
       {conn, data} = Auth.csrf_session(conn)
 
-      rows =
-        DB.query(
-          "SELECT r.*,m.unread_at FROM rooms r JOIN memberships m ON m.room_id=r.id WHERE m.user_id=? AND m.involvement!='invisible' ORDER BY LOWER(r.name)",
-          [user["id"]]
-        )
+      # The sidebar is a pure function of the user, these tables, the flash and whether it is a
+      # frame request, so its HTML is kept until one of the tables changes (and the queries are
+      # skipped too).
+      frame? = get_req_header(conn, "turbo-frame") != []
 
-      {directs, others} = Enum.split_with(rows, &(&1["type"] == "Rooms::Direct"))
+      tables =
+        ~w(rooms memberships users accounts active_storage_attachments active_storage_blobs)
 
-      excludes =
-        DB.query(
-          "SELECT DISTINCT user_id FROM memberships WHERE room_id IN (SELECT r.id FROM rooms r JOIN memberships m ON m.room_id=r.id WHERE m.user_id=? AND r.type='Rooms::Direct')",
-          [user["id"]]
-        )
-        |> Enum.map(& &1["user_id"])
-        |> then(&Enum.uniq([user["id"] | &1]))
+      key = {:sidebar, user["id"], DB.generations(tables), data["flash"], frame?}
 
-      users =
-        DB.query("SELECT * FROM users WHERE status=0 ORDER BY created_at")
-        |> Enum.reject(&(&1["id"] in excludes))
-        |> Enum.take(max(20 - length(excludes), 0))
+      html =
+        Campfire.FragmentCache.memo(key, &byte_size/1, fn ->
+          rows =
+            DB.cached(
+              "SELECT r.*,m.unread_at FROM rooms r JOIN memberships m ON m.room_id=r.id WHERE m.user_id=? AND m.involvement!='invisible' ORDER BY LOWER(r.name)",
+              [user["id"]],
+              ~w(rooms memberships)
+            )
 
-      token = Rails.csrf_mask(Rails.csrf_form(data["_csrf_token"], "/rooms/directs", "POST"))
-      account = DB.one("SELECT settings FROM accounts LIMIT 1")
-      settings = Jason.decode!(account["settings"] || "{}")
+          {directs, others} = Enum.split_with(rows, &(&1["type"] == "Rooms::Direct"))
 
-      content =
-        frame(
-          user_id: user["id"],
-          avatar: avatar_path(user),
-          global_stream: Rails.sign_stream("rooms"),
-          user_stream:
-            Rails.sign_stream(
-              Base.url_encode64("gid://campfire/User/#{user["id"]}", padding: false) <> ":rooms"
-            ),
-          create_allowed:
-            user["role"] == 1 || !settings["restrict_room_creation_to_administrators"],
-          directs:
-            directs
-            |> Enum.sort_by(& &1["updated_at"], :desc)
-            |> Enum.map_join(&render_direct(&1, user)),
-          shared:
-            Enum.map_join(others, fn room ->
-              "          " <>
-                shared(
-                  id: room["id"],
-                  key: Broadcasts.room_key(room),
-                  name: Assets.html_escape(room["name"]),
-                  unread: !is_nil(room["unread_at"])
-                )
-            end),
-          placeholders:
-            Enum.map_join(users, fn u ->
-              placeholder(
-                id: u["id"],
-                avatar: avatar_path(u),
-                name: Assets.html_escape(first_name(u)),
-                token: token
-              )
-            end)
-        )
+          # Every member of the user's direct rooms in one query, in each room's
+          # index_memberships_on_room_id_and_user_id order: they are excluded from the
+          # placeholders, and each listed direct room shows its members.
+          direct_members =
+            DB.cached(
+              ~s{SELECT m.room_id AS "sidebar.room_id", u.* FROM memberships m JOIN users u ON u.id=m.user_id WHERE m.room_id IN (SELECT r.id FROM rooms r JOIN memberships mm ON mm.room_id=r.id WHERE mm.user_id=? AND r.type='Rooms::Direct') ORDER BY m.room_id, m.user_id},
+              [user["id"]],
+              ~w(memberships users rooms)
+            )
+            |> Enum.group_by(& &1["sidebar.room_id"], &Map.delete(&1, "sidebar.room_id"))
 
-      {conn, html} = Campfire.Page.render(conn, user, data, content: content)
+          excludes =
+            direct_members
+            |> Map.values()
+            |> List.flatten()
+            |> Enum.map(& &1["id"])
+            |> then(&Enum.uniq([user["id"] | &1]))
+
+          users =
+            DB.cached("SELECT * FROM users WHERE status=0 ORDER BY created_at", [], ~w(users))
+            |> Enum.reject(&(&1["id"] in excludes))
+            |> Enum.take(max(20 - length(excludes), 0))
+
+          account = Campfire.Page.account()
+
+          settings = Jason.decode!(account["settings"] || "{}")
+
+          content =
+            frame(
+              user_id: user["id"],
+              avatar: avatar_path(user),
+              global_stream: Rails.sign_stream("rooms"),
+              user_stream:
+                Rails.sign_stream(
+                  Base.url_encode64("gid://campfire/User/#{user["id"]}", padding: false) <>
+                    ":rooms"
+                ),
+              create_allowed:
+                user["role"] == 1 || !settings["restrict_room_creation_to_administrators"],
+              directs:
+                directs
+                |> Enum.sort_by(& &1["updated_at"], :desc)
+                |> Enum.map_join(fn room ->
+                  members =
+                    Enum.reject(
+                      Map.get(direct_members, room["id"], []),
+                      &(&1["id"] == user["id"])
+                    )
+
+                  render_direct(room, user, members)
+                end),
+              shared:
+                Enum.map_join(others, fn room ->
+                  "          " <>
+                    shared(
+                      id: room["id"],
+                      key: Broadcasts.room_key(room),
+                      name: Assets.html_escape(room["name"]),
+                      unread: !is_nil(room["unread_at"])
+                    )
+                end),
+              placeholders:
+                Enum.map_join(users, fn u ->
+                  placeholder(
+                    id: u["id"],
+                    avatar: avatar_path(u),
+                    name: Assets.html_escape(first_name(u))
+                  )
+                end)
+            )
+
+          {_conn, html} =
+            Campfire.Page.render(conn, user, data, account: account, content: content)
+
+          html
+        end)
+
+      conn = Campfire.Page.finish_session(conn, data)
 
       conn
       |> Auth.set_auth_cookie(session)
@@ -90,8 +127,8 @@ defmodule Campfire.Sidebar do
 
   def avatar_path(user),
     do:
-      "/users/#{Rails.signed_id("User", user["id"], "avatar")}/avatar?v=" <>
-        (user["updated_at"] |> String.replace(~r/[^0-9]/, "") |> String.slice(0, 14))
+      "/users/#{Campfire.Mentions.avatar_token(user)}/avatar?v=" <>
+        (user["updated_at"] |> Campfire.Chat.digits() |> String.slice(0, 14))
 
   defp first_name(user), do: user["name"] |> String.split() |> List.first() || ""
 
@@ -104,12 +141,13 @@ defmodule Campfire.Sidebar do
     )
   end
 
-  def render_direct(room, user) do
+  def render_direct(room, user, members \\ nil) do
     members =
-      DB.query(
-        "SELECT u.* FROM users u JOIN memberships m ON m.user_id=u.id WHERE m.room_id=? AND u.id!=?",
-        [room["id"], user["id"]]
-      )
+      members ||
+        DB.query(
+          "SELECT u.* FROM users u JOIN memberships m ON m.user_id=u.id WHERE m.room_id=? AND u.id!=?",
+          [room["id"], user["id"]]
+        )
 
     members = if members == [], do: [user], else: members
 

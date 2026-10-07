@@ -1,4 +1,6 @@
 defmodule Campfire.RemoteIP do
+  import Kernel, except: [sigil_r: 2]
+  import Campfire.Sigils
   @moduledoc "ActionDispatch remote address selection and default trusted proxies."
   import Plug.Conn
 

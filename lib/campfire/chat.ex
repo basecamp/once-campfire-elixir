@@ -12,6 +12,23 @@ defmodule Campfire.Chat do
   def integer(_), do: 0
   def present?(v), do: is_binary(v) and String.trim(v) != ""
 
+  @doc "The ASCII digits of a timestamp, as `String.replace(value, ~r/[^0-9]/, \"\")` gave."
+  def digits(
+        <<y::binary-size(4), ?-, mo::binary-size(2), ?-, d::binary-size(2), ?\s,
+          h::binary-size(2), ?:, mi::binary-size(2), ?:, s::binary-size(2), rest::binary>> = value
+      ) do
+    # The usual SQLite timestamp layout, with an optional ".ffffff" fraction.
+    case rest do
+      "" -> y <> mo <> d <> h <> mi <> s
+      <<?., fraction::binary>> -> y <> mo <> d <> h <> mi <> s <> digits_of(fraction)
+      _ -> digits_of(value)
+    end
+  end
+
+  def digits(value) when is_binary(value), do: digits_of(value)
+
+  defp digits_of(value), do: for(<<c <- value>>, c in ?0..?9, into: "", do: <<c>>)
+
   def bot(key) do
     case String.split(String.trim(key), "-") do
       [id, token | _] ->
@@ -27,9 +44,10 @@ defmodule Campfire.Chat do
 
   def room(user, id),
     do:
-      DB.one(
+      DB.cached_one(
         "SELECT r.* FROM rooms r JOIN memberships m ON m.room_id=r.id WHERE r.id=? AND m.user_id=?",
-        [integer(id), user["id"]]
+        [integer(id), user["id"]],
+        ~w(rooms memberships)
       )
 
   def can_administer?(user, message), do: user["role"] == 1 or user["id"] == message["creator_id"]
@@ -43,27 +61,31 @@ defmodule Campfire.Chat do
         page(room, params["after"], ">", "ASC")
 
       true ->
-        DB.query(
+        DB.cached(
           "SELECT * FROM messages WHERE room_id=? ORDER BY created_at DESC LIMIT 40",
-          [room["id"]]
+          [room["id"]],
+          ~w(messages)
         )
         |> Enum.reverse()
     end
   end
 
+  # One query pages from the anchor message; only an empty page needs a second query to tell a
+  # missing anchor (404) from no more messages.
   defp page(room, id, op, order) do
-    case DB.one("SELECT * FROM messages WHERE room_id=? AND id=?", [room["id"], integer(id)]) do
-      nil ->
-        {:error, :not_found}
+    params = [room["id"], integer(id)]
 
-      m ->
-        result =
-          DB.query(
-            "SELECT * FROM messages WHERE room_id=? AND created_at #{op} ? ORDER BY created_at #{order} LIMIT 40",
-            [room["id"], m["created_at"]]
-          )
+    result =
+      DB.cached(
+        "WITH anchor AS (SELECT created_at FROM messages WHERE room_id=?1 AND id=?2) SELECT m.* FROM messages m, anchor WHERE m.room_id=?1 AND m.created_at #{op} anchor.created_at ORDER BY m.created_at #{order} LIMIT 40",
+        params,
+        ~w(messages)
+      )
 
-        if order == "DESC", do: Enum.reverse(result), else: result
+    cond do
+      result != [] -> if order == "DESC", do: Enum.reverse(result), else: result
+      DB.one("SELECT id FROM messages WHERE room_id=? AND id=?", params) -> []
+      true -> {:error, :not_found}
     end
   end
 
@@ -97,7 +119,9 @@ defmodule Campfire.Chat do
               [message["id"], body, now, now]
             )
 
-          Campfire.BlobEmbeds.sync(q, text["id"], embeds)
+          # The rich text was just created (AUTOINCREMENT never reuses an id), so with no
+          # embeds there is nothing to sync.
+          if embeds != [], do: Campfire.BlobEmbeds.sync(q, text["id"], embeds)
         end
 
         if attachment do
@@ -323,13 +347,14 @@ defmodule Campfire.Chat do
 
   def present_message(message, base) do
     text =
-      DB.one(
+      DB.cached_one(
         "SELECT body FROM action_text_rich_texts WHERE record_type='Message' AND record_id=? AND name='body'",
-        [message["id"]]
+        [message["id"]],
+        ~w(action_text_rich_texts)
       )
 
     body = if text, do: text["body"], else: nil
-    user = DB.one("SELECT * FROM users WHERE id=?", [message["creator_id"]])
+    user = DB.cached_one("SELECT * FROM users WHERE id=?", [message["creator_id"]], ~w(users))
 
     %{
       "id" => message["id"],
@@ -346,7 +371,7 @@ defmodule Campfire.Chat do
 
   def present_user(user, base) do
     avatar = Rails.signed_id("User", user["id"], "avatar")
-    version = user["updated_at"] |> String.replace(~r/[^0-9]/, "") |> String.slice(0, 14)
+    version = user["updated_at"] |> Campfire.Chat.digits() |> String.slice(0, 14)
 
     %{
       "id" => user["id"],

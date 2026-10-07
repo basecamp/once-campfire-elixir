@@ -1,54 +1,33 @@
 defmodule Campfire.HtmlParser do
-  @moduledoc "Persistent native Gumbo parsers pinned to the Rails reference's Nokogiri version."
-  use GenServer
-  @workers 4
+  @moduledoc """
+  Native Gumbo HTML parsing pinned to the Rails reference's Nokogiri version,
+  as a NIF. Elements are `{name, [{attribute, value}], children}`, comments
+  `{:comment, text}` and text nodes binaries.
+  """
+  @on_load :load
+  # Larger documents parse on a dirty scheduler so they never hold a normal one.
+  @dirty_bytes 16_384
 
-  def children do
-    for index <- 0..(@workers - 1) do
-      %{id: {__MODULE__, index}, start: {__MODULE__, :start_link, [index]}}
-    end
+  def load do
+    :campfire
+    |> :code.priv_dir()
+    |> Path.join("native/campfire_html")
+    |> String.to_charlist()
+    |> :erlang.load_nif(0)
   end
-
-  def start_link(index), do: GenServer.start_link(__MODULE__, index, name: name(index))
 
   def parse(html) do
-    index = :erlang.phash2(self(), @workers)
+    nodes = if byte_size(html) > @dirty_bytes, do: parse_dirty(html), else: parse_nif(html)
 
-    case GenServer.call(name(index), {:parse, html}, 30_000) do
-      %{"error" => message} -> raise ArgumentError, message
-      nodes -> Enum.map(nodes, &decode_node/1)
+    case nodes do
+      {:error, message} -> raise ArgumentError, message
+      nodes -> nodes
     end
   end
 
-  defp name(index), do: String.to_atom("Elixir.Campfire.HtmlParser.#{index}")
+  @doc false
+  def parse_nif(_html), do: :erlang.nif_error(:not_loaded)
 
-  defp decode_node([tag, attrs, children]),
-    do: {tag, Enum.map(attrs, &List.to_tuple/1), Enum.map(children, &decode_node/1)}
-
-  defp decode_node(%{"comment" => text}), do: {:comment, text}
-  defp decode_node(text) when is_binary(text), do: text
-
-  @impl true
-  def init(_index) do
-    executable = System.find_executable("campfire-html") || raise "campfire-html is unavailable"
-    port = Port.open({:spawn_executable, executable}, [:binary, {:packet, 4}, :exit_status])
-    {:ok, port}
-  end
-
-  @impl true
-  def handle_call({:parse, html}, _from, port) do
-    true = Port.command(port, html)
-
-    receive do
-      {^port, {:data, data}} -> {:reply, Jason.decode!(data), port}
-      {^port, {:exit_status, status}} -> {:stop, {:parser_exit, status}, port}
-    after
-      25_000 -> {:stop, :parser_timeout, port}
-    end
-  end
-
-  @impl true
-  def terminate(_, port) do
-    if Port.info(port), do: Port.close(port)
-  end
+  @doc false
+  def parse_dirty(_html), do: :erlang.nif_error(:not_loaded)
 end

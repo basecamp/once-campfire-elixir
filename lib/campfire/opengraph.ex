@@ -1,7 +1,12 @@
 defmodule Campfire.Opengraph do
+  import Kernel, except: [sigil_r: 2]
+  import Campfire.Sigils
   alias Campfire.{HtmlParser, Network, RichText}
   @fields ~w(title url image description)
-  @media ~r/\bhttps?:\/\/\S+\.(?:zip|tar|tar\.gz|tar\.bz2|tar\.xz|gz|bz2|rar|7z|dmg|exe|msi|pkg|deb|iso|jpg|jpeg|png|gif|bmp|mp4|mov|avi|mkv|wmv|flv|heic|heif|mp3|wav|ogg|aac|wma|webm|ogv|mpg|mpeg)\b/
+  defp media,
+    do:
+      ~r/\bhttps?:\/\/\S+\.(?:zip|tar|tar\.gz|tar\.bz2|tar\.xz|gz|bz2|rar|7z|dmg|exe|msi|pkg|deb|iso|jpg|jpeg|png|gif|bmp|mp4|mov|avi|mkv|wmv|flv|heic|heif|mp3|wav|ogg|aac|wma|webm|ogv|mpg|mpeg)\b/
+
   @images ~w(image/jpeg image/png image/gif image/webp)
   @twitter ~w(twitter.com www.twitter.com x.com www.x.com)
 
@@ -45,7 +50,7 @@ defmodule Campfire.Opengraph do
         do: URI.to_string(%{uri | host: "fxtwitter.com"}),
         else: url
 
-    html = if !Regex.match?(@media, fetch_url), do: fetch(fetch_url, :get)
+    html = if !Regex.match?(media(), fetch_url), do: fetch(fetch_url, :get)
     metadata(html, url)
   rescue
     _ -> :invalid

@@ -5,7 +5,7 @@
     {
       "id": "sessions",
       "description": "Cookies, signing, encryption, CSRF, authentication and old browser tabs",
-      "status": "verified",
+      "status": "pending",
       "evidence": [
         "parity/all-test.log",
         "test/rails_test.exs",
@@ -17,7 +17,7 @@
         "parity/results/session-lifecycle.json",
         "parity/results/verification.json"
       ],
-      "notes": "Live credential/CSRF/session lifecycle, signed/encrypted cookie interoperability, old-form continuity and actual browser/logout flows pass."
+      "notes": "PENDING after the further-perf changes (2026-10-05): forgery protection uses Sec-Fetch-Site/Origin instead of authenticity tokens (pages carry no token inputs; the csrf-token meta is empty), the _campfire_session cookie is decrypted once per request and written only when its data changes (no session for visitors until a flash or return-to is stored), and session_token is re-signed only when a session starts or its hourly activity refresh runs. Re-run sessions, session_lifecycle and browser gates (old-tab token continuity is intentionally gone). Previously verified: Live credential/CSRF/session lifecycle, signed/encrypted cookie interoperability, old-form continuity and actual browser/logout flows pass."
     },
     {
       "id": "routing",
@@ -38,7 +38,7 @@
     {
       "id": "data",
       "description": "Schema, encodings, nullability, typecasting and bidirectional writes",
-      "status": "verified",
+      "status": "pending",
       "evidence": [
         "vectors/schema.json",
         "parity/chat-test.log",
@@ -52,7 +52,7 @@
         "parity/results/message-attachments.json",
         "parity/results/verification.json"
       ],
-      "notes": "Pinned schema and scalar casts, complete mutation/FTS/storage snapshots, transactional failure boundaries, fresh schema bootstrap and bidirectional production rollback pass."
+      "notes": "PENDING after the further-perf changes (2026-10-05): boot adds index_messages_on_room_id_and_created_at (additive; Rails ignores it) and connections no longer set mmap_size. Re-run schema, fresh-install and rollback gates. Previously verified: Pinned schema and scalar casts, complete mutation/FTS/storage snapshots, transactional failure boundaries, fresh schema bootstrap and bidirectional production rollback pass."
     },
     {
       "id": "mutations",
@@ -74,7 +74,7 @@
     {
       "id": "views",
       "description": "Templates, helper escaping, frontend assets and browser interactions",
-      "status": "verified",
+      "status": "pending",
       "evidence": [
         "parity/richtext-test.log",
         "parity/results/http.json",
@@ -98,7 +98,7 @@
         "parity/results/verification.json",
         "parity/results/browser-flows.json"
       ],
-      "notes": "Byte comparisons plus actual Chromium composer, file uploads, room/profile/account edits and logout pass. Rich-text comparison retains the documented escaping/error rules."
+      "notes": "PENDING after the further-perf changes (2026-10-05): authenticity_token inputs removed and the csrf-token meta is empty; gzip at zlib level 1 (decoded bodies unchanged); spliced pages take their ETag from per-request text plus cached fragment digests; complete gzipped bodies are sent with Content-Length instead of chunked. Update parity/http.py and frontend comparisons for token-free markup, then re-run http, compression, page and browser gates. Previously verified: Byte comparisons plus actual Chromium composer, file uploads, room/profile/account edits and logout pass. Rich-text comparison retains the documented escaping/error rules."
     },
     {
       "id": "storage",
@@ -119,7 +119,7 @@
     {
       "id": "jobs",
       "description": "Claims, retry, schedules, shutdown, mail and external integrations",
-      "status": "verified",
+      "status": "pending",
       "evidence": [
         "parity/results/mutation.json",
         "parity/results/jobs.json",
@@ -130,12 +130,12 @@
         "parity/results/verification.json",
         "parity/results/network-protocol.json"
       ],
-      "notes": "Actual queue claims, failures/no retries, processed stats, worker drain, webhook replies/timeout/protocol boundaries and real isolated encrypted HTTPS push delivery pass."
+      "notes": "PENDING after PR #1 replaced Resque with the in-process queue (Campfire.Worker): no Resque wire format, Redis stats or bin/jobs consumer; queued jobs do not survive a restart. Rewrite parity/drain_jobs.py, jobs.py and worker_lifecycle.py for the in-memory queue and re-verify. Previously verified: Actual queue claims, failures/no retries, processed stats, worker drain, webhook replies/timeout/protocol boundaries and real isolated encrypted HTTPS push delivery pass."
     },
     {
       "id": "realtime",
       "description": "Cable or polling, authorization, revocation and unique-user fanout",
-      "status": "verified",
+      "status": "pending",
       "evidence": [
         "parity/results/cable.json",
         "parity/results/cable-interop.json",
@@ -146,12 +146,12 @@
         "parity/results/user-lifecycle.json",
         "parity/results/browser-flows.json"
       ],
-      "notes": "Cable protocol/authorization, cross-runtime pubsub, message/boost/room/involvement fanout, session/ban/deactivation revocation and browser lifecycle pass."
+      "notes": "PENDING after PR #1 replaced Redis pub/sub with in-process fan-out (Campfire.CableFanout): no cross-runtime pub/sub, so mixed Rails/Elixir cable legs no longer apply. Re-run cable protocol, authorization, revocation and browser lifecycle gates; drop or rewrite the interop legs. Previously verified: Cable protocol/authorization, cross-runtime pubsub, message/boost/room/involvement fanout, session/ban/deactivation revocation and browser lifecycle pass."
     },
     {
       "id": "operations",
       "description": "Environment, readiness, deployment, metrics and rollback rehearsal",
-      "status": "verified",
+      "status": "pending",
       "evidence": [
         "parity/results/rollback.json",
         "parity/results/verification.json",
@@ -160,10 +160,10 @@
         "parity/results/release.json",
         "parity/results/http-shutdown.json"
       ],
-      "notes": "Native production release with pinned Thruster TLS/HTTP2, fresh first-run and real worker, ONCE backup/restore, in-flight HTTP/job drain and Rails\u2192Elixir\u2192Rails rollback pass on isolated volumes."
+      "notes": "PENDING after Thruster was replaced by the in-process Campfire.Front (2026-10-05): Bandit serves HTTP_PORT directly with Thruster's cache, gzip, forwarded headers, body limit and request log reimplemented, and TLS_DOMAIN uses site_encrypt. Re-run release smoke, TLS/HTTP2, fresh first-run, backup/restore, drain and rollback rehearsal. Previously verified: Native production release with pinned Thruster TLS/HTTP2, fresh first-run and real worker, ONCE backup/restore, in-flight HTTP/job drain and Rails→Elixir→Rails rollback pass on isolated volumes."
     }
   ],
-  "complete": true,
+  "complete": false,
   "benchmark_status": "complete: two balanced validated baseline rounds and two balanced validated tuned rounds per app; remaining Rust capacity gap retained",
   "verified_at": "2026-10-04T11:35:55.266334+00:00",
   "source_digest": "ad793a949fb8bc0f03f370a2b562b9226f3e86d9304fc4be6110ea72b0179056",

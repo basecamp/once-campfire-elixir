@@ -1,6 +1,6 @@
 defmodule Campfire.Messages do
   import Plug.Conn
-  alias Campfire.{Auth, Broadcasts, Chat, DB, MessagesView, Rails, Webhooks}
+  alias Campfire.{Auth, Broadcasts, Chat, DB, MessagesView, Rails, RichText, Webhooks}
 
   require EEx
   EEx.function_from_file(:defp, :editor, "priv/templates/message_edit.html.eex", [:assigns])
@@ -40,7 +40,6 @@ defmodule Campfire.Messages do
       messages ->
         conn = Campfire.ModelCache.collection(conn, messages)
         {conn, data} = Auth.csrf_session(conn)
-        token = Rails.csrf_mask(Rails.csrf_global(data["_csrf_token"]))
 
         if json?(conn) do
           conn
@@ -50,12 +49,28 @@ defmodule Campfire.Messages do
             Rails.json(Enum.map(messages, &Chat.present_message(&1, Auth.base(conn))))
           )
         else
-          body = MessagesView.render_many(messages, Auth.base(conn), token)
+          base = Auth.base(conn)
+          [etag] = get_resp_header(conn, "etag")
+
+          # The ETag covers every message version, the template digest and the flash, so equal
+          # ETags mean equal pages: the fragment parts and their gzip are kept per ETag and base.
+          # Only the gzip bytes are counted, since the parts share the cached fragments.
+          {parts, gzip} =
+            Campfire.FragmentCache.memo(
+              {:messages_page, etag, base},
+              fn {_, gzip} -> 1024 + byte_size(gzip) end,
+              fn ->
+                parts = [{:raw, "\n"} | MessagesView.render_parts(messages, base)]
+                {parts, IO.iodata_to_binary(Campfire.HttpCompression.gzip_parts(parts))}
+              end
+            )
 
           conn
           |> Auth.set_csrf_session(data)
           |> put_resp_content_type("text/html")
-          |> send_resp(200, "\n" <> body)
+          |> assign(:page_parts, parts)
+          |> assign(:precompressed, gzip)
+          |> send_resp(200, Campfire.HttpCompression.body(parts))
         end
     end
   end
@@ -68,12 +83,19 @@ defmodule Campfire.Messages do
     case Chat.create_message(user, room, attrs["body"], attrs) do
       message when is_map(message) ->
         Campfire.Attachments.process_message(message)
-        Broadcasts.create(room, message, Auth.base(conn), user)
-        Webhooks.enqueue(room, message)
+
+        # The new fragment renders from what this request holds: the creator, the room (only its
+        # name and type show), the body as create_message stored it, and no boosts yet.
+        body =
+          if is_nil(attrs["body"]), do: nil, else: RichText.serialize(to_string(attrs["body"]))
+
+        preload = %{creator: user, room: room, body: body, boosts: []}
+        Broadcasts.create(room, message, Auth.base(conn), user, preload)
+        Webhooks.enqueue(room, message, body)
 
         stream =
           ~s(<turbo-stream action="append" target="messages_#{Broadcasts.room_key(room)}"><template>
-#{MessagesView.render(message, Auth.base(conn)) |> String.trim_trailing("\n")}</template></turbo-stream>\n)
+#{MessagesView.render(message, Auth.base(conn), preload) |> String.trim_trailing("\n")}</template></turbo-stream>\n)
 
         conn |> put_resp_content_type("text/vnd.turbo-stream.html") |> send_resp(200, stream)
 
@@ -127,8 +149,7 @@ defmodule Campfire.Messages do
 
       conn.method == "GET" ->
         {conn, data} = Auth.csrf_session(conn)
-        token = Rails.csrf_mask(Rails.csrf_global(data["_csrf_token"]))
-        content = "      \n" <> MessagesView.render(message, Auth.base(conn), token) <> "\n\n"
+        content = "      \n" <> MessagesView.render(message, Auth.base(conn)) <> "\n\n"
         {conn, html} = Campfire.Page.render(conn, user, data, content: content)
         conn |> put_resp_content_type("text/html") |> send_resp(200, html)
 
@@ -156,7 +177,6 @@ defmodule Campfire.Messages do
           )
 
         body = if text, do: text["body"] || "", else: ""
-        path = "/rooms/#{room["id"]}/messages/#{message["id"]}"
         {conn, data} = Auth.csrf_session(conn)
 
         content =
@@ -165,9 +185,7 @@ defmodule Campfire.Messages do
             room_id: room["id"],
             client_id: Campfire.Assets.html_escape(message["client_message_id"]),
             base: Auth.base(conn),
-            body: Campfire.Assets.html_escape(body),
-            patch_token: Rails.csrf_mask(Rails.csrf_form(data["_csrf_token"], path, "PATCH")),
-            delete_token: Rails.csrf_mask(Rails.csrf_form(data["_csrf_token"], path, "DELETE"))
+            body: Campfire.Assets.html_escape(body)
           )
 
         {conn, html} = Campfire.Page.render(conn, user, data, content: content)

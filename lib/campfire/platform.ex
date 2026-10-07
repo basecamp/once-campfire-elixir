@@ -2,11 +2,29 @@ defmodule Campfire.Platform do
   alias Campfire.UserAgent
 
   @fields ~w(ios android mac chrome firefox safari edge apple_messages mobile desktop windows operating_system browser)
-  def describe(raw), do: Map.new(@fields, &{&1, value(raw, &1)})
+  # Parsing is deterministic, so each User-Agent string is parsed once and kept (pages parse
+  # the same header with regexes for the PWA branch and the browser check).
+  def describe(raw) do
+    raw = raw || ""
+
+    Campfire.FragmentCache.memo({:platform, raw}, 512 + byte_size(raw), fn ->
+      a = agent(raw)
+      Map.new(@fields, &{&1, value(raw, a, &1)})
+    end)
+  end
 
   def value(raw, field) do
     raw = raw || ""
-    a = UserAgent.parse(raw)
+    value(raw, agent(raw), field)
+  end
+
+  defp agent(raw),
+    do:
+      Campfire.FragmentCache.memo({:user_agent, raw}, 512 + byte_size(raw), fn ->
+        UserAgent.parse(raw)
+      end)
+
+  defp value(raw, a, field) do
     ios = String.contains?(raw, ["iPhone", "iPad"])
     android = String.contains?(raw, "Android")
 
@@ -81,7 +99,7 @@ defmodule Campfire.Platform do
     if String.trim(raw || "") == "" do
       false
     else
-      a = UserAgent.parse(raw)
+      a = agent(raw)
       version = UserAgent.version(a)
 
       if is_nil(version) || String.trim(version) == "" do

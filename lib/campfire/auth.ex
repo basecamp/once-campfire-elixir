@@ -2,25 +2,72 @@ defmodule Campfire.Auth do
   alias Campfire.{DB, Rails, Chat}
   import Plug.Conn
 
+  @session_columns ~w(id created_at ip_address last_active_at token updated_at user_agent user_id)
+  @session_keys Enum.map(@session_columns, &("session." <> &1))
+  # The session and its user in one query; session columns are prefixed to keep them apart.
+  @session_user_sql "SELECT u.*, " <>
+                      Enum.map_join(@session_columns, ", ", &~s(s."#{&1}" AS "session.#{&1}")) <>
+                      " FROM sessions s JOIN users u ON u.id=s.user_id WHERE s.token=?"
+
   def session_lookup(conn) do
     conn = fetch_cookies(conn)
 
     with raw when is_binary(raw) <- conn.cookies["session_token"],
-         token when is_binary(token) <- Rails.verify_cookie("session_token", URI.decode(raw)),
-         session when is_map(session) <- DB.one("SELECT * FROM sessions WHERE token=?", [token]),
-         user when is_map(user) <- DB.one("SELECT * FROM users WHERE id=?", [session["user_id"]]) do
-      {conn, user, session}
+         token when is_binary(token) <- session_token(raw),
+         row when is_map(row) <- DB.cached_one(@session_user_sql, [token], ~w(sessions users)) do
+      {session, user} = Map.split(row, @session_keys)
+      {conn, user, Map.new(session, fn {"session." <> key, value} -> {key, value} end)}
     else
       _ -> {conn, nil, nil}
     end
   end
 
-  def session_user(conn) do
-    case session_lookup(conn) do
-      {conn, nil, nil} -> {conn, nil, nil}
-      {conn, user, session} -> {conn, user, resume_session(conn, session)}
+  # A verified session_token cookie is kept (its signature check is deterministic), and only its
+  # expiry is compared with the clock on later requests. Unverifiable cookies are not kept.
+  defp session_token(raw) do
+    now = Campfire.Clock.now()
+
+    verified =
+      Campfire.FragmentCache.memo({:session_cookie, raw}, 64 + byte_size(raw), fn ->
+        Rails.verify_cookie_expiry("session_token", URI.decode(raw), now)
+      end)
+
+    case verified do
+      {token, nil} -> token
+      {token, expires} -> if DateTime.compare(expires, now) == :gt, do: token
+      nil -> nil
     end
   end
+
+  # Resolved once per request; later calls reuse the guard's lookup.
+  def session_user(%{private: %{campfire_session_user: {user, session}}} = conn),
+    do: {conn, user, session}
+
+  def session_user(conn) do
+    {conn, user, session, current} =
+      case session_lookup(conn) do
+        {conn, nil, nil} ->
+          {conn, nil, nil, false}
+
+        {conn, user, session} ->
+          resumed = resume_session(conn, session)
+          {conn, user, resumed, resumed == session}
+      end
+
+    conn =
+      conn
+      |> put_private(:campfire_session_user, {user, session})
+      |> put_private(:campfire_session_cookie_current, current)
+
+    {conn, user, session}
+  end
+
+  defp forget_session_user(conn),
+    do: %{
+      conn
+      | private:
+          Map.drop(conn.private, [:campfire_session_user, :campfire_session_cookie_current])
+    }
 
   def start_session(conn, user) do
     now = Chat.timestamp()
@@ -40,8 +87,22 @@ defmodule Campfire.Auth do
         ]
       )
 
-    set_auth_cookie(conn, session)
+    conn |> forget_session_user() |> set_auth_cookie(session)
   end
+
+  # The signed session_token cookie is re-issued (with its 20-year expiry) when a session starts
+  # and when its hourly activity refresh runs, not on every request: the client already holds
+  # a valid cookie for this session otherwise.
+  def set_auth_cookie(
+        %{
+          private: %{
+            campfire_session_user: {_, %{"id" => id}},
+            campfire_session_cookie_current: true
+          }
+        } = conn,
+        %{"id" => id}
+      ),
+      do: conn
 
   def set_auth_cookie(conn, session) do
     expires = permanent_expiry() |> DateTime.to_iso8601()
@@ -66,52 +127,92 @@ defmodule Campfire.Auth do
 
   def banned?(conn) do
     conn.method not in ["GET", "HEAD"] and
-      DB.one("SELECT id FROM bans WHERE ip_address=? LIMIT 1", [
-        Campfire.RemoteIP.address(conn)
-      ]) != nil
+      DB.cached_one(
+        "SELECT id FROM bans WHERE ip_address=? LIMIT 1",
+        [Campfire.RemoteIP.address(conn)],
+        ~w(bans)
+      ) != nil
   end
 
+  # The `_campfire_session` cookie's data, decrypted at most once per request (cached by raw
+  # value in the process dictionary, which Campfire.HttpResponse clears per request). Forgery
+  # protection no longer needs a session, so a request without the cookie gets empty data and
+  # none is written unless something is stored in it.
   def csrf_session(conn) do
     conn = fetch_cookies(conn)
-
-    data =
-      case conn.cookies["_campfire_session"] do
-        raw when is_binary(raw) -> Rails.decrypt_cookie("_campfire_session", URI.decode(raw))
-        _ -> nil
-      end
-
-    if is_map(data),
-      do: {conn, data},
-      else:
-        {conn,
-         %{
-           "session_id" => Base.encode16(:crypto.strong_rand_bytes(16), case: :lower),
-           "_csrf_token" => Rails.csrf_token()
-         }}
+    {conn, decrypt_session(conn.cookies["_campfire_session"])}
   end
 
-  def set_csrf_session(conn, data),
-    do:
-      put_resp_cookie(
-        conn,
+  defp decrypt_session(raw) when is_binary(raw) do
+    case Process.get(:campfire_session) do
+      {^raw, data} ->
+        data
+
+      _ ->
+        data =
+          case Rails.decrypt_cookie("_campfire_session", URI.decode(raw)) do
+            data when is_map(data) -> data
+            _ -> %{}
+          end
+
+        Process.put(:campfire_session, {raw, data})
+        data
+    end
+  end
+
+  defp decrypt_session(_), do: %{}
+
+  # Writes the session cookie only when its data differs from what the client already holds
+  # (or what this response already set).
+  def set_csrf_session(conn, data) do
+    current =
+      case conn.private do
+        %{campfire_session_written: written} -> written
+        _ -> elem(csrf_session(conn), 1)
+      end
+
+    if Map.delete(data, "session_id") == Map.delete(current, "session_id") do
+      conn
+    else
+      data =
+        Map.put_new_lazy(data, "session_id", fn ->
+          current["session_id"] || Base.encode16(:crypto.strong_rand_bytes(16), case: :lower)
+        end)
+
+      conn
+      |> put_private(:campfire_session_written, data)
+      |> put_resp_cookie(
         "_campfire_session",
         URI.encode(Rails.encrypt_cookie("_campfire_session", data), &URI.char_unreserved?/1),
         http_only: true,
         same_site: "Lax",
         max_age: DateTime.diff(permanent_expiry(), Campfire.Clock.now())
       )
+    end
+  end
 
-  def csrf_valid?(conn, params) do
-    {_, data} = csrf_session(conn)
+  # Forgery protection by `Sec-Fetch-Site` instead of tokens, as in Rails main's
+  # `protect_from_forgery using: :header_only`. Browsers send the header on every request to a
+  # secure origin. Without it (plain HTTP, or an old browser) a write must carry an Origin equal
+  # to the base URL, which browsers send on every same-origin POST and fetch write; a write with
+  # neither header is refused. Callers apply this to non-GET/HEAD requests.
+  def csrf_valid?(conn, _params) do
     origin = List.first(get_req_header(conn, "origin"))
-    origin_ok = is_nil(origin) or origin == base(conn)
-    tokens = [params["authenticity_token"], List.first(get_req_header(conn, "x-csrf-token"))]
 
-    origin_ok &&
-      Enum.any?(
-        tokens,
-        &Rails.csrf_valid?(&1, data["_csrf_token"], conn.request_path, conn.method)
-      )
+    cond do
+      origin == "null" ->
+        false
+
+      not is_nil(origin) and origin != base(conn) ->
+        false
+
+      true ->
+        case List.first(get_req_header(conn, "sec-fetch-site")) do
+          site when site in ["same-origin", "same-site"] -> true
+          nil -> origin == base(conn)
+          _ -> false
+        end
+    end
   end
 
   def request_authentication(conn) do
@@ -148,7 +249,11 @@ defmodule Campfire.Auth do
 
     DB.query("DELETE FROM sessions WHERE id=?", [session["id"]])
     Campfire.Cable.disconnect(session["user_id"], true)
-    conn |> delete_resp_cookie("session_token") |> delete_resp_cookie("_campfire_session")
+
+    conn
+    |> forget_session_user()
+    |> delete_resp_cookie("session_token")
+    |> delete_resp_cookie("_campfire_session")
   end
 
   def redirect(conn, destination) do

@@ -1,4 +1,6 @@
 defmodule Campfire.Rack do
+  import Kernel, except: [sigil_r: 2]
+  import Campfire.Sigils
   @moduledoc "Rack's inclusive byte-range behavior, including Ruby integer conversion quirks."
   def integer(text) do
     case Regex.run(~r/^[\x09-\x0d\x20]*([+-]?)(?:0[dD])?([0-9](?:_?[0-9])*)/, text) do

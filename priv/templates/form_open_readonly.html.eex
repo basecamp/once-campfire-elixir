@@ -2,7 +2,7 @@
 
 <section class="panel txt-align-center" style="view-transition-name: edit-room-<%= @id %>">
   
-  <form action="/rooms/opens/<%= @id %>" accept-charset="UTF-8" method="post"><input type="hidden" name="_method" value="patch" /><input type="hidden" name="authenticity_token" value="<%= @token %>" />
+  <form action="/rooms/opens/<%= @id %>" accept-charset="UTF-8" method="post"><input type="hidden" name="_method" value="patch" />
   <div class="flex align-center gap">
       <h1 class="flex-item-grow txt-x-large">
         <%= @name %>

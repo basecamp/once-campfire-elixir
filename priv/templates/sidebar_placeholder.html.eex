@@ -9,4 +9,4 @@
       <%= @name %>
     </span>
   </span>
-</button><input type="hidden" name="authenticity_token" value="<%= @token %>" /></form>
+</button></form>

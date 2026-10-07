@@ -2,14 +2,14 @@
 
 <section class="panel txt-align-center flex flex-column gap" style="view-transition-name: account-settings">
     <div class="align-center center avatar__form gap" data-controller="upload-preview">
-      <form class="txt--medium" data-controller="form" enctype="multipart/form-data" action="/account.<%= @account_id %>" accept-charset="UTF-8" method="post"><input type="hidden" name="_method" value="patch" /><input type="hidden" name="authenticity_token" value="<%= @patch_token %>" />
+      <form class="txt--medium" data-controller="form" enctype="multipart/form-data" action="/account.<%= @account_id %>" accept-charset="UTF-8" method="post"><input type="hidden" name="_method" value="patch" />
         <label class="btn input--file">
           <img aria-hidden="true" src="<%= Campfire.Assets.path("camera.svg") %>" width="20" height="20" />
           <input class="input" accept="image/*" data-action="upload-preview#previewImage change-&gt;form#submit" type="file" name="account[logo]" id="account_logo" />
           <span class="for-screen-reader">Upload logo</span>
         </label>
 </form>
-      <form data-controller="form" enctype="multipart/form-data" action="/account.<%= @account_id %>" accept-charset="UTF-8" method="post"><input type="hidden" name="_method" value="patch" /><input type="hidden" name="authenticity_token" value="<%= @patch_token %>" />
+      <form data-controller="form" enctype="multipart/form-data" action="/account.<%= @account_id %>" accept-charset="UTF-8" method="post"><input type="hidden" name="_method" value="patch" />
         <label class="btn avatar input--file account-logo txt-xx-large">
           <img role="presentation" data-upload-preview-target="image" src="/account/logo?v=<%= @account_version %>" width="48" height="48" />
           <input class="input" accept="image/*" data-action="upload-preview#previewImage change-&gt;form#submit" type="file" name="account[logo]" id="account_logo" />
@@ -18,7 +18,7 @@
 </form>
 <%= @delete_logo %>    </div>
 
-    <form class="flex flex-column gap" data-controller="form" action="/account.<%= @account_id %>" accept-charset="UTF-8" method="post"><input type="hidden" name="_method" value="patch" /><input type="hidden" name="authenticity_token" value="<%= @patch_token %>" />
+    <form class="flex flex-column gap" data-controller="form" action="/account.<%= @account_id %>" accept-charset="UTF-8" method="post"><input type="hidden" name="_method" value="patch" />
       <div class="flex align-center gap">
         <details class="position-relative" data-controller="popup" data-action="keydown.esc-&gt;popup#close toggle-&gt;popup#toggle click@document-&gt;popup#closeOnClickOutside" data-popup-orientation-top-class="popup-orientation-top"><summary class="btn" tabindex="-1"><img aria-hidden="true" class="color-icon" src="<%= Campfire.Assets.path("globe.svg") %>" width="20" height="20" /><span class="for-screen-reader">Translate</span></summary><div class="language-list-menu shadow" data-popup-target="menu"><dl class="language-list"><dt>🇺🇸</dt><dd class="margin-none">Name this account</dd><dt>🇪🇸</dt><dd class="margin-none">Nombre de esta cuenta</dd><dt>🇫🇷</dt><dd class="margin-none">Nommez ce compte</dd><dt>🇮🇳</dt><dd class="margin-none">इस खाते का नाम दें</dd><dt>🇩🇪</dt><dd class="margin-none">Benennen Sie dieses Konto</dd><dt>🇧🇷</dt><dd class="margin-none">Dê um nome a essa conta</dd><dt>🇯🇵</dt><dd class="margin-none">アカウントに名前を付ける</dd></dl></div></details>
 
@@ -32,7 +32,7 @@
 </button>      </div>
 </form>
     <div class="margin-block-start pad-block pad-inline-double fill-shade border-radius">
-      <form class="flex align-center gap center" data-controller="form" action="/account.<%= @account_id %>" accept-charset="UTF-8" method="post"><input type="hidden" name="_method" value="put" /><input type="hidden" name="authenticity_token" value="<%= @put_token %>" />
+      <form class="flex align-center gap center" data-controller="form" action="/account.<%= @account_id %>" accept-charset="UTF-8" method="post"><input type="hidden" name="_method" value="put" />
         <div class="flex-item-grow flex align-center gap txt-align-start">
           <img class="colorize--black" aria-hidden="true" src="<%= Campfire.Assets.path("crown.svg") %>" width="18" height="18" /> Must be admin to create new rooms
         </div>
@@ -79,7 +79,7 @@
       <form class="button_to" method="post" action="/account/join_code"><button class="btn btn--regenerate" type="submit">
         <img aria-hidden="true" class="colorize--black" src="<%= Campfire.Assets.path("refresh.svg") %>" width="20" height="20" />
         <span class="for-screen-reader">Regenerate join link</span>
-</button><input type="hidden" name="authenticity_token" value="<%= @join_token %>" /></form>  </div>
+</button></form>  </div>
 </div>
 
 

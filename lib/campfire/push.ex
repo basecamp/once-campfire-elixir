@@ -4,14 +4,7 @@ defmodule Campfire.Push do
   @hosts ~w(jmt17.google.com fcm.googleapis.com updates.push.services.mozilla.com web.push.apple.com notify.windows.com)
   def valid_endpoint?(endpoint) when is_binary(endpoint) do
     with {:ok, uri} <- Campfire.HttpURL.parse(endpoint) do
-      permitted =
-        uri.scheme == "https" && uri.port == 443 && is_binary(uri.host) &&
-          Enum.any?(@hosts, fn host ->
-            String.downcase(uri.host) == host ||
-              String.ends_with?(String.downcase(uri.host), "." <> host)
-          end)
-
-      permitted && match?({:ok, _}, Network.resolve(uri.host))
+      permitted_uri?(uri) && match?({:ok, _}, Network.resolve(uri.host))
     else
       _ -> false
     end
@@ -19,62 +12,88 @@ defmodule Campfire.Push do
 
   def valid_endpoint?(_), do: false
 
+  # The endpoint's scheme, port and push service host, without resolving it.
+  defp permitted_endpoint?(endpoint) when is_binary(endpoint) do
+    case Campfire.HttpURL.parse(endpoint) do
+      {:ok, uri} -> permitted_uri?(uri)
+      _ -> false
+    end
+  end
+
+  defp permitted_endpoint?(_), do: false
+
+  defp permitted_uri?(uri) do
+    uri.scheme == "https" && uri.port == 443 && is_binary(uri.host) &&
+      Enum.any?(@hosts, fn host ->
+        String.downcase(uri.host) == host ||
+          String.ends_with?(String.downcase(uri.host), "." <> host)
+      end)
+  end
+
   def subscriptions(room, message) do
     cutoff = Chat.timestamp(DateTime.add(Campfire.Clock.now(), -60))
 
+    # Each subscription comes with its membership's involvement, instead of one query each.
     rows =
       DB.query(
-        "SELECT s.* FROM push_subscriptions s JOIN memberships m ON m.user_id=s.user_id WHERE m.room_id=? AND m.user_id!=? AND m.involvement IN ('everything','mentions') AND (m.connected_at IS NULL OR m.connected_at < ?)",
+        ~s{SELECT s.*, m.involvement AS "push.involvement" FROM push_subscriptions s JOIN memberships m ON m.user_id=s.user_id WHERE m.room_id=? AND m.user_id!=? AND m.involvement IN ('everything','mentions') AND (m.connected_at IS NULL OR m.connected_at < ?)},
         [room["id"], message["creator_id"], cutoff]
       )
 
-    text =
-      DB.one(
-        "SELECT body FROM action_text_rich_texts WHERE record_type='Message' AND record_id=? AND name='body'",
-        [message["id"]]
-      )
+    mentioned =
+      if rows == [],
+        do: [],
+        else:
+          (case DB.cached_one(
+                  "SELECT body FROM action_text_rich_texts WHERE record_type='Message' AND record_id=? AND name='body'",
+                  [message["id"]],
+                  ~w(action_text_rich_texts)
+                ) do
+             nil -> []
+             text -> Enum.map(Mentions.users(text["body"] || ""), & &1["id"])
+           end)
 
-    mentioned = if text, do: Enum.map(Mentions.users(text["body"] || ""), & &1["id"]), else: []
-
-    Enum.filter(rows, fn s ->
-      membership =
-        DB.one("SELECT involvement FROM memberships WHERE room_id=? AND user_id=?", [
-          room["id"],
-          s["user_id"]
-        ])
-
-      membership["involvement"] == "everything" || s["user_id"] in mentioned
-    end)
+    for s <- rows,
+        s["push.involvement"] == "everything" || s["user_id"] in mentioned,
+        do: Map.delete(s, "push.involvement")
   end
 
+  # Only subscriptions to a push service's endpoint need a payload and a badge count; any other
+  # endpoint is skipped as deliver/4 would. deliver/4 still resolves the host, as before.
   def perform(room, message) do
-    creator = DB.one("SELECT * FROM users WHERE id=?", [message["creator_id"]])
-    body = Chat.present_message(message, "")["body"]["plain_text"]
+    deliverable = Enum.filter(subscriptions(room, message), &permitted_endpoint?(&1["endpoint"]))
 
-    payload =
-      if room["type"] == "Rooms::Direct",
-        do: %{"title" => creator["name"], "body" => body, "path" => "/rooms/#{room["id"]}"},
-        else: %{
-          "title" => room["name"],
-          "body" => "#{creator["name"]}: #{body}",
-          "path" => "/rooms/#{room["id"]}"
-        }
+    if deliverable != [] do
+      creator =
+        DB.cached_one("SELECT * FROM users WHERE id=?", [message["creator_id"]], ~w(users))
 
-    subscriptions(room, message)
-    |> Task.async_stream(
-      fn subscription ->
-        badge =
-          DB.one(
-            "SELECT count(*) AS count FROM memberships WHERE user_id=? AND unread_at IS NOT NULL",
-            [subscription["user_id"]]
-          )["count"]
+      body = Chat.present_message(message, "")["body"]["plain_text"]
 
-        deliver(subscription, payload, badge)
-      end,
-      max_concurrency: 50,
-      timeout: :infinity
-    )
-    |> Stream.run()
+      payload =
+        if room["type"] == "Rooms::Direct",
+          do: %{"title" => creator["name"], "body" => body, "path" => "/rooms/#{room["id"]}"},
+          else: %{
+            "title" => room["name"],
+            "body" => "#{creator["name"]}: #{body}",
+            "path" => "/rooms/#{room["id"]}"
+          }
+
+      deliverable
+      |> Task.async_stream(
+        fn subscription ->
+          badge =
+            DB.one(
+              "SELECT count(*) AS count FROM memberships WHERE user_id=? AND unread_at IS NOT NULL",
+              [subscription["user_id"]]
+            )["count"]
+
+          deliver(subscription, payload, badge)
+        end,
+        max_concurrency: 50,
+        timeout: :infinity
+      )
+      |> Stream.run()
+    end
 
     :ok
   end

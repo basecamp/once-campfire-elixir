@@ -11,7 +11,7 @@ defmodule Campfire.Flash do
   end
 
   def sweep(conn) do
-    if conn.assigns[:new_flash] || conn.assigns[:rails_exception] do
+    if conn.assigns[:new_flash] || conn.assigns[:rails_exception] || !session_cookie?(conn) do
       conn
     else
       {conn, incoming} = Auth.csrf_session(conn)
@@ -34,6 +34,16 @@ defmodule Campfire.Flash do
       end
     end
   end
+
+  # Without a _campfire_session cookie there is no flash to sweep, and no need to parse cookies.
+  defp session_cookie?(%{req_cookies: %Plug.Conn.Unfetched{}} = conn),
+    do:
+      Enum.any?(
+        Plug.Conn.get_req_header(conn, "cookie"),
+        &String.contains?(&1, "_campfire_session=")
+      )
+
+  defp session_cookie?(conn), do: Map.has_key?(conn.req_cookies, "_campfire_session")
 
   def render(data) do
     flashes = get_in(data, ["flash", "flashes"]) || %{}

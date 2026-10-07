@@ -12,6 +12,11 @@ defmodule Campfire.HttpResponse do
   def init(opts), do: opts
 
   def call(conn, _) do
+    # The per-request session cache kept by Campfire.Auth, and Campfire.DB's once-per-request
+    # check for commits by other SQLite clients.
+    Process.delete(:campfire_session)
+    Process.delete(:campfire_db_checked)
+    Process.put(:campfire_request, true)
     conn = delete_resp_header(conn, "cache-control")
 
     conn =
@@ -27,11 +32,16 @@ defmodule Campfire.HttpResponse do
       if conn.assigns[:rails_exception] do
         if conn.resp_body == "", do: conn, else: Campfire.HttpCompression.apply(conn)
       else
+        # The security headers a response doesn't already set, appended in order in one pass.
         conn =
-          Enum.reduce(if(conn.state == :set_file, do: [], else: @security), conn, fn {key, value},
-                                                                                     c ->
-            if get_resp_header(c, key) == [], do: put_resp_header(c, key, value), else: c
-          end)
+          if conn.state == :set_file,
+            do: conn,
+            else: %{
+              conn
+              | resp_headers:
+                  conn.resp_headers ++
+                    Enum.reject(@security, &List.keymember?(conn.resp_headers, elem(&1, 0), 0))
+            }
 
         conn =
           if conn.request_path in ["/up", "/cable"] ||
@@ -39,14 +49,13 @@ defmodule Campfire.HttpResponse do
              do: conn,
              else:
                conn
-               |> put_resp_header("x-version", System.get_env("APP_VERSION", "dev"))
-               |> put_resp_header("x-rev", System.get_env("GIT_REVISION", "dev"))
+               |> put_resp_header("x-version", Campfire.Release.version())
+               |> put_resp_header("x-rev", Campfire.Release.revision())
 
         conn =
-          if is_binary(conn.resp_body) &&
-               String.contains?(conn.resp_body, ~s(<link rel="stylesheet")),
-             do: put_resp_header(conn, "link", Campfire.Assets.preload_header()),
-             else: conn
+          if stylesheet?(conn.assigns[:page_parts] || conn.resp_body),
+            do: put_resp_header(conn, "link", Campfire.Assets.preload_header()),
+            else: conn
 
         conn = etag(conn)
 
@@ -142,13 +151,24 @@ defmodule Campfire.HttpResponse do
     if body != "", do: put_resp_header(conn, "vary", "Accept-Encoding"), else: conn
   end
 
+  # A spliced page's message fragments are sanitized and never link a stylesheet, so only its
+  # per-request text is searched rather than the whole (up to 450 KB) body.
+  defp stylesheet?([part | _] = parts) when elem(part, 0) == :raw,
+    do: Enum.any?(parts, &(elem(&1, 0) == :raw and stylesheet?(elem(&1, 1))))
+
+  defp stylesheet?(body) when is_binary(body),
+    do: String.contains?(body, ~s(<link rel="stylesheet"))
+
+  defp stylesheet?(body) when is_list(body), do: Enum.any?(body, &stylesheet?/1)
+  defp stylesheet?(_), do: false
+
   defp etag(conn) do
     if conn.status in [200, 201] && get_resp_header(conn, "etag") == [] &&
          get_resp_header(conn, "last-modified") == [] &&
          (is_binary(conn.resp_body) || is_list(conn.resp_body)) &&
          IO.iodata_length(conn.resp_body) > 0 do
-      digest =
-        :crypto.hash(:sha256, conn.resp_body) |> Base.encode16(case: :lower) |> binary_part(0, 32)
+      {conn, digest} = digest(conn)
+      digest = digest |> Base.encode16(case: :lower) |> binary_part(0, 32)
 
       conn = put_resp_header(conn, "etag", ~s(W/"#{digest}"))
 
@@ -158,6 +178,22 @@ defmodule Campfire.HttpResponse do
     else
       conn
     end
+  end
+
+  # Rack::ETag digests the whole body. A page spliced from cached message fragments (about
+  # 450 KB for a room) is digested from its parts' digests: each fragment's is computed once and
+  # kept with the fragment, and the per-request text's is kept on the parts for gzip to reuse.
+  defp digest(%{assigns: %{page_parts: parts}} = conn) do
+    parts = Campfire.HttpCompression.with_digests(parts)
+
+    {assign(conn, :page_parts, parts),
+     :crypto.hash(:sha256, Enum.map(parts, &Campfire.HttpCompression.digest/1))}
+  end
+
+  # A whole body's digest is also the key of its kept gzip (Campfire.HttpCompression).
+  defp digest(conn) do
+    digest = :crypto.hash(:sha256, conn.resp_body)
+    {assign(conn, :body_digest, digest), digest}
   end
 
   defp fresh?(conn) do

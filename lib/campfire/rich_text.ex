@@ -1,4 +1,7 @@
 defmodule Campfire.RichText do
+  import Kernel, except: [sigil_r: 2]
+  import Campfire.Sigils
+
   @moduledoc "Action Text fragment rendering and plain-text conversion. Pinned Action Text attachment expansion and HTML serialization."
   @tags ~w(a abbr acronym address b big blockquote br cite code dd del dfn div dl dt em h1 h2 h3 h4 h5 h6 hr i img ins kbd li ol p pre samp small span strong sub sup time tt ul var s u mark table thead tbody tfoot tr th td figure figcaption action-text-attachment)
   @attributes ~w(abbr alt cite class datetime height href lang name src title width xml:lang align style data-language sgid content-type url filename filesize width height previewable presentation caption content)

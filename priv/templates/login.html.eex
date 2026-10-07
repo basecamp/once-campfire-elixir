@@ -2,7 +2,7 @@
   <div class="panel <%= if @rejected, do: "shake", else: "" %>">
     <figure class="account-logo avatar center margin-block-end txt-xx-large"><img alt="Account logo" src="/account/logo?v=<%= @account_version %>" width="300" height="300" /></figure>
 
-    <form class="flex flex-column gap" action="<%= @base %>/session" accept-charset="UTF-8" method="post"><input type="hidden" name="authenticity_token" value="<%= @form_token %>" />
+    <form class="flex flex-column gap" action="<%= @base %>/session" accept-charset="UTF-8" method="post">
       <fieldset class="flex flex-column gap center-block upad">
         <legend class="txt-large txt-align-center"><strong><%= @account_name %></strong></legend>
 

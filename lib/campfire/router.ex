@@ -316,10 +316,9 @@ defmodule Campfire.Router do
 
         if "html" in Campfire.ResponseFormats.requested(conn) do
           {conn, data} = Auth.csrf_session(conn)
-          token = Rails.csrf_mask(Rails.csrf_global(data["_csrf_token"]))
 
           body =
-            "\n" <> Enum.map_join(messages, &Campfire.MessagesView.render(&1, base(conn), token))
+            "\n" <> Enum.map_join(messages, &Campfire.MessagesView.render(&1, base(conn)))
 
           conn
           |> Auth.set_csrf_session(data)

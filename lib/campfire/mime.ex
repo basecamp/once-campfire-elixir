@@ -1,4 +1,6 @@
 defmodule Campfire.Mime do
+  import Kernel, except: [sigil_r: 2]
+  import Campfire.Sigils
   @external_resource "priv/compat/marcel.json"
   @tables Jason.decode!(File.read!(@external_resource))
   @binary "application/octet-stream"

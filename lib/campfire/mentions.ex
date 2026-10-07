@@ -1,4 +1,6 @@
 defmodule Campfire.Mentions do
+  import Kernel, except: [sigil_r: 2]
+  import Campfire.Sigils
   alias Campfire.{Assets, DB, Rails, RichText}
 
   def resolve(attrs) do
@@ -112,8 +114,8 @@ defmodule Campfire.Mentions do
       |> Enum.join(" – ")
       |> Assets.html_escape()
 
-    token = Rails.signed_id("User", user["id"], "avatar")
-    version = user["updated_at"] |> String.replace(~r/[^0-9]/, "") |> String.slice(0, 14)
+    token = avatar_token(user)
+    version = user["updated_at"] |> Campfire.Chat.digits() |> String.slice(0, 14)
 
     if render == :action_text do
       ~s(<a title="#{title}" class="btn avatar" href="/users/#{user["id"]}"><img src="/users/#{token}/avatar?v=#{version}" width="48" height="48"></a>)
@@ -125,4 +127,11 @@ defmodule Campfire.Mentions do
   def html(user),
     do:
       ~s(<span class="mention" sgid="#{Rails.attachable_sgid("User", user["id"])}">#{avatar(user)} #{Assets.html_escape(user["name"])}</span>)
+
+  @doc "The signed id in a user's avatar URL. It never expires, so it is signed once per user."
+  def avatar_token(user),
+    do:
+      Campfire.FragmentCache.memo({:avatar_token, user["id"]}, fn ->
+        Rails.signed_id("User", user["id"], "avatar")
+      end)
 end

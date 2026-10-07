@@ -1,6 +1,6 @@
 defmodule Campfire.Signup do
   import Plug.Conn
-  alias Campfire.{Assets, Auth, DB, Page, People, Rails}
+  alias Campfire.{Assets, Auth, DB, Page, People}
   require EEx
   EEx.function_from_file(:defp, :form, "priv/templates/signup.html.eex", [:assigns])
   EEx.function_from_file(:defp, :nav, "priv/templates/signup_nav.html.eex", [:_assigns])
@@ -36,11 +36,8 @@ defmodule Campfire.Signup do
     content =
       form(
         path: Assets.html_escape(conn.request_path),
-        form_token:
-          Rails.csrf_mask(Rails.csrf_form(data["_csrf_token"], conn.request_path, "POST")),
         account_name: Assets.html_escape(account["name"]),
-        account_version:
-          account["updated_at"] |> String.replace(~r/[^0-9]/, "") |> String.slice(0, 14),
+        account_version: account["updated_at"] |> Campfire.Chat.digits() |> String.slice(0, 14),
         help: Campfire.Sessions.help()
       )
 
@@ -56,27 +53,22 @@ defmodule Campfire.Signup do
   end
 
   defp create(conn) do
-    case Campfire.Params.required(conn.params, "user") do
-      %{} = attrs ->
-        attrs = Campfire.Params.permit(attrs, ~w(name avatar email_address password))
+    attrs =
+      Campfire.Params.required(conn.params, "user")
+      |> Campfire.Params.permit(~w(name avatar email_address password))
 
-        case People.create(attrs) do
-          user when is_map(user) ->
-            conn |> Auth.start_session(user) |> Auth.redirect("/")
+    case People.create(attrs) do
+      user when is_map(user) ->
+        conn |> Auth.start_session(user) |> Auth.redirect("/")
 
-          {:error, error} ->
-            if String.contains?(inspect(error), "UNIQUE constraint failed: users.email_address"),
-              do:
-                Auth.redirect(
-                  conn,
-                  "/session/new?email_address=" <>
-                    URI.encode_www_form(attrs["email_address"] || "")
-                ),
-              else: raise(error)
-        end
-
-      _ ->
-        head(conn, 400)
+      {:error, error} ->
+        if String.contains?(inspect(error), "UNIQUE constraint failed: users.email_address"),
+          do:
+            Auth.redirect(
+              conn,
+              "/session/new?email_address=" <> URI.encode_www_form(attrs["email_address"] || "")
+            ),
+          else: raise(error)
     end
   end
 

@@ -1,4 +1,6 @@
 defmodule Campfire.ResponseFormats do
+  import Kernel, except: [sigil_r: 2]
+  import Campfire.Sigils
   @moduledoc "Pinned controller templates and explicit respond_to format boundaries."
   import Plug.Conn
 
@@ -21,49 +23,63 @@ defmodule Campfire.ResponseFormats do
       params["format"] ->
         [params["format"]]
 
-      Regex.match?(~r/\.(json|xml)\z/, conn.request_path) ->
+      String.ends_with?(conn.request_path, [".json", ".xml"]) ->
         [List.last(String.split(conn.request_path, "."))]
 
       true ->
         accept = get_req_header(conn, "accept") |> Enum.join(",")
         xhr? = get_req_header(conn, "x-requested-with") == ["XMLHttpRequest"]
 
-        if accept == "" || (!xhr? && Regex.match?(~r/,\s*\*\/\*|\*\/\*\s*,/, accept)) do
-          [if(xhr?, do: "js", else: "html")]
-        else
-          formats =
-            accept
-            |> String.split(",")
-            |> Enum.with_index()
-            |> Enum.sort_by(fn {type, index} ->
-              quality =
-                case Regex.run(~r/;\s*q="?([0-9.]+)/, type) do
-                  [_, value] ->
-                    case Float.parse(value) do
-                      {number, _} -> number
-                      _ -> 0.0
-                    end
+        # The formats an Accept header asks for are kept per (bounded) header value.
+        if byte_size(accept) <= 512,
+          do:
+            Campfire.FragmentCache.memo(
+              {:accept_formats, accept, xhr?},
+              128 + byte_size(accept),
+              fn ->
+                accepted(accept, xhr?)
+              end
+            ),
+          else: accepted(accept, xhr?)
+    end
+  end
 
-                  _ ->
-                    1.0
+  defp accepted(accept, xhr?) do
+    if accept == "" || (!xhr? && Regex.match?(~r/,\s*\*\/\*|\*\/\*\s*,/, accept)) do
+      [if(xhr?, do: "js", else: "html")]
+    else
+      formats =
+        accept
+        |> String.split(",")
+        |> Enum.with_index()
+        |> Enum.sort_by(fn {type, index} ->
+          quality =
+            case Regex.run(~r/;\s*q="?([0-9.]+)/, type) do
+              [_, value] ->
+                case Float.parse(value) do
+                  {number, _} -> number
+                  _ -> 0.0
                 end
 
-              {-quality, index}
-            end)
-            |> Enum.flat_map(fn {type, _} ->
-              type = String.split(type, ";") |> hd() |> String.trim()
+              _ ->
+                1.0
+            end
 
-              cond do
-                type == "*/*" -> ["all"]
-                type in ["text/*", "application/*"] -> @wildcards[String.split(type, "/") |> hd()]
-                @mime[type] -> [@mime[type]]
-                true -> []
-              end
-            end)
-            |> Enum.uniq()
+          {-quality, index}
+        end)
+        |> Enum.flat_map(fn {type, _} ->
+          type = String.split(type, ";") |> hd() |> String.trim()
 
-          if formats == [], do: ["html"], else: formats
-        end
+          cond do
+            type == "*/*" -> ["all"]
+            type in ["text/*", "application/*"] -> @wildcards[String.split(type, "/") |> hd()]
+            @mime[type] -> [@mime[type]]
+            true -> []
+          end
+        end)
+        |> Enum.uniq()
+
+      if formats == [], do: ["html"], else: formats
     end
   end
 

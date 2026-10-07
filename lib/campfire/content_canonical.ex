@@ -1,4 +1,7 @@
 defmodule Campfire.ContentCanonical do
+  import Kernel, except: [sigil_r: 2]
+  import Campfire.Sigils
+
   @trix ~w(sgid contentType url href filename filesize width height previewable content caption presentation)
 
   def nodes(nodes),

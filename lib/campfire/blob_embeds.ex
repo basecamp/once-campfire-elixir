@@ -1,4 +1,6 @@
 defmodule Campfire.BlobEmbeds do
+  import Kernel, except: [sigil_r: 2]
+  import Campfire.Sigils
   alias Campfire.{Attachments, DB, Rails, RichText}
 
   def resolve(attrs) do

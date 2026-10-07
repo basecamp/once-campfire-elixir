@@ -9,5 +9,5 @@
 <%= @recent_links %><%= if @has_recents do %>      <form class="button_to" method="post" action="<%= @base %>/searches/clear"><input type="hidden" name="_method" value="delete" /><button class="btn searches__btn" data-turbo-confirm="Are you sure you want to clear your recent searches?" type="submit">
         <img aria-hidden="true" src="<%= Campfire.Assets.path("broom.svg") %>" />
         <span class="for-screen-reader">Clear recent searches</span>
-</button><input type="hidden" name="authenticity_token" value="<%= @clear_token %>" /></form><% end %>  </div>
+</button></form><% end %>  </div>
 

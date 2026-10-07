@@ -5,6 +5,7 @@
 /var/
 /erl_crash.dump
 /priv/static/assets/
+/priv/native/
 __pycache__/
 *.pyc
 

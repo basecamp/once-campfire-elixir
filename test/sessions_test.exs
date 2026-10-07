@@ -1,6 +1,7 @@
 defmodule Campfire.SessionsTest do
   use ExUnit.Case, async: false
   import Plug.Test
+  import Plug.Conn, only: [put_req_header: 3]
   alias Campfire.{Auth, DB, Rails, Router}
   @fixture Jason.decode!(File.read!("test/fixtures/seed.json"))
   setup do
@@ -16,22 +17,29 @@ defmodule Campfire.SessionsTest do
   end
 
   defp csrf_post(method, path, params) do
-    page = browser()
-    cookie = page.resp_cookies["_campfire_session"][:value]
-    data = Rails.decrypt_cookie("_campfire_session", URI.decode(cookie))
-    token = Rails.csrf_mask(Rails.csrf_global(data["_csrf_token"]))
-
-    conn(method, path, Map.put(params, "authenticity_token", token))
-    |> put_req_cookie("_campfire_session", cookie)
+    conn(method, path, params)
+    |> put_req_header("sec-fetch-site", "same-origin")
     |> Router.call(Router.init([]))
   end
 
-  test "login renders original frontend and reusable CSRF session" do
+  defp forgery_check(headers, scheme \\ :http) do
+    port = if scheme == :https, do: 443, else: 80
+    conn = %{conn(:post, "/session") | scheme: scheme, host: "campfire.test", port: port}
+
+    conn =
+      Enum.reduce(headers, conn, fn {name, value}, conn -> put_req_header(conn, name, value) end)
+
+    Auth.csrf_valid?(conn, %{})
+  end
+
+  test "login renders original frontend without a forgery token or session" do
     page = browser()
     assert page.status == 200
     assert page.resp_body =~ "<title>Sign in</title>"
     assert page.resp_body =~ "application-a54c74a7.js"
-    assert page.resp_cookies["_campfire_session"][:http_only]
+    assert page.resp_body =~ ~s(<meta name="csrf-token" content="" />)
+    refute page.resp_body =~ ~s(name="authenticity_token" value=)
+    refute page.resp_cookies["_campfire_session"]
     assert length(Regex.scan(~r/lifebuoy-/, page.resp_body)) == 1
 
     assert csrf_post(:post, "/session", %{
@@ -40,7 +48,7 @@ defmodule Campfire.SessionsTest do
            }).status == 401
   end
 
-  test "valid credentials start a Rails-readable session; CSRF rejects forgery" do
+  test "valid credentials start a Rails-readable session; Sec-Fetch-Site rejects forgery" do
     assert csrf_post(:post, "/session", %{
              "email_address" => "david@37signals.com",
              "password" => "secret123456"
@@ -55,23 +63,98 @@ defmodule Campfire.SessionsTest do
         "email_address" => "david@37signals.com",
         "password" => "secret123456"
       })
+      |> put_req_header("sec-fetch-site", "cross-site")
       |> Router.call(Router.init([]))
 
     assert forged.status == 422
   end
 
+  test "forgery protection follows Sec-Fetch-Site and Origin" do
+    for site <- ["same-origin", "same-site"] do
+      assert forgery_check([{"sec-fetch-site", site}])
+      assert forgery_check([{"sec-fetch-site", site}], :https)
+    end
+
+    for site <- ["cross-site", "none", "bogus"] do
+      refute forgery_check([{"sec-fetch-site", site}])
+      refute forgery_check([{"sec-fetch-site", site}], :https)
+    end
+
+    # Without Sec-Fetch-Site (plain HTTP, or an old browser), a write needs a matching Origin.
+    refute forgery_check([])
+    refute forgery_check([], :https)
+    assert forgery_check([{"origin", "http://campfire.test"}])
+    assert forgery_check([{"origin", "https://campfire.test"}], :https)
+    refute forgery_check([{"origin", "http://evil.test"}])
+    refute forgery_check([{"origin", "null"}])
+
+    assert forgery_check(
+             [{"origin", "https://campfire.test"}, {"sec-fetch-site", "same-origin"}],
+             :https
+           )
+
+    refute forgery_check(
+             [{"origin", "https://evil.test"}, {"sec-fetch-site", "same-origin"}],
+             :https
+           )
+
+    refute forgery_check([{"origin", "null"}, {"sec-fetch-site", "same-origin"}], :https)
+  end
+
+  test "a write with neither Sec-Fetch-Site nor Origin is refused" do
+    forged =
+      conn(:post, "/session", %{
+        "email_address" => "david@37signals.com",
+        "password" => "secret123456"
+      })
+      |> Router.call(Router.init([]))
+
+    assert forged.status == 422
+
+    with_origin =
+      conn(:post, "/session", %{
+        "email_address" => "david@37signals.com",
+        "password" => "secret123456"
+      })
+      |> put_req_header("origin", "http://www.example.com")
+      |> Router.call(Router.init([]))
+
+    assert with_origin.status == 302
+  end
+
+  test "the session cookie is written only when its data changes" do
+    page = browser()
+    refute page.resp_cookies["_campfire_session"]
+
+    data = %{
+      "session_id" => "abc",
+      "flash" => %{"discard" => [], "flashes" => %{"notice" => "Hi"}}
+    }
+
+    cookie = URI.encode(Rails.encrypt_cookie("_campfire_session", data), &URI.char_unreserved?/1)
+    conn = conn(:get, "/") |> put_req_cookie("_campfire_session", cookie)
+
+    unchanged = Auth.set_csrf_session(conn, data)
+    refute unchanged.resp_cookies["_campfire_session"]
+
+    changed = Auth.set_csrf_session(conn, Map.delete(data, "flash"))
+    written = changed.resp_cookies["_campfire_session"][:value]
+
+    assert Rails.decrypt_cookie("_campfire_session", URI.decode(written)) == %{
+             "session_id" => "abc"
+           }
+  end
+
   test "return-to is removed once and the newly signed authentication cookie verifies" do
     c = conn(:get, "/rooms/486777696?before=123") |> Auth.request_authentication()
     cookie = c.resp_cookies["_campfire_session"][:value]
-    data = Rails.decrypt_cookie("_campfire_session", URI.decode(cookie))
-    token = Rails.csrf_mask(Rails.csrf_global(data["_csrf_token"]))
 
     response =
       conn(:post, "/session", %{
         "email_address" => "david@37signals.com",
-        "password" => "secret123456",
-        "authenticity_token" => token
+        "password" => "secret123456"
       })
+      |> put_req_header("sec-fetch-site", "same-origin")
       |> put_req_cookie("_campfire_session", cookie)
       |> Router.call(Router.init([]))
 
@@ -115,7 +198,56 @@ defmodule Campfire.SessionsTest do
     assert updated["last_active_at"] == "2026-03-02 16:00:00"
   end
 
-  test "login rate limit rejects the eleventh valid-CSRF attempt" do
+  test "session_token is re-signed only when the session starts or its activity refreshes" do
+    user = DB.one("SELECT * FROM users WHERE id=127326141")
+    raw = (conn(:get, "/") |> Auth.start_session(user)).resp_cookies["session_token"][:value]
+    session = DB.one("SELECT * FROM sessions ORDER BY id DESC LIMIT 1")
+
+    resign = fn ->
+      {conn, ^user, session} =
+        conn(:get, "/") |> put_req_cookie("session_token", raw) |> Auth.session_user()
+
+      Auth.set_auth_cookie(conn, session).resp_cookies["session_token"]
+    end
+
+    refute resign.()
+
+    DB.query("UPDATE sessions SET last_active_at=? WHERE id=?", [
+      "2026-03-02 14:59:59",
+      session["id"]
+    ])
+
+    assert %{value: value} = resign.()
+    assert Rails.verify_cookie("session_token", URI.decode(value)) == session["token"]
+  end
+
+  test "a room page renders the same bytes and ETag twice and revalidates with 304" do
+    user = DB.one("SELECT * FROM users WHERE id=127326141")
+    raw = (conn(:get, "/") |> Auth.start_session(user)).resp_cookies["session_token"][:value]
+
+    get = fn headers ->
+      Enum.reduce(headers, conn(:get, "/rooms/486777696"), fn {name, value}, conn ->
+        put_req_header(conn, name, value)
+      end)
+      |> put_req_cookie("session_token", raw)
+      |> put_req_header("accept-encoding", "gzip")
+      |> Router.call(Router.init([]))
+    end
+
+    first = get.([])
+    second = get.([])
+    assert first.status == 200
+    assert :zlib.gunzip(IO.iodata_to_binary(first.resp_body)) =~ "message__body"
+
+    assert :zlib.gunzip(IO.iodata_to_binary(first.resp_body)) ==
+             :zlib.gunzip(IO.iodata_to_binary(second.resp_body))
+
+    [etag] = Plug.Conn.get_resp_header(first, "etag")
+    assert Plug.Conn.get_resp_header(second, "etag") == [etag]
+    assert get.([{"if-none-match", etag}]).status == 304
+  end
+
+  test "login rate limit rejects the eleventh same-origin attempt" do
     for _ <- 1..10,
         do:
           assert(

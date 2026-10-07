@@ -7,49 +7,19 @@ defmodule Campfire.Application do
       {Registry, keys: :duplicate, name: Campfire.Connections},
       Campfire.RateLimiter,
       Campfire.FragmentCache,
-      Campfire.CableFrames,
+      Campfire.Front.Cache,
       {Campfire.DB, path: System.get_env("DATABASE_PATH", "var/production.sqlite3")}
     ]
 
-    children = children ++ Campfire.HtmlParser.children()
-
     children =
-      case System.get_env("REDIS_URL") do
-        nil ->
-          children
-
-        url ->
-          children ++
-            [
-              {Redix, {url, [name: Campfire.Redis]}},
-              %{
-                id: Campfire.CableRedis,
-                start: {Redix.PubSub, :start_link, [url, [name: Campfire.CableRedis]]}
-              }
-            ]
-      end
-
-    children =
-      if System.get_env("CAMPFIRE_WORKER") == "1",
-        do: children ++ [Campfire.Worker],
-        else: children
+      if System.get_env("CAMPFIRE_JOBS_ADAPTER") == "disabled",
+        do: children,
+        else: children ++ [{Task.Supervisor, name: Campfire.JobTasks}, Campfire.Worker]
 
     children =
       if System.get_env("CAMPFIRE_NO_SERVER") == "1",
         do: children,
-        else:
-          children ++
-            [
-              {Bandit,
-               plug: Campfire.Endpoint,
-               http_options: [compress: false],
-               port: String.to_integer(System.get_env("PORT", "7070")),
-               ip:
-                 if(System.get_env("CAMPFIRE_BIND") == "loopback",
-                   do: {127, 0, 0, 1},
-                   else: {0, 0, 0, 0}
-                 )}
-            ]
+        else: children ++ Campfire.Front.Server.children(Campfire.Front.Config.load())
 
     Supervisor.start_link(children, strategy: :one_for_one, name: Campfire.Supervisor)
   end
