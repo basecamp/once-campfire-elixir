@@ -26,7 +26,7 @@ defmodule Campfire.Page do
       content: "",
       footer: "        \n",
       sidebar: "      \n",
-      meta_token: Rails.csrf_mask(Rails.csrf_global(data["_csrf_token"])),
+      meta_token: Campfire.ResponseCache.mask(Rails.csrf_global(data["_csrf_token"])),
       vapid: Assets.html_escape(System.get_env("VAPID_PUBLIC_KEY", "")),
       account_version:
         (account["updated_at"] || "") |> String.replace(~r/[^0-9]/, "") |> String.slice(0, 14)

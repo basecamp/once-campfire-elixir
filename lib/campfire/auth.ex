@@ -15,6 +15,9 @@ defmodule Campfire.Auth do
     end
   end
 
+  def session_user(%{assigns: %{response_cache_auth: {user, session}}} = conn),
+    do: {conn, user, session}
+
   def session_user(conn) do
     case session_lookup(conn) do
       {conn, nil, nil} -> {conn, nil, nil}
@@ -70,6 +73,8 @@ defmodule Campfire.Auth do
         Campfire.RemoteIP.address(conn)
       ]) != nil
   end
+
+  def csrf_session(%{assigns: %{response_cache_csrf: data}} = conn), do: {conn, data}
 
   def csrf_session(conn) do
     conn = fetch_cookies(conn)

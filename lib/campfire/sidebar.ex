@@ -39,7 +39,11 @@ defmodule Campfire.Sidebar do
         |> Enum.reject(&(&1["id"] in excludes))
         |> Enum.take(max(20 - length(excludes), 0))
 
-      token = Rails.csrf_mask(Rails.csrf_form(data["_csrf_token"], "/rooms/directs", "POST"))
+      token =
+        Campfire.ResponseCache.mask(
+          Rails.csrf_form(data["_csrf_token"], "/rooms/directs", "POST")
+        )
+
       account = DB.one("SELECT settings FROM accounts LIMIT 1")
       settings = Jason.decode!(account["settings"] || "{}")
 

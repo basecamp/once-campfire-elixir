@@ -25,7 +25,7 @@ defmodule Campfire.RoomPage do
       true ->
         if room = Chat.room(user, room_id) do
           {conn, data} = Auth.csrf_session(conn)
-          token = Rails.csrf_mask(Rails.csrf_global(data["_csrf_token"]))
+          token = Campfire.ResponseCache.mask(Rails.csrf_global(data["_csrf_token"]))
           messages = messages(room, message_id)
           account = DB.one("SELECT * FROM accounts LIMIT 1")
           gid = Base.url_encode64("gid://campfire/#{room["type"]}/#{room["id"]}", padding: false)
@@ -46,7 +46,7 @@ defmodule Campfire.RoomPage do
             base: Assets.html_escape(Auth.base(conn)),
             meta_token: token,
             form_token:
-              Rails.csrf_mask(
+              Campfire.ResponseCache.mask(
                 Rails.csrf_form(data["_csrf_token"], "/rooms/#{room["id"]}/messages", "POST")
               ),
             vapid: Assets.html_escape(System.get_env("VAPID_PUBLIC_KEY", "")),
@@ -102,7 +102,9 @@ defmodule Campfire.RoomPage do
         join_url: Assets.html_escape(url),
         qr: Base.url_encode64(url),
         join_token:
-          Rails.csrf_mask(Rails.csrf_form(data["_csrf_token"], "/account/join_code", "POST"))
+          Campfire.ResponseCache.mask(
+            Rails.csrf_form(data["_csrf_token"], "/account/join_code", "POST")
+          )
       )
     else
       "    \n"

@@ -53,6 +53,10 @@ defmodule Campfire.FragmentCache do
   end
 
   def fetch(key, render) do
+    if Campfire.ResponseCache.capturing?(), do: render.(), else: cached(key, render)
+  end
+
+  defp cached(key, render) do
     case :ets.lookup(__MODULE__, key) do
       [{^key, html}] ->
         html

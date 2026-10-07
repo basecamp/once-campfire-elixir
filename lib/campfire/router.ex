@@ -19,6 +19,7 @@ defmodule Campfire.Router do
   plug(Campfire.RouteRecognition)
   plug(:match)
   plug(Campfire.BrowserGuard)
+  plug(:response_cache)
   plug(:dispatch)
 
   get("/", do: Campfire.Navigation.welcome(conn))
@@ -435,4 +436,6 @@ defmodule Campfire.Router do
       conn
       |> put_resp_header("content-type", "application/json; charset=UTF-8")
       |> send_resp(404, ~s({"status":404,"error":"Not Found"}))
+
+  defp response_cache(conn, _), do: Campfire.ResponseCache.call(conn, [])
 end

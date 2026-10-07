@@ -10,6 +10,8 @@ defmodule Campfire.Endpoint do
 
     error ->
       respond(conn, error)
+  after
+    Campfire.ResponseCache.finish()
   end
 
   defp respond(conn, error) do
