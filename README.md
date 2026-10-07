@@ -92,7 +92,7 @@ bin/rails-to-elixir doctor
 bin/parity-services stop
 ```
 
-The native suite passes **1,955 tests**. A full **65-gate** parity run covers the
+The native suite passes **1,956 tests**. A full **65-gate** parity run covers the
 reviewed backend; fresh shared browser checks cover the current frontend.
 Verification includes actual
 Chromium flows, all-table/FTS/storage mutation snapshots, injected transaction
@@ -128,6 +128,10 @@ Benchmarks run separately from verification; see [`bench/README.md`](bench/READM
 for the workload, validation and reproduction commands.
 
 ## Known differences
+
+- Message pagination ETags describe the actual rendered body, and omit Last-Modified:
+  compatible SQLite writers can change rich text or related presentation without touching
+  message timestamps. Fresh CSRF masks can therefore produce a new HTML ETag.
 
 - Authenticated room, message-list, sidebar and search HTML bodies use a bounded
   cache: 64 MiB per app, disabled with `CAMPFIRE_RESPONSE_CACHE_MB=0`.

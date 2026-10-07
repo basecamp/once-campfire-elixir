@@ -38,7 +38,13 @@ defmodule Campfire.Messages do
         send_resp(conn, 204, "")
 
       messages ->
-        conn = Campfire.ModelCache.collection(conn, messages)
+        # Foreign SQL can change rich text or creator/boost presentation without
+        # touching message timestamps. HttpResponse hashes the rendered body.
+        conn =
+          conn
+          |> assign(:controller_validator, true)
+          |> put_resp_header("cache-control", "max-age=0, private, must-revalidate")
+
         {conn, data} = Auth.csrf_session(conn)
         token = Campfire.ResponseCache.mask(Rails.csrf_global(data["_csrf_token"]))
 

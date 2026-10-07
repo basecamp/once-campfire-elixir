@@ -180,6 +180,33 @@ defmodule Campfire.ResponseCacheTest do
              "new snapshot"
   end
 
+  test "pagination validators follow actual content after foreign writes without timestamps",
+       context do
+    message = Chat.create_message(context.user, context.room, "before conditional leaf text")
+    path = "/rooms/#{context.room["id"]}/messages"
+    html = [{"accept", "text/html"}]
+    initial = get(context, path, html)
+    assert initial.status == 200
+    [etag] = get_resp_header(initial, "etag")
+
+    :ok =
+      SQL.execute(
+        context.foreign,
+        "UPDATE action_text_rich_texts SET body='foreign conditional leaf text' WHERE record_id=#{message["id"]}"
+      )
+
+    changed = get(context, path, html ++ [{"if-none-match", etag}])
+    assert changed.status == 200
+    assert changed.resp_body =~ "foreign conditional leaf text"
+    refute changed.resp_body =~ "before conditional leaf text"
+    assert get_resp_header(changed, "etag") != [etag]
+    assert get_resp_header(changed, "last-modified") == []
+    dated = get(context, path, html ++ [{"if-modified-since", "Tue, 03 Mar 2099 00:00:00 GMT"}])
+    assert dated.status == 200
+    assert dated.resp_body =~ "foreign conditional leaf text"
+    assert get(context, path, html ++ [{"if-none-match", "*"}]).status == 304
+  end
+
   test "warm bodies never replace current membership or authentication", context do
     path = "/rooms/#{context.room["id"]}"
     assert get(context, path).status == 200

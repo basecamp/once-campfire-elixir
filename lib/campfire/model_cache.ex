@@ -8,48 +8,6 @@ defmodule Campfire.ModelCache do
                    "digest"
                  ]
 
-  @external_resource "vectors/message-etags.json"
-  @messages_digest Jason.decode!(File.read!("vectors/message-etags.json"))["digest"]
-
-  def collection(conn, records) do
-    {_, data} = Campfire.Auth.csrf_session(conn)
-    flash = get_in(data, ["flash", "flashes"]) || %{}
-    keys = Enum.map(records, &cache_key("messages", &1))
-
-    keys =
-      if Enum.any?(Campfire.ResponseFormats.requested(conn), &(&1 in ["html", "all"])),
-        do: keys ++ [@messages_digest],
-        else: keys
-
-    keys = keys ++ Enum.flat_map(flash, fn {name, value} -> [name, to_string(value)] end)
-
-    digest =
-      :crypto.hash(:sha256, Enum.join(keys, "/"))
-      |> Base.encode16(case: :lower)
-      |> binary_part(0, 32)
-
-    modified =
-      records |> Enum.map(& &1["updated_at"]) |> Enum.reject(&is_nil/1) |> Enum.max(fn -> nil end)
-
-    conn =
-      conn
-      |> assign(:controller_validator, true)
-      |> put_resp_header("etag", ~s(W/"#{digest}"))
-      |> put_resp_header("cache-control", "max-age=0, private, must-revalidate")
-
-    if modified do
-      {:ok, datetime, _} = DateTime.from_iso8601(String.replace(modified, " ", "T") <> "Z")
-
-      put_resp_header(
-        conn,
-        "last-modified",
-        Calendar.strftime(datetime, "%a, %d %b %Y %H:%M:%S GMT")
-      )
-    else
-      conn
-    end
-  end
-
   defp cache_key(table, record) do
     version = record["updated_at"] || record["created_at"]
 
