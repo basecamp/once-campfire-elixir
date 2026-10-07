@@ -1,5 +1,18 @@
 # Application benchmarks
 
+Shared response contracts, the load generator, exact write audits and browser flows
+live in [once-campfire-verification](https://github.com/basecamp/once-campfire-verification).
+Clone it alongside this repo and follow its setup instructions. For the maintained HTTP
+comparison, run `ruby bench/compare.rb` (Elixir and Rust by default). Set
+`VERIFICATION_ROOT` to use another checkout location; output stays in its ignored `tmp/bench/`.
+
+The detailed local `bench/run` below retains HTTP, Cable, upload and job-drain checks
+and uses the shared validated client. Its default output is ignored `tmp/bench/results/`.
+It needs the local parity seed and ledger as well as the shared checkout. An explicit
+`LOADGEN` skips the client build; otherwise the launcher builds it in the shared
+checkout's `loadgen/target/` under the invoking UID.
+
+
 `bench/run --apps elixir,rust --reps 4` compares the production images using the
 Rust port's unchanged populated seed. The launcher requires the complete parity
 ledger and a successful complete verification of the current source digest.
@@ -52,7 +65,7 @@ release; profiler timings are diagnostic and are never used as benchmark results
 The toolkit benchmark command measures whole-process primitive wall time rather
 than full application throughput.
 
-The current reader/statement-cache comparison is in
+The historical reader/statement-cache comparison is in
 [`results/native-linux-b6b82e5-cache-115cabc-20261005-http12-nofile65536/`](results/native-linux-b6b82e5-cache-115cabc-20261005-http12-nofile65536/README.md).
 Four balanced rounds on a native amd64 Xeon @ 2.60 GHz Linux orb used four guest
 server CPUs and four separate guest load-generator CPUs, twelve-second HTTP cells,

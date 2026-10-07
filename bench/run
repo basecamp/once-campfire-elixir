@@ -8,7 +8,7 @@
 # copy of parity/.seed/default, a fresh container pinned to SERVER_CPUS, then cold start, idle
 # memory, the HTTP suite, the Action Cable fan-out suite and the upload suite, with container
 # memory sampled throughout and each process's memory, by role, during the fan-out
-# (bench/lib/procmem.py). The load generator (bench/loadgen) runs pinned to LOADGEN_CPUS. Before
+# (bench/lib/procmem.py). The shared verification load generator runs pinned to LOADGEN_CPUS. Before
 # each app's run it waits (up to LOAD_WAIT_SECS) for the 1-minute load average to drop below
 # LOAD_MAX, and records it.
 #
@@ -34,6 +34,7 @@ set -euo pipefail
 
 ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 BENCH=$ROOT/bench
+VERIFICATION_ROOT=${VERIFICATION_ROOT:-$(dirname "$ROOT")/once-campfire-verification}
 RUST_ROOT=${RUST_ROOT:-$(dirname "$ROOT")/once-campfire-rust}
 SEED=${SEED:-$ROOT/parity/.seed/default}
 LABELS=$SEED/labels.json
@@ -70,7 +71,7 @@ suite() { [[ " $SUITES " = *" $1 "* ]]; }
 # 1c22a94 fixed; the app now runs as configured.
 RUST_EXTRA_ENV=${RUST_EXTRA_ENV-}
 BASE=http://127.0.0.1:$PORT
-LOADGEN=${LOADGEN:-$ROOT/target/bench/release/loadgen}
+LOADGEN=${LOADGEN:-$VERIFICATION_ROOT/loadgen/target/release/loadgen}
 LOADGEN_BUILD_IMAGE=${LOADGEN_BUILD_IMAGE:-rust:1.98.1-slim}
 LOADGEN_CARGO_HOME=${LOADGEN_CARGO_HOME:-/tmp/campfire-bench-cargo}
 
@@ -84,7 +85,7 @@ while [ $# -gt 0 ]; do
     *) echo "unknown option $1" >&2; exit 2 ;;
   esac
 done
-OUT=${OUT:-$BENCH/results/$(date +%Y%m%d-%H%M%S)}
+OUT=${OUT:-$ROOT/tmp/bench/results/$(date +%Y%m%d-%H%M%S)}
 if [ -d "$OUT" ] && [ -n "$(find "$OUT" -mindepth 1 -maxdepth 1 -print -quit)" ]; then
   echo "refusing to overwrite non-empty result directory: $OUT" >&2
   exit 1
@@ -150,12 +151,12 @@ for port in ports:
   try:s.bind(('127.0.0.1',port))
   except OSError:raise SystemExit(f'Benchmark port {port} is already occupied')
 PYPORT
-if [ "$LOADGEN" = "$ROOT/target/bench/release/loadgen" ]; then
-mkdir -p "$LOADGEN_CARGO_HOME"
-docker run --rm --user "$(id -u):$(id -g)" \
-  -e CARGO_HOME=/cargo -e CARGO_TARGET_DIR=/app/target/bench \
-  -v "$LOADGEN_CARGO_HOME:/cargo" -v "$ROOT:/app" -w /app/bench/loadgen \
-  "$LOADGEN_BUILD_IMAGE" cargo build --release --locked
+if [ "$LOADGEN" = "$VERIFICATION_ROOT/loadgen/target/release/loadgen" ]; then
+  mkdir -p "$LOADGEN_CARGO_HOME" "$VERIFICATION_ROOT/loadgen/target"
+  docker run --rm --user "$(id -u):$(id -g)" \
+    -e CARGO_HOME=/cargo -e CARGO_TARGET_DIR=/verification/loadgen/target \
+    -v "$LOADGEN_CARGO_HOME:/cargo" -v "$VERIFICATION_ROOT:/verification" -w /verification/loadgen \
+    "$LOADGEN_BUILD_IMAGE" cargo build --release --locked
 fi
 
 ROOM=$(label rooms.watercooler)        # the busy room (131 messages)
@@ -378,16 +379,22 @@ PY
 
 {
   echo "date: $(date -Is)"
+  echo "shared verification source: $(git -C "$VERIFICATION_ROOT" rev-parse HEAD) (dirty: $(git -C "$VERIFICATION_ROOT" status --porcelain -- bench loadgen browser | wc -l) files)"
+  echo "shared response gates sha256: $(sha256sum "$VERIFICATION_ROOT/bench/contracts.rb" "$VERIFICATION_ROOT/bench/check_sample.rb" "$VERIFICATION_ROOT/bench/validate_acks.rb" | sha256sum)"
   echo "host: $(uname -r), $(grep -m1 'model name' /proc/cpuinfo | cut -d: -f2 | xargs), $(nproc) threads, $(free -g | awk '/Mem:/{print $2}')GB"
   echo "server cpus: $SERVER_CPUS (nproc $(taskset -c "$SERVER_CPUS" nproc)); loadgen cpus: $LOADGEN_CPUS; network: $NETWORK"
   echo "env: $(env_args | grep -E 'WEB_CONC|JOB_CONC|MAX_THREADS' | paste -sd' ' -)"
   echo "seed sha256: $(sha256sum "$SEED/db/production.sqlite3")"
   echo "seed tree sha256: $(cd "$SEED" && find . -type f -print0 | sort -z | xargs -0 sha256sum | sha256sum)"
   echo "loadgen sha256: $(sha256sum "$LOADGEN")"
-  echo "loadgen build image: $(docker image inspect -f '{{index .RepoDigests 0}}' "$LOADGEN_BUILD_IMAGE")"
+  if [ "$LOADGEN" = "$VERIFICATION_ROOT/loadgen/target/release/loadgen" ]; then
+    echo "loadgen build image: $(docker image inspect -f '{{index .RepoDigests 0}}' "$LOADGEN_BUILD_IMAGE")"
+  else
+    echo "loadgen build image: external LOADGEN override"
+  fi
   echo "docker runtime: $(docker version -f '{{.Server.Version}}')"
   echo "benchmark source: $(git -C "$ROOT" rev-parse HEAD) (bench dirty: $(git -C "$ROOT" status --porcelain -- bench | wc -l) files)"
-  echo "benchmark harness sha256: $(sha256sum "$BENCH/run" "$BENCH/report" "$BENCH/validate.py" "$BENCH/validate-results.py" "$BENCH/job-state.py" "$BENCH/loadgen/src/main.rs" "$BENCH/loadgen/Cargo.toml" "$BENCH/loadgen/Cargo.lock" | sha256sum)"
+  echo "benchmark harness sha256: $(sha256sum "$BENCH/run" "$BENCH/report" "$BENCH/validate.py" "$BENCH/validate-results.py" "$BENCH/job-state.py" "$VERIFICATION_ROOT/loadgen/src/main.rs" "$VERIFICATION_ROOT/loadgen/src/validation.rs" "$VERIFICATION_ROOT/loadgen/Cargo.toml" "$VERIFICATION_ROOT/loadgen/Cargo.lock" | sha256sum)"
   echo "elixir source digest: $(python3 "$BENCH/validate.py" digest)"
   echo "rust extra env:${RUST_EXTRA_ENV:+ $RUST_EXTRA_ENV}"
   echo "workload: suites=$SUITES HTTP_SECS=$HTTP_SECS HTTP_CONCS=$HTTP_CONCS CABLE_CLIENTS=$CABLE_CLIENTS CABLE_TPUT_SECS=$CABLE_TPUT_SECS CABLE_POSTERS=$CABLE_POSTERS UPLOAD_REPS=$UPLOAD_REPS REPS=$REPS"

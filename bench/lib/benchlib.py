@@ -1,5 +1,5 @@
 """Shared pieces for bench/attrib and bench/profile: start the Rust app in one of several serving
-configurations, drive bench/loadgen against it, and account CPU and memory per process.
+configurations, drive the shared verification load generator against it, and account CPU and memory per process.
 
 Configurations (see `start`):
 
@@ -20,7 +20,8 @@ ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 BENCH = os.path.join(ROOT, "bench")
 SEED = os.path.join(ROOT, "parity", ".seed", "default")
 ENV_FILE = os.path.join(ROOT, "parity", ".env.reference")
-LOADGEN = os.path.join(ROOT, "target", "bench", "release", "loadgen")
+VERIFICATION_ROOT = os.path.abspath(os.environ.get("VERIFICATION_ROOT", os.path.join(os.path.dirname(ROOT), "once-campfire-verification")))
+LOADGEN = os.environ.get("LOADGEN", os.path.join(VERIFICATION_ROOT, "loadgen", "target", "release", "loadgen"))
 
 SERVER_CPUS = os.environ.get("SERVER_CPUS", "8-11")
 LOADGEN_CPUS = os.environ.get("LOADGEN_CPUS", "12-15")
@@ -44,8 +45,11 @@ def loadavg():
 
 
 def build_loadgen():
-    subprocess.run(["cargo", "build", "--release", "-q"], cwd=os.path.join(BENCH, "loadgen"), check=True,
-                   env={**os.environ, "CARGO_TARGET_DIR": os.path.join(ROOT, "target", "bench")})
+    if "LOADGEN" in os.environ:
+        return
+    subprocess.run(["cargo", "build", "--release", "--locked", "-q",
+                    "--target-dir", os.path.join(VERIFICATION_ROOT, "loadgen", "target")],
+                   cwd=os.path.join(VERIFICATION_ROOT, "loadgen"), check=True)
 
 
 # --- Seed ------------------------------------------------------------------------------------

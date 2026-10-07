@@ -3,7 +3,7 @@
 import argparse,json,os,pathlib,shutil,socket,sqlite3,subprocess,time,urllib.request
 parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--suite',choices=['http','write','cable'],default='http');options=parser.parse_args()
 ROOT=pathlib.Path(__file__).resolve().parents[1];SEED=pathlib.Path(os.environ.get('SEED',ROOT/'parity/.seed/default'))
-PORT=47140;NAME='campfire-elixir-profile';WORK=ROOT/'bench/.work/profile';OUT=pathlib.Path(os.environ.get('PROFILE_OUT',ROOT/('bench/results/profile-'+options.suite)));OUT.mkdir(parents=True,exist_ok=True)
+PORT=47140;NAME='campfire-elixir-profile';WORK=ROOT/'bench/.work/profile';OUT=pathlib.Path(os.environ.get('PROFILE_OUT',ROOT/('tmp/bench/profile-'+options.suite)));OUT.mkdir(parents=True,exist_ok=True)
 SERVER_CPUS=os.environ.get('SERVER_CPUS','8-11');LOADGEN_CPUS=os.environ.get('LOADGEN_CPUS','12-15');IMAGE=os.environ.get('PROFILE_IMAGE','campfire-elixir:release')
 def run(argv,**kw):
  r=subprocess.run(list(map(str,argv)),capture_output=True,text=True,**kw)
@@ -18,7 +18,9 @@ if WORK.exists():shutil.rmtree(WORK)
 shutil.copytree(SEED,WORK)
 with sqlite3.connect(WORK/'db/production.sqlite3') as db:
  db.execute("UPDATE push_subscriptions SET endpoint='https://127.0.0.1:9/push/'||id");db.execute("UPDATE webhooks SET url='http://127.0.0.1:9/hook/'||id")
-labels=json.loads((SEED/'labels.json').read_text());base=f'http://127.0.0.1:{PORT}';room=labels['rooms.watercooler'];lg=ROOT/'target/bench/release/loadgen'
+labels=json.loads((SEED/'labels.json').read_text());base=f'http://127.0.0.1:{PORT}';room=labels['rooms.watercooler']
+verification=pathlib.Path(os.environ.get('VERIFICATION_ROOT',ROOT.parent/'once-campfire-verification')).resolve()
+lg=pathlib.Path(os.environ.get('LOADGEN',verification/'loadgen/target/release/loadgen'))
 def load(*args):return run(['taskset','-c',LOADGEN_CPUS,lg,*args])
 try:
  run(['docker','run','-d','--name',NAME,'--network','host','--cpuset-cpus',SERVER_CPUS,'--user',f'{os.getuid()}:{os.getgid()}','--env-file',ROOT/'parity/reference.env','-e',f'PORT={PORT}','-v',f'{WORK}/db:/rails/storage/db','-v',f'{WORK}/storage:/rails/storage/files',IMAGE])

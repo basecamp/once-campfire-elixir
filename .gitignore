@@ -24,3 +24,5 @@ __pycache__/
 !/parity/checkpoints/20261005-statement-cache/
 /parity/checkpoints/20261005-statement-cache/*
 !/parity/checkpoints/20261005-statement-cache/README.md
+
+/tmp/
