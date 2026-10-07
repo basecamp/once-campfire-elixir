@@ -131,6 +131,29 @@ defmodule Campfire.SessionsTest do
            }).status == 429
   end
 
+  test "transfer GET renders one complete auto-submit form without signing in" do
+    before = DB.one("SELECT COUNT(*) AS n FROM sessions")["n"]
+    page = conn(:get, "/session/transfers/example") |> Router.call(Router.init([]))
+    assert page.status == 200
+
+    assert length(Regex.scan(~r/<form\b/, page.resp_body)) ==
+             length(Regex.scan(~r/<\/form>/, page.resp_body))
+
+    assert length(
+             Regex.scan(
+               ~r/<form\b[^>]*data-controller="auto-submit"[^>]*>(?:\s*<input\b[^>]*>)*\s*<\/form>/,
+               page.resp_body
+             )
+           ) == 1
+
+    assert page.resp_body =~
+             ~r/<form[^>]*data-controller="auto-submit"[^>]*action="\/session\/transfers\/example"/
+
+    assert page.resp_body =~ ~r/name="_method" value="put"[^>]*>.*?<\/form>/s
+    refute Map.has_key?(page.resp_cookies, "session_token")
+    assert DB.one("SELECT COUNT(*) AS n FROM sessions")["n"] == before
+  end
+
   test "transfer requires purpose, unexpired signature and active user" do
     good = Rails.signed_id("User", 127_326_141, "transfer", "2026-03-02T20:00:00Z")
     assert csrf_post(:put, "/session/transfers/" <> good, %{}).status == 302

@@ -125,6 +125,10 @@ for the workload, validation and reproduction commands.
 
 ## Known differences
 
+- Session-transfer auto-submit forms explicitly close their form tag; the pinned Rails
+  reference omitted it.
+- Background sidebar refreshes preserve an open New Ping form and selected recipients.
+
 - Direct-ping autocomplete explicitly requests JSON, repairing the inherited fetch-header bug.
 
 - Sidebar connection refresh waits for the current Turbo frame to finish loading,
