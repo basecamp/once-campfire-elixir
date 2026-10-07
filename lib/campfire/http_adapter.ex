@@ -53,7 +53,7 @@ defmodule Campfire.HttpAdapter do
   defp compress_file(_, remaining, _, adapter, first) when remaining <= 0, do: {adapter, first}
 
   defp compress_file(file, remaining, z, adapter, first) do
-    case IO.binread(file, min(remaining, 16384)) do
+    case IO.binread(file, min(remaining, 16_384)) do
       :eof ->
         {adapter, first}
 

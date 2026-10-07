@@ -4,6 +4,7 @@ import hashlib,json,os,re,shutil,sqlite3,subprocess,time
 from sessions import ROOT,request
 from contextlib import closing
 BASE=ROOT/'var/fresh-install'
+CPUS=os.environ.get('PARITY_CPUS',','.join(map(str,sorted(os.sched_getaffinity(0)))))
 def docker(*args,check=True):return subprocess.run(['docker',*map(str,args)],capture_output=True,text=True,check=check)
 def snapshot(path):
  with closing(sqlite3.connect(path)) as db, db:
@@ -17,7 +18,7 @@ def run(side,port):
  if folder.exists():shutil.rmtree(folder)
  folder.mkdir(parents=True);(folder/'db').mkdir();(folder/'files').mkdir();(folder/'backups').mkdir()
  image='campfire-reference:app' if side=='reference' else 'campfire-elixir:release'
- docker('run','-d','--name',name,'--cpuset-cpus','8-11','--user',f'{os.getuid()}:{os.getgid()}','--env-file',ROOT/'parity/reference.env','-p',f'127.0.0.1:{port}:'+'80','-v',f'{folder}:/rails/storage',image)
+ docker('run','-d','--name',name,'--cpuset-cpus',CPUS,'--user',f'{os.getuid()}:{os.getgid()}','--env-file',ROOT/'parity/reference.env','-p',f'127.0.0.1:{port}:'+'80','-v',f'{folder}:/rails/storage',image)
  path=folder/'db/production.sqlite3'
  try:
   for _ in range(300):

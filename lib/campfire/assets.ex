@@ -1,9 +1,17 @@
 defmodule Campfire.Assets do
-  @external_resource "priv/static/assets/.manifest.json"
-  @manifest Jason.decode!(File.read!(@external_resource))
+  @manifest_file "priv/static/assets/.manifest.json"
+  @layout_file "priv/templates/application.html.eex"
+  @external_resource @manifest_file
+  @external_resource @layout_file
+  unless File.regular?(@manifest_file) do
+    raise "Missing #{@manifest_file}. Run bin/setup-local for native development " <>
+            "or bin/export-assets with the pinned Docker reference image (see README)."
+  end
+
+  @manifest Jason.decode!(File.read!(@manifest_file))
   @preloads Regex.scan(
               ~r/Assets.path\("([^"]+\.css)"\)/,
-              File.read!("priv/templates/application.html.eex")
+              File.read!(@layout_file)
             )
             |> Enum.map(fn [_, logical] ->
               "</assets/" <>

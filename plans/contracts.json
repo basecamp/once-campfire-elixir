@@ -164,14 +164,16 @@
     }
   ],
   "complete": true,
-  "benchmark_status": "complete: two balanced validated baseline rounds and two balanced validated tuned rounds per app; remaining Rust capacity gap retained",
-  "verified_at": "2026-10-04T11:35:55.266334+00:00",
-  "source_digest": "ad793a949fb8bc0f03f370a2b562b9226f3e86d9304fc4be6110ea72b0179056",
+  "benchmark_status": "complete: frozen candidate measured in four balanced rounds per build; clean native x86_64 run regressed, ARM64 shared-host observations failed the drained-job audit",
+  "verified_at": "2026-10-05T07:38:42.478150+00:00",
+  "source_digest": "41b6eca0b581d7de06e82019648c4f71d316bcc552eaeb1edd8461223e6849b4",
   "comparison_rules": "plans/richtext-comparison.md",
   "benchmark_evidence": [
     "bench/results/baseline-20261004/report.md",
     "bench/results/tuned-fifo-20261004/report.md",
     "bench/results/tuning-comparison.md",
-    "bench/TUNING.md"
+    "bench/TUNING.md",
+    "bench/results/native-linux-b6b82e5-cache-115cabc-20261005-http12-nofile65536/README.md",
+    "bench/results/native-linux-b6b82e5-cache-115cabc-20261005-http12-nofile65536/comparison.md"
   ]
 }

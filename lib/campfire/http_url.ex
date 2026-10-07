@@ -7,7 +7,7 @@ defmodule Campfire.HttpURL do
     else
       uri = URI.parse(url)
       scheme = String.downcase(uri.scheme || "")
-      authority = uri.authority || ""
+      authority = uri |> Map.from_struct() |> Map.get(:authority) || ""
 
       port =
         if String.contains?(authority, "]"),

@@ -1,6 +1,6 @@
 defmodule Campfire.Sessions do
   import Plug.Conn
-  alias Campfire.{Auth, Assets, DB, Rails}
+  alias Campfire.{Assets, Auth, DB, Rails}
   require EEx
   EEx.function_from_file(:defp, :layout_html, "priv/templates/session.html.eex", [:assigns])
   EEx.function_from_file(:defp, :login_html, "priv/templates/login.html.eex", [:assigns])

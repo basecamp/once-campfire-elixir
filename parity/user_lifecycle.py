@@ -1,9 +1,23 @@
 #!/usr/bin/env python3
 """Ban/unban/deactivate effects on all active sockets, old cookies and persistent policy."""
-import difflib,json,re,sqlite3,subprocess
+import base64,difflib,json,re,sqlite3,subprocess,time
 from sessions import ROOT,request
 from websocket import WebSocket
 from drain_jobs import drain
+
+def wait_for_disconnect_bridge(side,user_id):
+ encoded=base64.urlsafe_b64encode(f'gid://campfire/User/{user_id}'.encode()).decode().rstrip('=')
+ channel='campfire_production:action_cable/'+encoded
+ deadline=time.monotonic()+5
+ while time.monotonic()<deadline:
+  if side=='reference':
+   output=subprocess.check_output(['docker','exec','campfire-elixir-redis','redis-cli','-p','47079','PUBSUB','NUMSUB',channel],text=True).splitlines()
+   ready=int(output[-1])>0
+  else:
+   ready=int(subprocess.check_output(['docker','exec','campfire-elixir-redis','redis-cli','-p','47079','PUBSUB','NUMPAT'],text=True))>0
+  if ready:return
+  time.sleep(.01)
+ raise AssertionError(f'{side} disconnect bridge did not subscribe')
 
 def run(side,port):
  subprocess.run([str(ROOT/'bin/parity-services'),'reset',side],check=True)
@@ -31,6 +45,7 @@ def run(side,port):
   sessions=[login(email,'198.51.100.9') for _ in range(2)];sockets=[]
   for jar,_,_ in sessions:
    sock=WebSocket(port,jar);assert sock.receive()=={'type':'welcome'};_,status=sock.subscribe({'channel':'HeartbeatChannel'});assert status=='confirm_subscription';sockets.append(sock)
+  wait_for_disconnect_bridge(side,target)
   action('/users/'+str(target)+'/ban','POST') if stage=='ban' else action('/account/users/'+str(target),'DELETE')
   result[stage]={'disconnects':[sock.receive() for sock in sockets],'old_sessions':[request(port,'/account/edit',cookies=jar,headers=h)[0] for jar,_,h in sessions],'state':snapshot()}
   assert result[stage]['disconnects']==[{'type':'disconnect','reason':'remote','reconnect':False}]*2

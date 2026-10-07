@@ -252,7 +252,7 @@ defmodule Campfire.Network do
         {:ok, IO.iodata_to_binary(parts)}
       else
         with {:ok, buffer} <- at_least(socket, transport, timeout, buffer, length + 2),
-             <<chunk::binary-size(length), "\r\n", rest::binary>> <- buffer do
+             <<chunk::binary-size(^length), "\r\n", rest::binary>> <- buffer do
           receive_chunks(socket, transport, timeout, rest, [parts, chunk], size + length, limit)
         else
           error -> error

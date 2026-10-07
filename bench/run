@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Benchmark the Elixir and Rust ports on the same Rails seed and CPUs.
+# Benchmark production images on the same Rails seed and CPUs.
 #
 #   bench/run [--apps elixir,rust[,reference]] [--reps 4] [--out DIR] [--user-agent UA]
 #   bench/report DIR            # median + spread table from a results dir
@@ -35,13 +35,17 @@ set -euo pipefail
 ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 BENCH=$ROOT/bench
 RUST_ROOT=${RUST_ROOT:-/home/dhh/Work/basecamp/once-campfire-rust}
-SEED=$RUST_ROOT/parity/.seed/default
+SEED=${SEED:-$ROOT/parity/.seed/default}
 LABELS=$SEED/labels.json
 ENV_FILE=$ROOT/parity/reference.env
 
 REFERENCE_IMAGE=${REFERENCE_IMAGE:-campfire-reference:app}
 RUST_IMAGE=${RUST_IMAGE:-campfire-rust:app}
 ELIXIR_IMAGE=${ELIXIR_IMAGE:-campfire-elixir:release}
+BASELINE_IMAGE=${BASELINE_IMAGE:-campfire-elixir:baseline}
+CANDIDATE_IMAGE=${CANDIDATE_IMAGE:-campfire-elixir:candidate}
+BASELINE_SHA=${BASELINE_SHA:-unknown}
+CANDIDATE_SHA=${CANDIDATE_SHA:-unknown}
 GO_IMAGE=${GO_IMAGE:-once-campfire-go:optimized}
 GO_ROOT=${GO_ROOT:-$(dirname "$ROOT")/once-campfire-go}
 SERVER_CPUS=${SERVER_CPUS:-8-11}
@@ -52,6 +56,8 @@ CABLE_CLIENTS=${CABLE_CLIENTS:-100 500 1000}
 CABLE_TPUT_SECS=${CABLE_TPUT_SECS:-15}
 CABLE_POSTERS=${CABLE_POSTERS:-4}
 UPLOAD_REPS=${UPLOAD_REPS:-5}
+JOB_DRAIN_SECS=${JOB_DRAIN_SECS:-120}
+NOFILE=${NOFILE:-65536}
 PORT=${PORT:-47130}
 NETWORK=${NETWORK:-host}
 LOAD_MAX=${LOAD_MAX:-1.5}
@@ -65,6 +71,8 @@ suite() { [[ " $SUITES " = *" $1 "* ]]; }
 RUST_EXTRA_ENV=${RUST_EXTRA_ENV-}
 BASE=http://127.0.0.1:$PORT
 LOADGEN=$ROOT/target/bench/release/loadgen
+LOADGEN_BUILD_IMAGE=${LOADGEN_BUILD_IMAGE:-rust:1.98.1-slim}
+LOADGEN_CARGO_HOME=${LOADGEN_CARGO_HOME:-/tmp/campfire-bench-cargo}
 
 APPS=elixir,rust REPS=4 OUT="" USER_AGENT_ARGS=()
 while [ $# -gt 0 ]; do
@@ -77,20 +85,51 @@ while [ $# -gt 0 ]; do
   esac
 done
 OUT=${OUT:-$BENCH/results/$(date +%Y%m%d-%H%M%S)}
-mkdir -p "$OUT"
+if [ -d "$OUT" ] && [ -n "$(find "$OUT" -mindepth 1 -maxdepth 1 -print -quit)" ]; then
+  echo "refusing to overwrite non-empty result directory: $OUT" >&2
+  exit 1
+fi
+mkdir -p "$OUT/raw"
 WORK=$BENCH/.work
 CONTAINER=bench-campfire-elixir-$PORT
+
+python3 - "$OUT/manifest.json" "$APPS" "$REPS" "$SUITES" "$HTTP_CONCS" "$CABLE_CLIENTS" "$UPLOAD_REPS" <<'PY'
+import json, sys
+path, apps, reps, suites, concs, clients, uploads = sys.argv[1:]
+json.dump({
+  "schema_version": 2, "status": "running", "complete": False,
+  "expected": {
+    "apps": apps.split(','), "reps": int(reps), "suites": suites.split(),
+    "http_routes": ["room_show", "messages_page", "sidebar", "search", "avatar", "static_css", "up", "post_message"],
+    "http_concs": [int(x) for x in concs.split()], "cable_clients": [int(x) for x in clients.split()],
+    "upload_reps": int(uploads)
+  }
+}, open(path, "w"), indent=2)
+open(path, "a").write("\n")
+PY
 
 log() { echo "[$(date +%T)] $*" >&2; }
 label() { python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))[sys.argv[2]])' "$LABELS" "$1"; }
 lg() { taskset -c "$LOADGEN_CPUS" "$LOADGEN" "$@" "${USER_AGENT_ARGS[@]}"; }
 
 teardown() {
+  local status=$?
   [ -n "${SAMPLER:-}" ] && kill "$SAMPLER" 2>/dev/null || true
   [ -n "${PROCMEM:-}" ] && kill "$PROCMEM" 2>/dev/null || true
   docker rm -f "$CONTAINER" >/dev/null 2>&1 || true
+  python3 "$BENCH/validate-results.py" interrupt "$OUT" 2>/dev/null || true
+  return "$status"
 }
-trap teardown EXIT INT TERM
+trap teardown EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
+
+python3 "$BENCH/validate-results.py" matrix "$OUT"
+
+if ! ulimit -n "$NOFILE" 2>/dev/null || [ "$(ulimit -n)" -lt "$NOFILE" ]; then
+  echo "load generator requires nofile >= $NOFILE (got $(ulimit -n))" >&2
+  exit 1
+fi
 
 python3 "$BENCH/validate.py" ledger
 python3 - "$PORT" "$NETWORK" <<'PYPORT'
@@ -103,7 +142,11 @@ for port in ports:
   try:s.bind(('127.0.0.1',port))
   except OSError:raise SystemExit(f'Benchmark port {port} is already occupied')
 PYPORT
-(cd "$BENCH/loadgen" && CARGO_TARGET_DIR=$ROOT/target/bench mise exec rust@1.98.1 -- cargo build --release --locked --offline -q)
+mkdir -p "$LOADGEN_CARGO_HOME"
+docker run --rm --user "$(id -u):$(id -g)" \
+  -e CARGO_HOME=/cargo -e CARGO_TARGET_DIR=/app/target/bench \
+  -v "$LOADGEN_CARGO_HOME:/cargo" -v "$ROOT:/app" -w /app/bench/loadgen \
+  "$LOADGEN_BUILD_IMAGE" cargo build --release --locked
 
 ROOM=$(label rooms.watercooler)        # the busy room (131 messages)
 WRITE_ROOM=$(label rooms.hq)           # writes and uploads go here, so the busy room stays put
@@ -112,14 +155,14 @@ AVATAR=$(label avatar_tokens.jason)    # image avatar
 EMAIL=$(label emails.david)
 PASSWORD=$(label passwords.all)
 
-image_for() { case "$1" in reference) echo "$REFERENCE_IMAGE" ;; elixir) echo "$ELIXIR_IMAGE" ;; go) echo "$GO_IMAGE" ;; rust|rust-identity) echo "$RUST_IMAGE" ;; esac; }
+image_for() { case "$1" in reference) echo "$REFERENCE_IMAGE" ;; baseline) echo "$BASELINE_IMAGE" ;; candidate) echo "$CANDIDATE_IMAGE" ;; elixir) echo "$ELIXIR_IMAGE" ;; go) echo "$GO_IMAGE" ;; rust|rust-identity) echo "$RUST_IMAGE" ;; esac; }
 
 # Environment: parity/.env.reference, but with the reference's *default* process model for
 # SERVER_CPUS (config/puma.rb: workers = ceil(nproc * 0.666), JOB_CONCURRENCY the same, 5 threads;
 # config/resque-pool.yml: ceil(nproc * 0.5) Resque workers). The Rust app reads RAILS_MAX_THREADS
 # (reader pool) and JOB_CONCURRENCY (job workers) the same way; it is always one process.
 env_args() {
-  if [ "${1:-}" = elixir ]; then printf '%s\n' -e "PORT=$PORT"; fi
+  if [[ "${1:-}" =~ ^(baseline|candidate|elixir)$ ]]; then printf '%s\n' -e "PORT=$PORT"; fi
   local ncpu; ncpu=$(taskset -c "$SERVER_CPUS" nproc)
   local workers=$(( (ncpu * 666 + 999) / 1000 ))
   grep -Ev '^(#|$|WEB_CONCURRENCY|JOB_CONCURRENCY|RAILS_MAX_THREADS|RAILS_LOG_LEVEL)' "$ENV_FILE" | sed 's/^/-e\n/'
@@ -140,7 +183,12 @@ db.commit()
 PY
 }
 
-cgroup_dir() { echo "/sys/fs/cgroup/system.slice/docker-$(docker inspect -f '{{.Id}}' "$CONTAINER").scope"; }
+cgroup_dir() {
+  local pid relative
+  pid=$(docker inspect -f '{{.State.Pid}}' "$CONTAINER")
+  relative=$(cut -d: -f3 "/proc/$pid/cgroup")
+  echo "/sys/fs/cgroup$relative"
+}
 mem_anon() { awk '$1=="anon"{print $2}' "$1/memory.stat"; }
 
 # Samples memory.current and anon every 200ms, keeping the maxima in $1.
@@ -172,6 +220,7 @@ start_app() {
   local net=(--network host -e "HTTP_PORT=$PORT" -e "TARGET_PORT=$((PORT + 1))")
   [ "$NETWORK" = bridge ] && net=(--dns 127.0.0.1 -p "127.0.0.1:$PORT:80")
   docker run -d --name "$CONTAINER" --cpuset-cpus "$SERVER_CPUS" --user "$(id -u):$(id -g)" \
+    --ulimit "nofile=$NOFILE:$NOFILE" \
     "${net[@]}" "${args[@]}" \
     -v "$dir/db:/rails/storage/db" -v "$dir/storage:/rails/storage/files" \
     "$(image_for "$app")" >/dev/null
@@ -191,6 +240,10 @@ wait_for_quiet() {
     sleep 10; waited=$((waited + 10))
   done
   log "load before run: $(cut -d' ' -f1-3 /proc/loadavg) (waited ${waited}s)"
+  if awk -v max="$LOAD_MAX" '{exit !($1 >= max)}' /proc/loadavg; then
+    echo "load average remained at or above $LOAD_MAX after ${waited}s" >&2
+    return 1
+  fi
 }
 
 run_rep() {
@@ -236,6 +289,7 @@ run_rep() {
       local cpu_before; cpu_before=$(awk '$1=="usage_usec" {print $2}' "$cg/cpu.stat")
       local res; res=$(lg http --base "$BASE" --cookie "$cookie" "${args[@]}" --conc "$c" --duration "$HTTP_SECS")
       local cpu_after; cpu_after=$(awk '$1=="usage_usec" {print $2}' "$cg/cpu.stat")
+      printf '%s\n' "$res" > "$OUT/raw/$app-$rep-http-$name-c$c.json"
       res=$(python3 -c 'import json,sys; r=json.loads(sys.argv[1]); assert r["errors"]==0 and r.get("invalid_responses",0)==0 and set(r["statuses"])=={"200"}, r; r["cpu_us_per_success"]=(int(sys.argv[3])-int(sys.argv[2]))/r["ok"]; print(json.dumps(r))' "$res" "$cpu_before" "$cpu_after")
       http_json=$(python3 -c 'import json,sys; a=json.loads(sys.argv[1]); r=json.loads(sys.argv[2]); r["route"]=sys.argv[3]; a.append(r); print(json.dumps(a))' "$http_json" "$res" "$name")
       log "$app rep $rep: $name c=$c $(python3 -c 'import json,sys; r=json.loads(sys.argv[1]); print(r["rps"], "rps p50", r["latency"].get("p50_ms"), "p99", r["latency"].get("p99_ms"), r["statuses"], "err", r["errors"])' "$res")"
@@ -249,10 +303,11 @@ run_rep() {
     taskset -c "$PROCMEM_CPUS" python3 "$BENCH/lib/procmem.py" sample "$cg" "$pm.jsonl" & PROCMEM=$!
     local res; res=$(lg cable --base "$BASE" --cookie "$cookie" --room "$ROOM" --csrf "$csrf" --streams "$streams" \
       --clients "$n" --tput-secs "$CABLE_TPUT_SECS" --posters "$CABLE_POSTERS" 2> "$pm.stderr")
+    printf '%s\n' "$res" > "$OUT/raw/$app-$rep-cable-$n.json"
     sleep 0.5; kill "$PROCMEM" 2>/dev/null || true; wait "$PROCMEM" 2>/dev/null || true; PROCMEM=""
     res=$(python3 -c 'import json,sys; r=json.loads(sys.argv[1]); r["process_memory"]=json.loads(sys.argv[2]); print(json.dumps(r))' \
       "$res" "$(python3 "$BENCH/lib/procmem.py" phases "$pm.jsonl" "$pm.stderr")")
-    python3 -c 'import json,sys; r=json.loads(sys.argv[1]); assert r["ready"]==r["clients"] and r["failed"]==0 and r["latency"]["complete"]==r["latency"]["messages"] and r["throughput"]["complete"]==r["throughput"]["posted"],r' "$res"
+    python3 -c 'import json,sys; r=json.loads(sys.argv[1]); p=r["latency"]; t=r["throughput"]; assert r["ready"]==r["clients"] and r["failed"]==0 and p["messages"]>0 and p["post_attempts"]==p["post_successes"]==p["complete"]==p["messages"] and p["post_errors"]==0 and t["post_attempts"]==t["posted"]==t["complete"]>0 and t["post_errors"]==0,r' "$res"
     cable_json=$(python3 -c 'import json,sys; a=json.loads(sys.argv[1]); a.append(json.loads(sys.argv[2])); print(json.dumps(a))' "$cable_json" "$res")
     log "$app rep $rep: cable $n clients $(python3 -c 'import json,sys; r=json.loads(sys.argv[1]); print("ready", r["ready"], "lat all p50", r["latency"]["all_clients"].get("p50_ms"), "p99", r["latency"]["all_clients"].get("p99_ms"), "tput", r["throughput"]["delivered_msgs_per_sec"], "msg/s", r["throughput"]["complete"], "/", r["throughput"]["posted"])' "$res")"
     sleep 2
@@ -261,20 +316,30 @@ run_rep() {
   if [ "$app" != rust-identity ] && suite upload; then
     upload_json=$(lg upload --base "$BASE" --cookie "$cookie" --room "$WRITE_ROOM" --csrf "$csrf" \
       --file "$ROOT/reference/test/fixtures/files/black_hole.jpg" --reps "$UPLOAD_REPS")
-    python3 -c 'import json,sys; r=json.loads(sys.argv[1]); assert all(x.get("post_status")==200 and x.get("thumb_status")==200 and x.get("thumb_bytes",0)>100 and "error" not in x for x in r["runs"]),r' "$upload_json"
+    printf '%s\n' "$upload_json" > "$OUT/raw/$app-$rep-upload.json"
+    python3 -c 'import json,sys; r=json.loads(sys.argv[1]); assert len(r["runs"])==int(sys.argv[2]) and len(r["runs"])>0 and all(x.get("post_status")==200 and x.get("thumb_status")==200 and x.get("thumb_bytes",0)>100 and "error" not in x for x in r["runs"]),r' "$upload_json" "$UPLOAD_REPS"
     log "$app rep $rep: upload median $(python3 -c 'import json,sys; print(json.loads(sys.argv[1])["median_total_ms"])' "$upload_json")ms"
   fi
 
   sleep 0.5
   local peak; peak=$(cat "$OUT/.$app-$rep.mem")
   local cg_peak; cg_peak=$(( $(cat "$cg/memory.peak" 2>/dev/null || echo 0) / 1048576 ))
-  python3 "$BENCH/job-state.py" > "$OUT/$app-$rep-jobs.json"
+  python3 "$BENCH/job-state.py" "$JOB_DRAIN_SECS" > "$OUT/$app-$rep-jobs.json"
+  python3 - "$app" "$OUT/$app-$rep-jobs.json" <<'PY'
+import json, sys
+app, path = sys.argv[1:]
+jobs = json.load(open(path))
+if app in {"reference", "baseline", "elixir", "candidate"}:
+    assert jobs.get("backend") == "redis_resque" and jobs.get("drained") is True, jobs
+else:
+    assert jobs.get("backend") == "internal_unobserved", jobs
+PY
   kill "$SAMPLER" 2>/dev/null || true; SAMPLER=""
   python3 - "$f" "$app" "$rep" "$cold_ms" "$idle_cur" "$idle_anon" "$peak" "$cg_peak" "$http_json" "$cable_json" "$upload_json" "$load_start" "$(cat /proc/loadavg)" <<'PY'
 import json, sys
 f, app, rep, cold, idle_cur, idle_anon, peak, cg_peak, http, cable, upload, load0, load = sys.argv[1:]
 json.dump({
-  "app": app, "rep": int(rep), "cold_start_ms": int(cold),
+  "schema_version": 2, "sample_complete": True, "app": app, "rep": int(rep), "cold_start_ms": int(cold),
   "memory": {"idle_current_mb": int(idle_cur), "idle_anon_mb": int(idle_anon), **json.loads(peak), "cgroup_peak_mb": int(cg_peak)},
   "http": json.loads(http), "cable": json.loads(cable), "upload": json.loads(upload), "loadavg_start": load0, "loadavg_end": load,
 }, open(f, "w"), indent=1)
@@ -288,16 +353,25 @@ PY
   echo "date: $(date -Is)"
   echo "host: $(uname -r), $(grep -m1 'model name' /proc/cpuinfo | cut -d: -f2 | xargs), $(nproc) threads, $(free -g | awk '/Mem:/{print $2}')GB"
   echo "server cpus: $SERVER_CPUS (nproc $(taskset -c "$SERVER_CPUS" nproc)); loadgen cpus: $LOADGEN_CPUS; network: $NETWORK"
-  echo "env: $(env_args | grep -E 'WEB_CONC|JOB_CONC|MAX_THREADS' | tr '\n' ' ')"
+  echo "env: $(env_args | grep -E 'WEB_CONC|JOB_CONC|MAX_THREADS' | paste -sd' ' -)"
   echo "seed sha256: $(sha256sum "$SEED/db/production.sqlite3")"
+  echo "seed tree sha256: $(cd "$SEED" && find . -type f -print0 | sort -z | xargs -0 sha256sum | sha256sum)"
+  echo "loadgen sha256: $(sha256sum "$LOADGEN")"
+  echo "loadgen build image: $(docker image inspect -f '{{index .RepoDigests 0}}' "$LOADGEN_BUILD_IMAGE")"
+  echo "docker runtime: $(docker version -f '{{.Server.Version}}')"
+  echo "benchmark source: $(git -C "$ROOT" rev-parse HEAD) (bench dirty: $(git -C "$ROOT" status --porcelain -- bench | wc -l) files)"
+  echo "benchmark harness sha256: $(sha256sum "$BENCH/run" "$BENCH/report" "$BENCH/validate.py" "$BENCH/validate-results.py" "$BENCH/job-state.py" "$BENCH/loadgen/src/main.rs" "$BENCH/loadgen/Cargo.toml" "$BENCH/loadgen/Cargo.lock" | sha256sum)"
   echo "elixir source digest: $(python3 "$BENCH/validate.py" digest)"
-  echo "rust extra env: $RUST_EXTRA_ENV"
+  echo "rust extra env:${RUST_EXTRA_ENV:+ $RUST_EXTRA_ENV}"
   echo "workload: suites=$SUITES HTTP_SECS=$HTTP_SECS HTTP_CONCS=$HTTP_CONCS CABLE_CLIENTS=$CABLE_CLIENTS CABLE_TPUT_SECS=$CABLE_TPUT_SECS CABLE_POSTERS=$CABLE_POSTERS UPLOAD_REPS=$UPLOAD_REPS REPS=$REPS"
+  echo "descriptors: server_nofile=$NOFILE loadgen_nofile=$(ulimit -n); job_drain_secs=$JOB_DRAIN_SECS"
   echo "quiet wait: LOAD_MAX=$LOAD_MAX LOAD_WAIT_SECS=$LOAD_WAIT_SECS"
   echo "user agent: ${USER_AGENT_ARGS[1]:-(none)}"
   for app in ${APPS//,/ }; do echo "$app image: $(image_for "$app") $(docker image inspect -f '{{.Id}} {{.Created}} unpacked_bytes={{.Size}}' "$(image_for "$app")")"; done
+  if [[ ",$APPS," = *,baseline,* ]]; then echo "baseline source: $BASELINE_SHA"; fi
+  if [[ ",$APPS," = *,candidate,* ]]; then echo "candidate source: $CANDIDATE_SHA"; fi
   if [[ ",$APPS," = *,go,* ]]; then echo "go HEAD: $(git -C "$GO_ROOT" rev-parse HEAD) (dirty: $(git -C "$GO_ROOT" status --porcelain -- cmd internal assets go.mod go.sum third_party Dockerfile | wc -l) files)"; fi
-  echo "rust HEAD: $(git -C "$RUST_ROOT" rev-parse --short HEAD) (dirty: $(git -C "$RUST_ROOT" status --porcelain -- crates Cargo.toml Cargo.lock | wc -l) files)"
+  if [[ ",$APPS," = *,rust,* || ",$APPS," = *,rust-identity,* ]]; then echo "rust HEAD: $(git -C "$RUST_ROOT" rev-parse --short HEAD) (dirty: $(git -C "$RUST_ROOT" status --porcelain -- crates Cargo.toml Cargo.lock | wc -l) files)"; fi
 } > "$OUT/env.txt"
 cat "$OUT/env.txt" >&2
 
@@ -311,4 +385,5 @@ for rep in $(seq 1 "$REPS"); do
     echo "$(date +%T) $app rep $rep end:   $(uptime)" >> "$OUT/uptime.log"
   done
 done
+python3 "$BENCH/validate-results.py" finalize "$OUT"
 "$BENCH/report" "$OUT" | tee "$OUT/report.md"

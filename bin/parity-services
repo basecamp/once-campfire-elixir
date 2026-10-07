@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Isolated fixture servers only; never operates on existing deployments."""
-import base64,hashlib,json,os,pathlib,shutil,sqlite3,subprocess,sys,time,urllib.request
+import base64,hashlib,json,os,pathlib,shutil,socket,sqlite3,subprocess,sys,time,urllib.request
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 NAMES={'reference':'campfire-elixir-rails','candidate':'campfire-elixir-candidate','redis':'campfire-elixir-redis'}
 PORTS={'reference':47071,'candidate':47070,'redis':47079}
@@ -8,6 +8,13 @@ def docker(*args,check=True):
  return subprocess.run(['docker',*map(str,args)],check=check,capture_output=True,text=True)
 def stop(side):
  docker('rm','-f',NAMES[side],check=False)
+ if side in PORTS:
+  for _ in range(100):
+   try:
+    with socket.create_connection(('127.0.0.1',PORTS[side]),timeout=.05):pass
+   except OSError:return
+   time.sleep(.05)
+  raise SystemExit(f'{side} fixture port {PORTS[side]} remained open after teardown')
 def seed(side):
  folder=ROOT/'var'/('rails/db' if side=='reference' else 'candidate')
  folder.mkdir(parents=True,exist_ok=True)
@@ -40,7 +47,7 @@ def start(side):
   docker(*common,'-e','FAKETIME='+('@' if os.environ.get('CAMPFIRE_PARITY_TICK')=='1' else '')+'2026-03-02 16:00:00','-v',f'{ROOT}/var/rails:/rails/storage','campfire-reference:latest','bin/rails','server','-b','127.0.0.1','-p',PORTS[side])
  else:
   args=[]
-  for value in ['HEX_HOME=/app/.hex','MIX_HOME=/app/.mix','HOME=/app','TMPDIR=/app/var/tmp','EXQLITE_USE_SYSTEM=1','DATABASE_PATH=/app/var/candidate/production.sqlite3','STORAGE_PATH=/app/var/candidate/files','CAMPFIRE_CLOCK=2026-03-02T16:00:00Z','CAMPFIRE_CLOCK_TICK='+os.environ.get('CAMPFIRE_PARITY_TICK','0'),f'PORT={PORTS[side]}']:args+=['-e',value]
+  for value in ['HEX_HOME=/app/.hex','MIX_HOME=/app/.mix','HOME=/app','TMPDIR=/app/var/tmp','EXQLITE_USE_SYSTEM=1','DATABASE_PATH=/app/var/candidate/production.sqlite3','STORAGE_PATH=/app/var/candidate/files','CAMPFIRE_CABLE_REDIS_BRIDGE=1','CAMPFIRE_CLOCK=2026-03-02T16:00:00Z','CAMPFIRE_CLOCK_TICK='+os.environ.get('CAMPFIRE_PARITY_TICK','0'),f'PORT={PORTS[side]}']:args+=['-e',value]
   docker(*common,*args,'-v',f'{ROOT}:/app','-w','/app','campfire-elixir:toolchain','mix','run','--no-halt')
  for _ in range(120):
   try:

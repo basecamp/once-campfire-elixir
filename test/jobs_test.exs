@@ -1,6 +1,7 @@
 defmodule Campfire.JobsTest do
   use ExUnit.Case, async: false
-  alias Campfire.{Chat, DB, Worker, Webhooks}
+  import ExUnit.CaptureLog
+  alias Campfire.{Chat, DB, Jobs, Webhooks, Worker}
   @fixture Jason.decode!(File.read!("test/fixtures/seed.json"))
   setup do
     DB.restore_fixture(@fixture)
@@ -59,7 +60,7 @@ defmodule Campfire.JobsTest do
       end)
 
     assert is_map(Webhooks.perform(bot, message))
-    Task.await(task)
+    Task.await(task, 6_000)
     :gen_tcp.close(listen)
     reply = DB.one("SELECT * FROM messages ORDER BY id DESC LIMIT 1")
     assert reply["creator_id"] == bot["id"]
@@ -73,5 +74,55 @@ defmodule Campfire.JobsTest do
         "arguments" => [%{"_aj_globalid" => "gid://campfire/User/999999999999"}]
       })
     end
+  end
+
+  test "enqueue reports unavailable Redis without exiting the caller" do
+    adapter = System.get_env("CAMPFIRE_JOBS_ADAPTER")
+    System.delete_env("CAMPFIRE_JOBS_ADAPTER")
+
+    on_exit(fn ->
+      if adapter,
+        do: System.put_env("CAMPFIRE_JOBS_ADAPTER", adapter),
+        else: System.delete_env("CAMPFIRE_JOBS_ADAPTER")
+    end)
+
+    assert Process.whereis(Campfire.Redis) == nil
+
+    log =
+      capture_log(fn ->
+        assert Jobs.enqueue("ExampleJob", []) == {:error, :redis_unavailable}
+      end)
+
+    assert log =~ "Campfire job enqueue failed: :redis_unavailable"
+  end
+
+  test "enqueue reports a Redis disconnect race without exiting the caller" do
+    adapter = System.get_env("CAMPFIRE_JOBS_ADAPTER")
+    System.delete_env("CAMPFIRE_JOBS_ADAPTER")
+
+    redis =
+      spawn(fn ->
+        receive do
+          {:"$gen_cast", _request} -> exit(:simulated_disconnect)
+        end
+      end)
+
+    Process.register(redis, Campfire.Redis)
+
+    on_exit(fn ->
+      if Process.alive?(redis), do: Process.exit(redis, :kill)
+
+      if adapter,
+        do: System.put_env("CAMPFIRE_JOBS_ADAPTER", adapter),
+        else: System.delete_env("CAMPFIRE_JOBS_ADAPTER")
+    end)
+
+    log =
+      capture_log(fn ->
+        assert Jobs.enqueue("ExampleJob", []) ==
+                 {:error, {:redis_unavailable, :simulated_disconnect}}
+      end)
+
+    assert log =~ "Campfire job enqueue failed: {:redis_unavailable, :simulated_disconnect}"
   end
 end

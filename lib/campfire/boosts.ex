@@ -31,15 +31,10 @@ defmodule Campfire.Boosts do
   end
 
   defp action(%{method: "POST"} = conn, user, message, nil) do
-    case Campfire.Params.required(conn.params, "boost") |> Campfire.Params.permit(["content"]) do
-      %{} = attrs ->
-        boost = Chat.create_boost(user, message, attrs["content"])
-        Broadcasts.boost_create(message, boost)
-        Auth.redirect(conn, "/messages/#{message["id"]}/boosts")
-
-      _ ->
-        send_resp(conn, 400, "")
-    end
+    attrs = Campfire.Params.required(conn.params, "boost") |> Campfire.Params.permit(["content"])
+    boost = Chat.create_boost(user, message, attrs["content"])
+    Broadcasts.boost_create(message, boost)
+    Auth.redirect(conn, "/messages/#{message["id"]}/boosts")
   end
 
   defp action(%{method: "DELETE"} = conn, user, message, id) do

@@ -2,7 +2,6 @@ defmodule Campfire.Cable do
   @behaviour WebSock
   import Plug.Conn
   alias Campfire.{Auth, Chat, Clock, Presence, Rails}
-  @prefix "campfire_production:"
 
   def upgrade(conn) do
     {conn, user, _session} = Auth.session_lookup(conn)
@@ -20,11 +19,14 @@ defmodule Campfire.Cable do
       |> put_resp_header("sec-websocket-protocol", "actioncable-v1-json")
       |> upgrade_adapter(
         :websocket,
-        {__MODULE__, %{user: user, subscriptions: %{}}, [compress: false]}
+        {__MODULE__, %{user: user, subscriptions: %{}}, websocket_options()}
       )
       |> halt()
     end
   end
+
+  @doc false
+  def websocket_options, do: [compress: false, timeout: :infinity]
 
   @impl true
   def init(%{user: nil} = state),
@@ -37,13 +39,6 @@ defmodule Campfire.Cable do
 
   def init(state) do
     Registry.register(Campfire.Connections, state.user["id"], nil)
-
-    internal =
-      "action_cable/" <>
-        Base.url_encode64("gid://campfire/User/#{state.user["id"]}", padding: false)
-
-    subscribe_redis(internal)
-    state = Map.put(state, :internal, internal)
     Process.send_after(self(), :ping, 3000)
     {:push, {:text, Rails.json(%{"type" => "welcome"})}, state}
   end
@@ -146,20 +141,6 @@ defmodule Campfire.Cable do
 
   defp register(stream, id) do
     Registry.register(Campfire.Streams, stream, id)
-
-    subscribe_redis(stream)
-  end
-
-  defp subscribe_redis(stream) do
-    if Process.whereis(Campfire.CableRedis) do
-      {:ok, ref} = Redix.PubSub.subscribe(Campfire.CableRedis, @prefix <> stream, self())
-
-      receive do
-        {:redix_pubsub, _, ^ref, :subscribed, _} -> :ok
-      after
-        5000 -> raise "Redis stream subscription timeout"
-      end
-    end
   end
 
   defp unsubscribe(id, state) do
@@ -172,10 +153,6 @@ defmodule Campfire.Cable do
 
         if sub.stream do
           Registry.unregister_match(Campfire.Streams, sub.stream, id)
-
-          if Process.whereis(Campfire.CableRedis) &&
-               !Enum.any?(subscriptions, fn {_, s} -> s.stream == sub.stream end),
-             do: Redix.PubSub.unsubscribe(Campfire.CableRedis, @prefix <> sub.stream, self())
         end
 
         %{state | subscriptions: subscriptions}
@@ -205,23 +182,35 @@ defmodule Campfire.Cable do
   end
 
   def broadcast(stream, data) do
-    if Process.whereis(Campfire.Redis) do
-      Redix.command(Campfire.Redis, ["PUBLISH", @prefix <> stream, Rails.json(data)])
+    payload = Rails.json(data)
+
+    if Process.whereis(Campfire.CableRedisBridge) do
+      Campfire.CableRedisBridge.publish(stream, payload)
     else
-      Registry.dispatch(Campfire.Streams, stream, fn entries ->
-        for {pid, id} <- entries, do: send(pid, {:delivery, id, data})
-      end)
+      deliver(stream, payload)
     end
 
     :ok
   end
 
-  def disconnect(user_id, reconnect) do
-    if Process.whereis(Campfire.Redis) do
-      internal =
-        "action_cable/" <> Base.url_encode64("gid://campfire/User/#{user_id}", padding: false)
+  def deliver(stream, payload) do
+    Registry.dispatch(Campfire.Streams, stream, fn entries ->
+      for {pid, id} <- entries, do: send(pid, {:delivery, stream, id, payload})
+    end)
 
-      broadcast(internal, %{"type" => "disconnect", "reconnect" => reconnect})
+    :ok
+  end
+
+  def disconnect(user_id, reconnect) do
+    if Process.whereis(Campfire.CableRedisBridge) do
+      internal =
+        "action_cable/" <>
+          Base.url_encode64("gid://campfire/User/#{user_id}", padding: false)
+
+      Campfire.CableRedisBridge.publish(
+        internal,
+        Rails.json(%{"type" => "disconnect", "reconnect" => reconnect})
+      )
     else
       Registry.dispatch(Campfire.Connections, user_id, fn entries ->
         for {pid, _} <- entries, do: send(pid, {:disconnect, reconnect})
@@ -242,33 +231,11 @@ defmodule Campfire.Cable do
      state}
   end
 
-  def handle_info({:delivery, id, data}, state),
-    do: {:push, {:text, Rails.json(%{"identifier" => id, "message" => data})}, state}
-
-  def handle_info(
-        {:redix_pubsub, _, _, :message, %{channel: @prefix <> stream, payload: payload}},
-        %{internal: stream} = state
-      ) do
-    case Jason.decode(payload) do
-      {:ok, %{"type" => "disconnect"} = data} ->
-        handle_info({:disconnect, Map.get(data, "reconnect", true)}, state)
-
-      _ ->
-        {:ok, state}
+  def handle_info({:delivery, stream, id, payload}, state) do
+    case Campfire.CableFrames.frame(stream, id, payload) do
+      {:ok, frame} -> {:push, {:text, frame}, state}
+      {:error, _} -> {:ok, state}
     end
-  end
-
-  def handle_info(
-        {:redix_pubsub, _pubsub, _ref, :message, %{channel: @prefix <> stream, payload: payload}},
-        state
-      ) do
-    messages =
-      for {id, sub} <- state.subscriptions,
-          sub.stream == stream,
-          {:ok, frame} <- [Campfire.CableFrames.frame(stream, id, payload)],
-          do: {:text, frame}
-
-    {:push, messages, state}
   end
 
   def handle_info({:disconnect, reconnect}, state),

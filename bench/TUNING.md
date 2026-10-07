@@ -60,3 +60,24 @@ fanout advantage. Results are in `results/tuning-comparison.md` and
 `results/tuned-fifo-20261004/report.md`. The Native/Rust room preflights record
 approximately 464/416 KB decoded and 21/24 KB compressed; actual response sizes
 and each port's production process model remain part of the comparison.
+
+## Elixir runtime architecture review
+
+The later Elixir-only review removes Redis from fragment-cache reads and ordinary
+Cable fanout, retains it as the durable Rails-compatible job queue, and changes the
+database boundary from one process for every query to one writer plus supervised
+read-only connections. On runtimes with one online scheduler, a separate read pool
+cannot execute concurrently and profiling measured its DBConnection ownership and
+statement-preparation overhead, so reads intentionally use the writer connection;
+multischeduler releases retain the read pool.
+
+`results/elixir-baseline-final-20261004/` compares untouched upstream `b6b82e5`
+with final `a6225d7` in three alternating, validated production runs on identical
+data and CPU sets. Median post-message throughput improves from 104 to 119 req/s at
+16 connections and 109 to 134 req/s at 64. Median 100-client fanout improves from
+28.0 to 33.6 delivered messages/s; 500-client fanout improves from 8.30 to 9.60,
+while all-client p99 falls from 194 to 139 ms. Most read endpoints overlap in their
+three-run ranges. Room rendering at 64 connections regresses from 70.3 to 63.8
+req/s, and 500-client whole-container saturated PSS rises from 275 to 296 MiB.
+Uploads remain 385 ms median in both images. The result is therefore a correctness-
+driven concurrency improvement, not a claim of universal speed or lower memory.

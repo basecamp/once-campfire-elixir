@@ -16,8 +16,23 @@ Preflight rejects redirects, errors, empty bodies, and unpopulated room/search
 responses. Timed HTTP counts only successful 200 responses. Raw results retain
 status/error counts, throughput, latency, CPU per successful HTTP response, cold
 readiness, cgroup memory, process PSS/anonymous memory, fixture digest, source digest,
-image IDs, workload validation, and external Resque queue backlog where applicable.
-Go and Rust own their queues internally; their external Resque state is unavailable.
+image IDs, descriptor limits, benchmark/runtime identities, workload validation, and
+external Resque queued/active/failed observations where applicable. Rails and Elixir
+require at least three consecutive quiet Redis observations spanning at least one second
+and fail if jobs do not drain within `JOB_DRAIN_SECS`. This is an observed quiet window,
+not an atomic job-completion guarantee: a worker can pop a job before registering it as
+active. A single queue-length read is never treated as completion. Go and Rust
+own their queues internally, so the result records that their job state is unobserved.
+
+New runs use result schema 2. `manifest.json` declares the exact app/repetition/workload
+matrix and remains `complete: false` until every sample, preflight, raw load-generator
+JSON, upload/thumbnail check, job audit, and final directory audit succeeds. Raw JSON is
+written under `raw/` before validation, so an interrupted or rejected attempt retains
+the response that caused it to stop. The audit compares raw results with reported samples,
+recomputes the final job quiet window, and rejects missing or extra runs. Cable records paced and saturated POST attempts,
+successes/errors, and requires a 200 Turbo Stream response plus positive complete fanout.
+The server and load generator both require the recorded `NOFILE` limit (65,536 by
+default), and a run aborts if host load remains above `LOAD_MAX` after the quiet wait.
 
 Elixir runs BEAM, Redis, native media/parser helpers, and the same pinned Thruster
 binary as Rails. Go and Rust run their own integrated HTTP/proxy/job implementations.
@@ -25,11 +40,49 @@ These are their actual production process models. Loopback measurements exclude
 NIC/TLS costs. Cable uses one authenticated user with many connections, so this
 workload is not a distinct-user capacity claim.
 
-Keep each result directory and `env.txt`. `bench/report DIR` produces median and
-range tables. `bench/profile-elixir` profiles a warmed populated room on an isolated
+Keep each result directory and `env.txt`. `bench/report DIR` revalidates schema-2
+completeness before producing median and range tables. Historical directories without
+a manifest can only be rendered with `bench/report --legacy DIR`; the output is marked
+legacy and does not imply the new upload/job/attempt assurance. `bench/profile-elixir` profiles a warmed populated room on an isolated
 release; profiler timings are diagnostic and are never used as benchmark results.
 The toolkit benchmark command measures whole-process primitive wall time rather
 than full application throughput.
+
+The current reader/statement-cache comparison is in
+[`results/native-linux-b6b82e5-cache-115cabc-20261005-http12-nofile65536/`](results/native-linux-b6b82e5-cache-115cabc-20261005-http12-nofile65536/README.md).
+Four balanced rounds on a native amd64 Xeon @ 2.60 GHz Linux orb used four guest
+server CPUs and four separate guest load-generator CPUs, twelve-second HTTP cells,
+the production Thruster path and identical populated seeds. All 192 HTTP cells,
+24 Cable cases and 40 uploads validated, with complete fanouts and drained jobs.
+Populated HTTP throughput improves, but room/messages p99 at 64 connections and
+peak memory regress. The directory includes the summary, full ranges and a provenance
+archive checksum. Raw measurements, executable audit scripts and complete verification
+receipts are preserved locally and available on request; they are not part of the
+review diff. Earlier runs, including failed and qualified attempts, are also preserved
+locally. These are not Ryzen or Mac rates, and no universal performance win is claimed.
+
+### Exact populated seed
+
+The exact seed used by the matched Elixir runs is preserved as
+[`fixtures/campfire-benchmark-seed-default-20261004.tar.gz`](fixtures/campfire-benchmark-seed-default-20261004.tar.gz).
+Restore it without reusing mutable data from either source checkout:
+
+```sh
+test "$(shasum -a 256 bench/fixtures/campfire-benchmark-seed-default-20261004.tar.gz | awk '{print $1}')" = \
+  668a9e9b5a3f0e132a3be77503446af71887289d539ea8c053e12057a18c0a52
+rm -rf parity/.seed/default
+mkdir -p parity/.seed
+tar -xzf bench/fixtures/campfire-benchmark-seed-default-20261004.tar.gz -C parity/.seed
+test "$(shasum -a 256 parity/.seed/default/db/production.sqlite3 | awk '{print $1}')" = \
+  bda9a5cd61d78d53f377cf07ee9268741caebc19b94a6efe782cafe827efc8db
+```
+
+`bench/run` copies this seed for every app invocation; it does not benchmark in the
+preserved directory. The public Rust harness can regenerate the canonical logical
+seed with `PARITY_RUNTIME=docker parity/bin/seed build default` at commit
+`95af38bcc90f0ab06f703007ca25aa9e199536f1`. That process guarantees matching SQL
+dump and storage-tree bytes, but independent SQLite files need not have the same raw
+file hash. Use this archived fixture when reproducing the exact historical input.
 
 The completed baseline is in `results/baseline-20261004/`. Profiling evidence and
 changes are described in [TUNING.md](TUNING.md). To reproduce the matched comparison:

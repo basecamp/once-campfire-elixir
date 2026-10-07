@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "kind": "arm64-video-preview",
+  "architecture": "aarch64-linux",
+  "reference": {
+    "sha": "90b330024dec3e757c79b6a7e6568f93da8e3148",
+    "ruby": "ruby 3.4.10 (2026-06-30 revision 2b0b7728dc) +YJIT +PRISM [aarch64-linux]",
+    "rails": "8.2.0.alpha",
+    "ffmpeg": "7.1.5-0+deb13u1",
+    "libvips": "8.16.1",
+    "preview_arguments": "-vf 'select=eq(n\\,0)+eq(key\\,1)+gt(scene\\,0.015),loop=loop=-1:size=2,trim=start_frame=1' -frames:v 1 -f image2"
+  },
+  "fixture": "alpha-centuri.mov",
+  "preview": {
+    "byte_size": 11790,
+    "checksum": "Ckn6FYF3wfdTi3GYIHXgbg=="
+  },
+  "variants": {
+    "alpha-centuri-preview-webp": {
+      "byte_size": 3346,
+      "checksum": "BLqQqutSvW4uMlH52CJJCw=="
+    },
+    "alpha-centuri-poster": {
+      "byte_size": 5134,
+      "checksum": "SCvxTijcri7iO5qMei25DA=="
+    },
+    "alpha-centuri-poster-from-key": {
+      "byte_size": 5134,
+      "checksum": "SCvxTijcri7iO5qMei25DA=="
+    }
+  }
+}

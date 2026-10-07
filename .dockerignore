@@ -6,6 +6,7 @@ plans
 .hex
 .mix
 _build
+priv/native
 .agents
 bench
 rails-to-elixir

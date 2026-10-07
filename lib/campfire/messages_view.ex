@@ -1,21 +1,23 @@
 defmodule Campfire.MessagesView do
   alias Campfire.{Assets, DB, Mentions, RichText}
   require EEx
+  @csrf_placeholder "<!--campfire-csrf-input-->"
   EEx.function_from_file(:defp, :item, "priv/templates/message.html.eex", [:assigns])
   EEx.function_from_file(:defp, :boost_html, "priv/templates/boost.html.eex", [:assigns])
 
   EEx.function_from_file(:defp, :boosts_html, "priv/templates/boosts.html.eex", [:assigns])
 
   def render(message, base, csrf \\ nil) do
-    Campfire.FragmentCache.record(:message, message, fn ->
-      render_fragment(message, base, csrf)
+    :message
+    |> Campfire.FragmentCache.record(message, fn ->
+      render_fragment(message, base, if(csrf, do: :placeholder))
     end)
+    |> put_csrf(csrf)
+  rescue
+    _ -> failed_fragment()
   end
 
-  def render_many(messages, base, csrf) do
-    Campfire.FragmentCache.records(:message, messages, &render_fragment(&1, base, csrf))
-    |> Enum.join()
-  end
+  def render_many(messages, base, csrf), do: Enum.map_join(messages, &render(&1, base, csrf))
 
   defp render_fragment(message, base, csrf) do
     creator = DB.one("SELECT * FROM users WHERE id=?", [message["creator_id"]])
@@ -51,19 +53,16 @@ defmodule Campfire.MessagesView do
       created_iso: iso(message["created_at"]),
       emoji_class:
         if(all_emoji?(RichText.plain_text(body || "")), do: "message--emoji", else: ""),
-      presentation: presentation_message(message, body),
+      presentation: presentation_fragment(message, body),
       attachment_actions: attachment_actions(message),
       boosting: render_boosts(message, csrf),
-      csrf_input:
-        if(csrf,
-          do: ~s(<input type="hidden" name="authenticity_token" value="#{csrf}" />),
-          else: ""
-        )
+      csrf_input: csrf_input(csrf)
     )
-  rescue
-    _ ->
-      "<div class=\"message message--formatted message--failed center\">\n  <div class=\"message__body\">\n    <div class=\"message__body-content txt-align-center\">\n      Failed to load message content\n    </div>\n  </div>\n</div>\n"
   end
+
+  defp failed_fragment,
+    do:
+      "<div class=\"message message--formatted message--failed center\">\n  <div class=\"message__body\">\n    <div class=\"message__body-content txt-align-center\">\n      Failed to load message content\n    </div>\n  </div>\n</div>\n"
 
   defp attachment_actions(message) do
     if blob = Campfire.Attachments.find("Message", message["id"], "attachment") do
@@ -99,7 +98,11 @@ defmodule Campfire.MessagesView do
   end
 
   def render_boost(boost, csrf \\ nil) do
-    Campfire.FragmentCache.record(:boost, boost, fn -> render_boost_fragment(boost, csrf) end)
+    :boost
+    |> Campfire.FragmentCache.record(boost, fn ->
+      render_boost_fragment(boost, if(csrf, do: :placeholder))
+    end)
+    |> put_csrf(csrf)
   end
 
   defp render_boost_fragment(boost, csrf) do
@@ -119,13 +122,18 @@ defmodule Campfire.MessagesView do
       content: Assets.html_escape(boost["content"]),
       emoji: all_emoji?(boost["content"]),
       avatar: avatar,
-      csrf_input:
-        if(csrf,
-          do: ~s(<input type="hidden" name="authenticity_token" value="#{csrf}" />),
-          else: ""
-        )
+      csrf_input: csrf_input(csrf)
     )
   end
+
+  defp csrf_input(:placeholder), do: @csrf_placeholder
+  defp csrf_input(nil), do: ""
+
+  defp csrf_input(token),
+    do: ~s(<input type="hidden" name="authenticity_token" value="#{Assets.html_escape(token)}" />)
+
+  defp put_csrf(html, :placeholder), do: html
+  defp put_csrf(html, token), do: String.replace(html, @csrf_placeholder, csrf_input(token))
 
   def presentation_element(message) do
     text =
@@ -143,17 +151,33 @@ defmodule Campfire.MessagesView do
     do: Regex.match?(~r/\A(\p{Emoji_Presentation}|\p{Extended_Pictographic}|\x{FE0F})+\z/u, text)
 
   def presentation_message(message, body) do
+    present(message, body, &presentation/1)
+  end
+
+  defp presentation_fragment(message, body) do
+    present(message, body, &presentation!/1)
+  end
+
+  defp present(message, body, render) do
     blob = Campfire.Attachments.find("Message", message["id"], "attachment")
     sound = Campfire.Sounds.find(Campfire.Chat.plain_text_body(message, body || ""))
 
     cond do
       blob -> Campfire.AttachmentView.render(blob)
       sound -> Campfire.Sounds.render(sound)
-      true -> presentation(body)
+      true -> render.(body)
     end
   end
 
   def presentation(body) do
+    presentation!(body)
+  rescue
+    _ -> ""
+  end
+
+  defp presentation!(nil), do: ""
+
+  defp presentation!(body) do
     body
     |> RichText.parse()
     |> remove_solo_link()
@@ -164,8 +188,6 @@ defmodule Campfire.MessagesView do
     |> final_sanitize()
     |> RichText.serialize_nodes()
     |> Campfire.Autolink.render()
-  rescue
-    _ -> ""
   end
 
   defp remove_solo_link(nodes) do

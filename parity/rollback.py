@@ -28,7 +28,7 @@ def snapshot(side):
   for name in names:
    rows=[{k:({"sqlite_blob_base64":base64.b64encode(v).decode()} if isinstance(v,bytes) else v) for k,v in dict(r).items()} for r in db.execute('SELECT '+('rowid,body' if name=='message_search_index' else '*')+' FROM "'+name+'"')]
    tables[name]=sorted(rows,key=lambda r:json.dumps(r,sort_keys=True))
- for path in folder.rglob('*'):
+ for path in sorted(folder.rglob('*')):
   if path.is_file():files[str(path.relative_to(folder))]=hashlib.sha256(path.read_bytes()).hexdigest()
  return {'tables':tables,'files':files}
 
@@ -50,6 +50,21 @@ def handoff(origin,target):
   time.sleep(.1)
  raise AssertionError('handoff readiness failed')
 
+def restart(side):
+ container='campfire-elixir-release' if side=='release' else 'campfire-elixir-rails'
+ port=47072 if side=='release' else 47071
+ docker('restart',container)
+ for _ in range(120):
+  try:
+   if request(port,'/up')[0]==200:return
+  except OSError:pass
+  time.sleep(.1)
+ raise AssertionError('restart readiness failed')
+
+def clear_rails_fragments():
+ keys=docker('exec','campfire-elixir-redis','redis-cli','-p','47079','--scan','--pattern','views/*').stdout.split()
+ if keys:docker('exec','campfire-elixir-redis','redis-cli','-p','47079','DEL',*keys)
+
 def run():
  global BASELINE_FOREIGN_KEYS
  assert docker('inspect','--format','{{.Config.Image}}','campfire-elixir-release').stdout.strip()=='campfire-elixir:release'
@@ -65,6 +80,8 @@ def run():
   assert s in [200,302],(path,s,p[:200])
  mutate(47071,'/account',{'account[name]':'Rails handoff account'})
  mutate(47071,'/rooms/486777696/messages',{'message[body]':'<p>Created in Rails before handoff</p>','message[client_message_id]':'rollback-rails-message'},'POST')
+ restart('reference')
+ clear_rails_fragments()
  request(47071,'/rooms/486777696',cookies=cookies)
  _,before,_=request(47071,'/rooms/486777696',cookies=cookies);before=normalize(before)
  handoff('reference','release')
@@ -72,9 +89,11 @@ def run():
  mutate(47072,'/account',{'account[name]':'Elixir handoff account'})
  mutate(47072,'/users/me/profile',{'user[avatar]':sign(7,'blob_id')})
  mutate(47072,'/rooms/486777696/messages',{'message[attachment]':sign(7,'blob_id'),'message[client_message_id]':'rollback-elixir-attachment'},'POST')
+ restart('release')
  request(47072,'/rooms/486777696',cookies=cookies)
  _,before,_=request(47072,'/rooms/486777696',cookies=cookies);before=normalize(before)
  handoff('release','reference')
+ clear_rails_fragments()
  s,page,_=request(47071,'/rooms/486777696',cookies=cookies);(ROOT/'var/rollback-before-elixir.html').write_text(before);(ROOT/'var/rollback-after-rails.html').write_text(normalize(page));assert s==200 and normalize(page)==before,'Elixir page/session changed on Rails rollback'
  mutate(47071,'/rooms/486777696/messages',{'message[body]':'<p>Rails writes after rollback</p>','message[client_message_id]':'rollback-after-message'},'POST')
  # Rails consumes jobs produced by both runtimes, using the native-created storage graph.
@@ -83,7 +102,7 @@ def run():
  final=snapshot('reference')
  messages=final['tables']['messages'];assert all(any(m['client_message_id']==key for m in messages) for key in ['rollback-rails-message','rollback-elixir-attachment','rollback-after-message'])
  assert final['tables']['accounts'][0]['name']=='Elixir handoff account'
- result={'passed':True,'scope':['production release','all persisted tables and no additional foreign key violations','all storage files copied byte-for-byte','Rails session accepted by release','Elixir cookies accepted by Rails','room HTML after each handoff','native avatar and message attachment','Rails consumes mixed-runtime jobs','Rails writes after rollback'],'fixture_foreign_key_violations':BASELINE_FOREIGN_KEYS,'final_tables':{k:len(v) for k,v in final['tables'].items()},'final_files':final['files']}
+ result={'passed':True,'scope':['production release','all persisted tables and no additional foreign key violations','all storage files copied byte-for-byte','Rails session accepted by release','Elixir cookies accepted by Rails','Rails view-cache invalidation at migration boundaries while preserving jobs','room HTML after each handoff','native avatar and message attachment','Rails consumes mixed-runtime jobs','Rails writes after rollback'],'fixture_foreign_key_violations':BASELINE_FOREIGN_KEYS,'final_tables':{k:len(v) for k,v in final['tables'].items()},'final_files':final['files']}
  (ROOT/'parity/results/rollback.json').write_text(json.dumps(result,indent=2)+'\n')
  print('Rails -> production Elixir -> Rails rollback passed')
 if __name__=='__main__':run()

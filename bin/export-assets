@@ -1,16 +1,71 @@
 #!/bin/sh
 set -eu
 ROOT=$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)
-REVISION=$(docker image inspect campfire-reference:app --format '{{range .Config.Env}}{{println .}}{{end}}' | sed -n 's/^GIT_REVISION=//p')
-EXPECTED=$(git -C "$ROOT/reference" rev-parse HEAD)
-[ "$REVISION" = "$EXPECTED" ] || { echo "Reference image revision differs from pinned source" >&2; exit 1; }
-CONTAINER=$(docker create campfire-reference:app)
-trap 'docker rm "$CONTAINER" >/dev/null' EXIT
-mkdir -p "$ROOT/priv/static/assets"
-docker cp "$CONTAINER:/rails/public/assets/." "$ROOT/priv/static/assets/"
+EXPECTED=$(git -C "$ROOT" rev-parse HEAD:reference)
+[ -f "$ROOT/reference/Gemfile.lock" ] || { echo "Run git submodule update --init reference first" >&2; exit 1; }
+[ "$(git -C "$ROOT/reference" rev-parse HEAD)" = "$EXPECTED" ] || { echo "Reference checkout differs from pinned source; run git submodule update --init reference" >&2; exit 1; }
+SOURCE="$ROOT/reference"
+BUILD=
+CONTAINER=
+STAGED=
+cleanup() {
+  [ -z "$BUILD" ] || rm -rf "$BUILD"
+  [ -z "$STAGED" ] || rm -rf "$STAGED"
+  [ -z "$CONTAINER" ] || docker rm "$CONTAINER" >/dev/null 2>&1 || true
+}
+trap cleanup EXIT
+mkdir -p "$ROOT/priv/static"
+STAGED=$(mktemp -d "$ROOT/priv/static/assets.XXXXXX")
+chmod 755 "$STAGED"
 
-mkdir -p "$ROOT/priv/public" "$ROOT/priv/pwa" "$ROOT/priv/images/logos"
-for file in robots.txt 404.html 422.html 500.html 502.html; do docker cp "$CONTAINER:/rails/public/$file" "$ROOT/priv/public/$file"; done
-cp "$ROOT/reference/app/views/pwa/manifest.json.erb" "$ROOT/reference/app/views/pwa/service_worker.js" "$ROOT/priv/pwa/"
-cp "$ROOT/reference/app/assets/images/logos/app-icon.png" "$ROOT/reference/app/assets/images/logos/app-icon-192.png" "$ROOT/priv/images/logos/"
-cp "$ROOT/reference/app/assets/images/default-bot-avatar.svg" "$ROOT/priv/images/"
+case "${1:---docker}" in
+  --local)
+    # Build from committed source in a disposable copy, never inside reference/.
+    RUBY_VERSION=$(cat "$ROOT/reference/.ruby-version")
+    [ "$(ruby -e 'print RUBY_VERSION')" = "$RUBY_VERSION" ] || { echo "Local asset export requires Ruby $RUBY_VERSION (see README)" >&2; exit 1; }
+    mkdir -p "$ROOT/var"
+    BUILD=$(mktemp -d "$ROOT/var/reference-assets.XXXXXX")
+    git -C "$ROOT/reference" archive "$EXPECTED" -o "$BUILD/source.tar"
+    tar -xf "$BUILD/source.tar" -C "$BUILD"
+    (
+      cd "$BUILD"
+      export BUNDLE_GEMFILE="$BUILD/Gemfile" BUNDLE_PATH="$ROOT/var/reference-bundle"
+      export BUNDLE_FROZEN=true BUNDLE_WITHOUT=development BUNDLE_IGNORE_CONFIG=1
+      bundle install
+      RAILS_ENV=production SECRET_KEY_BASE_DUMMY=1 bundle exec rails assets:precompile
+    )
+    SOURCE="$BUILD"
+    mkdir -p "$ROOT/priv/public"
+    cp -R "$BUILD/public/assets/." "$STAGED/"
+    for file in robots.txt 404.html 422.html 500.html 502.html; do cp "$BUILD/public/$file" "$ROOT/priv/public/$file"; done
+    ;;
+  --docker)
+    if ! IMAGE_ENV=$(docker image inspect campfire-reference:app --format '{{range .Config.Env}}{{println .}}{{end}}'); then
+      echo "Cannot inspect campfire-reference:app. Build it as documented in README, or use bin/export-assets --local (no Docker)." >&2
+      exit 1
+    fi
+    REVISION=$(printf '%s\n' "$IMAGE_ENV" | sed -n 's/^GIT_REVISION=//p')
+    [ "$REVISION" = "$EXPECTED" ] || { echo "Reference image revision differs from pinned source" >&2; exit 1; }
+    CONTAINER=$(docker create campfire-reference:app)
+    mkdir -p "$ROOT/priv/public"
+    docker cp "$CONTAINER:/rails/public/assets/." "$STAGED/"
+    for file in robots.txt 404.html 422.html 500.html 502.html; do docker cp "$CONTAINER:/rails/public/$file" "$ROOT/priv/public/$file"; done
+    ;;
+  *) echo "Usage: bin/export-assets [--docker|--local]" >&2; exit 1 ;;
+esac
+
+mkdir -p "$ROOT/priv/pwa" "$ROOT/priv/images/logos"
+cp "$SOURCE/app/views/pwa/manifest.json.erb" "$SOURCE/app/views/pwa/service_worker.js" "$ROOT/priv/pwa/"
+cp "$SOURCE/app/assets/images/logos/app-icon.png" "$SOURCE/app/assets/images/logos/app-icon-192.png" "$ROOT/priv/images/logos/"
+cp "$SOURCE/app/assets/images/default-bot-avatar.svg" "$ROOT/priv/images/"
+
+ASSETS="$ROOT/priv/static/assets"
+PREVIOUS="$ROOT/priv/static/assets.previous.$$"
+[ ! -e "$ASSETS" ] || mv "$ASSETS" "$PREVIOUS"
+if mv "$STAGED" "$ASSETS"; then
+  STAGED=
+  rm -rf "$PREVIOUS"
+else
+  [ ! -e "$PREVIOUS" ] || mv "$PREVIOUS" "$ASSETS"
+  exit 1
+fi

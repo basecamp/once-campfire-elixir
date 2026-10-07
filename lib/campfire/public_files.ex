@@ -120,7 +120,7 @@ defmodule Campfire.PublicFiles do
 
   defp chunks(body) do
     size = min(byte_size(body), 8192)
-    <<chunk::binary-size(size), rest::binary>> = body
+    <<chunk::binary-size(^size), rest::binary>> = body
     [chunk | chunks(rest)]
   end
 end
