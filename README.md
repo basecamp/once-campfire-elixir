@@ -147,6 +147,9 @@ for the workload, validation and reproduction commands.
   invalidate cached bodies. Fragment keys also retain the pre-render SQLite epoch and
   request host, including conditional requests and when response caching is disabled.
   JSON and conditional requests retain their native paths.
+- Public files and assets are served from an in-memory copy with a precompressed gzip body,
+  byte for byte as from disk, with HEAD, Range, conditional and encoding negotiation
+  unchanged: 32 MiB per app, disabled with `CAMPFIRE_STATIC_CACHE_MB=0`.
 
 - Session-transfer auto-submit forms explicitly close their form tag; the pinned Rails
   reference omitted it.
