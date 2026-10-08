@@ -13,7 +13,7 @@ defmodule Campfire.FetchMetadataTest do
 
     for method <- ~w(GET HEAD POST PUT PATCH DELETE OPTIONS TRACE),
         scheme <- [:http, :https],
-        forced <- [false, true],
+        forced <- [nil, "0", "false", "1", "true", "TRUE"],
         site <- [
           nil,
           "same-origin",
@@ -26,7 +26,7 @@ defmodule Campfire.FetchMetadataTest do
           "garbage"
         ],
         origin <- [nil, :matching, "null", "https://attacker.test"] do
-      if forced, do: System.put_env("FORCE_SSL", "1"), else: System.delete_env("FORCE_SSL")
+      if forced, do: System.put_env("FORCE_SSL", forced), else: System.delete_env("FORCE_SSL")
       request = %{conn(method, "/session") | scheme: scheme, host: "campfire.test", port: 8443}
       actual_origin = if origin == :matching, do: Auth.base(request), else: origin
       request = if site, do: put_req_header(request, "sec-fetch-site", site), else: request
@@ -38,7 +38,7 @@ defmodule Campfire.FetchMetadataTest do
         method in ~w(GET HEAD) or
           (origin in [nil, :matching] and
              (site in ["same-origin", "same-site"] or
-                (is_nil(site) and scheme == :http and not forced)))
+                (is_nil(site) and scheme == :http and forced not in ["1", "true", "TRUE"])))
 
       assert Auth.request_allowed?(request) == expected,
              inspect({method, scheme, forced, site, origin})

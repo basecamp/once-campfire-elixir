@@ -92,7 +92,7 @@ bin/rails-to-elixir doctor
 bin/parity-services stop
 ```
 
-The native suite passes **1,956 tests**. A full **65-gate** parity run covers the
+The native suite passes **1,961 tests**. The historical **65-gate** token-era parity run covered the
 reviewed backend; fresh shared browser checks cover the current frontend.
 Verification includes actual
 Chromium flows, all-table/FTS/storage mutation snapshots, injected transaction
@@ -131,7 +131,7 @@ for the workload, validation and reproduction commands.
 
 - Browser writes use Fetch Metadata instead of CSRF tokens. Unsafe requests reject a null or
   mismatched Origin and require `Sec-Fetch-Site: same-origin` or `same-site`; missing metadata
-  is accepted only over plain HTTP without `FORCE_SSL=1`. GET/HEAD and authenticated bot routes
+  is accepted only over plain HTTP without `FORCE_SSL=1` or `true`. GET/HEAD and authenticated bot routes
   retain their existing behavior. Forms and uploads generate no CSRF tokens, while legacy
   signed cookies and token-bearing tabs remain readable. Signed disk PUTs use authenticated
   upload ownership and expiring capabilities independently of Fetch Metadata. Only the trusted

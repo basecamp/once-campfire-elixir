@@ -114,9 +114,15 @@ defmodule Campfire.Auth do
 
       origin_ok &&
         case get_req_header(conn, "sec-fetch-site") do
-          [site] when site in ["same-origin", "same-site"] -> true
-          [] -> conn.scheme == :http && System.get_env("FORCE_SSL") != "1"
-          _ -> false
+          [site] when site in ["same-origin", "same-site"] ->
+            true
+
+          [] ->
+            conn.scheme == :http &&
+              String.downcase(System.get_env("FORCE_SSL", "")) not in ["1", "true"]
+
+          _ ->
+            false
         end
     end
   end

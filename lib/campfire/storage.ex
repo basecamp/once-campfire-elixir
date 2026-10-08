@@ -250,7 +250,8 @@ defmodule Campfire.Storage do
         attrs = Campfire.Params.required(conn.params, "blob")
 
         if Chat.present?(attrs["filename"]) && Chat.present?(attrs["checksum"]) &&
-             !is_nil(attrs["byte_size"]) do
+             !is_nil(attrs["byte_size"]) &&
+             (is_nil(attrs["metadata"]) || is_map(attrs["metadata"])) do
           now = Chat.timestamp()
           key = Campfire.Random.token(28, "0123456789abcdefghijklmnopqrstuvwxyz")
           type = attrs["content_type"]
@@ -343,7 +344,14 @@ defmodule Campfire.Storage do
             get_req_header(conn, "content-length") |> List.first() |> Chat.integer()
 
           blob = DB.one("SELECT metadata FROM active_storage_blobs WHERE key=?", [key])
-          owner = if blob, do: Jason.decode!(blob["metadata"] || "{}")["campfire_upload_user_id"]
+
+          owner =
+            if blob do
+              case Jason.decode(blob["metadata"] || "{}") do
+                {:ok, metadata} when is_map(metadata) -> metadata["campfire_upload_user_id"]
+                _ -> nil
+              end
+            end
 
           cond do
             !blob ->

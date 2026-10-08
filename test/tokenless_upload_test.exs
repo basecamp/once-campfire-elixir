@@ -12,6 +12,33 @@ defmodule Campfire.TokenlessUploadTest do
     %{user: user, cookie: cookie}
   end
 
+  test "malformed client metadata rejects without creating a blob", context do
+    before = DB.one("SELECT COUNT(*) AS count FROM active_storage_blobs")["count"]
+
+    for metadata <- ["invalid", ["invalid"], 123, false] do
+      payload =
+        Jason.encode!(%{
+          "blob" => %{
+            "filename" => "bad.txt",
+            "byte_size" => 1,
+            "checksum" => "invalid",
+            "metadata" => metadata
+          }
+        })
+
+      response =
+        conn(:post, "https://campfire.test/rails/active_storage/direct_uploads", payload)
+        |> put_req_header("content-type", "application/json")
+        |> put_req_header("sec-fetch-site", "same-origin")
+        |> put_req_cookie("session_token", context.cookie)
+        |> Endpoint.call(Endpoint.init([]))
+
+      assert response.status == 422
+    end
+
+    assert DB.one("SELECT COUNT(*) AS count FROM active_storage_blobs")["count"] == before
+  end
+
   test "token-free creation and signed authenticated disk PUT keep distinct protections",
        context do
     body = "token-free-upload"
@@ -72,6 +99,18 @@ defmodule Campfire.TokenlessUploadTest do
       |> Endpoint.call(Endpoint.init([]))
 
     assert valid.status == 204
+
+    for metadata <- ["[]", "123", ~s("legacy"), "not-json"] do
+      DB.query("UPDATE active_storage_blobs SET metadata=? WHERE id=?", [metadata, blob["id"]])
+
+      legacy =
+        upload
+        |> put_req_cookie("session_token", context.cookie)
+        |> Endpoint.call(Endpoint.init([]))
+
+      assert legacy.status == 204
+    end
+
     assert File.read!(Storage.path(blob["key"])) == body
 
     assert (conn(:put, upload_url <> "tampered", body)
