@@ -7,7 +7,7 @@ def run(side,port):
  subprocess.run([str(ROOT/'bin/parity-services'),'reset',side],check=True)
  pages={};users=json.loads((ROOT/'test/fixtures/seed.json').read_text())['tables']['users']
  for email in ['david@37signals.com','kevin@37signals.com']:
-  cookies={};_,p,_=request(port,'/session/new',cookies=cookies);token=re.search(r'name="csrf-token" content="([^"]+)"',p)[1]
+  cookies={};_,p,_=request(port,'/session/new',cookies=cookies);token=(re.search(r'name="csrf-token" content="([^"]+)"',p) or ("", ""))[1]
   assert request(port,'/session','POST',{'email_address':email,'password':'secret123456','authenticity_token':token},cookies)[0]==302
   for user in users:
    path=f'/users/{user["id"]}'
@@ -19,7 +19,7 @@ def run(side,port):
     status,p,_=request(port,'/users/149087659',cookies=cookies,headers=headers);assert status==200;pages[name]=normalize(p)
    status,p,_=request(port,'/users/149087659',cookies=cookies);assert status==200
    form=re.search(r'<form[^>]+action="/rooms/directs\?[^>]+>.*?</form>',p,re.S)[0]
-   token=re.search(r'name="authenticity_token" value="([^"]+)"',form)[1]
+   token=(re.search(r'name="authenticity_token" value="([^"]+)"',form) or ("", ""))[1]
    assert request(port,'/rooms/directs?user_ids%5B%5D=149087659','POST',{'authenticity_token':token},cookies)[0]==302
   status,p,_=request(port,'/users/9999999999',cookies=cookies);pages[email+'missing']={'status':status,'body':p};assert status==404
  assert request(port,'/users/149087659',cookies={})[0]==302

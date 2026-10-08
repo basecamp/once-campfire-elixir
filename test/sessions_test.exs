@@ -15,33 +15,41 @@ defmodule Campfire.SessionsTest do
     conn(:get, "/session/new") |> Router.call(Router.init([]))
   end
 
-  defp csrf_post(method, path, params) do
+  defp browser_write(method, path, params) do
     page = browser()
     cookie = page.resp_cookies["_campfire_session"][:value]
-    data = Rails.decrypt_cookie("_campfire_session", URI.decode(cookie))
-    token = Rails.csrf_mask(Rails.csrf_global(data["_csrf_token"]))
 
-    conn(method, path, Map.put(params, "authenticity_token", token))
+    conn(method, path, params)
     |> put_req_cookie("_campfire_session", cookie)
     |> Router.call(Router.init([]))
   end
 
-  test "login renders original frontend and reusable CSRF session" do
+  test "login renders token-free frontend and a Rails-readable browser session" do
     page = browser()
     assert page.status == 200
+    refute page.resp_body =~ ~s(<meta name="csrf-token")
+    refute page.resp_body =~ ~s(name="authenticity_token")
+
+    data =
+      Rails.decrypt_cookie(
+        "_campfire_session",
+        URI.decode(page.resp_cookies["_campfire_session"][:value])
+      )
+
+    refute Map.has_key?(data, "_csrf_token")
     assert page.resp_body =~ "<title>Sign in</title>"
     assert page.resp_body =~ "application-a54c74a7.js"
     assert page.resp_cookies["_campfire_session"][:http_only]
     assert length(Regex.scan(~r/lifebuoy-/, page.resp_body)) == 1
 
-    assert csrf_post(:post, "/session", %{
+    assert browser_write(:post, "/session", %{
              "email_address" => "david@37signals.com",
              "password" => "wrong"
            }).status == 401
   end
 
-  test "valid credentials start a Rails-readable session; CSRF rejects forgery" do
-    assert csrf_post(:post, "/session", %{
+  test "valid credentials start a Rails-readable session; fetch metadata rejects forgery" do
+    assert browser_write(:post, "/session", %{
              "email_address" => "david@37signals.com",
              "password" => "secret123456"
            }).status == 302
@@ -55,16 +63,62 @@ defmodule Campfire.SessionsTest do
         "email_address" => "david@37signals.com",
         "password" => "secret123456"
       })
+      |> Plug.Conn.put_req_header("sec-fetch-site", "cross-site")
       |> Router.call(Router.init([]))
 
     assert forged.status == 422
   end
 
+  test "HTTPS login needs metadata, not a token or browser cookie" do
+    params = %{"email_address" => "david@37signals.com", "password" => "secret123456"}
+
+    missing =
+      conn(
+        :post,
+        "https://campfire.test/session",
+        Map.put(params, "authenticity_token", "legacy-tab-token")
+      )
+      |> Router.call(Router.init([]))
+
+    assert missing.status == 422
+
+    valid =
+      conn(:post, "https://campfire.test/session", params)
+      |> Plug.Conn.put_req_header("sec-fetch-site", "same-origin")
+      |> Plug.Conn.put_req_header("origin", "https://campfire.test")
+      |> Router.call(Router.init([]))
+
+    assert valid.status == 302
+    assert valid.resp_cookies["session_token"]
+  end
+
+  test "setup form and creation do not generate or require tokens" do
+    DB.query("DELETE FROM accounts")
+    page = conn(:get, "/first_run") |> Router.call(Router.init([]))
+    assert page.status == 200
+    refute page.resp_body =~ ~s(name="authenticity_token")
+    refute page.resp_body =~ ~s(name="csrf-token")
+
+    response =
+      conn(:post, "https://campfire.test/first_run", %{
+        "user" => %{
+          "name" => "Setup Owner",
+          "email_address" => "setup@test.example",
+          "password" => "secret123456"
+        }
+      })
+      |> Plug.Conn.put_req_header("sec-fetch-site", "same-origin")
+      |> Router.call(Router.init([]))
+
+    assert response.status == 302
+    assert DB.one("SELECT id FROM accounts LIMIT 1")
+    assert response.resp_cookies["session_token"]
+  end
+
   test "return-to is removed once and the newly signed authentication cookie verifies" do
     c = conn(:get, "/rooms/486777696?before=123") |> Auth.request_authentication()
     cookie = c.resp_cookies["_campfire_session"][:value]
-    data = Rails.decrypt_cookie("_campfire_session", URI.decode(cookie))
-    token = Rails.csrf_mask(Rails.csrf_global(data["_csrf_token"]))
+    token = "legacy-tab-token"
 
     response =
       conn(:post, "/session", %{
@@ -119,13 +173,13 @@ defmodule Campfire.SessionsTest do
     for _ <- 1..10,
         do:
           assert(
-            csrf_post(:post, "/session", %{
+            browser_write(:post, "/session", %{
               "email_address" => "david@37signals.com",
               "password" => "bad"
             }).status == 401
           )
 
-    assert csrf_post(:post, "/session", %{
+    assert browser_write(:post, "/session", %{
              "email_address" => "david@37signals.com",
              "password" => "bad"
            }).status == 429
@@ -156,12 +210,12 @@ defmodule Campfire.SessionsTest do
 
   test "transfer requires purpose, unexpired signature and active user" do
     good = Rails.signed_id("User", 127_326_141, "transfer", "2026-03-02T20:00:00Z")
-    assert csrf_post(:put, "/session/transfers/" <> good, %{}).status == 302
+    assert browser_write(:put, "/session/transfers/" <> good, %{}).status == 302
     wrong = Rails.signed_id("User", 127_326_141, "avatar")
-    assert csrf_post(:put, "/session/transfers/" <> wrong, %{}).status == 400
+    assert browser_write(:put, "/session/transfers/" <> wrong, %{}).status == 400
     expired = Rails.signed_id("User", 127_326_141, "transfer", "2026-03-02T15:59:59Z")
-    assert csrf_post(:put, "/session/transfers/" <> expired, %{}).status == 400
+    assert browser_write(:put, "/session/transfers/" <> expired, %{}).status == 400
     DB.query("UPDATE users SET status=1 WHERE id=127326141")
-    assert csrf_post(:put, "/session/transfers/" <> good, %{}).status == 400
+    assert browser_write(:put, "/session/transfers/" <> good, %{}).status == 400
   end
 end

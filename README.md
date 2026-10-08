@@ -129,13 +129,21 @@ for the workload, validation and reproduction commands.
 
 ## Known differences
 
+- Browser writes use Fetch Metadata instead of CSRF tokens. Unsafe requests reject a null or
+  mismatched Origin and require `Sec-Fetch-Site: same-origin` or `same-site`; missing metadata
+  is accepted only over plain HTTP without `FORCE_SSL=1`. GET/HEAD and authenticated bot routes
+  retain their existing behavior. Forms and uploads generate no CSRF tokens, while legacy
+  signed cookies and token-bearing tabs remain readable. Signed disk PUTs use authenticated
+  upload ownership and expiring capabilities independently of Fetch Metadata. Only the trusted
+  local proxy can supply the effective scheme and origin.
+
 - Message pagination ETags describe the actual rendered body, and omit Last-Modified:
   compatible SQLite writers can change rich text or related presentation without touching
-  message timestamps. Fresh CSRF masks can therefore produce a new HTML ETag.
+  message timestamps.
 
-- Authenticated room, message-list, sidebar and search HTML bodies use a bounded
+- Authenticated room, message-list, sidebar and search complete HTML/gzip bodies use a bounded
   cache: 64 MiB per app, disabled with `CAMPFIRE_RESPONSE_CACHE_MB=0`.
-  Authorization, CSRF and cookies stay fresh; SQLite commits from any writer
+  Authorization and cookies stay fresh; SQLite commits from any writer
   invalidate cached bodies. Fragment keys also retain the pre-render SQLite epoch and
   request host, including conditional requests and when response caching is disabled.
   JSON and conditional requests retain their native paths.

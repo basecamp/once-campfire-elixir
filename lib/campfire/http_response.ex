@@ -71,7 +71,14 @@ defmodule Campfire.HttpResponse do
             put_resp_header(
               conn,
               "vary",
-              if(vary == "", do: "Accept-Encoding", else: vary <> ",Accept-Encoding")
+              if(
+                "accept-encoding" in (vary
+                                      |> String.downcase()
+                                      |> String.split(",")
+                                      |> Enum.map(&String.trim/1)),
+                do: vary,
+                else: if(vary == "", do: "Accept-Encoding", else: vary <> ",Accept-Encoding")
+              )
             )
           else
             conn
@@ -83,7 +90,7 @@ defmodule Campfire.HttpResponse do
               conn |> delete_resp_header("content-type") |> delete_resp_header("content-length"),
             else: conn
 
-        Campfire.HttpCompression.apply(conn)
+        conn |> Campfire.HttpCompression.apply() |> Campfire.ResponseCache.complete()
       end
     end)
   end

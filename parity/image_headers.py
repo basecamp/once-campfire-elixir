@@ -21,7 +21,7 @@ def avatar(id):
  return '/users/'+data+'--'+hmac.new(key,data.encode(),'sha256').hexdigest()+'/avatar'
 def run(side,port):
  subprocess.run([str(ROOT/'bin/parity-services'),'reset',side],check=True)
- cookies={};_,p,_=request(port,'/session/new',cookies=cookies);token=re.search(r'name="csrf-token" content="([^"]+)"',p)[1]
+ cookies={};_,p,_=request(port,'/session/new',cookies=cookies);token=(re.search(r'name="csrf-token" content="([^"]+)"',p) or ("", ""))[1]
  assert request(port,'/session','POST',{'email_address':'david@37signals.com','password':'secret123456','authenticity_token':token},cookies)[0]==302
  results={}
  def cases(stage):

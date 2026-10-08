@@ -2,7 +2,7 @@ defmodule Campfire.Signup do
   import Kernel, except: [sigil_r: 2]
   import Campfire.Sigils
   import Plug.Conn
-  alias Campfire.{Assets, Auth, DB, Page, People, Rails}
+  alias Campfire.{Assets, Auth, DB, Page, People}
   require EEx
   EEx.function_from_file(:defp, :form, "priv/templates/signup.html.eex", [:assigns])
   EEx.function_from_file(:defp, :nav, "priv/templates/signup_nav.html.eex", [:_assigns])
@@ -12,7 +12,7 @@ defmodule Campfire.Signup do
     account = DB.one("SELECT * FROM accounts LIMIT 1")
 
     cond do
-      conn.method == "POST" && !Auth.csrf_valid?(conn, conn.params) ->
+      conn.method == "POST" && !Auth.request_allowed?(conn) ->
         Campfire.HttpResponse.error(conn, 422)
 
       Auth.banned?(conn) ->
@@ -33,13 +33,11 @@ defmodule Campfire.Signup do
   end
 
   defp show(conn, account) do
-    {conn, data} = Auth.csrf_session(conn)
+    {conn, data} = Auth.browser_session(conn)
 
     content =
       form(
         path: Assets.html_escape(conn.request_path),
-        form_token:
-          Rails.csrf_mask(Rails.csrf_form(data["_csrf_token"], conn.request_path, "POST")),
         account_name: Assets.html_escape(account["name"]),
         account_version:
           account["updated_at"] |> String.replace(~r/[^0-9]/, "") |> String.slice(0, 14),

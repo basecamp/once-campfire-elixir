@@ -5,7 +5,7 @@ from sessions import ROOT,request,normalize
 ACTIONS=[('/account','PATCH','account'),('/account/custom_styles','PATCH','account'),('/users/me/profile','PATCH','user'),('/account/users/127326141','PATCH','user'),('/account/bots','POST','user'),('/rooms/opens','POST','room'),('/rooms/closeds','POST','room'),('/rooms/486777696/messages','POST','message'),('/rooms/486777696/messages/933434530','PATCH','message'),('/messages/933434530/boosts','POST','boost')]
 def run(side,port):
  subprocess.run([str(ROOT/'bin/parity-services'),'reset',side],check=True)
- cookies={};_,page,_=request(port,'/session/new',cookies=cookies);token=re.search(r'name="csrf-token" content="([^"]+)"',page)[1]
+ cookies={};_,page,_=request(port,'/session/new',cookies=cookies);token=(re.search(r'name="csrf-token" content="([^"]+)"',page) or ("", ""))[1]
  assert request(port,'/session','POST',{'email_address':'david@37signals.com','password':'secret123456','authenticity_token':token},cookies)[0]==302
  result={}
  for path,method,key in ACTIONS:

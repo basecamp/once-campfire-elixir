@@ -8,7 +8,7 @@ for side in ['reference','candidate']:subprocess.run([str(ROOT/'bin/parity-servi
 connections=[];credentials=[]
 for port in [47071,47070]:
  cookies={};status,page,_=request(port,'/session/new',cookies=cookies);assert status==200
- csrf=re.search(r'name="csrf-token" content="([^"]+)"',page)[1]
+ csrf=(re.search(r'name="csrf-token" content="([^"]+)"',page) or ("", ""))[1]
  status,_,_=request(port,'/session','POST',{'email_address':'david@37signals.com','password':'secret123456','authenticity_token':csrf},cookies);assert status==302
  ws=WebSocket(port,cookies);assert ws.receive()=={'type':'welcome'}
  identifier,status=ws.subscribe({'channel':'TypingNotificationsChannel','room_id':486777696});assert status=='confirm_subscription'

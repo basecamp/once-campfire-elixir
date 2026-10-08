@@ -4,7 +4,7 @@
   "contracts": [
     {
       "id": "sessions",
-      "description": "Cookies, signing, encryption, CSRF, authentication and old browser tabs",
+      "description": "Cookies, signing, encryption, Fetch Metadata, authentication and old browser tabs",
       "status": "verified",
       "evidence": [
         "parity/all-test.log",
@@ -15,9 +15,12 @@
         "parity/results/browser-pages.json",
         "test/user_agent_test.exs",
         "parity/results/session-lifecycle.json",
-        "parity/results/verification.json"
+        "parity/results/verification.json",
+        "test/fetch_metadata_test.exs",
+        "test/tokenless_upload_test.exs",
+        "test/response_cache_test.exs"
       ],
-      "notes": "Live credential/CSRF/session lifecycle, signed/encrypted cookie interoperability, old-form continuity and actual browser/logout flows pass."
+      "notes": "Historical token-era Rails parity receipts remain baseline evidence for cookies and login. Current native tests verify token-free forms, HTTPS login/setup/transfers, metadata/origin/TLS rejection, trusted proxy context and signed owner-authorized disk uploads; Rails CSRF crypto vectors remain historical compatibility tests, not active browser protection."
     },
     {
       "id": "routing",

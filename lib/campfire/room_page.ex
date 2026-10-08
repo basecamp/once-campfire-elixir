@@ -24,8 +24,7 @@ defmodule Campfire.RoomPage do
 
       true ->
         if room = Chat.room(user, room_id) do
-          {conn, data} = Auth.csrf_session(conn)
-          token = Campfire.ResponseCache.mask(Rails.csrf_global(data["_csrf_token"]))
+          {conn, data} = Auth.browser_session(conn)
           messages = messages(room, message_id)
           account = DB.one("SELECT * FROM accounts LIMIT 1")
           gid = Base.url_encode64("gid://campfire/#{room["type"]}/#{room["id"]}", padding: false)
@@ -44,17 +43,12 @@ defmodule Campfire.RoomPage do
             namespace: namespace(room),
             room_updated: MessagesView.epoch(room["updated_at"]),
             base: Assets.html_escape(Auth.base(conn)),
-            meta_token: token,
-            form_token:
-              Campfire.ResponseCache.mask(
-                Rails.csrf_form(data["_csrf_token"], "/rooms/#{room["id"]}/messages", "POST")
-              ),
             vapid: Assets.html_escape(System.get_env("VAPID_PUBLIC_KEY", "")),
             account_version:
               account["updated_at"] |> String.replace(~r/[^0-9]/, "") |> String.slice(0, 14),
             stream: Rails.sign_stream(gid <> ":messages"),
             invitation: invitation_for(conn, user, data, account, room),
-            messages: MessagesView.render_many(messages, Auth.base(conn), token)
+            messages: MessagesView.render_many(messages, Auth.base(conn))
           ]
 
           {conn, html} =
@@ -86,7 +80,7 @@ defmodule Campfire.RoomPage do
       Campfire.HttpResponse.exception(conn, 500, Campfire.Assets.read("public/500.html"))
   end
 
-  defp invitation_for(conn, user, data, account, room) do
+  defp invitation_for(conn, user, _data, account, room) do
     original = DB.one("SELECT id FROM rooms ORDER BY created_at LIMIT 1")
 
     count =
@@ -100,11 +94,7 @@ defmodule Campfire.RoomPage do
         account_version:
           account["updated_at"] |> String.replace(~r/[^0-9]/, "") |> String.slice(0, 14),
         join_url: Assets.html_escape(url),
-        qr: Base.url_encode64(url),
-        join_token:
-          Campfire.ResponseCache.mask(
-            Rails.csrf_form(data["_csrf_token"], "/account/join_code", "POST")
-          )
+        qr: Base.url_encode64(url)
       )
     else
       "    \n"

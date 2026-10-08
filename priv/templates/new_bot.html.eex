@@ -1,7 +1,7 @@
       
 
 <section class="panel">
-  <form class="flex flex-column gap" enctype="multipart/form-data" action="/account/bots" accept-charset="UTF-8" method="post"><input type="hidden" name="authenticity_token" value="<%= @form_token %>" />
+  <form class="flex flex-column gap" enctype="multipart/form-data" action="/account/bots" accept-charset="UTF-8" method="post">
     <h1 class="for-screen-reader">Chat Bot Setup</h1>
 <label class="align-center center avatar__form gap" data-controller="upload-preview">
   <div class="btn input--file">

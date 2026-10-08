@@ -7,7 +7,7 @@ defmodule Campfire.Admin do
 
     cond do
       !user -> Auth.request_authentication(conn)
-      !Auth.csrf_valid?(conn, conn.params) -> Campfire.HttpResponse.error(conn, 422)
+      !Auth.request_allowed?(conn) -> Campfire.HttpResponse.error(conn, 422)
       Auth.banned?(conn) -> head(conn, 429)
       admin_action?(action) && user["role"] != 1 -> head(conn, 403)
       true -> dispatch(Auth.set_auth_cookie(conn, session), user, action, id)

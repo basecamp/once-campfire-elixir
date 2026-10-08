@@ -1,6 +1,6 @@
       
 
-<form class="center" enctype="multipart/form-data" action="<%= @path %>" accept-charset="UTF-8" method="post"><input type="hidden" name="authenticity_token" value="<%= @form_token %>" />
+<form class="center" enctype="multipart/form-data" action="<%= @path %>" accept-charset="UTF-8" method="post">
   <section class="nametag u-relative">
     <div class="flex justify-center align-center pad-block">
       <img class="nametag__lanyard" aria-hidden="true" src="<%= Campfire.Assets.path("lanyard.svg") %>" />

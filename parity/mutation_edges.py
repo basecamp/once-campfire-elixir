@@ -6,7 +6,7 @@ from sessions import ROOT,request,normalize
 def run(side,port):
  subprocess.run([str(ROOT/'bin/parity-services'),'reset',side],check=True,env=dict(os.environ,CAMPFIRE_PARITY_TICK='1'))
  path=ROOT/'var'/('rails/db' if side=='reference' else 'candidate')/'production.sqlite3'
- cookies={};_,page,_=request(port,'/session/new',cookies=cookies);csrf=re.search(r'name="csrf-token" content="([^"]+)"',page)[1]
+ cookies={};_,page,_=request(port,'/session/new',cookies=cookies);csrf=(re.search(r'name="csrf-token" content="([^"]+)"',page) or ("", ""))[1]
  assert request(port,'/session','POST',{'email_address':'david@37signals.com','password':'secret123456','authenticity_token':csrf},cookies)[0]==302
  def state():
   with sqlite3.connect(path) as db:

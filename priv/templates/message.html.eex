@@ -28,42 +28,42 @@
 
     <div class="message__actions-menu border shadow" data-popup-target="menu">
       <div class="quick-boosts">
-          <form data-turbo-frame="boosting_message_<%= @client_id %>" data-action="popup#close" action="/messages/<%= @id %>/boosts" accept-charset="UTF-8" method="post"><%= @csrf_input %>
+          <form data-turbo-frame="boosting_message_<%= @client_id %>" data-action="popup#close" action="/messages/<%= @id %>/boosts" accept-charset="UTF-8" method="post">
             <input type="hidden" name="boost[content]" id="boost_content" value="👍" />
             <button name="button" type="submit" title="Thumbs up" class="btn message__action-btn" data-emoji="👍">
               <figure class="margin-none boost-character">👍</figure>
               <span class="for-screen-reader">Thumbs up</span>
-</button></form>          <form data-turbo-frame="boosting_message_<%= @client_id %>" data-action="popup#close" action="/messages/<%= @id %>/boosts" accept-charset="UTF-8" method="post"><%= @csrf_input %>
+</button></form>          <form data-turbo-frame="boosting_message_<%= @client_id %>" data-action="popup#close" action="/messages/<%= @id %>/boosts" accept-charset="UTF-8" method="post">
             <input type="hidden" name="boost[content]" id="boost_content" value="👏" />
             <button name="button" type="submit" title="Clapping" class="btn message__action-btn" data-emoji="👏">
               <figure class="margin-none boost-character">👏</figure>
               <span class="for-screen-reader">Clapping</span>
-</button></form>          <form data-turbo-frame="boosting_message_<%= @client_id %>" data-action="popup#close" action="/messages/<%= @id %>/boosts" accept-charset="UTF-8" method="post"><%= @csrf_input %>
+</button></form>          <form data-turbo-frame="boosting_message_<%= @client_id %>" data-action="popup#close" action="/messages/<%= @id %>/boosts" accept-charset="UTF-8" method="post">
             <input type="hidden" name="boost[content]" id="boost_content" value="👋" />
             <button name="button" type="submit" title="Waving hand" class="btn message__action-btn" data-emoji="👋">
               <figure class="margin-none boost-character">👋</figure>
               <span class="for-screen-reader">Waving hand</span>
-</button></form>          <form data-turbo-frame="boosting_message_<%= @client_id %>" data-action="popup#close" action="/messages/<%= @id %>/boosts" accept-charset="UTF-8" method="post"><%= @csrf_input %>
+</button></form>          <form data-turbo-frame="boosting_message_<%= @client_id %>" data-action="popup#close" action="/messages/<%= @id %>/boosts" accept-charset="UTF-8" method="post">
             <input type="hidden" name="boost[content]" id="boost_content" value="💪" />
             <button name="button" type="submit" title="Muscle" class="btn message__action-btn" data-emoji="💪">
               <figure class="margin-none boost-character">💪</figure>
               <span class="for-screen-reader">Muscle</span>
-</button></form>          <form data-turbo-frame="boosting_message_<%= @client_id %>" data-action="popup#close" action="/messages/<%= @id %>/boosts" accept-charset="UTF-8" method="post"><%= @csrf_input %>
+</button></form>          <form data-turbo-frame="boosting_message_<%= @client_id %>" data-action="popup#close" action="/messages/<%= @id %>/boosts" accept-charset="UTF-8" method="post">
             <input type="hidden" name="boost[content]" id="boost_content" value="❤️" />
             <button name="button" type="submit" title="Red heart" class="btn message__action-btn" data-emoji="❤️">
               <figure class="margin-none boost-character">❤️</figure>
               <span class="for-screen-reader">Red heart</span>
-</button></form>          <form data-turbo-frame="boosting_message_<%= @client_id %>" data-action="popup#close" action="/messages/<%= @id %>/boosts" accept-charset="UTF-8" method="post"><%= @csrf_input %>
+</button></form>          <form data-turbo-frame="boosting_message_<%= @client_id %>" data-action="popup#close" action="/messages/<%= @id %>/boosts" accept-charset="UTF-8" method="post">
             <input type="hidden" name="boost[content]" id="boost_content" value="😂" />
             <button name="button" type="submit" title="Face with tears of joy" class="btn message__action-btn" data-emoji="😂">
               <figure class="margin-none boost-character">😂</figure>
               <span class="for-screen-reader">Face with tears of joy</span>
-</button></form>          <form data-turbo-frame="boosting_message_<%= @client_id %>" data-action="popup#close" action="/messages/<%= @id %>/boosts" accept-charset="UTF-8" method="post"><%= @csrf_input %>
+</button></form>          <form data-turbo-frame="boosting_message_<%= @client_id %>" data-action="popup#close" action="/messages/<%= @id %>/boosts" accept-charset="UTF-8" method="post">
             <input type="hidden" name="boost[content]" id="boost_content" value="🎉" />
             <button name="button" type="submit" title="Party popper" class="btn message__action-btn" data-emoji="🎉">
               <figure class="margin-none boost-character">🎉</figure>
               <span class="for-screen-reader">Party popper</span>
-</button></form>          <form data-turbo-frame="boosting_message_<%= @client_id %>" data-action="popup#close" action="/messages/<%= @id %>/boosts" accept-charset="UTF-8" method="post"><%= @csrf_input %>
+</button></form>          <form data-turbo-frame="boosting_message_<%= @client_id %>" data-action="popup#close" action="/messages/<%= @id %>/boosts" accept-charset="UTF-8" method="post">
             <input type="hidden" name="boost[content]" id="boost_content" value="🔥" />
             <button name="button" type="submit" title="Fire" class="btn message__action-btn" data-emoji="🔥">
               <figure class="margin-none boost-character">🔥</figure>

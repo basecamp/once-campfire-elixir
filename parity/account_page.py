@@ -5,7 +5,7 @@ from sessions import ROOT,request,normalize
 from media import sign
 
 def login(port,email):
- c={};_,p,_=request(port,'/session/new',cookies=c);token=re.search(r'name="csrf-token" content="([^"]+)"',p)[1]
+ c={};_,p,_=request(port,'/session/new',cookies=c);token=(re.search(r'name="csrf-token" content="([^"]+)"',p) or ("", ""))[1]
  assert request(port,'/session','POST',{'email_address':email,'password':'secret123456','authenticity_token':token},c)[0]==302
  return c
 
@@ -18,7 +18,7 @@ def run(side,port):
  assert match and match[1].startswith('/account.')
  status,_,h=request(port,match[1],'PATCH',{'account[name]':'Account "<&> Ω','authenticity_token':match[2]},cookies);assert status==302,(side,status)
  status,p,_=request(port,'/account/edit',cookies=cookies);assert status==200;pages['renamed']=normalize(p)
- token=re.search(r'name="csrf-token" content="([^"]+)"',p)[1]
+ token=(re.search(r'name="csrf-token" content="([^"]+)"',p) or ("", ""))[1]
  for value in ['true','false']:
   status,_,_=request(port,match[1],'PUT',{'account[settings][restrict_room_creation_to_administrators]':value,'authenticity_token':token},cookies);assert status==302,(side,status)
   status,p,_=request(port,'/account/edit',cookies=cookies);assert status==200;pages['restriction_'+value]=normalize(p)

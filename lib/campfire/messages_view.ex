@@ -3,25 +3,23 @@ defmodule Campfire.MessagesView do
   import Campfire.Sigils
   alias Campfire.{Assets, DB, Mentions, RichText}
   require EEx
-  @csrf_placeholder "<!--campfire-csrf-input-->"
   EEx.function_from_file(:defp, :item, "priv/templates/message.html.eex", [:assigns])
   EEx.function_from_file(:defp, :boost_html, "priv/templates/boost.html.eex", [:assigns])
 
   EEx.function_from_file(:defp, :boosts_html, "priv/templates/boosts.html.eex", [:assigns])
 
-  def render(message, base, csrf \\ nil) do
+  def render(message, base) do
     :message
     |> Campfire.FragmentCache.record(message, fn ->
-      render_fragment(message, base, if(csrf, do: :placeholder))
+      render_fragment(message, base)
     end)
-    |> put_csrf(csrf)
   rescue
     _ -> failed_fragment()
   end
 
-  def render_many(messages, base, csrf), do: Enum.map_join(messages, &render(&1, base, csrf))
+  def render_many(messages, base), do: Enum.map_join(messages, &render(&1, base))
 
-  defp render_fragment(message, base, csrf) do
+  defp render_fragment(message, base) do
     creator = DB.one("SELECT * FROM users WHERE id=?", [message["creator_id"]])
     room = DB.one("SELECT * FROM rooms WHERE id=?", [message["room_id"]])
 
@@ -57,8 +55,7 @@ defmodule Campfire.MessagesView do
         if(all_emoji?(RichText.plain_text(body || "")), do: "message--emoji", else: ""),
       presentation: presentation_fragment(message, body),
       attachment_actions: attachment_actions(message),
-      boosting: render_boosts(message, csrf),
-      csrf_input: csrf_input(csrf)
+      boosting: render_boosts(message)
     )
   end
 
@@ -88,26 +85,25 @@ defmodule Campfire.MessagesView do
     end
   end
 
-  def render_boosts(message, csrf \\ nil) do
+  def render_boosts(message) do
     boosts_html(
       client_id: Assets.html_escape(message["client_message_id"]),
       id: message["id"],
       boosts:
         DB.query("SELECT * FROM boosts WHERE message_id=? ORDER BY created_at", [message["id"]])
-        |> Enum.map_join(&render_boost(&1, csrf))
+        |> Enum.map_join(&render_boost/1)
     )
     |> String.trim_trailing("\n")
   end
 
-  def render_boost(boost, csrf \\ nil) do
+  def render_boost(boost) do
     :boost
     |> Campfire.FragmentCache.record(boost, fn ->
-      render_boost_fragment(boost, if(csrf, do: :placeholder))
+      render_boost_fragment(boost)
     end)
-    |> put_csrf(csrf)
   end
 
-  defp render_boost_fragment(boost, csrf) do
+  defp render_boost_fragment(boost) do
     booster = DB.one("SELECT * FROM users WHERE id=?", [boost["booster_id"]])
 
     avatar =
@@ -123,19 +119,9 @@ defmodule Campfire.MessagesView do
       message_id: boost["message_id"],
       content: Assets.html_escape(boost["content"]),
       emoji: all_emoji?(boost["content"]),
-      avatar: avatar,
-      csrf_input: csrf_input(csrf)
+      avatar: avatar
     )
   end
-
-  defp csrf_input(:placeholder), do: @csrf_placeholder
-  defp csrf_input(nil), do: ""
-
-  defp csrf_input(token),
-    do: ~s(<input type="hidden" name="authenticity_token" value="#{Assets.html_escape(token)}" />)
-
-  defp put_csrf(html, :placeholder), do: html
-  defp put_csrf(html, token), do: String.replace(html, @csrf_placeholder, csrf_input(token))
 
   def presentation_element(message) do
     text =

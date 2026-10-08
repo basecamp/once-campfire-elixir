@@ -7,7 +7,7 @@ def run(side,port):
  subprocess.run([str(ROOT/'bin/parity-services'),'reset',side],check=True)
  results={}
  for email in ['david@37signals.com','kevin@37signals.com']:
-  c={};_,p,_=request(port,'/session/new',cookies=c);token=re.search(r'name="csrf-token" content="([^"]+)"',p)[1]
+  c={};_,p,_=request(port,'/session/new',cookies=c);token=(re.search(r'name="csrf-token" content="([^"]+)"',p) or ("", ""))[1]
   assert request(port,'/session','POST',{'email_address':email,'password':'secret123456','authenticity_token':token},c)[0]==302
   for path in ['/rooms/opens','/rooms/closeds','/rooms/directs','/rooms/opens/201306877','/rooms/closeds/201306877','/rooms/opens/486777696','/rooms/directs/699448325','/rooms/directs/201306877','/rooms/opens/186869642','/rooms/closeds/9999999999']:
    status,p,h=request(port,path,cookies=c)

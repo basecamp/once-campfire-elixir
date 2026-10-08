@@ -12,7 +12,7 @@ def decode(token,purpose):
 def run(side,port):
  subprocess.run([str(ROOT/'bin/parity-services'),'reset',side],check=True)
  cookies={};status,page,_=request(port,'/session/new',cookies=cookies);assert status==200
- csrf=re.search(r'name="csrf-token" content="([^"]+)"',page)[1]
+ csrf=(re.search(r'name="csrf-token" content="([^"]+)"',page) or ("", ""))[1]
  status,_,_=request(port,'/session','POST',{'email_address':'david@37signals.com','password':'secret123456','authenticity_token':csrf},cookies);assert status==302
  def raw(path,method='GET',body=None,headers=None):
   h={'Host':'campfire.test','Cookie':'; '.join(f'{k}={v}' for k,v in cookies.items()),'X-CSRF-Token':csrf}

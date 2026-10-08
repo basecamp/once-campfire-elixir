@@ -2,7 +2,7 @@ defmodule Campfire.AccountPage do
   import Kernel, except: [sigil_r: 2]
   import Campfire.Sigils
   import Plug.Conn
-  alias Campfire.{Assets, Attachments, Auth, Chat, DB, Mentions, Page, Rails}
+  alias Campfire.{Assets, Attachments, Auth, Chat, DB, Mentions, Page}
   require EEx
 
   for {function, file} <- [
@@ -30,7 +30,7 @@ defmodule Campfire.AccountPage do
 
     if user do
       conn = Auth.set_auth_cookie(conn, session)
-      {conn, data} = Auth.csrf_session(conn)
+      {conn, data} = Auth.browser_session(conn)
       account = DB.one("SELECT * FROM accounts LIMIT 1")
       admin = user["role"] == 1
 
@@ -41,7 +41,6 @@ defmodule Campfire.AccountPage do
 
       {administrators, members} = Enum.split_with(users, &(&1["role"] == 1))
       invitation = Auth.base(conn) <> "/join/" <> account["join_code"]
-      path = "/account.#{account["id"]}"
       version = String.replace(account["updated_at"], ~r/[^0-9]/, "") |> String.slice(0, 14)
       settings = Jason.decode!(account["settings"] || "{}")
       restriction = settings["restrict_room_creation_to_administrators"]
@@ -66,13 +65,9 @@ defmodule Campfire.AccountPage do
         members: Enum.map_join(members, &render_user(&1, user, data)),
         separator: administrators != [] && members != [],
         next_page: if(length(users) > 500, do: next_page(2), else: ""),
-        patch_token: token(data, path, "PATCH"),
-        put_token: token(data, path, "PUT"),
-        join_token: token(data, "/account/join_code", "POST"),
         delete_logo:
           if(Attachments.find("Account", account["id"], "logo"),
-            do:
-              logo_delete(account_version: version, token: token(data, "/account/logo", "DELETE")),
+            do: logo_delete(account_version: version),
             else: ""
           ),
         version: Assets.html_escape(System.get_env("APP_VERSION", "dev"))
@@ -102,7 +97,7 @@ defmodule Campfire.AccountPage do
       conn = Auth.set_auth_cookie(conn, session)
 
       if Enum.any?(Campfire.ResponseFormats.requested(conn), &(&1 in ["turbo_stream", "all"])) do
-        {conn, data} = Auth.csrf_session(conn)
+        {conn, data} = Auth.browser_session(conn)
         page = page_number(conn.params["page"])
         count = DB.one("SELECT COUNT(*) AS count FROM users WHERE status=0 AND role!=2")["count"]
 
@@ -128,7 +123,7 @@ defmodule Campfire.AccountPage do
             else: put_resp_header(conn, "vary", "Accept")
 
         conn
-        |> Auth.set_csrf_session(data)
+        |> Auth.set_browser_session(data)
         |> put_resp_content_type("text/vnd.turbo-stream.html")
         |> send_resp(200, body)
       else
@@ -150,10 +145,9 @@ defmodule Campfire.AccountPage do
     do:
       ~s(<turbo-frame loading="lazy" class="flex center" id="next_page_container" src="/account/users.turbo_stream?page=#{page}">\n  <div class="spinner center"></div>\n</turbo-frame>)
 
-  def render_user(target, current, data) do
+  def render_user(target, current, _data) do
     self = target["id"] == current["id"]
     admin = target["role"] == 1
-    path = "/account/users/#{target["id"]}"
 
     attrs = [
       id: target["id"],
@@ -165,8 +159,8 @@ defmodule Campfire.AccountPage do
 
     controls =
       if current["role"] == 1 && target["status"] == 0 do
-        role_form(attrs ++ [token: token(data, path, "PATCH")]) <>
-          if(self, do: "", else: delete_form(attrs ++ [token: token(data, path, "DELETE")]))
+        role_form(attrs ++ []) <>
+          if(self, do: "", else: delete_form(attrs ++ []))
       else
         ""
       end
@@ -186,7 +180,4 @@ defmodule Campfire.AccountPage do
         ]
     )
   end
-
-  defp token(data, path, method),
-    do: Rails.csrf_mask(Rails.csrf_form(data["_csrf_token"], path, method))
 end

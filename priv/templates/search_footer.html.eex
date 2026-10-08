@@ -3,7 +3,7 @@
       <img aria-hidden="true" src="<%= Campfire.Assets.path("arrow-left.svg") %>" />
       <span class="for-screen-reader">Exit search </span>
 </a>
-    <form class="margin-block flex-item-grow contain flex align-center gap" data-controller="form" data-action="keydown.esc-&gt;form#cancel" action="/searches" accept-charset="UTF-8" method="post"><input type="hidden" name="authenticity_token" value="<%= @search_token %>" />
+    <form class="margin-block flex-item-grow contain flex align-center gap" data-controller="form" data-action="keydown.esc-&gt;form#cancel" action="/searches" accept-charset="UTF-8" method="post">
       <div class="composer__input flex align-center flex-item-grow gap full-width input input--actor min-width">
         <img aria-hidden="true" class="composer__input-hint colorize--black" style="view-transition-name: input-btn;" src="<%= Campfire.Assets.path("search.svg") %>" width="20" height="20" />
 

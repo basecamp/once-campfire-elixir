@@ -9,7 +9,7 @@ def run(side,port):
  with sqlite3.connect(dbpath) as db:
   db.execute('DELETE FROM push_subscriptions')
   bot,room=db.execute("SELECT u.id || '-' || u.bot_token,m.room_id FROM users u JOIN memberships m ON m.user_id=u.id WHERE u.role=2 AND u.status=0 AND m.room_id=486777696 LIMIT 1").fetchone()
- cookies={};_,page,_=request(port,'/session/new',cookies=cookies);csrf=re.search(r'name="csrf-token" content="([^"]+)"',page)[1]
+ cookies={};_,page,_=request(port,'/session/new',cookies=cookies);csrf=(re.search(r'name="csrf-token" content="([^"]+)"',page) or ("", ""))[1]
  assert request(port,'/session','POST',{'email_address':'david@37signals.com','password':'secret123456','authenticity_token':csrf},cookies)[0]==302
  result={}
  def call(label,path,method='GET',body=None,jar=None):

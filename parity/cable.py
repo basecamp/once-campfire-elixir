@@ -12,7 +12,7 @@ def signed_stream(stream):
 def run(side,port):
  subprocess.run([str(ROOT/'bin/parity-services'),'reset',side],check=True)
  cookies={};status,page,_=request(port,'/session/new',cookies=cookies)
- csrf=re.search(r'name="csrf-token" content="([^"]+)"',page)[1]
+ csrf=(re.search(r'name="csrf-token" content="([^"]+)"',page) or ("", ""))[1]
  status,_,_=request(port,'/session','POST',{'email_address':'david@37signals.com','password':'secret123456','authenticity_token':csrf},cookies);assert status==302
  anon=WebSocket(port);unauthorized=anon.receive();assert unauthorized=={'type':'disconnect','reason':'unauthorized','reconnect':False};anon.close()
  a=WebSocket(port,cookies);b=WebSocket(port,cookies)

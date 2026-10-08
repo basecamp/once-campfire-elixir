@@ -9,7 +9,7 @@ def run(side,port):
  dbpath=ROOT/'var'/('rails/db' if side=='reference' else 'candidate')/'production.sqlite3'
  results={};cookies={}
  status,_,h=request(port,'/rooms/486777696?old=tab',cookies=cookies);assert status==302
- _,page,_=request(port,'/session/new',cookies=cookies);token=re.search(r'name="csrf-token" content="([^"]+)"',page)[1]
+ _,page,_=request(port,'/session/new',cookies=cookies);token=(re.search(r'name="csrf-token" content="([^"]+)"',page) or ("", ""))[1]
  status,_,h=request(port,'/session','POST',{'email_address':'david@37signals.com','password':'secret123456','authenticity_token':token},cookies);assert status==302
  results['return_to']=h['location'];assert h['location']=='http://campfire.test/rooms/486777696?old=tab'
  def session():
@@ -23,7 +23,7 @@ def run(side,port):
  status,page,_=request(port,'/users/me/profile',cookies=cookies);assert status==200
  transfer=re.search(r'/session/transfers/([^"<]+)',page)[1]
  new={};status,page,_=request(port,'/session/transfers/'+transfer,cookies=new);assert status==200
- transfer_token=re.search(r'name="authenticity_token" value="([^"]+)"',page)[1]
+ transfer_token=(re.search(r'name="authenticity_token" value="([^"]+)"',page) or ("", ""))[1]
  results['bad_transfer']=request(port,'/session/transfers/invalid','PATCH',{'authenticity_token':transfer_token},new)[0]
  results['transfer']=request(port,'/session/transfers/'+transfer,'PATCH',{'authenticity_token':transfer_token},new)[0]
  sock=WebSocket(port,cookies);assert sock.receive()=={'type':'welcome'}
@@ -33,7 +33,7 @@ def run(side,port):
  results['logout_redirect']=h['location'];results['disconnect']=sock.receive();sock.close()
  results['old_tab']=request(port,'/account/edit',cookies=old)[0]
  results['transferred_session']=request(port,'/account/edit',cookies=new)[0]
- anonymous={};_,page,_=request(port,'/session/new',cookies=anonymous);csrf=re.search(r'name="csrf-token" content="([^"]+)"',page)[1]
+ anonymous={};_,page,_=request(port,'/session/new',cookies=anonymous);csrf=(re.search(r'name="csrf-token" content="([^"]+)"',page) or ("", ""))[1]
  results['rate_limit']=[]
  for i in range(11):
   status,page,h=request(port,'/session','POST',{'email_address':'david@37signals.com','password':'wrong','authenticity_token':csrf},anonymous)

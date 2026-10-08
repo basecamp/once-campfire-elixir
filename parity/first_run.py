@@ -12,7 +12,7 @@ def run(side,port):
   for table in fixture['tables']:
    if table not in ['schema_migrations','ar_internal_metadata']:db.execute('DELETE FROM "'+table+'"')
  cookies={};status,page,h=request(port,'/first_run',cookies=cookies);assert status==200
- token=re.search(r'name="authenticity_token" value="([^"]+)"',page)[1]
+ token=(re.search(r'name="authenticity_token" value="([^"]+)"',page) or ("", ""))[1]
  status,body,h=request(port,'/first_run','POST',{'user[name]':'Elixir Owner','user[email_address]':'owner@example.com','user[password]':'setup-password','authenticity_token':token},cookies);assert status==302
  state={}
  with sqlite3.connect(path) as db:
@@ -30,7 +30,7 @@ def run(side,port):
  status,body,h=request(port,'/first_run',cookies=cookies);assert status==302
  # Verify the normalized salted password by authenticating against each runtime.
  status,body,h=request(port,'/session/new',cookies=cookies);assert status==200
- token=re.search(r'name="authenticity_token" value="([^"]+)"',body)[1]
+ token=(re.search(r'name="authenticity_token" value="([^"]+)"',body) or ("", ""))[1]
  status,_,_=request(port,'/session','POST',{'email_address':'owner@example.com','password':'setup-password','authenticity_token':token},cookies);assert status==302
  return {'page':normalize(page),'rows':state}
 a=run('reference',47071);b=run('candidate',47070)

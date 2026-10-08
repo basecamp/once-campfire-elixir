@@ -7,7 +7,7 @@ from websocket import WebSocket
 
 def run(side,port):
  subprocess.run([str(ROOT/'bin/parity-services'),'reset',side],check=True)
- cookies={};_,page,_=request(port,'/session/new',cookies=cookies);token=re.search(r'name="csrf-token" content="([^"]+)"',page)[1]
+ cookies={};_,page,_=request(port,'/session/new',cookies=cookies);token=(re.search(r'name="csrf-token" content="([^"]+)"',page) or ("", ""))[1]
  assert request(port,'/session','POST',{'email_address':'david@37signals.com','password':'secret123456','authenticity_token':token},cookies)[0]==302
  sock=WebSocket(port,cookies);assert sock.receive()=={'type':'welcome'}
  for stream in ['rooms',base64.urlsafe_b64encode(b'gid://campfire/User/127326141').decode().rstrip('=')+':rooms']:

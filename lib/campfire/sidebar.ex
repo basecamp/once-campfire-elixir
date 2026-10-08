@@ -16,7 +16,7 @@ defmodule Campfire.Sidebar do
     {conn, user, session} = Auth.session_user(conn)
 
     if user do
-      {conn, data} = Auth.csrf_session(conn)
+      {conn, data} = Auth.browser_session(conn)
 
       rows =
         DB.query(
@@ -38,11 +38,6 @@ defmodule Campfire.Sidebar do
         DB.query("SELECT * FROM users WHERE status=0 ORDER BY created_at")
         |> Enum.reject(&(&1["id"] in excludes))
         |> Enum.take(max(20 - length(excludes), 0))
-
-      token =
-        Campfire.ResponseCache.mask(
-          Rails.csrf_form(data["_csrf_token"], "/rooms/directs", "POST")
-        )
 
       account = DB.one("SELECT settings FROM accounts LIMIT 1")
       settings = Jason.decode!(account["settings"] || "{}")
@@ -77,8 +72,7 @@ defmodule Campfire.Sidebar do
               placeholder(
                 id: u["id"],
                 avatar: avatar_path(u),
-                name: Assets.html_escape(first_name(u)),
-                token: token
+                name: Assets.html_escape(first_name(u))
               )
             end)
         )

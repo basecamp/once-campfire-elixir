@@ -1,6 +1,6 @@
 defmodule Campfire.SettingsPages do
   import Plug.Conn
-  alias Campfire.{Assets, Attachments, Auth, Chat, DB, Page, Rails, Storage}
+  alias Campfire.{Assets, Attachments, Auth, Chat, DB, Page, Storage}
   require EEx
   EEx.function_from_file(:defp, :styles, "priv/templates/custom_styles.html.eex", [:assigns])
 
@@ -25,7 +25,7 @@ defmodule Campfire.SettingsPages do
         head(conn, 403)
 
       true ->
-        {conn, data} = Auth.csrf_session(Auth.set_auth_cookie(conn, session))
+        {conn, data} = Auth.browser_session(Auth.set_auth_cookie(conn, session))
         show(conn, user, data, action, id)
     end
   end
@@ -36,8 +36,7 @@ defmodule Campfire.SettingsPages do
     body =
       styles(
         base: Assets.html_escape(Auth.base(conn)),
-        styles: Assets.html_escape(account["custom_styles"] || ""),
-        form_token: token(data, "/account/custom_styles", "PATCH")
+        styles: Assets.html_escape(account["custom_styles"] || "")
       )
 
     page(conn, user, data, "Custom styles", styles_nav([]), body)
@@ -47,8 +46,7 @@ defmodule Campfire.SettingsPages do
     body =
       new_bot(
         avatar_src: Assets.path("default-bot-avatar.svg"),
-        webhook_value: "",
-        form_token: token(data, "/account/bots", "POST")
+        webhook_value: ""
       )
 
     page(conn, user, data, "New chat bot", new_bot_nav([]), body)
@@ -56,7 +54,6 @@ defmodule Campfire.SettingsPages do
 
   defp show(conn, user, data, :edit_bot, id) do
     if bot = DB.one("SELECT * FROM users WHERE id=? AND role=2 AND status=0", [Chat.integer(id)]) do
-      path = "/account/bots/#{bot["id"]}"
       avatar = Attachments.find("User", bot["id"], "avatar")
       hook = DB.one("SELECT url FROM webhooks WHERE user_id=?", [bot["id"]])
 
@@ -72,10 +69,7 @@ defmodule Campfire.SettingsPages do
               )
             ),
           webhook_value:
-            if(hook && hook["url"], do: ~s( value="#{Assets.html_escape(hook["url"])}"), else: ""),
-          form_token: token(data, path, "PATCH"),
-          delete_token: token(data, path, "DELETE"),
-          key_token: token(data, path <> "/key", "PUT")
+            if(hook && hook["url"], do: ~s( value="#{Assets.html_escape(hook["url"])}"), else: "")
         )
 
       page(conn, user, data, "Edit bot", edit_bot_nav([]), body)
@@ -88,9 +82,6 @@ defmodule Campfire.SettingsPages do
     {conn, html} = Page.render(conn, user, data, title: title, nav: nav, content: content)
     conn |> put_resp_content_type("text/html") |> send_resp(200, html)
   end
-
-  defp token(data, path, method),
-    do: Rails.csrf_mask(Rails.csrf_form(data["_csrf_token"], path, method))
 
   defp head(conn, status),
     do: conn |> put_resp_header("content-type", "text/html") |> send_resp(status, "")

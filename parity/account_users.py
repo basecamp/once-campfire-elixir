@@ -6,7 +6,7 @@ from sessions import ROOT,request,normalize
 def run(side,port):
  subprocess.run([str(ROOT/'bin/parity-services'),'reset',side],check=True)
  cookies={};_,body,_=request(port,'/session/new',cookies=cookies)
- token=re.search(r'name="csrf-token" content="([^"]+)"',body)[1]
+ token=(re.search(r'name="csrf-token" content="([^"]+)"',body) or ("", ""))[1]
  assert request(port,'/session','POST',{'email_address':'david@37signals.com','password':'secret123456','authenticity_token':token},cookies)[0]==302
  results={}
  def capture(path,headers=None):

@@ -9,7 +9,7 @@ defmodule Campfire.UnfurlLinks do
       !user ->
         Auth.request_authentication(conn)
 
-      !Auth.csrf_valid?(conn, conn.params) ->
+      !Auth.request_allowed?(conn) ->
         Campfire.HttpResponse.error(conn, 422)
 
       Auth.banned?(conn) ->

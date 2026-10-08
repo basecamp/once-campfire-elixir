@@ -27,7 +27,7 @@ defmodule Campfire.ResponseCacheTest do
 
     session = Auth.start_session(conn(:get, "/"), user).resp_cookies["session_token"].value
     data = %{"session_id" => "response-cache-test", "_csrf_token" => Rails.csrf_token()}
-    csrf = Auth.set_csrf_session(conn(:get, "/"), data).resp_cookies["_campfire_session"].value
+    csrf = Auth.set_browser_session(conn(:get, "/"), data).resp_cookies["_campfire_session"].value
     {:ok, foreign} = SQL.open(System.fetch_env!("DATABASE_PATH"))
     on_exit(fn -> SQL.close(foreign) end)
     %{user: user, room: room, session: session, csrf: csrf, data: data, foreign: foreign}
@@ -44,31 +44,30 @@ defmodule Campfire.ResponseCacheTest do
   defp get(context, path, headers \\ []),
     do: request(context, path, headers) |> Endpoint.call(Endpoint.init([]))
 
-  defp meta(body),
-    do: Regex.run(~r{<meta name="csrf-token" content="([^"]+)"}, body) |> Enum.at(1)
-
-  test "hot pages retain literal token text and regenerate valid masked tokens and cookies",
-       context do
-    Chat.create_message(context.user, context.room, context.data["_csrf_token"])
+  test "hot pages cache exact identity and gzip bytes without token substitution", context do
+    literal = "campfire-csrf-input authenticity_token literal-cache-text"
+    Chat.create_message(context.user, context.room, literal)
     path = "/rooms/#{context.room["id"]}"
-    first = get(context, path)
-    second = get(context, path)
-    assert first.status == 200 && second.status == 200
-    assert second.assigns[:response_cache_hit]
-    assert second.resp_body =~ context.data["_csrf_token"]
-    refute meta(first.resp_body) == meta(second.resp_body)
 
-    probe =
-      request(context, path)
-      |> Map.put(:method, "POST")
-      |> fetch_cookies()
-      |> put_req_header("x-csrf-token", meta(second.resp_body))
+    for headers <- [[], [{"accept-encoding", "gzip"}]] do
+      first = get(context, path, headers)
+      second = get(context, path, headers)
+      assert first.status == 200 && second.status == 200
+      assert second.assigns[:response_cache_hit]
+      assert first.resp_body == second.resp_body
 
-    assert Auth.csrf_valid?(probe, %{})
-    assert second.resp_cookies["session_token"].value
-    assert second.resp_cookies["_campfire_session"].value
-    assert second.resp_cookies["last_room"].value == to_string(context.room["id"])
-    refute Regex.match?(~r/csrf-[0-9A-F]{32}-[0-9]+/, second.resp_body)
+      body =
+        if get_resp_header(second, "content-encoding") == ["gzip"],
+          do: :zlib.gunzip(second.resp_body),
+          else: second.resp_body
+
+      assert body =~ literal
+      refute body =~ ~s(<meta name="csrf-token")
+      refute body =~ ~s(name="authenticity_token")
+      assert second.resp_cookies["session_token"].value
+      assert second.resp_cookies["_campfire_session"].value
+      assert second.resp_cookies["last_room"].value == to_string(context.room["id"])
+    end
   end
 
   test "local and foreign unversioned content and presentation writes invalidate", context do
@@ -256,7 +255,7 @@ defmodule Campfire.ResponseCacheTest do
 
     rendered = Campfire.RoomPage.show(prepared, to_string(context.room["id"]))
     assert rendered.status == 200
-    ResponseCache.finish()
+    ResponseCache.cleanup()
     final = get(context, path)
     refute final.assigns[:response_cache_hit]
     assert final.resp_body =~ "After render"
@@ -284,7 +283,7 @@ defmodule Campfire.ResponseCacheTest do
       Map.put(context.data, "flash", %{"discard" => [], "flashes" => %{"notice" => "fresh flash"}})
 
     flash_cookie =
-      Auth.set_csrf_session(conn(:get, "/"), flash_data).resp_cookies["_campfire_session"].value
+      Auth.set_browser_session(conn(:get, "/"), flash_data).resp_cookies["_campfire_session"].value
 
     flashed = get(%{context | csrf: flash_cookie}, path)
     assert flashed.resp_body =~ "fresh flash"

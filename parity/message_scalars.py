@@ -6,7 +6,7 @@ from sessions import ROOT,request,normalize
 def run(side,port):
  subprocess.run([str(ROOT/'bin/parity-services'),'reset',side],check=True)
  path=ROOT/'var'/('rails/db' if side=='reference' else 'candidate')/'production.sqlite3'
- jar={};_,page,_=request(port,'/session/new',cookies=jar);csrf=re.search(r'name="csrf-token" content="([^"]+)"',page)[1]
+ jar={};_,page,_=request(port,'/session/new',cookies=jar);csrf=(re.search(r'name="csrf-token" content="([^"]+)"',page) or ("", ""))[1]
  assert request(port,'/session','POST',{'email_address':'david@37signals.com','password':'secret123456','authenticity_token':csrf},jar)[0]==302
  def send(url,method,key,attrs):
   c=http.client.HTTPConnection('127.0.0.1',port,timeout=30);c.request(method,url,json.dumps({key:attrs}),{'Host':'campfire.test','Content-Type':'application/json','Accept':'text/vnd.turbo-stream.html' if key=='message' and method=='POST' else 'text/html','Cookie':'; '.join(k+'='+v for k,v in jar.items()),'X-CSRF-Token':csrf});r=c.getresponse();body=r.read().decode();headers=dict((k.lower(),v) for k,v in r.getheaders());c.close()

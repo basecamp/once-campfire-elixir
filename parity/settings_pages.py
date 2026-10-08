@@ -8,7 +8,7 @@ def run(side,port):
  subprocess.run([str(ROOT/'bin/parity-services'),'reset',side],check=True)
  cookies={};pages={}
  assert request(port,'/account/bots/new',cookies=cookies)[0]==302
- _,p,_=request(port,'/session/new',cookies=cookies);token=re.search(r'name="csrf-token" content="([^"]+)"',p)[1]
+ _,p,_=request(port,'/session/new',cookies=cookies);token=(re.search(r'name="csrf-token" content="([^"]+)"',p) or ("", ""))[1]
  assert request(port,'/session','POST',{'email_address':'david@37signals.com','password':'secret123456','authenticity_token':token},cookies)[0]==302
  for path in ['/account/bots','/account/custom_styles/edit','/account/bots/new','/account/bots/394959859/edit','/account/bots/773523956/edit']:
   status,p,_=request(port,path,cookies=cookies);assert status==200,(side,path,status,p[:500]);pages[path]=normalize(p)
@@ -27,7 +27,7 @@ def run(side,port):
  pages['bot_after_update']=normalize(p)
  status,p,_=request(port,'/account/bots',cookies=cookies);assert status==200;pages['bots_after_update']=normalize(p)
  # A regular member cannot administer bots or custom styles.
- member={};_,p,_=request(port,'/session/new',cookies=member);membertoken=re.search(r'name="csrf-token" content="([^"]+)"',p)[1]
+ member={};_,p,_=request(port,'/session/new',cookies=member);membertoken=(re.search(r'name="csrf-token" content="([^"]+)"',p) or ("", ""))[1]
  status,_,_=request(port,'/session','POST',{'email_address':'kevin@37signals.com','password':'secret123456','authenticity_token':membertoken},member);assert status==302,(side,status)
  for path in ['/account/bots/new','/account/custom_styles/edit','/account/bots/394959859/edit']:
   assert request(port,path,cookies=member)[0]==403

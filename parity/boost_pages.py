@@ -5,7 +5,7 @@ from sessions import ROOT,request,normalize
 
 def run(side,port):
  subprocess.run([str(ROOT/'bin/parity-services'),'reset',side],check=True)
- cookies={};_,p,_=request(port,'/session/new',cookies=cookies);token=re.search(r'name="csrf-token" content="([^"]+)"',p)[1]
+ cookies={};_,p,_=request(port,'/session/new',cookies=cookies);token=(re.search(r'name="csrf-token" content="([^"]+)"',p) or ("", ""))[1]
  assert request(port,'/session','POST',{'email_address':'david@37signals.com','password':'secret123456','authenticity_token':token},cookies)[0]==302
  fixture=json.loads((ROOT/'test/fixtures/seed.json').read_text());message=next(m for m in fixture['tables']['messages'] if m['room_id']==486777696)
  path=f'/messages/{message["id"]}/boosts';pages={}
@@ -15,7 +15,7 @@ def run(side,port):
    status,p,_=request(port,url,cookies=cookies,headers=headers);assert status==200,(side,name,status,p[:500]);pages[name+('_frame' if frame else '')]=normalize(p)
  # Submit the actual per-form token; the created boost must appear in both layouts.
  status,p,_=request(port,path+'/new',cookies=cookies)
- token=re.search(r'name="authenticity_token" value="([^"]+)"',p)[1]
+ token=(re.search(r'name="authenticity_token" value="([^"]+)"',p) or ("", ""))[1]
  assert request(port,path,'POST',{'boost[content]':'Nice! Ω','authenticity_token':token},cookies)[0]==302
  for frame in [False,True]:
   status,p,_=request(port,path,cookies=cookies,headers={'Turbo-Frame':'boosting_message_'+message['client_message_id']} if frame else {});assert status==200

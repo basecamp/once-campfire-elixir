@@ -22,7 +22,7 @@ defmodule Campfire.Navigation do
       if room do
         Auth.redirect(conn, "/rooms/#{room["id"]}")
       else
-        {conn, data} = Auth.csrf_session(conn)
+        {conn, data} = Auth.browser_session(conn)
 
         {conn, html} =
           Page.render(conn, user, data,

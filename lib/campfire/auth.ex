@@ -74,9 +74,9 @@ defmodule Campfire.Auth do
       ]) != nil
   end
 
-  def csrf_session(%{assigns: %{response_cache_csrf: data}} = conn), do: {conn, data}
+  def browser_session(%{assigns: %{response_cache_session: data}} = conn), do: {conn, data}
 
-  def csrf_session(conn) do
+  def browser_session(conn) do
     conn = fetch_cookies(conn)
 
     data =
@@ -90,12 +90,11 @@ defmodule Campfire.Auth do
       else:
         {conn,
          %{
-           "session_id" => Base.encode16(:crypto.strong_rand_bytes(16), case: :lower),
-           "_csrf_token" => Rails.csrf_token()
+           "session_id" => Base.encode16(:crypto.strong_rand_bytes(16), case: :lower)
          }}
   end
 
-  def set_csrf_session(conn, data),
+  def set_browser_session(conn, data),
     do:
       put_resp_cookie(
         conn,
@@ -106,24 +105,27 @@ defmodule Campfire.Auth do
         max_age: DateTime.diff(permanent_expiry(), Campfire.Clock.now())
       )
 
-  def csrf_valid?(conn, params) do
-    {_, data} = csrf_session(conn)
-    origin = List.first(get_req_header(conn, "origin"))
-    origin_ok = is_nil(origin) or origin == base(conn)
-    tokens = [params["authenticity_token"], List.first(get_req_header(conn, "x-csrf-token"))]
+  def request_allowed?(conn) do
+    if conn.method in ["GET", "HEAD"] do
+      true
+    else
+      origins = get_req_header(conn, "origin")
+      origin_ok = origins == [] or origins == [base(conn)]
 
-    origin_ok &&
-      Enum.any?(
-        tokens,
-        &Rails.csrf_valid?(&1, data["_csrf_token"], conn.request_path, conn.method)
-      )
+      origin_ok &&
+        case get_req_header(conn, "sec-fetch-site") do
+          [site] when site in ["same-origin", "same-site"] -> true
+          [] -> conn.scheme == :http && System.get_env("FORCE_SSL") != "1"
+          _ -> false
+        end
+    end
   end
 
   def request_authentication(conn) do
-    {conn, data} = csrf_session(conn)
+    {conn, data} = browser_session(conn)
 
     conn
-    |> set_csrf_session(
+    |> set_browser_session(
       Map.put(
         data,
         "return_to_after_authenticating",
@@ -135,11 +137,11 @@ defmodule Campfire.Auth do
   end
 
   def post_authenticating(conn) do
-    {conn, data} = csrf_session(conn)
+    {conn, data} = browser_session(conn)
     destination = data["return_to_after_authenticating"] || base(conn) <> "/"
 
     conn
-    |> set_csrf_session(Map.delete(data, "return_to_after_authenticating"))
+    |> set_browser_session(Map.delete(data, "return_to_after_authenticating"))
     |> redirect(destination)
   end
 

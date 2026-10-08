@@ -7,7 +7,7 @@ CASES=[r for r in VECTORS if r['ua'] and '\n' not in r['ua'] and '\r' not in r['
 CASES=[r for r in CASES if r['blocked']][:20]+[r for r in CASES if not r['blocked']][:12]
 def run(side,port):
  subprocess.run([str(ROOT/'bin/parity-services'),'reset',side],check=True)
- pages={};cookies={};_,p,_=request(port,'/session/new',cookies=cookies);token=re.search(r'name="csrf-token" content="([^"]+)"',p)[1]
+ pages={};cookies={};_,p,_=request(port,'/session/new',cookies=cookies);token=(re.search(r'name="csrf-token" content="([^"]+)"',p) or ("", ""))[1]
  assert request(port,'/session','POST',{'email_address':'david@37signals.com','password':'secret123456','authenticity_token':token},cookies)[0]==302
  for i,row in enumerate(CASES):
   headers={'User-Agent':row['ua']}

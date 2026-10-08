@@ -237,10 +237,10 @@ defmodule Campfire.Storage do
   end
 
   def direct_upload(conn) do
-    {conn, _user, session} = Auth.session_lookup(conn)
+    {conn, user, session} = Auth.session_lookup(conn)
 
     cond do
-      !Auth.csrf_valid?(conn, conn.params) ->
+      !Auth.request_allowed?(conn) ->
         Campfire.HttpResponse.error(conn, 422)
 
       !session ->
@@ -255,7 +255,7 @@ defmodule Campfire.Storage do
           key = Campfire.Random.token(28, "0123456789abcdefghijklmnopqrstuvwxyz")
           type = attrs["content_type"]
           size = Chat.integer(attrs["byte_size"])
-          metadata = attrs["metadata"] || %{}
+          metadata = Map.put(attrs["metadata"] || %{}, "campfire_upload_user_id", user["id"])
 
           case DB.query(
                  "INSERT INTO active_storage_blobs (key,filename,content_type,metadata,service_name,byte_size,checksum,created_at) VALUES (?,?,?,?,'local',?,?,?) RETURNING *",
@@ -323,7 +323,7 @@ defmodule Campfire.Storage do
   end
 
   def upload(conn, id) do
-    {conn, _user, session} = Auth.session_lookup(conn)
+    {conn, user, session} = Auth.session_lookup(conn)
 
     if session do
       case Rails.verify_message("ActiveStorage", id, "blob_token") do
@@ -342,20 +342,31 @@ defmodule Campfire.Storage do
           content_length =
             get_req_header(conn, "content-length") |> List.first() |> Chat.integer()
 
-          if content_type == type && content_length == size do
-            {:ok, body, conn} = Campfire.Body.read_all(conn)
-            file = path(key)
-            File.mkdir_p!(Path.dirname(file))
-            File.write!(file, body)
+          blob = DB.one("SELECT metadata FROM active_storage_blobs WHERE key=?", [key])
+          owner = if blob, do: Jason.decode!(blob["metadata"] || "{}")["campfire_upload_user_id"]
 
-            if byte_size(body) == size && Base.encode64(:crypto.hash(:md5, body)) == checksum do
-              send_resp(conn, 204, "")
-            else
-              File.rm(file)
+          cond do
+            !blob ->
+              head(conn, 404)
+
+            owner && owner != user["id"] ->
+              head(conn, 403)
+
+            content_type == type && content_length == size ->
+              {:ok, body, conn} = Campfire.Body.read_all(conn)
+              file = path(key)
+              File.mkdir_p!(Path.dirname(file))
+              File.write!(file, body)
+
+              if byte_size(body) == size && Base.encode64(:crypto.hash(:md5, body)) == checksum do
+                send_resp(conn, 204, "")
+              else
+                File.rm(file)
+                head(conn, 422)
+              end
+
+            true ->
               head(conn, 422)
-            end
-          else
-            head(conn, 422)
           end
 
         _ ->

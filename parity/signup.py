@@ -13,7 +13,7 @@ def run(side,port):
  cookies={};results={}
  assert request(port,'/join/invalid',cookies=cookies)[0]==404
  status,page,_=request(port,'/join/'+code,cookies=cookies);assert status==200,(side,status)
- token=re.search(r'name="authenticity_token" value="([^"]+)"',page)[1]
+ token=(re.search(r'name="authenticity_token" value="([^"]+)"',page) or ("", ""))[1]
  assert request(port,'/join/'+code,'POST',{'user[name]':'Forged signup'},cookies)[0]==422
  duplicate={'user[name]':'Duplicate','user[email_address]':'david@37signals.com','user[password]':'duplicate-password','authenticity_token':token}
  status,body,h=request(port,'/join/'+code,'POST',duplicate,cookies);assert status==302,(side,status,body[:200])
@@ -25,7 +25,7 @@ def run(side,port):
  results['authenticated_location']=h['location']
  # A second signup uploads original file bytes through the actual multipart form.
  other={};status,form,_=request(port,'/join/'+code,cookies=other);assert status==200
- formtoken=re.search(r'name="authenticity_token" value="([^"]+)"',form)[1]
+ formtoken=(re.search(r'name="authenticity_token" value="([^"]+)"',form) or ("", ""))[1]
  boundary='campfire-signup-parity';parts=[]
  for key,value in [('authenticity_token',formtoken),('user[name]','Uploaded avatar user'),('user[email_address]','avatar-signup@example.com'),('user[password]','avatar-password')]:
   parts.append(f'--{boundary}\r\nContent-Disposition: form-data; name="{key}"\r\n\r\n{value}\r\n'.encode())
@@ -68,7 +68,7 @@ def run(side,port):
  results['rows']=rows
  # Independently validate the new salted password by signing in again.
  other={};status,login,_=request(port,'/session/new',cookies=other);assert status==200
- token=re.search(r'name="authenticity_token" value="([^"]+)"',login)[1]
+ token=(re.search(r'name="authenticity_token" value="([^"]+)"',login) or ("", ""))[1]
  assert request(port,'/session','POST',{'email_address':'invite-parity@example.com','password':'signup-password','authenticity_token':token},other)[0]==302
  return results
 

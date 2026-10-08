@@ -2,19 +2,19 @@ defmodule Campfire.Flash do
   alias Campfire.{Assets, Auth}
 
   def put(conn, key, message) do
-    {conn, data} = Auth.csrf_session(conn)
+    {conn, data} = Auth.browser_session(conn)
     flash = %{"discard" => [], "flashes" => %{to_string(key) => message}}
 
     conn
     |> Plug.Conn.assign(:new_flash, true)
-    |> Auth.set_csrf_session(Map.put(data, "flash", flash))
+    |> Auth.set_browser_session(Map.put(data, "flash", flash))
   end
 
   def sweep(conn) do
     if conn.assigns[:new_flash] || conn.assigns[:rails_exception] do
       conn
     else
-      {conn, incoming} = Auth.csrf_session(conn)
+      {conn, incoming} = Auth.browser_session(conn)
 
       if incoming["flash"] do
         data =
@@ -27,7 +27,7 @@ defmodule Campfire.Flash do
           end
 
         if is_map(data) && data["flash"],
-          do: Auth.set_csrf_session(conn, Map.delete(data, "flash")),
+          do: Auth.set_browser_session(conn, Map.delete(data, "flash")),
           else: conn
       else
         conn

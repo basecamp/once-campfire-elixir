@@ -23,7 +23,7 @@ defmodule Campfire.ModelCache do
   def stale(conn, _, nil), do: {:stale, conn}
 
   def stale(conn, table, record) do
-    {_, data} = Campfire.Auth.csrf_session(conn)
+    {_, data} = Campfire.Auth.browser_session(conn)
     flash = get_in(data, ["flash", "flashes"]) || %{}
     svg? = Enum.any?(get_req_header(conn, "accept"), &String.contains?(&1, "image/svg+xml"))
     etag = etag(table, record, svg?, flash)

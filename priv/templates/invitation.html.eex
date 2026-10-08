@@ -37,7 +37,7 @@
 <%= if @admin do %>      <form class="button_to" method="post" action="/account/join_code"><button class="btn btn--regenerate" type="submit">
         <img aria-hidden="true" class="colorize--black" src="<%= Campfire.Assets.path("refresh.svg") %>" width="20" height="20" />
         <span class="for-screen-reader">Regenerate join link</span>
-</button><input type="hidden" name="authenticity_token" value="<%= @join_token %>" /></form><% end %>  </div>
+</button></form><% end %>  </div>
 </div>
 
       </div>

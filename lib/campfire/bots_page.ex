@@ -18,7 +18,7 @@ defmodule Campfire.BotsPage do
         conn |> put_resp_header("content-type", "text/html") |> send_resp(403, "")
 
       true ->
-        {conn, data} = Auth.csrf_session(Auth.set_auth_cookie(conn, session))
+        {conn, data} = Auth.browser_session(Auth.set_auth_cookie(conn, session))
         bots = DB.query("SELECT * FROM users WHERE role=2 AND status=0 ORDER BY LOWER(name)")
         content = index(bots: Enum.map_join(bots, &render_bot(&1, conn)))
 

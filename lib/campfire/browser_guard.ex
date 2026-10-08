@@ -70,7 +70,7 @@ defmodule Campfire.BrowserGuard do
       user && user["role"] == 2 && !bot_key ->
         conn
 
-      conn.method not in ["GET", "HEAD"] && method != :bot && !Auth.csrf_valid?(conn, conn.params) ->
+      conn.method not in ["GET", "HEAD"] && method != :bot && !Auth.request_allowed?(conn) ->
         conn
 
       conn.method not in ["GET", "HEAD"] && Auth.banned?(conn) ->
@@ -81,7 +81,7 @@ defmodule Campfire.BrowserGuard do
 
       true ->
         conn = if session, do: Auth.set_auth_cookie(conn, session), else: conn
-        {conn, data} = Auth.csrf_session(conn)
+        {conn, data} = Auth.browser_session(conn)
         raw = List.first(get_req_header(conn, "user-agent")) || ""
         lower = String.downcase(raw)
 

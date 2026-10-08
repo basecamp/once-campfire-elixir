@@ -12,7 +12,7 @@ defmodule Campfire.Messages do
       !user ->
         Auth.request_authentication(conn)
 
-      conn.method not in ["GET", "HEAD"] && !Auth.csrf_valid?(conn, conn.params) ->
+      conn.method not in ["GET", "HEAD"] && !Auth.request_allowed?(conn) ->
         Campfire.HttpResponse.error(conn, 422)
 
       Auth.banned?(conn) ->
@@ -45,8 +45,7 @@ defmodule Campfire.Messages do
           |> assign(:controller_validator, true)
           |> put_resp_header("cache-control", "max-age=0, private, must-revalidate")
 
-        {conn, data} = Auth.csrf_session(conn)
-        token = Campfire.ResponseCache.mask(Rails.csrf_global(data["_csrf_token"]))
+        {conn, data} = Auth.browser_session(conn)
 
         if json?(conn) do
           conn
@@ -56,10 +55,10 @@ defmodule Campfire.Messages do
             Rails.json(Enum.map(messages, &Chat.present_message(&1, Auth.base(conn))))
           )
         else
-          body = MessagesView.render_many(messages, Auth.base(conn), token)
+          body = MessagesView.render_many(messages, Auth.base(conn))
 
           conn
-          |> Auth.set_csrf_session(data)
+          |> Auth.set_browser_session(data)
           |> put_resp_content_type("text/html")
           |> send_resp(200, "\n" <> body)
         end
@@ -132,9 +131,8 @@ defmodule Campfire.Messages do
         |> send_resp(200, Rails.json(Chat.present_message(message, Auth.base(conn))))
 
       conn.method == "GET" ->
-        {conn, data} = Auth.csrf_session(conn)
-        token = Campfire.ResponseCache.mask(Rails.csrf_global(data["_csrf_token"]))
-        content = "      \n" <> MessagesView.render(message, Auth.base(conn), token) <> "\n\n"
+        {conn, data} = Auth.browser_session(conn)
+        content = "      \n" <> MessagesView.render(message, Auth.base(conn)) <> "\n\n"
         {conn, html} = Campfire.Page.render(conn, user, data, content: content)
         conn |> put_resp_content_type("text/html") |> send_resp(200, html)
 
@@ -162,8 +160,8 @@ defmodule Campfire.Messages do
           )
 
         body = if text, do: text["body"] || "", else: ""
-        path = "/rooms/#{room["id"]}/messages/#{message["id"]}"
-        {conn, data} = Auth.csrf_session(conn)
+
+        {conn, data} = Auth.browser_session(conn)
 
         content =
           editor(
@@ -171,11 +169,7 @@ defmodule Campfire.Messages do
             room_id: room["id"],
             client_id: Campfire.Assets.html_escape(message["client_message_id"]),
             base: Auth.base(conn),
-            body: Campfire.Assets.html_escape(body),
-            patch_token:
-              Campfire.ResponseCache.mask(Rails.csrf_form(data["_csrf_token"], path, "PATCH")),
-            delete_token:
-              Campfire.ResponseCache.mask(Rails.csrf_form(data["_csrf_token"], path, "DELETE"))
+            body: Campfire.Assets.html_escape(body)
           )
 
         {conn, html} = Campfire.Page.render(conn, user, data, content: content)

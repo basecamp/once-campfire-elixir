@@ -55,7 +55,7 @@ defmodule Campfire.FragmentCache do
   def fetch(key, render) do
     epoch = Campfire.ResponseCache.fragment_epoch()
 
-    if Campfire.ResponseCache.capturing?() || epoch == nil,
+    if epoch == nil || !Campfire.ResponseCache.fragment_valid?(),
       do: render.(),
       else: cached({epoch, Process.get(:campfire_request_host), key}, render)
   end

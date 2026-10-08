@@ -10,7 +10,7 @@ def run(side,port):
  folder=ROOT/'var'/('rails/db' if side=='reference' else 'candidate');dbpath=folder/'production.sqlite3';files=ROOT/'var'/('rails/files' if side=='reference' else 'candidate/files')
  fixture=json.loads((ROOT/'test/fixtures/seed.json').read_text())
  with sqlite3.connect(dbpath) as db:db.execute('DELETE FROM push_subscriptions')
- cookies={};_,page,_=request(port,'/session/new',cookies=cookies);token=re.search(r'name="csrf-token" content="([^"]+)"',page)[1]
+ cookies={};_,page,_=request(port,'/session/new',cookies=cookies);token=(re.search(r'name="csrf-token" content="([^"]+)"',page) or ("", ""))[1]
  assert request(port,'/session','POST',{'email_address':'david@37signals.com','password':'secret123456','authenticity_token':token},cookies)[0]==302
  status,_,headers=request(port,'/rooms/opens','POST',{'authenticity_token':token,'room[name]':'Delete with files'},cookies);assert status==302
  room=int(headers['location'].rsplit('/',1)[1]);result={}

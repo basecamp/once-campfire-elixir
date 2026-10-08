@@ -1,6 +1,6 @@
 defmodule Campfire.Involvement do
   import Plug.Conn
-  alias Campfire.{Auth, Broadcasts, Chat, DB, Rails}
+  alias Campfire.{Auth, Broadcasts, Chat, DB}
   require EEx
   EEx.function_from_file(:defp, :frame, "priv/templates/involvement.html.eex", [:assigns])
 
@@ -11,7 +11,7 @@ defmodule Campfire.Involvement do
     "invisible" => "Notifications are off and room invisible in sidebar"
   }
 
-  def profile_frame(room, current, data) do
+  def profile_frame(room, current, _data) do
     order =
       if room["type"] == "Rooms::Direct",
         do: ~w(everything nothing),
@@ -26,11 +26,7 @@ defmodule Campfire.Involvement do
         key: key,
         current: current,
         next: next,
-        label: @labels[current],
-        token:
-          Rails.csrf_mask(
-            Rails.csrf_form(data["_csrf_token"], "/rooms/#{room["id"]}/involvement", "PUT")
-          )
+        label: @labels[current]
       )
 
     content = content |> String.replace_prefix("      ", "") |> String.replace_suffix("\n\n", "")
@@ -69,7 +65,7 @@ defmodule Campfire.Involvement do
               else: ~w(mentions everything nothing invisible)
 
           next = Enum.at(order, Enum.find_index(order, &(&1 == current)) + 1) || List.first(order)
-          {conn, data} = Auth.csrf_session(conn)
+          {conn, data} = Auth.browser_session(conn)
 
           content =
             frame(
@@ -77,11 +73,7 @@ defmodule Campfire.Involvement do
               key: Broadcasts.room_key(room),
               current: current,
               next: next,
-              label: @labels[current],
-              token:
-                Rails.csrf_mask(
-                  Rails.csrf_form(data["_csrf_token"], "/rooms/#{room["id"]}/involvement", "PUT")
-                )
+              label: @labels[current]
             )
 
           {conn, html} = Campfire.Page.render(conn, user, data, content: content)

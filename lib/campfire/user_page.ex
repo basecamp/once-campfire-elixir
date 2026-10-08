@@ -1,6 +1,6 @@
 defmodule Campfire.UserPage do
   import Plug.Conn
-  alias Campfire.{Assets, Auth, Chat, DB, Page, ProfilePage, Rails}
+  alias Campfire.{Assets, Auth, Chat, DB, Page, ProfilePage}
   require EEx
 
   for branch <-
@@ -33,7 +33,7 @@ defmodule Campfire.UserPage do
         Campfire.HttpResponse.exception(conn, 404, Campfire.Assets.read("public/404.html"))
 
       true ->
-        {conn, data} = Auth.csrf_session(Auth.set_auth_cookie(conn, session))
+        {conn, data} = Auth.browser_session(Auth.set_auth_cookie(conn, session))
         self = current["id"] == target["id"]
         admin = current["role"] == 1
 
@@ -61,14 +61,7 @@ defmodule Campfire.UserPage do
           email: Assets.html_escape(target["email_address"] || ""),
           bio: Assets.html_escape(target["bio"] || ""),
           avatar_src: ProfilePage.avatar_path(target),
-          transfer: ProfilePage.transfer_link(conn, target, self),
-          direct_token: token(data, "/rooms/directs", "POST"),
-          ban_token:
-            token(
-              data,
-              "/users/#{target["id"]}/ban",
-              if(target["status"] == 0, do: "POST", else: "DELETE")
-            )
+          transfer: ProfilePage.transfer_link(conn, target, self)
         ]
 
         referer = List.first(get_req_header(conn, "referer"))
@@ -93,7 +86,4 @@ defmodule Campfire.UserPage do
         conn |> put_resp_content_type("text/html") |> send_resp(200, html)
     end
   end
-
-  defp token(data, path, method),
-    do: Rails.csrf_mask(Rails.csrf_form(data["_csrf_token"], path, method))
 end

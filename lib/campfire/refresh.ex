@@ -1,6 +1,6 @@
 defmodule Campfire.Refresh do
   import Plug.Conn
-  alias Campfire.{Auth, Broadcasts, Chat, DB, MessagesView, Rails}
+  alias Campfire.{Auth, Broadcasts, Chat, DB, MessagesView}
 
   def show(conn, room_id) do
     {conn, user, session} = Auth.session_user(conn)
@@ -33,23 +33,22 @@ defmodule Campfire.Refresh do
             )
             |> Enum.reverse()
 
-          {conn, data} = Auth.csrf_session(conn)
-          token = Rails.csrf_mask(Rails.csrf_global(data["_csrf_token"]))
+          {conn, data} = Auth.browser_session(conn)
 
           append =
             if new == [],
               do: "",
               else:
-                ~s(<turbo-stream action="append" target="messages_#{Broadcasts.room_key(room)}"><template>\n  \n#{Enum.map_join(new, &MessagesView.render(&1, Auth.base(conn), token))}</template></turbo-stream>)
+                ~s(<turbo-stream action="append" target="messages_#{Broadcasts.room_key(room)}"><template>\n  \n#{Enum.map_join(new, &MessagesView.render(&1, Auth.base(conn)))}</template></turbo-stream>)
 
           replaces =
             Enum.map_join(updated, fn message ->
-              ~s(  <turbo-stream action="replace" target="message_#{message["client_message_id"]}"><template>\n#{MessagesView.render(message, Auth.base(conn), token) |> String.trim_trailing("\n")}</template></turbo-stream>\n)
+              ~s(  <turbo-stream action="replace" target="message_#{message["client_message_id"]}"><template>\n#{MessagesView.render(message, Auth.base(conn)) |> String.trim_trailing("\n")}</template></turbo-stream>\n)
             end)
 
           conn
           |> Auth.set_auth_cookie(session)
-          |> Auth.set_csrf_session(data)
+          |> Auth.set_browser_session(data)
           |> put_resp_content_type("text/vnd.turbo-stream.html")
           |> send_resp(200, append <> "\n" <> replaces)
         else

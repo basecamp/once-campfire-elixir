@@ -5,7 +5,7 @@ from sessions import ROOT,request
 KEYS=['content-type','cache-control','etag','vary','x-version','x-rev','x-frame-options','x-xss-protection','x-content-type-options','x-permitted-cross-domain-policies','referrer-policy']
 def run(side,port):
  subprocess.run([str(ROOT/'bin/parity-services'),'reset',side],check=True)
- results={};c={};_,p,_=request(port,'/session/new',cookies=c);token=re.search(r'name="csrf-token" content="([^"]+)"',p)[1]
+ results={};c={};_,p,_=request(port,'/session/new',cookies=c);token=(re.search(r'name="csrf-token" content="([^"]+)"',p) or ("", ""))[1]
  def case(name,path,params,headers=None,method='POST'):
   status,p,h=request(port,path,method,params,c,headers=headers)
   results[name]={'status':status,'body':p,'headers':{k:h.get(k) for k in KEYS}}

@@ -1,10 +1,9 @@
 defmodule Campfire.ResponseCache do
-  @moduledoc "Bounded response bodies with fresh authorization, cookies and masked CSRF tokens."
+  @moduledoc "Bounded complete response representations with fresh authorization and cookies."
   use GenServer
   import Plug.Conn
-  alias Campfire.{Auth, Chat, Rails}
+  alias Campfire.{Auth, Chat}
   alias Exqlite.Sqlite3, as: SQL
-  @capture {__MODULE__, :capture}
   @fragment_epoch {__MODULE__, :fragment_epoch}
 
   def start_link(opts), do: GenServer.start_link(__MODULE__, opts, name: __MODULE__)
@@ -27,13 +26,13 @@ defmodule Campfire.ResponseCache do
     if epoch do
       # Capture before authentication; a commit during auth must prevent reuse/admission.
       {conn, user, session} = Auth.session_user(conn)
-      {conn, data} = Auth.csrf_session(conn)
+      {conn, data} = Auth.browser_session(conn)
 
       if user && !data["flash"] && accessible?(conn, user) do
         conn =
           conn
           |> assign(:response_cache_auth, {user, session})
-          |> assign(:response_cache_csrf, data)
+          |> assign(:response_cache_session, data)
 
         key =
           :crypto.hash(
@@ -42,7 +41,13 @@ defmodule Campfire.ResponseCache do
               {conn.scheme, conn.host, conn.port, conn.request_path, conn.query_string,
                conn.req_headers
                |> Enum.filter(fn {key, _} ->
-                 key in ["accept", "turbo-frame", "user-agent", "x-requested-with"]
+                 key in [
+                   "accept",
+                   "accept-encoding",
+                   "turbo-frame",
+                   "user-agent",
+                   "x-requested-with"
+                 ]
                end), user["id"], session["id"], data, conn.cookies["last_room"],
                System.get_env("SECRET_KEY_BASE"), System.get_env("VAPID_PUBLIC_KEY")}
             )
@@ -50,28 +55,7 @@ defmodule Campfire.ResponseCache do
 
         case get(key, epoch) do
           nil ->
-            Process.put(@capture, {"csrf-" <> Base.encode16(:crypto.strong_rand_bytes(16)), []})
-
-            register_before_send(conn, fn response ->
-              slots = finish()
-              body = IO.iodata_to_binary(response.resp_body || "")
-
-              entry = %{
-                body: body,
-                slots: slots,
-                headers: response.resp_headers,
-                cookies: Map.keys(response.resp_cookies)
-              }
-
-              if response.status == 200 &&
-                   Enum.any?(
-                     get_resp_header(response, "content-type"),
-                     &String.starts_with?(&1, "text/html")
-                   ),
-                 do: put(key, epoch, entry)
-
-              %{response | resp_body: render(entry)}
-            end)
+            assign(conn, :response_cache_capture, {key, epoch})
 
           entry ->
             conn =
@@ -86,7 +70,7 @@ defmodule Campfire.ResponseCache do
 
             conn =
               if "_campfire_session" in entry.cookies,
-                do: Auth.set_csrf_session(conn, data),
+                do: Auth.set_browser_session(conn, data),
                 else: conn
 
             conn =
@@ -100,7 +84,7 @@ defmodule Campfire.ResponseCache do
                 conn
               end
 
-            conn |> assign(:response_cache_hit, true) |> send_resp(200, render(entry)) |> halt()
+            conn |> assign(:response_cache_hit, true) |> send_resp(200, entry.body) |> halt()
         end
       else
         conn
@@ -110,19 +94,37 @@ defmodule Campfire.ResponseCache do
     end
   end
 
-  def mask(raw) do
-    case Process.get(@capture) do
-      {prefix, slots} ->
-        slot = prefix <> "-" <> Integer.to_string(length(slots))
-        Process.put(@capture, {prefix, [{slot, raw} | slots]})
-        slot
+  # HttpResponse calls this after validators/compression have selected the final
+  # representation. Hits retain those complete bytes and leave live cookies alone.
+  def complete(conn) do
+    case conn.assigns[:response_cache_capture] do
+      {key, epoch} when conn.status == 200 ->
+        if Enum.any?(get_resp_header(conn, "content-type"), &String.starts_with?(&1, "text/html")) do
+          body = IO.iodata_to_binary(conn.resp_body || "")
 
-      nil ->
-        Rails.csrf_mask(raw)
+          headers =
+            Enum.filter(conn.resp_headers, fn {name, _} ->
+              name in [
+                "content-type",
+                "content-encoding",
+                "content-length",
+                "etag",
+                "last-modified",
+                "cache-control",
+                "vary",
+                "link"
+              ]
+            end)
+
+          put(key, epoch, %{body: body, headers: headers, cookies: Map.keys(conn.resp_cookies)})
+        end
+
+        conn
+
+      _ ->
+        conn
     end
   end
-
-  def capturing?, do: Process.get(@capture) != nil
 
   def fragment_epoch do
     case Process.get(@fragment_epoch, :uncaptured) do
@@ -132,22 +134,21 @@ defmodule Campfire.ResponseCache do
   end
 
   def cleanup do
-    finish()
     Process.delete(@fragment_epoch)
+    Process.delete({__MODULE__, :fragment_valid})
   end
 
-  def finish do
-    case Process.delete(@capture) do
-      {_, slots} -> slots
-      nil -> []
+  def fragment_valid? do
+    case Process.get({__MODULE__, :fragment_valid}) do
+      nil ->
+        valid = fragment_epoch() == snapshot()
+        Process.put({__MODULE__, :fragment_valid}, valid)
+        valid
+
+      valid ->
+        valid
     end
   end
-
-  defp render(entry),
-    do:
-      Enum.reduce(entry.slots, entry.body, fn {slot, raw}, body ->
-        String.replace(body, slot, Rails.csrf_mask(raw))
-      end)
 
   defp eligible?(conn) do
     conn.method == "GET" && get_req_header(conn, "if-none-match") == [] &&

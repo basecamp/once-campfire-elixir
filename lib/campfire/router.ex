@@ -218,7 +218,7 @@ defmodule Campfire.Router do
         Auth.request_authentication(conn)
 
       method == :session and conn.method not in ["GET", "HEAD"] and
-          not Auth.csrf_valid?(conn, conn.params) ->
+          not Auth.request_allowed?(conn) ->
         Campfire.HttpResponse.error(conn, 422)
 
       Auth.banned?(conn) ->
@@ -289,7 +289,7 @@ defmodule Campfire.Router do
         Auth.request_authentication(conn)
 
       method == :session and conn.method not in ["GET", "HEAD"] and
-          not Auth.csrf_valid?(conn, conn.params) ->
+          not Auth.request_allowed?(conn) ->
         Campfire.HttpResponse.error(conn, 422)
 
       Auth.banned?(conn) ->
@@ -316,14 +316,13 @@ defmodule Campfire.Router do
           put_resp_header(conn, "x-total-count", to_string(count)) |> pagination(room, messages)
 
         if "html" in Campfire.ResponseFormats.requested(conn) do
-          {conn, data} = Auth.csrf_session(conn)
-          token = Rails.csrf_mask(Rails.csrf_global(data["_csrf_token"]))
+          {conn, data} = Auth.browser_session(conn)
 
           body =
-            "\n" <> Enum.map_join(messages, &Campfire.MessagesView.render(&1, base(conn), token))
+            "\n" <> Enum.map_join(messages, &Campfire.MessagesView.render(&1, base(conn)))
 
           conn
-          |> Auth.set_csrf_session(data)
+          |> Auth.set_browser_session(data)
           |> put_resp_content_type("text/html")
           |> send_resp(200, body)
         else

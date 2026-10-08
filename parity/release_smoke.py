@@ -7,7 +7,7 @@ config=json.loads(subprocess.check_output(['docker','inspect','campfire-elixir-r
 assert all(mount['Destination']=='/data' for mount in config['Mounts'])
 assert subprocess.run(['docker','exec','campfire-elixir-release','sh','-c','! command -v ruby && test ! -e /app/reference && test ! -e /rails/app && test ! -e /rails/config && test ! -e /campfire/lib/campfire-0.1.0/priv/native/campfire_html.so && test -x /campfire/lib/campfire-0.1.0/priv/native/campfire-html && command -v campfire-vips && command -v ffmpeg && command -v ffprobe'],capture_output=True).returncode==0
 c={};status,p,h=request(47072,'/session/new',cookies=c);assert status==200
-t=re.search(r'name="csrf-token" content="([^"]+)"',p)[1]
+t=(re.search(r'name="csrf-token" content="([^"]+)"',p) or ("", ""))[1]
 assert request(47072,'/session','POST',{'email_address':'david@37signals.com','password':'secret123456','authenticity_token':t},c)[0]==302
 for path in ['/rooms/104393281','/users/me/profile','/account/edit','/users/me/push_subscriptions','/webmanifest.json','/service-worker.js']:
  status,p,h=request(47072,path,cookies=c);assert status==200,(path,status,p[:100])

@@ -8,7 +8,7 @@ def run(side,port):
  subprocess.run([str(ROOT/'bin/parity-services'),'reset',side],check=True)
  dbpath=ROOT/'var'/('rails/db' if side=='reference' else 'candidate')/'production.sqlite3'
  with sqlite3.connect(dbpath) as db:db.execute("DELETE FROM push_subscriptions")
- cookies={};_,p,_=request(port,'/session/new',cookies=cookies);token=re.search(r'name="csrf-token" content="([^"]+)"',p)[1]
+ cookies={};_,p,_=request(port,'/session/new',cookies=cookies);token=(re.search(r'name="csrf-token" content="([^"]+)"',p) or ("", ""))[1]
  assert request(port,'/session','POST',{'email_address':'david@37signals.com','password':'secret123456','authenticity_token':token},cookies)[0]==302
  with sqlite3.connect(dbpath) as db:room=db.execute("SELECT room_id FROM memberships WHERE user_id=127326141 AND room_id IN (SELECT id FROM rooms WHERE type='Rooms::Open') LIMIT 1").fetchone()[0]
  results=[]

@@ -2,7 +2,7 @@ defmodule Campfire.Searches do
   import Kernel, except: [sigil_r: 2]
   import Campfire.Sigils
   import Plug.Conn
-  alias Campfire.{Assets, Auth, Chat, DB, MessagesView, Rails}
+  alias Campfire.{Assets, Auth, Chat, DB, MessagesView}
   require EEx
   EEx.function_from_file(:defp, :nav, "priv/templates/search_nav.html.eex", [:assigns])
   EEx.function_from_file(:defp, :content, "priv/templates/search_content.html.eex", [:assigns])
@@ -16,7 +16,7 @@ defmodule Campfire.Searches do
       !user ->
         Auth.request_authentication(conn)
 
-      conn.method != "GET" && !Auth.csrf_valid?(conn, conn.params) ->
+      conn.method != "GET" && !Auth.request_allowed?(conn) ->
         Campfire.HttpResponse.error(conn, 422)
 
       Auth.banned?(conn) ->
@@ -115,8 +115,8 @@ defmodule Campfire.Searches do
     recents =
       DB.query("SELECT * FROM searches WHERE user_id=? ORDER BY updated_at DESC", [user["id"]])
 
-    {conn, data} = Auth.csrf_session(conn)
-    token = Campfire.ResponseCache.mask(Rails.csrf_global(data["_csrf_token"]))
+    {conn, data} = Auth.browser_session(conn)
+
     return_room = if conn.cookies["last_room"], do: Chat.room(user, conn.cookies["last_room"])
 
     return_room =
@@ -139,13 +139,7 @@ defmodule Campfire.Searches do
       has_recents: recents != [],
       recent_links: links,
       return_room: return_room["id"],
-      messages: MessagesView.render_many(messages, Auth.base(conn), token),
-      clear_token:
-        Campfire.ResponseCache.mask(
-          Rails.csrf_form(data["_csrf_token"], "/searches/clear", "DELETE")
-        ),
-      search_token:
-        Campfire.ResponseCache.mask(Rails.csrf_form(data["_csrf_token"], "/searches", "POST"))
+      messages: MessagesView.render_many(messages, Auth.base(conn))
     ]
 
     {conn, html} =

@@ -28,12 +28,12 @@ def run(side,port):
    time.sleep(.1)
   else:raise AssertionError(docker('logs',name).stdout)
   jar={};status,page,_=request(port,'/first_run',cookies=jar);assert status==200,(side,status,page[:100])
-  csrf=re.search(r'name="csrf-token" content="([^"]+)"',page)[1]
+  csrf=(re.search(r'name="csrf-token" content="([^"]+)"',page) or ("", ""))[1]
   status,body,_=request(port,'/first_run','POST',{'user[name]':'Fresh owner','user[email_address]':'fresh@example.com','user[password]':'fresh-password','authenticity_token':csrf},jar);assert status==302,(side,status,body[:100])
   assert request(port,'/',cookies=jar)[0]==302
   # A fresh all-in-one image must process queued application callbacks.
   status,page,_=request(port,'/rooms/'+str(snapshot(path)['rooms'][0]['id']),cookies=jar);assert status==200
-  token=re.search(r'name="csrf-token" content="([^"]+)"',page)[1]
+  token=(re.search(r'name="csrf-token" content="([^"]+)"',page) or ("", ""))[1]
   room=snapshot(path)['rooms'][0]['id']
   assert request(port,f'/rooms/{room}/messages','POST',{'message[body]':'<p>Fresh queued message</p>','message[client_message_id]':'fresh-production-message','authenticity_token':token},jar,headers={'Accept':'text/vnd.turbo-stream.html'})[0]==200
   for _ in range(200):

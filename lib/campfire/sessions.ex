@@ -6,31 +6,26 @@ defmodule Campfire.Sessions do
   require EEx
   EEx.function_from_file(:defp, :layout_html, "priv/templates/session.html.eex", [:assigns])
   EEx.function_from_file(:defp, :login_html, "priv/templates/login.html.eex", [:assigns])
-  EEx.function_from_file(:defp, :setup_html, "priv/templates/first_run.html.eex", [:assigns])
+  EEx.function_from_file(:defp, :setup_html, "priv/templates/first_run.html.eex", [:_assigns])
 
   EEx.function_from_file(:defp, :transfer_html, "priv/templates/transfer.html.eex", [:assigns])
 
   def transfer_page(conn, _id) do
-    {conn, data} = Auth.csrf_session(conn)
+    {conn, data} = Auth.browser_session(conn)
 
     content =
-      transfer_html(
-        path: Assets.html_escape(conn.request_path),
-        token: Rails.csrf_mask(Rails.csrf_form(data["_csrf_token"], conn.request_path, "PUT"))
-      )
+      transfer_html(path: Assets.html_escape(conn.request_path))
 
     {conn, html} = Campfire.Page.render(conn, nil, data, content: content)
     conn |> put_resp_content_type("text/html") |> send_resp(200, html)
   end
 
   def login_page(conn, params \\ %{}, status \\ 200) do
-    {conn, data} = Auth.csrf_session(conn)
+    {conn, data} = Auth.browser_session(conn)
     account = DB.one("SELECT * FROM accounts LIMIT 1") || %{}
 
     assigns =
       [
-        meta_token: Rails.csrf_mask(Rails.csrf_global(data["_csrf_token"])),
-        form_token: Rails.csrf_mask(Rails.csrf_form(data["_csrf_token"], "/session", "POST")),
         base: Auth.base(conn),
         account_version: version(account["updated_at"]),
         account_name: Assets.html_escape(account["name"] || "Campfire"),
@@ -51,7 +46,7 @@ defmodule Campfire.Sessions do
     body = layout_html(assigns ++ [content: login_html(assigns)])
 
     conn
-    |> Auth.set_csrf_session(data)
+    |> Auth.set_browser_session(data)
     |> put_resp_content_type("text/html")
     |> send_resp(status, body)
   end
@@ -60,11 +55,9 @@ defmodule Campfire.Sessions do
     if DB.one("SELECT id FROM accounts LIMIT 1") do
       Auth.redirect(conn, "/")
     else
-      {conn, data} = Auth.csrf_session(conn)
+      {conn, data} = Auth.browser_session(conn)
 
       assigns = [
-        meta_token: Rails.csrf_mask(Rails.csrf_global(data["_csrf_token"])),
-        form_token: Rails.csrf_mask(Rails.csrf_form(data["_csrf_token"], "/first_run", "POST")),
         base: Auth.base(conn),
         account_version: "",
         vapid: Assets.html_escape(System.get_env("VAPID_PUBLIC_KEY", "")),
@@ -79,7 +72,7 @@ defmodule Campfire.Sessions do
       body = layout_html(assigns ++ [content: setup_html(assigns)])
 
       conn
-      |> Auth.set_csrf_session(data)
+      |> Auth.set_browser_session(data)
       |> put_resp_content_type("text/html")
       |> send_resp(200, body)
     end
@@ -87,7 +80,7 @@ defmodule Campfire.Sessions do
 
   def first_run_create(conn, params) do
     cond do
-      !Auth.csrf_valid?(conn, params) ->
+      !Auth.request_allowed?(conn) ->
         Campfire.HttpResponse.error(conn, 422)
 
       DB.one("SELECT id FROM accounts LIMIT 1") ->
@@ -110,7 +103,7 @@ defmodule Campfire.Sessions do
 
   def create(conn, params) do
     cond do
-      not Auth.csrf_valid?(conn, params) ->
+      not Auth.request_allowed?(conn) ->
         Campfire.HttpResponse.error(conn, 422)
 
       Auth.banned?(conn) ->
@@ -140,8 +133,8 @@ defmodule Campfire.Sessions do
     end
   end
 
-  def transfer(conn, id, params) do
-    if Auth.csrf_valid?(conn, params) do
+  def transfer(conn, id, _params) do
+    if Auth.request_allowed?(conn) do
       with user_id when is_integer(user_id) <- Rails.verify_id("User", id, "transfer"),
            user when is_map(user) <-
              DB.one("SELECT * FROM users WHERE status=0 AND id=?", [user_id]) do
@@ -160,7 +153,7 @@ defmodule Campfire.Sessions do
         Auth.request_authentication(conn)
 
       {conn, _user, session} ->
-        if Auth.csrf_valid?(conn, params) do
+        if Auth.request_allowed?(conn) do
           conn
           |> Auth.terminate_session(session, params["push_subscription_endpoint"])
           |> Auth.redirect("/")
