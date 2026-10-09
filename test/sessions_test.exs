@@ -6,8 +6,8 @@ defmodule Campfire.SessionsTest do
   setup do
     Campfire.RateLimiter.clear()
     DB.restore_fixture(@fixture)
-    System.put_env("CAMPFIRE_CLOCK", "2026-03-02T16:00:00Z")
-    on_exit(fn -> System.delete_env("CAMPFIRE_CLOCK") end)
+    Campfire.Clock.set("2026-03-02T16:00:00Z")
+    on_exit(fn -> Campfire.Clock.set(nil) end)
     :ok
   end
 

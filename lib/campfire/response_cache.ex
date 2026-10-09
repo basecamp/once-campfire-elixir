@@ -20,7 +20,9 @@ defmodule Campfire.ResponseCache do
   def call(conn, _) do
     # Every render, including flash/conditional and cache-disabled paths, must
     # namespace timestamp-only fragments before its first authenticated read.
-    Process.put(@fragment_epoch, snapshot())
+    # Routes that never render message fragments skip the snapshot (a SQLite
+    # query); fragment_epoch/0 still captures one lazily if needed.
+    if fragments?(conn), do: Process.put(@fragment_epoch, snapshot())
     epoch = if eligible?(conn) && limit() > 0, do: fragment_epoch()
 
     if epoch do
@@ -147,6 +149,34 @@ defmodule Campfire.ResponseCache do
 
       valid ->
         valid
+    end
+  end
+
+  defp fragments?(%{path_info: path}) do
+    case path do
+      ["up"] ->
+        false
+
+      ["cable"] ->
+        false
+
+      ["rails", "active_storage" | _] ->
+        false
+
+      ["users", _, "avatar"] ->
+        false
+
+      ["account", "logo"] ->
+        false
+
+      ["qr_code", _] ->
+        false
+
+      [asset] when asset in ~w(webmanifest service-worker webmanifest.json service-worker.js) ->
+        false
+
+      _ ->
+        true
     end
   end
 

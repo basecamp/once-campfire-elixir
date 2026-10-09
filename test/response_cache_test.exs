@@ -8,12 +8,12 @@ defmodule Campfire.ResponseCacheTest do
 
   setup do
     DB.restore_fixture(@fixture)
-    System.put_env("CAMPFIRE_CLOCK", "2026-03-02T16:00:00Z")
+    Campfire.Clock.set("2026-03-02T16:00:00Z")
     System.put_env("CAMPFIRE_RESPONSE_CACHE_MB", "64")
 
     on_exit(fn ->
       ResponseCache.cleanup()
-      System.delete_env("CAMPFIRE_CLOCK")
+      Campfire.Clock.set(nil)
       System.delete_env("CAMPFIRE_RESPONSE_CACHE_MB")
     end)
 
@@ -64,9 +64,12 @@ defmodule Campfire.ResponseCacheTest do
       assert body =~ literal
       refute body =~ ~s(<meta name="csrf-token")
       refute body =~ ~s(name="authenticity_token")
-      assert second.resp_cookies["session_token"].value
-      assert second.resp_cookies["_campfire_session"].value
-      assert second.resp_cookies["last_room"].value == to_string(context.room["id"])
+      # Unchanged cookies are not re-sent, on renders and hits alike.
+      for conn <- [first, second] do
+        refute Map.has_key?(conn.resp_cookies, "session_token")
+        refute Map.has_key?(conn.resp_cookies, "_campfire_session")
+        assert conn.resp_cookies["last_room"].value == to_string(context.room["id"])
+      end
     end
   end
 

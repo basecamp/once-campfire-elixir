@@ -4,8 +4,8 @@ defmodule Campfire.ChatTest do
   @fixture Jason.decode!(File.read!("test/fixtures/seed.json"))
   setup do
     :ok = DB.restore_fixture(@fixture)
-    System.put_env("CAMPFIRE_CLOCK", "2026-03-02T16:00:00Z")
-    on_exit(fn -> System.delete_env("CAMPFIRE_CLOCK") end)
+    Campfire.Clock.set("2026-03-02T16:00:00Z")
+    on_exit(fn -> Campfire.Clock.set(nil) end)
     user = Chat.bot("394959859-BenderBot123")
     room = Chat.room(user, 486_777_696)
     %{user: user, room: room}

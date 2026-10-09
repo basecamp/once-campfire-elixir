@@ -64,9 +64,7 @@ defmodule Campfire.RoomPage do
 
           conn
           |> Auth.set_auth_cookie(session)
-          |> put_resp_cookie("last_room", to_string(room["id"]),
-            max_age: DateTime.diff(Auth.permanent_expiry(), Campfire.Clock.now())
-          )
+          |> remember_room(room)
           |> put_resp_content_type("text/html")
           |> send_resp(200, html)
         else
@@ -78,6 +76,18 @@ defmodule Campfire.RoomPage do
   rescue
     Campfire.Pwa.MissingAsset ->
       Campfire.HttpResponse.exception(conn, 500, Campfire.Assets.read("public/500.html"))
+  end
+
+  # Like the Rust port, the cookie is only sent when the room changed.
+  defp remember_room(conn, room) do
+    id = to_string(room["id"])
+
+    if conn.cookies["last_room"] == id,
+      do: conn,
+      else:
+        put_resp_cookie(conn, "last_room", id,
+          max_age: DateTime.diff(Auth.permanent_expiry(), Campfire.Clock.now())
+        )
   end
 
   defp invitation_for(conn, user, _data, account, room) do

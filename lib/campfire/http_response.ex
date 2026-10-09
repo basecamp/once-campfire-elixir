@@ -28,20 +28,13 @@ defmodule Campfire.HttpResponse do
       if conn.assigns[:rails_exception] do
         if conn.resp_body == "", do: conn, else: Campfire.HttpCompression.apply(conn)
       else
-        conn =
-          Enum.reduce(if(conn.state == :set_file, do: [], else: @security), conn, fn {key, value},
-                                                                                     c ->
-            if get_resp_header(c, key) == [], do: put_resp_header(c, key, value), else: c
-          end)
+        conn = if conn.state == :set_file, do: conn, else: defaults(conn, @security)
 
         conn =
           if conn.request_path in ["/up", "/cable"] ||
                String.starts_with?(conn.request_path, "/rails/active_storage/"),
              do: conn,
-             else:
-               conn
-               |> put_resp_header("x-version", System.get_env("APP_VERSION", "dev"))
-               |> put_resp_header("x-rev", System.get_env("GIT_REVISION", "dev"))
+             else: replace(conn, version_headers())
 
         conn =
           if is_binary(conn.resp_body) &&
@@ -93,6 +86,41 @@ defmodule Campfire.HttpResponse do
         conn |> Campfire.HttpCompression.apply() |> Campfire.ResponseCache.complete()
       end
     end)
+  end
+
+  # Constant headers, validated once, are added in one step instead of a
+  # validated put_resp_header/3 call each, keeping put_resp_header's order.
+  defp defaults(conn, headers) do
+    missing =
+      for {key, _} = header <- headers, not List.keymember?(conn.resp_headers, key, 0), do: header
+
+    %{conn | resp_headers: conn.resp_headers ++ missing}
+  end
+
+  defp replace(conn, headers) do
+    %{
+      conn
+      | resp_headers:
+          Enum.reduce(headers, conn.resp_headers, &List.keystore(&2, elem(&1, 0), 0, &1))
+    }
+  end
+
+  defp version_headers do
+    case :persistent_term.get({__MODULE__, :version}, nil) do
+      nil ->
+        headers = [
+          {"x-version", System.get_env("APP_VERSION", "dev")},
+          {"x-rev", System.get_env("GIT_REVISION", "dev")}
+        ]
+
+        # The same check put_resp_header/3 applies to each value.
+        for {key, value} <- headers, do: put_resp_header(%Plug.Conn{}, key, value)
+        :persistent_term.put({__MODULE__, :version}, headers)
+        headers
+
+      headers ->
+        headers
+    end
   end
 
   def error(conn, status) do
