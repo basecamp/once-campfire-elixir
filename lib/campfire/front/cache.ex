@@ -98,16 +98,25 @@ defmodule Campfire.Front.Cache do
       entry =
         {key, now + lifetime, size, status, headers, body, variant_values(conn, names), nil}
 
-      case :ets.lookup(__MODULE__, key) do
+      put(entry)
+    end
+
+    :ok
+  end
+
+  # The counter follows the table exactly: whoever inserts an entry adds its size, whoever
+  # takes one out subtracts it, so concurrent stores of one key cannot count it twice.
+  defp put({key, _, size, _, _, _, _, _} = entry) do
+    if :ets.insert_new(__MODULE__, entry) do
+      :atomics.add(size_ref(), 1, size)
+    else
+      case :ets.take(__MODULE__, key) do
         [{^key, _, old, _, _, _, _, _}] -> :atomics.sub(size_ref(), 1, old)
         [] -> :ok
       end
 
-      :ets.insert(__MODULE__, entry)
-      :atomics.add(size_ref(), 1, size)
+      put(entry)
     end
-
-    :ok
   end
 
   @doc "Remembers the gzipped body of an entry."
