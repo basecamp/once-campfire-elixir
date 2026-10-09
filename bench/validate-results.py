@@ -27,6 +27,9 @@ def validate_matrix(expected):
     require(suites and len(suites) == len(set(suites)) and set(suites) <= {"http", "cable", "upload"},
             "matrix: suites must be supported, nonempty and unique")
     require("rust-identity" not in apps or "http" in suites, "matrix: rust-identity requires HTTP work")
+    backends = expected.get("job_backends", {})
+    require(set(backends) == set(apps) and set(backends.values()) <= {"redis_resque", "internal_unobserved"},
+            "matrix: every app must declare its job backend")
     if "http" in suites:
         routes = expected.get("http_routes", [])
         require(routes and len(routes) == len(set(routes)) and all(isinstance(route, str) and route for route in routes),
@@ -84,10 +87,11 @@ def validate_upload(sample, count):
         require(row.get("thumb_status") == 200 and row.get("thumb_bytes", 0) > 100, f"upload {index}: invalid thumbnail")
 
 
-def validate_jobs(root, app, rep):
+def validate_jobs(root, app, rep, expected):
     jobs = load(root / f"{app}-{rep}-jobs.json")
-    if app in REDIS_APPS:
-        require(jobs.get("backend") == "redis_resque", f"{app}-{rep}: Redis state unavailable")
+    # The manifest declares each app's backend; a result never chooses its own.
+    require(jobs.get("backend") == expected, f"{app}-{rep}: expected {expected} jobs, observed {jobs.get('backend')}")
+    if expected == "redis_resque":
         require(jobs.get("drained") is True, f"{app}-{rep}: jobs did not drain")
         observations = jobs.get("observations", [])
         require(len(observations) >= 3, f"{app}-{rep}: insufficient job observations")
@@ -180,7 +184,7 @@ def validate(root, require_complete):
                 require(load(raw) == sample["upload"], f"{raw.name}: raw result differs from sample")
             else:
                 require(sample.get("upload") == {}, f"{app}-{rep}: unexpected upload results")
-            validate_jobs(root, app, rep)
+            validate_jobs(root, app, rep, expected["job_backends"][app])
             require(all(sample.get("memory", {}).get(key, 0) > 0 for key in ("idle_current_mb", "idle_anon_mb", "peak_current_mb", "peak_anon_mb")),
                     f"{app}-{rep}: missing memory metrics")
             counts["runs"] += 1

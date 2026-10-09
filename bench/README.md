@@ -34,11 +34,15 @@ Identical response bytes reuse a prior full validation by exact equality. Raw re
 status/error counts, throughput, latency, CPU per successful HTTP response, cold
 readiness, cgroup memory, process PSS/anonymous memory, fixture digest, source digest,
 image IDs, descriptor limits, benchmark/runtime identities, workload validation, and
-external Resque queued/active/failed observations where applicable. Rails and Elixir
-require at least three consecutive quiet Redis observations spanning at least one second
+external Resque queued/active/failed observations where applicable. Rails (and Elixir
+images from before Redis was removed) require at least three consecutive quiet Redis observations spanning at least one second
 and fail if jobs do not drain within `JOB_DRAIN_SECS`. This is an observed quiet window,
 not an atomic job-completion guarantee: a worker can pop a job before registering it as
-active. A single queue-length read is never treated as completion. Go and Rust
+active. A single queue-length read is never treated as completion. Each run's manifest declares
+the job backend every app owns (`redis_resque` for Rails and baseline images,
+`internal_unobserved` otherwise; override with `<APP>_JOBS_BACKEND`, for example for an
+older Elixir image), and results are validated against that declaration, never against the
+backend a run happens to observe. Current Elixir, Go and Rust
 own their queues internally, so the result records that their job state is unobserved.
 
 New runs use result schema 2. `manifest.json` declares the exact app/repetition/workload
@@ -51,8 +55,8 @@ successes/errors, and requires a 200 Turbo Stream response plus positive complet
 The server and load generator both require the recorded `NOFILE` limit (65,536 by
 default), and a run aborts if host load remains above `LOAD_MAX` after the quiet wait.
 
-Elixir runs BEAM, Redis, native media/parser helpers, and the same pinned Thruster
-binary as Rails. Go and Rust run their own integrated HTTP/proxy/job implementations.
+Elixir runs BEAM (including its in-process, non-durable job queue), native
+media/parser helpers, and the same pinned Thruster binary as Rails. Go and Rust run their own integrated HTTP/proxy/job implementations.
 These are their actual production process models. Loopback measurements exclude
 NIC/TLS costs. Cable uses one authenticated user with many connections, so this
 workload is not a distinct-user capacity claim.

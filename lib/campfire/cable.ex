@@ -3,7 +3,7 @@ defmodule Campfire.Cable do
   import Campfire.Sigils
   @behaviour WebSock
   import Plug.Conn
-  alias Campfire.{Auth, Chat, Clock, Presence, Rails}
+  alias Campfire.{Auth, CableFanout, Chat, Clock, Presence, Rails}
 
   def upgrade(conn) do
     {conn, user, _session} = Auth.session_lookup(conn)
@@ -183,41 +183,15 @@ defmodule Campfire.Cable do
     {:ok, state}
   end
 
-  def broadcast(stream, data) do
-    payload = Rails.json(data)
+  def broadcast(stream, data), do: broadcast_all([{stream, data}])
 
-    if Process.whereis(Campfire.CableRedisBridge) do
-      Campfire.CableRedisBridge.publish(stream, payload)
-    else
-      deliver(stream, payload)
-    end
-
-    :ok
-  end
-
-  def deliver(stream, payload) do
-    Registry.dispatch(Campfire.Streams, stream, fn entries ->
-      for {pid, id} <- entries, do: send(pid, {:delivery, stream, id, payload})
-    end)
-
-    :ok
-  end
+  @doc "Delivers several broadcasts together, in order."
+  def broadcast_all(broadcasts), do: CableFanout.deliver(broadcasts)
 
   def disconnect(user_id, reconnect) do
-    if Process.whereis(Campfire.CableRedisBridge) do
-      internal =
-        "action_cable/" <>
-          Base.url_encode64("gid://campfire/User/#{user_id}", padding: false)
-
-      Campfire.CableRedisBridge.publish(
-        internal,
-        Rails.json(%{"type" => "disconnect", "reconnect" => reconnect})
-      )
-    else
-      Registry.dispatch(Campfire.Connections, user_id, fn entries ->
-        for {pid, _} <- entries, do: send(pid, {:disconnect, reconnect})
-      end)
-    end
+    Registry.dispatch(Campfire.Connections, user_id, fn entries ->
+      for {pid, _} <- entries, do: send(pid, {:disconnect, reconnect})
+    end)
   end
 
   def gid_param(room),
@@ -233,12 +207,9 @@ defmodule Campfire.Cable do
      state}
   end
 
-  def handle_info({:delivery, stream, id, payload}, state) do
-    case Campfire.CableFrames.frame(stream, id, payload) do
-      {:ok, frame} -> {:push, {:text, frame}, state}
-      {:error, _} -> {:ok, state}
-    end
-  end
+  # Frames are encoded once per stream and identifier by `Campfire.CableFanout`.
+  def handle_info({:cable_frames, frames}, state),
+    do: {:push, Enum.map(frames, &{:text, &1}), state}
 
   def handle_info({:disconnect, reconnect}, state),
     do:
