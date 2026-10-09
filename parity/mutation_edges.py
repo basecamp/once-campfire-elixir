@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """Dirty tracking, null values and transaction failures through JSON requests."""
 import difflib,http.client,json,os,re,sqlite3,subprocess
-from sessions import ROOT,request,normalize
+from sessions import ROOT,request,normalize,csrf_token,BROWSER
 
 def run(side,port):
  subprocess.run([str(ROOT/'bin/parity-services'),'reset',side],check=True,env=dict(os.environ,CAMPFIRE_PARITY_TICK='1'))
  path=ROOT/'var'/('rails/db' if side=='reference' else 'candidate')/'production.sqlite3'
- cookies={};_,page,_=request(port,'/session/new',cookies=cookies);csrf=re.search(r'name="csrf-token" content="([^"]+)"',page)[1]
+ cookies={};_,page,_=request(port,'/session/new',cookies=cookies);csrf=csrf_token(page)
  assert request(port,'/session','POST',{'email_address':'david@37signals.com','password':'secret123456','authenticity_token':csrf},cookies)[0]==302
  def state():
   with sqlite3.connect(path) as db:
@@ -21,7 +21,7 @@ def run(side,port):
  result={}
  for index,(url,key,attrs) in enumerate(actions):
   c=http.client.HTTPConnection('127.0.0.1',port,timeout=30)
-  c.request('PATCH',url,json.dumps({key:attrs}),{'Host':'campfire.test','User-Agent':'Mozilla/5.0 Chrome/131.0.0.0 Safari/537.36','Content-Type':'application/json','Accept':'text/html','Cookie':'; '.join(k+'='+v for k,v in cookies.items()),'X-CSRF-Token':csrf})
+  c.request('PATCH',url,json.dumps({key:attrs}),{'Host':'campfire.test',**BROWSER,'User-Agent':'Mozilla/5.0 Chrome/131.0.0.0 Safari/537.36','Content-Type':'application/json','Accept':'text/html','Cookie':'; '.join(k+'='+v for k,v in cookies.items()),'X-CSRF-Token':csrf})
   r=c.getresponse();body=r.read().decode();headers=dict((k.lower(),v) for k,v in r.getheaders());c.close()
   current=state()
   for table,rows in current.items():

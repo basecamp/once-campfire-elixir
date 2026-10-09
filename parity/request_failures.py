@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """Missing/scalar nested parameters, callback ordering and bot-key authorization."""
 import json,re,sqlite3,subprocess,urllib.parse,difflib
-from sessions import ROOT,request,normalize
+from sessions import ROOT,request,normalize,csrf_token
 ACTIONS=[('/account','PATCH','account'),('/account/custom_styles','PATCH','account'),('/users/me/profile','PATCH','user'),('/account/users/127326141','PATCH','user'),('/account/bots','POST','user'),('/rooms/opens','POST','room'),('/rooms/closeds','POST','room'),('/rooms/486777696/messages','POST','message'),('/rooms/486777696/messages/933434530','PATCH','message'),('/messages/933434530/boosts','POST','boost')]
 def run(side,port):
  subprocess.run([str(ROOT/'bin/parity-services'),'reset',side],check=True)
- cookies={};_,page,_=request(port,'/session/new',cookies=cookies);token=re.search(r'name="csrf-token" content="([^"]+)"',page)[1]
+ cookies={};_,page,_=request(port,'/session/new',cookies=cookies);token=csrf_token(page)
  assert request(port,'/session','POST',{'email_address':'david@37signals.com','password':'secret123456','authenticity_token':token},cookies)[0]==302
  result={}
  for path,method,key in ACTIONS:
@@ -18,7 +18,7 @@ def run(side,port):
     result[f'{method} {path}.{fmt} {value}']={'status':status,'type':h.get('content-type'),'body':json.loads(body) if h.get('content-type','').startswith('application/json') else normalize(body)}
  # Invalid JSON updates must keep the callback's authentication/CSRF responses.
  for label,jar,params in [('anonymous',{},{}),('no_csrf',cookies,{}),('valid_csrf',cookies,{'authenticity_token':token})]:
-  status,body,h=request(port,'/rooms/486777696/messages/933434530.json','PATCH',params,jar)
+  status,body,h=request(port,'/rooms/486777696/messages/933434530.json','PATCH',params,jar,browser=label=='valid_csrf')
   result['update_'+label]={'status':status,'type':h.get('content-type'),'body':json.loads(body) if h.get('content-type','').startswith('application/json') else normalize(body),'location':h.get('location')}
  dbpath=ROOT/'var'/('rails/db' if side=='reference' else 'candidate')/'production.sqlite3'
  with sqlite3.connect(dbpath) as db:key=db.execute("SELECT id || '-' || bot_token FROM users WHERE role=2 AND status=0 LIMIT 1").fetchone()[0]

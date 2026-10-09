@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Model ETags, conditional image responses and cache invalidation."""
 import json,re,subprocess,http.client,base64,hashlib,sqlite3
-from sessions import ROOT,request
+from sessions import ROOT,request,csrf_token
 from branding import sign
 
 def image(port,path,cookies,method='GET',headers=None):
@@ -21,7 +21,7 @@ def avatar(id):
  return '/users/'+data+'--'+hmac.new(key,data.encode(),'sha256').hexdigest()+'/avatar'
 def run(side,port):
  subprocess.run([str(ROOT/'bin/parity-services'),'reset',side],check=True)
- cookies={};_,p,_=request(port,'/session/new',cookies=cookies);token=re.search(r'name="csrf-token" content="([^"]+)"',p)[1]
+ cookies={};_,p,_=request(port,'/session/new',cookies=cookies);token=csrf_token(p)
  assert request(port,'/session','POST',{'email_address':'david@37signals.com','password':'secret123456','authenticity_token':token},cookies)[0]==302
  results={}
  def cases(stage):

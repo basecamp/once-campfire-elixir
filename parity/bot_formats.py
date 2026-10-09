@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Bot and session API routes, inherited views, optional formats and head responses."""
 import difflib,http.client,json,re,sqlite3,subprocess
-from sessions import ROOT,request,normalize
+from sessions import ROOT,request,normalize,csrf_token,BROWSER
 FORMATS=['json','html','xml','turbo_stream','pdf']
 def run(side,port):
  subprocess.run([str(ROOT/'bin/parity-services'),'reset',side],check=True)
@@ -9,12 +9,13 @@ def run(side,port):
  with sqlite3.connect(dbpath) as db:
   db.execute('DELETE FROM push_subscriptions')
   bot,room=db.execute("SELECT u.id || '-' || u.bot_token,m.room_id FROM users u JOIN memberships m ON m.user_id=u.id WHERE u.role=2 AND u.status=0 AND m.room_id=486777696 LIMIT 1").fetchone()
- cookies={};_,page,_=request(port,'/session/new',cookies=cookies);csrf=re.search(r'name="csrf-token" content="([^"]+)"',page)[1]
+ cookies={};_,page,_=request(port,'/session/new',cookies=cookies);csrf=csrf_token(page)
  assert request(port,'/session','POST',{'email_address':'david@37signals.com','password':'secret123456','authenticity_token':csrf},cookies)[0]==302
  result={}
  def call(label,path,method='GET',body=None,jar=None):
   headers={'Host':'campfire.test','Content-Type':'text/plain','User-Agent':'Mozilla/5.0 Chrome/131.0.0.0 Safari/537.36'}
   if jar:headers.update({'Cookie':'; '.join(f'{k}={v}' for k,v in jar.items()),'X-CSRF-Token':csrf})
+  if method!='GET':headers.update(BROWSER)
   c=http.client.HTTPConnection('127.0.0.1',port,timeout=30);c.request(method,path,body,headers);r=c.getresponse();text=r.read().decode();h={k.lower():v for k,v in r.getheaders()};c.close()
   parsed=json.loads(text) if text and h.get('content-type','').startswith('application/json') else normalize(text)
   def clean(v):

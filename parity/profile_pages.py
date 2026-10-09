@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """Profile forms, membership controls, avatar preview and transfer tokens."""
 import json,re,subprocess,difflib,sqlite3
-from sessions import ROOT,request,normalize
+from sessions import ROOT,request,normalize,csrf_token
 from media import sign
 
 def run(side,port):
  subprocess.run([str(ROOT/'bin/parity-services'),'reset',side],check=True)
  pages={}
  for email in ['david@37signals.com','kevin@37signals.com']:
-  cookies={};_,p,_=request(port,'/session/new',cookies=cookies);token=re.search(r'name="csrf-token" content="([^"]+)"',p)[1]
+  cookies={};_,p,_=request(port,'/session/new',cookies=cookies);token=csrf_token(p)
   assert request(port,'/session','POST',{'email_address':email,'password':'secret123456','authenticity_token':token},cookies)[0]==302
   if email=='david@37signals.com':
    for name,row in json.loads((ROOT/'vectors/pwa-views.json').read_text()).items():
@@ -16,7 +16,7 @@ def run(side,port):
     pages['pwa_'+name]=normalize(p)
   for name,headers in [('initial',{}),('referrer',{'Referer':'http://campfire.test/rooms/486777696'}),('self_referrer',{'Referer':'http://campfire.test/users/me/profile'}),('frame',{'Turbo-Frame':'profile'})]:
    status,p,_=request(port,'/users/me/profile',cookies=cookies,headers=headers);assert status==200,(side,status,p[:500]);pages[email+name]=normalize(p)
-  token=re.search(r'name="csrf-token" content="([^"]+)"',p)[1]
+  token=csrf_token(p)
   attrs={'user[name]':'Profile "<&> Ω','user[email_address]':email,'user[bio]':'Line 1\n<&> Ω','authenticity_token':token}
   status,_,_=request(port,'/users/me/profile','PATCH',attrs,cookies);assert status==302
   for n in range(2):

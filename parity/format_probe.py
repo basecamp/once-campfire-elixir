@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """Keep raw browser-controller optional-format comparisons during implementation."""
 import json,re,subprocess
-from sessions import ROOT,request,normalize
+from sessions import ROOT,request,normalize,csrf_token
 PATHS=['/account/edit','/users/127326141','/users/me/profile','/account/bots','/account/bots/new','/account/custom_styles/edit','/rooms/486777696','/rooms/486777696/messages','/rooms/486777696/messages/933434530','/rooms/486777696/messages/933434530/edit','/rooms/486777696/refresh?since=0','/rooms/486777696/involvement','/users/me/sidebar','/autocompletable/users','/searches','/messages/933434530/boosts','/messages/933434530/boosts/new','/users/me/push_subscriptions']
 def run(side,port):
  subprocess.run([str(ROOT/'bin/parity-services'),'reset',side],check=True)
- cookies={};_,p,_=request(port,'/session/new',cookies=cookies);token=re.search(r'name="csrf-token" content="([^"]+)"',p)[1]
+ cookies={};_,p,_=request(port,'/session/new',cookies=cookies);token=csrf_token(p)
  assert request(port,'/session','POST',{'email_address':'david@37signals.com','password':'secret123456','authenticity_token':token},cookies)[0]==302
  result={}
  for path in PATHS:

@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """Room settings, participant controls and administration form parity."""
 import json,re,subprocess,difflib,sqlite3
-from sessions import ROOT,request,normalize
+from sessions import ROOT,request,normalize,csrf_token,form_token
 
 def run(side,port):
  subprocess.run([str(ROOT/'bin/parity-services'),'reset',side],check=True)
  pages={}
  for email in ['david@37signals.com','kevin@37signals.com']:
-  cookies={};_,p,_=request(port,'/session/new',cookies=cookies);token=re.search(r'name="csrf-token" content="([^"]+)"',p)[1]
+  cookies={};_,p,_=request(port,'/session/new',cookies=cookies);token=csrf_token(p)
   assert request(port,'/session','POST',{'email_address':email,'password':'secret123456','authenticity_token':token},cookies)[0]==302
   paths=['/rooms/opens/new','/rooms/closeds/new','/rooms/directs/new']
   roomids=[104393281,486777696,201306877,699448326] if email=='david@37signals.com' else [201306877,699448326]
@@ -25,7 +25,7 @@ def run(side,port):
   # Submit the real form token to update a room the viewer can administer.
   id=201306877 if email=='david@37signals.com' else 699448326
   status,p,_=request(port,f'/rooms/closeds/{id}/edit',cookies=cookies);assert status==200
-  token=re.search(r'name="authenticity_token" value="([^"]+)"',p)[1]
+  token=form_token(p)
   params={'room[name]':'Room "<&> Ω','user_ids[]':127326141 if email=='david@37signals.com' else 712064548,'authenticity_token':token}
   assert request(port,f'/rooms/closeds/{id}','PATCH',params,cookies)[0]==302
   status,p,_=request(port,f'/rooms/closeds/{id}/edit',cookies=cookies);assert status==200;pages[email+'updated']=normalize(p)

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Action Cable authentication, stream authorization, typing and presence parity."""
 import base64,hashlib,hmac,json,pathlib,re,sqlite3,subprocess,time
-from sessions import request
+from sessions import request,csrf_token
 from websocket import WebSocket
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 SECRET=next(s.split('=',1)[1] for s in (ROOT/'parity/reference.env').read_text().splitlines() if s.startswith('SECRET_KEY_BASE='))
@@ -12,7 +12,7 @@ def signed_stream(stream):
 def run(side,port):
  subprocess.run([str(ROOT/'bin/parity-services'),'reset',side],check=True)
  cookies={};status,page,_=request(port,'/session/new',cookies=cookies)
- csrf=re.search(r'name="csrf-token" content="([^"]+)"',page)[1]
+ csrf=csrf_token(page)
  status,_,_=request(port,'/session','POST',{'email_address':'david@37signals.com','password':'secret123456','authenticity_token':csrf},cookies);assert status==302
  anon=WebSocket(port);unauthorized=anon.receive();assert unauthorized=={'type':'disconnect','reason':'unauthorized','reconnect':False};anon.close()
  a=WebSocket(port,cookies);b=WebSocket(port,cookies)

@@ -2,13 +2,13 @@
 from drain_jobs import WAIT
 """Exercise real multipart attachments against the source and the native application."""
 import base64,hashlib,http.client,json,re,sqlite3,subprocess
-from sessions import ROOT,request
+from sessions import ROOT,request,csrf_token,BROWSER
 
 def run(side,port):
  subprocess.run([str(ROOT/'bin/parity-services'),'reset',side],check=True)
  dbpath=ROOT/'var'/('rails/db' if side=='reference' else 'candidate')/'production.sqlite3'
  with sqlite3.connect(dbpath) as db:db.execute("DELETE FROM push_subscriptions")
- cookies={};_,p,_=request(port,'/session/new',cookies=cookies);token=re.search(r'name="csrf-token" content="([^"]+)"',p)[1]
+ cookies={};_,p,_=request(port,'/session/new',cookies=cookies);token=csrf_token(p)
  assert request(port,'/session','POST',{'email_address':'david@37signals.com','password':'secret123456','authenticity_token':token},cookies)[0]==302
  with sqlite3.connect(dbpath) as db:room=db.execute("SELECT room_id FROM memberships WHERE user_id=127326141 AND room_id IN (SELECT id FROM rooms WHERE type='Rooms::Open') LIMIT 1").fetchone()[0]
  results=[]
@@ -22,7 +22,7 @@ def run(side,port):
    parts.append(f'--{boundary}\r\nContent-Disposition: form-data; name="{key}"\r\n\r\n{value}\r\n'.encode())
   parts.append(f'--{boundary}\r\nContent-Disposition: form-data; name="message[attachment]"; filename="{filename}"\r\nContent-Type: {type}\r\n\r\n'.encode()+data+b'\r\n')
   body=b''.join(parts)+f'--{boundary}--\r\n'.encode()
-  c=http.client.HTTPConnection('127.0.0.1',port,timeout=60);c.request('POST',f'/rooms/{room}/messages',body,{'Host':'campfire.test','Cookie':'; '.join(f'{k}={v}' for k,v in cookies.items()),'Content-Type':f'multipart/form-data; boundary={boundary}','Accept':'text/vnd.turbo-stream.html'});r=c.getresponse();response=r.read().decode();c.close();assert r.status==200,(side,filename,r.status,response[:500])
+  c=http.client.HTTPConnection('127.0.0.1',port,timeout=60);c.request('POST',f'/rooms/{room}/messages',body,{'Host':'campfire.test',**BROWSER,'Cookie':'; '.join(f'{k}={v}' for k,v in cookies.items()),'Content-Type':f'multipart/form-data; boundary={boundary}','Accept':'text/vnd.turbo-stream.html'});r=c.getresponse();response=r.read().decode();c.close();assert r.status==200,(side,filename,r.status,response[:500])
   results.append({'filename':filename,'status':r.status,'body':response})
  def snapshot():
   fixture=json.loads((ROOT/'test/fixtures/seed.json').read_text());state={}

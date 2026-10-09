@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """Compare real paginated account Turbo Stream rows and lazy next-page frames."""
 import difflib,json,re,sqlite3,subprocess
-from sessions import ROOT,request,normalize
+from sessions import ROOT,request,normalize,csrf_token
 
 def run(side,port):
  subprocess.run([str(ROOT/'bin/parity-services'),'reset',side],check=True)
  cookies={};_,body,_=request(port,'/session/new',cookies=cookies)
- token=re.search(r'name="csrf-token" content="([^"]+)"',body)[1]
+ token=csrf_token(body)
  assert request(port,'/session','POST',{'email_address':'david@37signals.com','password':'secret123456','authenticity_token':token},cookies)[0]==302
  results={}
  def capture(path,headers=None):

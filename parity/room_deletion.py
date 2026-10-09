@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Delete a room with image/video messages, boosts, variants and shared embeds."""
 import base64,hashlib,http.client,json,re,sqlite3,subprocess,difflib
-from sessions import ROOT,request,normalize
+from sessions import ROOT,request,normalize,csrf_token,BROWSER
 from drain_jobs import drain
 from message_attachments import sgid
 
@@ -10,7 +10,7 @@ def run(side,port):
  folder=ROOT/'var'/('rails/db' if side=='reference' else 'candidate');dbpath=folder/'production.sqlite3';files=ROOT/'var'/('rails/files' if side=='reference' else 'candidate/files')
  fixture=json.loads((ROOT/'test/fixtures/seed.json').read_text())
  with sqlite3.connect(dbpath) as db:db.execute('DELETE FROM push_subscriptions')
- cookies={};_,page,_=request(port,'/session/new',cookies=cookies);token=re.search(r'name="csrf-token" content="([^"]+)"',page)[1]
+ cookies={};_,page,_=request(port,'/session/new',cookies=cookies);token=csrf_token(page)
  assert request(port,'/session','POST',{'email_address':'david@37signals.com','password':'secret123456','authenticity_token':token},cookies)[0]==302
  status,_,headers=request(port,'/rooms/opens','POST',{'authenticity_token':token,'room[name]':'Delete with files'},cookies);assert status==302
  room=int(headers['location'].rsplit('/',1)[1]);result={}
@@ -18,7 +18,7 @@ def run(side,port):
   data=(ROOT/'reference/test/fixtures/files'/name).read_bytes();boundary='campfire-room-delete';parts=[]
   for key,value in [('authenticity_token',token),('message[client_message_id]','delete-'+name)]:parts.append(f'--{boundary}\r\nContent-Disposition: form-data; name="{key}"\r\n\r\n{value}\r\n'.encode())
   parts.append(f'--{boundary}\r\nContent-Disposition: form-data; name="message[attachment]"; filename="{name}"\r\nContent-Type: {mime}\r\n\r\n'.encode()+data+b'\r\n');body=b''.join(parts)+f'--{boundary}--\r\n'.encode()
-  conn=http.client.HTTPConnection('127.0.0.1',port,timeout=60);conn.request('POST',f'/rooms/{room}/messages',body,{'Host':'campfire.test','Cookie':'; '.join(f'{k}={v}' for k,v in cookies.items()),'Content-Type':f'multipart/form-data; boundary={boundary}','Accept':'text/vnd.turbo-stream.html'});response=conn.getresponse();html=response.read().decode();conn.close();assert response.status==200,(side,name,response.status,html[:200]);result[name]=normalize(html)
+  conn=http.client.HTTPConnection('127.0.0.1',port,timeout=60);conn.request('POST',f'/rooms/{room}/messages',body,{'Host':'campfire.test',**BROWSER,'Cookie':'; '.join(f'{k}={v}' for k,v in cookies.items()),'Content-Type':f'multipart/form-data; boundary={boundary}','Accept':'text/vnd.turbo-stream.html'});response=conn.getresponse();html=response.read().decode();conn.close();assert response.status==200,(side,name,response.status,html[:200]);result[name]=normalize(html)
  body=f'<p>Shared <action-text-attachment sgid="{sgid(1)}"></action-text-attachment></p>'
  assert request(port,f'/rooms/{room}/messages','POST',{'authenticity_token':token,'message[body]':body,'message[client_message_id]':'delete-shared'},cookies,headers={'Accept':'text/vnd.turbo-stream.html'})[0]==200
  with sqlite3.connect(dbpath) as db:message=db.execute("SELECT id FROM messages WHERE client_message_id='delete-moon.jpg'").fetchone()[0]

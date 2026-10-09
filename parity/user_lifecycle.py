@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Ban/unban/deactivate effects on all active sockets, old cookies and persistent policy."""
 import difflib,json,re,sqlite3,subprocess
-from sessions import ROOT,request
+from sessions import ROOT,request,csrf_token
 from websocket import WebSocket
 from drain_jobs import drain
 
@@ -9,7 +9,7 @@ def run(side,port):
  subprocess.run([str(ROOT/'bin/parity-services'),'reset',side],check=True)
  dbpath=ROOT/'var'/('rails/db' if side=='reference' else 'candidate')/'production.sqlite3'
  def login(email,ip):
-  cookies={};headers={'X-Forwarded-For':ip};_,page,_=request(port,'/session/new',cookies=cookies,headers=headers);csrf=re.search(r'name="csrf-token" content="([^"]+)"',page)[1]
+  cookies={};headers={'X-Forwarded-For':ip};_,page,_=request(port,'/session/new',cookies=cookies,headers=headers);csrf=csrf_token(page)
   status,_,_=request(port,'/session','POST',{'email_address':email,'password':'secret123456','authenticity_token':csrf},cookies,headers=headers);assert status==302,(side,status)
   return cookies,csrf,headers
  admin,csrf,headers=login('david@37signals.com','198.51.100.10')

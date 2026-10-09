@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """Browser restriction order, bot exemptions and incompatible page HTML."""
 import json,re,subprocess,difflib
-from sessions import ROOT,request,normalize
+from sessions import ROOT,request,normalize,csrf_token
 VECTORS=json.loads((ROOT/'vectors/campfire_user_agents.json').read_text())['user_agents']
 CASES=[r for r in VECTORS if r['ua'] and '\n' not in r['ua'] and '\r' not in r['ua'] and isinstance(r['blocked'],bool)]
 CASES=[r for r in CASES if r['blocked']][:20]+[r for r in CASES if not r['blocked']][:12]
 def run(side,port):
  subprocess.run([str(ROOT/'bin/parity-services'),'reset',side],check=True)
- pages={};cookies={};_,p,_=request(port,'/session/new',cookies=cookies);token=re.search(r'name="csrf-token" content="([^"]+)"',p)[1]
+ pages={};cookies={};_,p,_=request(port,'/session/new',cookies=cookies);token=csrf_token(p)
  assert request(port,'/session','POST',{'email_address':'david@37signals.com','password':'secret123456','authenticity_token':token},cookies)[0]==302
  for i,row in enumerate(CASES):
   headers={'User-Agent':row['ua']}
@@ -15,7 +15,7 @@ def run(side,port):
    status,p,h=request(port,path,cookies=jar,headers=headers)
    pages[f'{i}_{name}']={'status':status,'body':normalize(p),'location':h.get('location')}
  old={'User-Agent':CASES[0]['ua']}
- status,p,_=request(port,'/session','POST',{'email_address':'david@37signals.com','password':'secret123456'},cookies,old);assert status==422
+ status,p,_=request(port,'/session','POST',{'email_address':'david@37signals.com','password':'secret123456'},cookies,old,browser=False);assert status==422
  assert request(port,'/up',headers=old)[0]==200
  return pages
 if __name__=='__main__':

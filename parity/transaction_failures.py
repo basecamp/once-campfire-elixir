@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Deliberate fixture-only SQLite callback faults and parent/child commit boundaries."""
 import difflib,http.client,json,re,sqlite3,subprocess
-from sessions import ROOT,request,normalize
+from sessions import ROOT,request,normalize,csrf_token,BROWSER
 FIXTURE=json.loads((ROOT/'test/fixtures/seed.json').read_text())
 def run(side,port,setup):
  subprocess.run([str(ROOT/'bin/parity-services'),'reset',side],check=True)
@@ -12,10 +12,10 @@ def run(side,port,setup):
    for table in FIXTURE['tables']:
     if table not in ['schema_migrations','ar_internal_metadata']:db.execute('DELETE FROM "'+table+'"')
    db.execute("CREATE TRIGGER fixture_fail BEFORE INSERT ON rooms BEGIN SELECT RAISE(ABORT,'fixture room insert failure'); END")
- cookies={};_,page,_=request(port,'/first_run' if setup else '/session/new',cookies=cookies);csrf=re.search(r'name="csrf-token" content="([^"]+)"',page)[1]
+ cookies={};_,page,_=request(port,'/first_run' if setup else '/session/new',cookies=cookies);csrf=csrf_token(page)
  if not setup:assert request(port,'/session','POST',{'email_address':'david@37signals.com','password':'secret123456','authenticity_token':csrf},cookies)[0]==302
  def send(url,attrs):
-  c=http.client.HTTPConnection('127.0.0.1',port,timeout=30);c.request('POST',url,json.dumps({'user':attrs}),{'Host':'campfire.test','User-Agent':'Mozilla/5.0 Chrome/131.0.0.0 Safari/537.36','Content-Type':'application/json','Accept':'text/html','Cookie':'; '.join(k+'='+v for k,v in cookies.items()),'X-CSRF-Token':csrf});r=c.getresponse();body=r.read().decode();headers=dict((k.lower(),v) for k,v in r.getheaders());c.close()
+  c=http.client.HTTPConnection('127.0.0.1',port,timeout=30);c.request('POST',url,json.dumps({'user':attrs}),{'Host':'campfire.test',**BROWSER,'User-Agent':'Mozilla/5.0 Chrome/131.0.0.0 Safari/537.36','Content-Type':'application/json','Accept':'text/html','Cookie':'; '.join(k+'='+v for k,v in cookies.items()),'X-CSRF-Token':csrf});r=c.getresponse();body=r.read().decode();headers=dict((k.lower(),v) for k,v in r.getheaders());c.close()
   with sqlite3.connect(path) as db:
    db.row_factory=sqlite3.Row;rows={}
    for table in ['accounts','users','rooms','memberships','webhooks','sessions','sqlite_sequence']:

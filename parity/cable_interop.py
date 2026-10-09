@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """Exercise Rails/Elixir Redis stream fanout and remote disconnect interoperability."""
 import json,pathlib,re,subprocess
-from sessions import request
+from sessions import request,csrf_token
 from websocket import WebSocket
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 for side in ['reference','candidate']:subprocess.run([str(ROOT/'bin/parity-services'),'reset',side],check=True)
 connections=[];credentials=[]
 for port in [47071,47070]:
  cookies={};status,page,_=request(port,'/session/new',cookies=cookies);assert status==200
- csrf=re.search(r'name="csrf-token" content="([^"]+)"',page)[1]
+ csrf=csrf_token(page)
  status,_,_=request(port,'/session','POST',{'email_address':'david@37signals.com','password':'secret123456','authenticity_token':csrf},cookies);assert status==302
  ws=WebSocket(port,cookies);assert ws.receive()=={'type':'welcome'}
  identifier,status=ws.subscribe({'channel':'TypingNotificationsChannel','room_id':486777696});assert status=='confirm_subscription'

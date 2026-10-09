@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """Real socket room administration broadcasts, per-user delivery and revocation."""
 import base64,difflib,json,re,subprocess
-from sessions import ROOT,request
+from sessions import ROOT,request,csrf_token
 from message_broadcasts import signed_stream
 from websocket import WebSocket
 
 def run(side,port):
  subprocess.run([str(ROOT/'bin/parity-services'),'reset',side],check=True)
- cookies={};_,page,_=request(port,'/session/new',cookies=cookies);token=re.search(r'name="csrf-token" content="([^"]+)"',page)[1]
+ cookies={};_,page,_=request(port,'/session/new',cookies=cookies);token=csrf_token(page)
  assert request(port,'/session','POST',{'email_address':'david@37signals.com','password':'secret123456','authenticity_token':token},cookies)[0]==302
  sock=WebSocket(port,cookies);assert sock.receive()=={'type':'welcome'}
  for stream in ['rooms',base64.urlsafe_b64encode(b'gid://campfire/User/127326141').decode().rstrip('=')+':rooms']:

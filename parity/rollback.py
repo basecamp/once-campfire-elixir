@@ -2,7 +2,7 @@
 """Fixture-only handoff from pinned Rails to production Elixir and back."""
 import json,re,sqlite3,subprocess,shutil,time,base64,hashlib
 from contextlib import contextmanager
-from sessions import ROOT,request,normalize
+from sessions import ROOT,request,normalize,csrf_token
 from media import sign
 
 @contextmanager
@@ -58,7 +58,7 @@ def run():
  with connect(paths('reference')[0]) as db:
   BASELINE_FOREIGN_KEYS=sorted(db.execute('PRAGMA foreign_key_check').fetchall())
   db.execute('DELETE FROM push_subscriptions')
- cookies={};_,page,_=request(47071,'/session/new',cookies=cookies);token=re.search(r'name="csrf-token" content="([^"]+)"',page)[1]
+ cookies={};_,page,_=request(47071,'/session/new',cookies=cookies);token=csrf_token(page)
  assert request(47071,'/session','POST',{'email_address':'david@37signals.com','password':'secret123456','authenticity_token':token},cookies)[0]==302
  def mutate(port,path,attrs,method='PATCH'):
   s,p,h=request(port,path,method,dict(attrs,authenticity_token=token),cookies,headers={'Accept':'text/vnd.turbo-stream.html'} if '/messages' in path else {})

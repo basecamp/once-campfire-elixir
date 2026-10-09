@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Invite signup HTML, security/duplicate paths, and complete persisted rows."""
 import json,pathlib,re,sqlite3,subprocess,difflib,http.client,base64,hashlib,hmac
-from sessions import request,normalize
+from sessions import request,normalize,form_token,BROWSER
 from media import sign,SECRET
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 fixture=json.loads((ROOT/'test/fixtures/seed.json').read_text())
@@ -13,8 +13,8 @@ def run(side,port):
  cookies={};results={}
  assert request(port,'/join/invalid',cookies=cookies)[0]==404
  status,page,_=request(port,'/join/'+code,cookies=cookies);assert status==200,(side,status)
- token=re.search(r'name="authenticity_token" value="([^"]+)"',page)[1]
- assert request(port,'/join/'+code,'POST',{'user[name]':'Forged signup'},cookies)[0]==422
+ token=form_token(page)
+ assert request(port,'/join/'+code,'POST',{'user[name]':'Forged signup'},cookies,browser=False)[0]==422
  duplicate={'user[name]':'Duplicate','user[email_address]':'david@37signals.com','user[password]':'duplicate-password','authenticity_token':token}
  status,body,h=request(port,'/join/'+code,'POST',duplicate,cookies);assert status==302,(side,status,body[:200])
  results['duplicate_location']=h['location']
@@ -25,14 +25,14 @@ def run(side,port):
  results['authenticated_location']=h['location']
  # A second signup uploads original file bytes through the actual multipart form.
  other={};status,form,_=request(port,'/join/'+code,cookies=other);assert status==200
- formtoken=re.search(r'name="authenticity_token" value="([^"]+)"',form)[1]
+ formtoken=form_token(form)
  boundary='campfire-signup-parity';parts=[]
  for key,value in [('authenticity_token',formtoken),('user[name]','Uploaded avatar user'),('user[email_address]','avatar-signup@example.com'),('user[password]','avatar-password')]:
   parts.append(f'--{boundary}\r\nContent-Disposition: form-data; name="{key}"\r\n\r\n{value}\r\n'.encode())
  image=(ROOT/'reference/test/fixtures/files/moon.jpg').read_bytes()
  parts.append(f'--{boundary}\r\nContent-Disposition: form-data; name="user[avatar]"; filename="moon.jpg"\r\nContent-Type: image/jpeg\r\n\r\n'.encode()+image+b'\r\n')
  body=b''.join(parts)+f'--{boundary}--\r\n'.encode()
- c=http.client.HTTPConnection('127.0.0.1',port,timeout=30);c.request('POST','/join/'+code,body,{'Host':'campfire.test','User-Agent':'Mozilla/5.0 Chrome/131.0.0.0 Safari/537.36','Cookie':'; '.join(f'{k}={v}' for k,v in other.items()),'Content-Type':f'multipart/form-data; boundary={boundary}'})
+ c=http.client.HTTPConnection('127.0.0.1',port,timeout=30);c.request('POST','/join/'+code,body,{'Host':'campfire.test',**BROWSER,'User-Agent':'Mozilla/5.0 Chrome/131.0.0.0 Safari/537.36','Cookie':'; '.join(f'{k}={v}' for k,v in other.items()),'Content-Type':f'multipart/form-data; boundary={boundary}'})
  r=c.getresponse();body=r.read();headers={k.lower():v for k,v in r.getheaders()};c.close();assert r.status==302,(side,r.status,body[:500])
  results['multipart_location']=headers['location']
  # Both avatars are served as source-compatible WebP variants.
@@ -68,7 +68,7 @@ def run(side,port):
  results['rows']=rows
  # Independently validate the new salted password by signing in again.
  other={};status,login,_=request(port,'/session/new',cookies=other);assert status==200
- token=re.search(r'name="authenticity_token" value="([^"]+)"',login)[1]
+ token=form_token(login)
  assert request(port,'/session','POST',{'email_address':'invite-parity@example.com','password':'signup-password','authenticity_token':token},other)[0]==302
  return results
 

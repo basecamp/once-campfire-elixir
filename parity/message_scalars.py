@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 """Scalar casts and ignored nested fields through real message/boost mutation endpoints."""
 import difflib,http.client,json,re,sqlite3,subprocess
-from sessions import ROOT,request,normalize
+from sessions import ROOT,request,normalize,csrf_token,BROWSER
 
 def run(side,port):
  subprocess.run([str(ROOT/'bin/parity-services'),'reset',side],check=True)
  path=ROOT/'var'/('rails/db' if side=='reference' else 'candidate')/'production.sqlite3'
- jar={};_,page,_=request(port,'/session/new',cookies=jar);csrf=re.search(r'name="csrf-token" content="([^"]+)"',page)[1]
+ jar={};_,page,_=request(port,'/session/new',cookies=jar);csrf=csrf_token(page)
  assert request(port,'/session','POST',{'email_address':'david@37signals.com','password':'secret123456','authenticity_token':csrf},jar)[0]==302
  def send(url,method,key,attrs):
-  c=http.client.HTTPConnection('127.0.0.1',port,timeout=30);c.request(method,url,json.dumps({key:attrs}),{'Host':'campfire.test','Content-Type':'application/json','Accept':'text/vnd.turbo-stream.html' if key=='message' and method=='POST' else 'text/html','Cookie':'; '.join(k+'='+v for k,v in jar.items()),'X-CSRF-Token':csrf});r=c.getresponse();body=r.read().decode();headers=dict((k.lower(),v) for k,v in r.getheaders());c.close()
+  c=http.client.HTTPConnection('127.0.0.1',port,timeout=30);c.request(method,url,json.dumps({key:attrs}),{'Host':'campfire.test',**BROWSER,'Content-Type':'application/json','Accept':'text/vnd.turbo-stream.html' if key=='message' and method=='POST' else 'text/html','Cookie':'; '.join(k+'='+v for k,v in jar.items()),'X-CSRF-Token':csrf});r=c.getresponse();body=r.read().decode();headers=dict((k.lower(),v) for k,v in r.getheaders());c.close()
   with sqlite3.connect(path) as db:
    db.row_factory=sqlite3.Row
    rows={t:[dict(x) for x in db.execute('SELECT '+('rowid,body' if t=='message_search_index' else '*')+' FROM '+t)] for t in ['messages','action_text_rich_texts','boosts','rooms','memberships','message_search_index']}

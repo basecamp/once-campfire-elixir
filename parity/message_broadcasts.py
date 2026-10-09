@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Observe native and Rails message/boost broadcasts on real authenticated sockets."""
 import base64,difflib,hashlib,hmac,json,re,subprocess
-from sessions import ROOT,request
+from sessions import ROOT,request,csrf_token
 from websocket import WebSocket
 SECRET=next(s.split('=',1)[1] for s in (ROOT/'parity/reference.env').read_text().splitlines() if s.startswith('SECRET_KEY_BASE='))
 def signed_stream(stream):
@@ -11,7 +11,7 @@ def signed_stream(stream):
 def run(side,port):
  subprocess.run([str(ROOT/'bin/parity-services'),'reset',side],check=True)
  cookies={};_,page,_=request(port,'/session/new',cookies=cookies)
- token=re.search(r'name="csrf-token" content="([^"]+)"',page)[1]
+ token=csrf_token(page)
  status,_,_=request(port,'/session','POST',{'email_address':'david@37signals.com','password':'secret123456','authenticity_token':token},cookies);assert status==302
  sock=WebSocket(port,cookies);assert sock.receive()=={'type':'welcome'}
  room=486777696

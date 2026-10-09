@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """Account settings HTML, role controls, invitation, logo and actual form actions."""
 import json,re,subprocess,difflib,sqlite3
-from sessions import ROOT,request,normalize
+from sessions import ROOT,request,normalize,csrf_token,form_token
 from media import sign
 
 def login(port,email):
- c={};_,p,_=request(port,'/session/new',cookies=c);token=re.search(r'name="csrf-token" content="([^"]+)"',p)[1]
+ c={};_,p,_=request(port,'/session/new',cookies=c);token=csrf_token(p)
  assert request(port,'/session','POST',{'email_address':email,'password':'secret123456','authenticity_token':token},c)[0]==302
  return c
 
@@ -14,11 +14,11 @@ def run(side,port):
  pages={};cookies=login(port,'david@37signals.com')
  status,p,_=request(port,'/account/edit',cookies=cookies);assert status==200,(side,status,p[:400]);pages['administrator']=normalize(p)
  # Submit the actual URL and token generated for the account model form.
- match=re.search(r'<form class="flex flex-column gap"[^>]*action="([^"]+)"[^>]*>[\s\S]*?name="authenticity_token" value="([^"]+)"',p)
+ match=re.search(r'<form class="flex flex-column gap"[^>]*action="([^"]+)"[^>]*>([\s\S]*?)</form>',p)
  assert match and match[1].startswith('/account.')
- status,_,h=request(port,match[1],'PATCH',{'account[name]':'Account "<&> Ω','authenticity_token':match[2]},cookies);assert status==302,(side,status)
+ status,_,h=request(port,match[1],'PATCH',{'account[name]':'Account "<&> Ω','authenticity_token':form_token(match[2])},cookies);assert status==302,(side,status)
  status,p,_=request(port,'/account/edit',cookies=cookies);assert status==200;pages['renamed']=normalize(p)
- token=re.search(r'name="csrf-token" content="([^"]+)"',p)[1]
+ token=csrf_token(p)
  for value in ['true','false']:
   status,_,_=request(port,match[1],'PUT',{'account[settings][restrict_room_creation_to_administrators]':value,'authenticity_token':token},cookies);assert status==302,(side,status)
   status,p,_=request(port,'/account/edit',cookies=cookies);assert status==200;pages['restriction_'+value]=normalize(p)

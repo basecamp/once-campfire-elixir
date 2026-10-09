@@ -2,7 +2,7 @@
 from drain_jobs import WAIT
 """Drain real Resque queues and compare webhook delivery/reply persistence on fixture copies."""
 import http.server,json,re,sqlite3,subprocess,threading
-from sessions import ROOT,request
+from sessions import ROOT,request,csrf_token
 class Sink(http.server.BaseHTTPRequestHandler):
  payloads=[]
  def do_POST(self):
@@ -15,7 +15,7 @@ def run(side,port):
  path=ROOT/'var'/('rails/db' if side=='reference' else 'candidate')/'production.sqlite3'
  with sqlite3.connect(path) as db:
   db.execute('DELETE FROM push_subscriptions');db.execute('UPDATE webhooks SET url=? WHERE user_id=394959859',['http://127.0.0.1:47110/hook'])
- c={};_,p,_=request(port,'/session/new',cookies=c);token=re.search(r'name="csrf-token" content="([^"]+)"',p)[1]
+ c={};_,p,_=request(port,'/session/new',cookies=c);token=csrf_token(p)
  status,_,_=request(port,'/session','POST',{'email_address':'david@37signals.com','password':'secret123456','authenticity_token':token},c);assert status==302
  status,_,h=request(port,'/rooms/directs','POST',{'authenticity_token':token,'user_ids[]':394959859},c);assert status==302;room=h['location'].rsplit('/',1)[1]
  status,_,_=request(port,f'/rooms/{room}/messages','POST',{'authenticity_token':token,'message[body]':'<p>Job queue delivery</p>','message[client_message_id]':'job-source-message'},c,headers={'Accept':'text/vnd.turbo-stream.html'});assert status==200

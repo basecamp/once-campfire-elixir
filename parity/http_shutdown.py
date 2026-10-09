@@ -21,7 +21,7 @@ send_request=->(path,method,params={}) do
  http=Net::HTTP.new('127.0.0.1',47200);http.read_timeout=30
  q=(method=='GET' ? Net::HTTP::Get : Net::HTTP::Post).new(path)
  q['Host']='campfire.test';q['User-Agent']='Mozilla/5.0 Chrome/131.0.0.0 Safari/537.36';q['Cookie']=jar.map{|k,v|"#{k}=#{v}"}.join('; ')
- q.set_form_data(params) if method!='GET'
+ if method!='GET';q.set_form_data(params);q['Origin']='http://campfire.test';q['Sec-Fetch-Site']='same-origin';end
  r=http.request(q);(r.get_fields('set-cookie')||[]).each{|v|k,x=v.split(';',2).first.split('=',2);jar[k]=x};r
 end
 case ARGV[0]
@@ -30,7 +30,7 @@ when 'ready'
    begin;r=send_request.call('/up','GET');exit 0 if r.code=='200';rescue SystemCallError,EOFError;end;sleep 0.05
   end;raise 'not ready'
 when 'login'
-  r=send_request.call('/session/new','GET');csrf=r.body[/name="csrf-token" content="([^"]+)"/,1];raise 'missing csrf' unless csrf
+  r=send_request.call('/session/new','GET');csrf=r.body[/name="csrf-token" content="([^"]*)"/,1];raise 'missing csrf' unless csrf
   r=send_request.call('/session','POST',{'email_address'=>'david@37signals.com','password'=>'secret123456','authenticity_token'=>csrf});raise r.code unless r.code=='302'
   File.write('/fixture/credentials.json',JSON.generate(cookies:jar,csrf:csrf))
 when 'post'

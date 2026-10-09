@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """Public exception bodies, content negotiation, CSRF errors and unfurl rejections."""
 import json,re,subprocess,difflib
-from sessions import ROOT,request
+from sessions import ROOT,request,csrf_token
 KEYS=['content-type','cache-control','etag','vary','x-version','x-rev','x-frame-options','x-xss-protection','x-content-type-options','x-permitted-cross-domain-policies','referrer-policy']
 def run(side,port):
  subprocess.run([str(ROOT/'bin/parity-services'),'reset',side],check=True)
- results={};c={};_,p,_=request(port,'/session/new',cookies=c);token=re.search(r'name="csrf-token" content="([^"]+)"',p)[1]
+ results={};c={};_,p,_=request(port,'/session/new',cookies=c);token=csrf_token(p)
+ # A case without a token is a forged request on both sides.
  def case(name,path,params,headers=None,method='POST'):
-  status,p,h=request(port,path,method,params,c,headers=headers)
+  status,p,h=request(port,path,method,params,c,headers=headers,browser='authenticity_token' in params)
   results[name]={'status':status,'body':p,'headers':{k:h.get(k) for k in KEYS}}
  for accept in ['text/html','application/json']:
   case('login_csrf'+accept,'/session',{}, {'Accept':accept})

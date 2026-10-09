@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Live direct-upload allocation, byte integrity, redirects and range contracts."""
 import base64,hashlib,hmac,http.client,json,pathlib,re,sqlite3,subprocess,urllib.parse
-from sessions import request
+from sessions import request,csrf_token,BROWSER
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 SECRET=next(s.split('=',1)[1] for s in (ROOT/'parity/reference.env').read_text().splitlines() if s.startswith('SECRET_KEY_BASE='))
 KEY=hashlib.pbkdf2_hmac('sha256',SECRET.encode(),b'ActiveStorage',1000,64)
@@ -12,10 +12,11 @@ def decode(token,purpose):
 def run(side,port):
  subprocess.run([str(ROOT/'bin/parity-services'),'reset',side],check=True)
  cookies={};status,page,_=request(port,'/session/new',cookies=cookies);assert status==200
- csrf=re.search(r'name="csrf-token" content="([^"]+)"',page)[1]
+ csrf=csrf_token(page)
  status,_,_=request(port,'/session','POST',{'email_address':'david@37signals.com','password':'secret123456','authenticity_token':csrf},cookies);assert status==302
  def raw(path,method='GET',body=None,headers=None):
   h={'Host':'campfire.test','Cookie':'; '.join(f'{k}={v}' for k,v in cookies.items()),'X-CSRF-Token':csrf}
+  if method!='GET':h.update(BROWSER)
   if headers:h.update(headers)
   c=http.client.HTTPConnection('127.0.0.1',port,timeout=15);c.request(method,path,body,h);r=c.getresponse();data=r.read();headers=dict((k.lower(),v) for k,v in r.getheaders());c.close();return r.status,data,headers
  data=b'0123456789 Campfire storage parity\n'

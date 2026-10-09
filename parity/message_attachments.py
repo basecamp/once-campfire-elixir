@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Signed message attachment edits and rich-text blob association lifecycle."""
 import base64,difflib,hashlib,hmac,json,re,sqlite3,subprocess
-from sessions import ROOT,request,normalize
+from sessions import ROOT,request,normalize,csrf_token
 from media import sign,SECRET
 from drain_jobs import drain
 
@@ -13,7 +13,7 @@ def run(side,port):
  subprocess.run([str(ROOT/'bin/parity-services'),'reset',side],check=True)
  dbpath=ROOT/'var'/('rails/db' if side=='reference' else 'candidate')/'production.sqlite3'
  with sqlite3.connect(dbpath) as db:db.execute('DELETE FROM push_subscriptions')
- cookies={};_,page,_=request(port,'/session/new',cookies=cookies);token=re.search(r'name="csrf-token" content="([^"]+)"',page)[1]
+ cookies={};_,page,_=request(port,'/session/new',cookies=cookies);token=csrf_token(page)
  assert request(port,'/session','POST',{'email_address':'david@37signals.com','password':'secret123456','authenticity_token':token},cookies)[0]==302
  result={};room=486777696
  def mutate(label,path,method,attrs):

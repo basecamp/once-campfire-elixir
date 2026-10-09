@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """Message collection validators, conditional GET/HEAD and update invalidation."""
 import json,re,sqlite3,subprocess,difflib
-from sessions import ROOT,request,normalize
+from sessions import ROOT,request,normalize,csrf_token
 
 def run(side,port):
  subprocess.run([str(ROOT/'bin/parity-services'),'reset',side],check=True)
- cookies={};_,page,_=request(port,'/session/new',cookies=cookies);token=re.search(r'name="csrf-token" content="([^"]+)"',page)[1]
+ cookies={};_,page,_=request(port,'/session/new',cookies=cookies);token=csrf_token(page)
  assert request(port,'/session','POST',{'email_address':'david@37signals.com','password':'secret123456','authenticity_token':token},cookies)[0]==302
  path='/rooms/486777696/messages';result={}
  def check(label,headers=None,method='GET'):

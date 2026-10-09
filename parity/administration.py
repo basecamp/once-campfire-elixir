@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """Compare persisted administration mutations on isolated reference/candidate fixtures."""
 import json,pathlib,re,sqlite3,subprocess
-from sessions import request
+from sessions import request,csrf_token
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 fixture=json.loads((ROOT/'test/fixtures/seed.json').read_text())
 def run(side,port):
  subprocess.run([str(ROOT/'bin/parity-services'),'reset',side],check=True)
  path=ROOT/'var'/('rails/db' if side=='reference' else 'candidate')/'production.sqlite3'
  cookies={};status,page,_=request(port,'/session/new',cookies=cookies);assert status==200
- token=re.search(r'name="csrf-token" content="([^"]+)"',page)[1]
+ token=csrf_token(page)
  def send(path,method,params):
   status,body,h=request(port,path,method,dict(params,authenticity_token=token),cookies);assert status==302,(side,path,status,body[:500]);return h['location']
  send('/session','POST',{'email_address':'david@37signals.com','password':'secret123456'})

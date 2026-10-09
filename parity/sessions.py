@@ -2,9 +2,14 @@
 """Live Rails/Elixir browser login, credential rejection and cookie interoperability."""
 import http.client,json,pathlib,re,sqlite3,subprocess,urllib.parse
 ROOT=pathlib.Path(__file__).resolve().parents[1]
-def request(port,path,method='GET',params=None,cookies=None,headers=None):
+# What a browser sends with a same-origin form POST or fetch write; the candidate checks these
+# instead of tokens, so every write carries them unless a test asks for a forged one.
+BROWSER={'Origin':'http://campfire.test','Sec-Fetch-Site':'same-origin'}
+def request(port,path,method='GET',params=None,cookies=None,headers=None,browser=None):
  h={'Host':'campfire.test','User-Agent':'Mozilla/5.0 Chrome/131.0.0.0 Safari/537.36'}
  if cookies:h['Cookie']='; '.join(f'{k}={v}' for k,v in cookies.items())
+ if browser is None:browser=method not in ('GET','HEAD')
+ if browser:h.update(BROWSER)
  if headers:h.update(headers)
  body=urllib.parse.urlencode(params) if params is not None else None
  if body is not None:h['Content-Type']='application/x-www-form-urlencoded'
@@ -18,15 +23,21 @@ def request(port,path,method='GET',params=None,cookies=None,headers=None):
 def normalize(s):
  s=re.sub(r'<input type="hidden" name="authenticity_token" value="[^"]*" />','',s)
  return re.sub(r'(<meta name="csrf-token" content=")[^"]*',r'\1<VALIDATED_TOKEN>',s)
-# What a browser sends with a same-origin form POST.
-BROWSER={'Origin':'http://campfire.test','Sec-Fetch-Site':'same-origin'}
+# Rails pages carry a masked token in the meta tag and in each form; the candidate's are empty
+# or absent. Each side submits what its page carries, so the same script drives both.
+def csrf_token(page):
+ m=re.search(r'name="csrf-token" content="([^"]*)"',page)
+ return m[1] if m else ''
+def form_token(page):
+ m=re.search(r'name="authenticity_token" value="([^"]*)"',page)
+ return m[1] if m else ''
 def token(page):
- m=re.search(r'name="authenticity_token" value="([^"]+)"',page)
- return {'authenticity_token':m[1]} if m else {}
+ value=form_token(page)
+ return {'authenticity_token':value} if value else {}
 def run(side,port):
  subprocess.run([str(ROOT/'bin/parity-services'),'reset',side],check=True)
  cookies={};status,page,h=request(port,'/session/new',cookies=cookies);assert status==200
- forged=request(port,'/session','POST',{'email_address':'david@37signals.com','password':'secret123456'},cookies)[0];assert forged==422
+ forged=request(port,'/session','POST',{'email_address':'david@37signals.com','password':'secret123456'},cookies,browser=False)[0];assert forged==422
  status,rejected,h=request(port,'/session','POST',{'email_address':'david@37signals.com','password':'incorrect',**token(page)},cookies,BROWSER);assert status==401
  status,body,h=request(port,'/session','POST',{'email_address':'david@37signals.com','password':'secret123456',**token(rejected)},cookies,BROWSER);assert status==302 and h['location']=='http://campfire.test/'
  dbpath=ROOT/'var'/('rails/db' if side=='reference' else 'candidate')/'production.sqlite3'
