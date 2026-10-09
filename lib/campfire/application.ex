@@ -15,19 +15,6 @@ defmodule Campfire.Application do
     ]
 
     children =
-      if System.schedulers_online() > 1 do
-        children ++
-          [
-            {PartitionSupervisor,
-             name: Campfire.DB.ReadPool,
-             child_spec: {Campfire.DB, path: database_path, read_only: true, name: nil},
-             partitions: min(System.schedulers_online(), 8)}
-          ]
-      else
-        children
-      end
-
-    children =
       case {System.get_env("REDIS_URL"), System.get_env("CAMPFIRE_CABLE_REDIS_BRIDGE")} do
         {url, "1"} when is_binary(url) ->
           children ++

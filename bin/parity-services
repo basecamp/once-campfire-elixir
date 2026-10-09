@@ -47,7 +47,7 @@ def start(side):
   docker(*common,'-e','FAKETIME='+('@' if os.environ.get('CAMPFIRE_PARITY_TICK')=='1' else '')+'2026-03-02 16:00:00','-v',f'{ROOT}/var/rails:/rails/storage','campfire-reference:latest','bin/rails','server','-b','127.0.0.1','-p',PORTS[side])
  else:
   args=[]
-  for value in ['HEX_HOME=/app/.hex','MIX_HOME=/app/.mix','HOME=/app','TMPDIR=/app/var/tmp','EXQLITE_USE_SYSTEM=1','DATABASE_PATH=/app/var/candidate/production.sqlite3','STORAGE_PATH=/app/var/candidate/files','CAMPFIRE_CABLE_REDIS_BRIDGE=1','CAMPFIRE_CLOCK=2026-03-02T16:00:00Z','CAMPFIRE_CLOCK_TICK='+os.environ.get('CAMPFIRE_PARITY_TICK','0'),f'PORT={PORTS[side]}']:args+=['-e',value]
+  for value in ['HEX_HOME=/app/.hex','MIX_HOME=/app/.mix','HOME=/app','TMPDIR=/app/var/tmp','DATABASE_PATH=/app/var/candidate/production.sqlite3','STORAGE_PATH=/app/var/candidate/files','CAMPFIRE_CABLE_REDIS_BRIDGE=1','CAMPFIRE_CLOCK=2026-03-02T16:00:00Z','CAMPFIRE_CLOCK_TICK='+os.environ.get('CAMPFIRE_PARITY_TICK','0'),f'PORT={PORTS[side]}']:args+=['-e',value]
   docker(*common,*args,'-v',f'{ROOT}:/app','-w','/app','campfire-elixir:toolchain','mix','run','--no-halt')
  for _ in range(120):
   try:

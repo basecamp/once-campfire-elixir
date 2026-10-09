@@ -14,7 +14,6 @@ defmodule Campfire.MixProject do
         {:bandit, "~> 1.8"},
         {:plug, "~> 1.18"},
         {:jason, "~> 1.4"},
-        {:exqlite, "~> 0.33"},
         {:bcrypt_elixir, "~> 3.3"},
         {:floki, "~> 0.38"},
         {:redix, "~> 1.5"},

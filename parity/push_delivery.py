@@ -25,7 +25,7 @@ def run(side):
    if invalidate:code+='p=WebPush::Pool.new(invalid_subscription_handler: ->(id) { Push::Subscription.find(id).destroy! }); begin; p.send(:deliver,n,s.id); rescue => e; puts e.class; ensure; p.shutdown; end'
    else:code+='begin; n.deliver; rescue => e; puts e.class; end'
   else:
-   common += ['-e','CAMPFIRE_NO_SERVER=1','-e','CAMPFIRE_JOBS_ADAPTER=disabled','-e','DATABASE_PATH=/fixture/production.sqlite3','-e','EXQLITE_USE_SYSTEM=1','-e','HOME=/app','-e','HEX_HOME=/app/.hex','-e','MIX_HOME=/app/.mix','-e','TMPDIR=/app/var/tmp','-v',f'{ROOT}:/app','-w','/app','campfire-elixir:toolchain','mix','run','-e']
+   common += ['-e','CAMPFIRE_NO_SERVER=1','-e','CAMPFIRE_JOBS_ADAPTER=disabled','-e','DATABASE_PATH=/fixture/production.sqlite3','-e','-e','HOME=/app','-e','HEX_HOME=/app/.hex','-e','MIX_HOME=/app/.mix','-e','TMPDIR=/app/var/tmp','-v',f'{ROOT}:/app','-w','/app','campfire-elixir:toolchain','mix','run','-e']
    code='s=Campfire.DB.one("SELECT * FROM push_subscriptions WHERE id=123"); IO.inspect Campfire.Push.deliver(s,%{"title" => "Push <& Ω", "body" => "Body\\nline", "path" => "/rooms/486777696"},Campfire.DB.one("SELECT count(*) AS n FROM memberships WHERE user_id=127326141 AND unread_at IS NOT NULL")["n"],invalidate: '+str(invalidate).lower()+')'
   output=docker(*common,code,timeout=60)
   (ROOT/f'parity/push-{side}-{label}.log').write_text(output.stdout+output.stderr)
@@ -58,7 +58,7 @@ if __name__=='__main__':
   assert a==b,(a,b)
   expected={'success':True,'gone':False,'missing':True,'server_error':True,'manual_gone':True,'bad_certificate':False,'manual_bad_certificate':True,'private':True}
   assert {k:v['exists'] for k,v in a.items()}==expected,a
-  subprocess.run(['docker','run','--rm','--network','host','--user',f'{os.getuid()}:{os.getgid()}','--env-file',ROOT/'parity/reference.env','-e','CAMPFIRE_NO_SERVER=1','-e','CAMPFIRE_JOBS_ADAPTER=disabled','-e','DATABASE_PATH=/app/var/test.sqlite3','-e','EXQLITE_USE_SYSTEM=1','-e','HOME=/app','-e','HEX_HOME=/app/.hex','-e','MIX_HOME=/app/.mix','-e','TMPDIR=/app/var/tmp','-v',f'{ROOT}:/app','-w','/app','campfire-elixir:toolchain','mix','run','parity/verify_push_wire.exs'],check=True)
+  subprocess.run(['docker','run','--rm','--network','host','--user',f'{os.getuid()}:{os.getgid()}','--env-file',ROOT/'parity/reference.env','-e','CAMPFIRE_NO_SERVER=1','-e','CAMPFIRE_JOBS_ADAPTER=disabled','-e','DATABASE_PATH=/app/var/test.sqlite3','-e','-e','HOME=/app','-e','HEX_HOME=/app/.hex','-e','MIX_HOME=/app/.mix','-e','TMPDIR=/app/var/tmp','-v',f'{ROOT}:/app','-w','/app','campfire-elixir:toolchain','mix','run','parity/verify_push_wire.exs'],check=True)
   (ROOT/'parity/results/push-delivery.json').write_text(json.dumps({'passed':True,'scope':['actual HTTPS delivery to controlled allowed-host public-IP fixture','201/404/410/500 delivery responses','expired-subscription cleanup','TLS failure cleanup','manual notification preserves invalid subscriptions','private-IP rejection','isolated namespace with no external network']},indent=2)+'\n')
   print('HTTPS push delivery, payloads and subscription invalidation parity passed')
  finally:subprocess.run(['docker','rm','-f',SINK],check=True,capture_output=True)
