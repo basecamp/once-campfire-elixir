@@ -53,13 +53,23 @@ defmodule Campfire.DBNativeTest do
     assert DB.Native.query(connection, sql, ["native"]) == {:ok, []}
   end
 
-  test "statements that ran long are handed to a pooled reader", %{connection: connection} do
+  test "a statement that runs long is interrupted and handed to a pooled reader",
+       %{connection: connection} do
     sql =
       "SELECT * FROM (WITH RECURSIVE n(i) AS (SELECT 1 UNION ALL SELECT i+1 FROM n WHERE i<?) SELECT count(*) AS c FROM n)"
 
-    assert DB.Native.query(connection, sql, [3_000_000]) == {:ok, [%{"c" => 3_000_000}]}
+    # Its first run is cut short at the budget (1 ms; the pooled reader takes about 200 ms),
+    # and the statement is then refused until the pooled reader has carried it for a while.
+    {elapsed, result} = :timer.tc(fn -> DB.Native.query(connection, sql, [3_000_000]) end)
+    assert result == :slow
+    assert elapsed < 50_000
     assert DB.Native.query(connection, sql, [1]) == :slow
     assert DB.one(sql, [1]) == %{"c" => 1}
+    assert DB.one(sql, [3_000_000]) == %{"c" => 3_000_000}
+
+    # A quick statement still runs in full afterwards.
+    assert DB.Native.query(connection, "SELECT count(*) AS c FROM users", []) ==
+             {:ok, [%{"c" => DB.one("SELECT count(*) AS c FROM users")["c"]}]}
   end
 
   test "the WAL index header changes with every commit" do

@@ -11,6 +11,11 @@
 // a connection in use (busy), a statement that ran long last time (slow), a
 // parameter type other than integer, float, binary or nil (unsupported), and
 // every SQLite error (error). The caller then uses the regular reader.
+//
+// A statement never holds the scheduler for long: a progress handler checks
+// the clock every PROGRESS_OPS virtual machine instructions and interrupts
+// the statement once BUDGET_US have passed, which also marks it slow. What
+// remains unbounded is a single page read from the file.
 #define _POSIX_C_SOURCE 200809L
 #include <erl_nif.h>
 #include <fcntl.h>
@@ -26,6 +31,8 @@
 #define MAX_COLUMNS 256
 #define SLOW_US 1000
 #define SLOW_RETRY 1000
+#define BUDGET_US SLOW_US
+#define PROGRESS_OPS 500
 
 typedef struct {
     uint64_t hash;
@@ -39,6 +46,7 @@ typedef struct {
     sqlite3* db;
     atomic_flag busy;
     unsigned count;
+    ErlNifTime deadline;
     entry_t entries[SLOTS];
 } conn_t;
 
@@ -81,6 +89,12 @@ static ERL_NIF_TERM make_error(ErlNifEnv* env, const char* message)
     return enif_make_tuple2(env, am_error, make_binary(env, message, strlen(message)));
 }
 
+static int progress(void* arg)
+{
+    conn_t* conn = arg;
+    return enif_monotonic_time(ERL_NIF_USEC) > conn->deadline;
+}
+
 static ERL_NIF_TERM nif_open(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 {
     (void)argc;
@@ -104,6 +118,7 @@ static ERL_NIF_TERM nif_open(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[]
 
     ERL_NIF_TERM result;
     if (rc == SQLITE_OK) {
+        sqlite3_progress_handler(conn->db, PROGRESS_OPS, progress, conn);
         result = enif_make_tuple2(env, am_ok, enif_make_resource(env, conn));
     } else {
         result = make_error(env, conn->db ? sqlite3_errmsg(conn->db) : "out of memory");
@@ -210,6 +225,10 @@ static ERL_NIF_TERM cell(ErlNifEnv* env, sqlite3_stmt* stmt, int i)
 
 static ERL_NIF_TERM run(ErlNifEnv* env, conn_t* conn, ErlNifBinary* sql, ERL_NIF_TERM params)
 {
+    // The handler also runs while preparing, so the budget starts here.
+    ErlNifTime started = enif_monotonic_time(ERL_NIF_USEC);
+    conn->deadline = started + BUDGET_US;
+
     entry_t* entry = statement(conn, sql);
     if (!entry) return am_unsupported;
 
@@ -225,7 +244,6 @@ static ERL_NIF_TERM run(ErlNifEnv* env, conn_t* conn, ErlNifBinary* sql, ERL_NIF
         return bound ? make_error(env, sqlite3_errmsg(conn->db)) : am_unsupported;
     }
 
-    ErlNifTime started = enif_monotonic_time(ERL_NIF_USEC);
     ERL_NIF_TERM keys[MAX_COLUMNS], values[MAX_COLUMNS];
     ERL_NIF_TERM rows = enif_make_list(env, 0), result;
     int columns = 0, rc, named = 0;
@@ -253,6 +271,8 @@ done:
         result = enif_make_tuple2(env, am_ok, result);
     } else if (rc == SQLITE_MISUSE) {
         result = am_unsupported;
+    } else if (rc == SQLITE_INTERRUPT) {
+        result = am_slow;
     } else {
         result = make_error(env, sqlite3_errmsg(conn->db));
     }
@@ -261,7 +281,7 @@ done:
     sqlite3_clear_bindings(stmt);
 
     ErlNifTime elapsed = enif_monotonic_time(ERL_NIF_USEC) - started;
-    if (elapsed > SLOW_US) entry->slow = 1;
+    if (elapsed > SLOW_US || rc == SQLITE_INTERRUPT) entry->slow = 1;
     int percent = (int)(elapsed / 10);
     enif_consume_timeslice(env, percent < 1 ? 1 : percent > 100 ? 100 : percent);
     return result;
