@@ -1,18 +1,17 @@
 defmodule Campfire.TransformationsTest do
   use ExUnit.Case, async: true
 
-  @vectors for item <-
-                 Jason.decode!(File.read!("vectors/transformations.json"),
-                   objects: :ordered_objects
-                 ),
-               do: Map.new(item.values)
+  @vectors for item <- Campfire.JSON.decode!(File.read!("vectors/transformations.json")),
+               do: Map.new(item)
   for {item, index} <- Enum.with_index(@vectors) do
     @item item
     test "pinned Active Storage image transformation #{index}" do
       input = "reference/test/fixtures/files/" <> @item["fixture"]
       output = Path.join(System.tmp_dir!(), "transform-#{System.unique_integer([:positive])}.png")
       on_exit(fn -> File.rm(output) end)
-      result = Campfire.Media.transform(input, output, @item["transformations"].values)
+
+      result =
+        Campfire.Media.transform(input, output, Campfire.JSON.pairs(@item["transformations"]))
 
       if @item["error"] do
         assert match?({:error, _}, result)

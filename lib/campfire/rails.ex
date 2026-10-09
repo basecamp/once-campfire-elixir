@@ -2,15 +2,24 @@ defmodule Campfire.Rails do
   import Kernel, except: [sigil_r: 2]
   import Campfire.Sigils
   @moduledoc "Rails signing and encryption, validated against reference-produced vectors."
-  def json(value),
-    do:
-      Jason.encode!(value)
-      |> String.replace("<", "\\u003c")
-      |> String.replace(">", "\\u003e")
-      |> String.replace("&", "\\u0026")
+  @doc "JSON as Rails generates it; see `Campfire.JSON`."
+  def json(value), do: IO.iodata_to_binary(Campfire.JSON.encode(value))
+
+  # SECRET_KEY_BASE, read once.
+  defp secret do
+    case :persistent_term.get({__MODULE__, :secret}, nil) do
+      nil ->
+        secret = System.fetch_env!("SECRET_KEY_BASE")
+        :persistent_term.put({__MODULE__, :secret}, secret)
+        secret
+
+      secret ->
+        secret
+    end
+  end
 
   def key(salt, length) do
-    secret = System.fetch_env!("SECRET_KEY_BASE")
+    secret = secret()
     cache = {__MODULE__, secret, salt, length}
 
     case :persistent_term.get(cache, nil) do
@@ -30,8 +39,14 @@ defmodule Campfire.Rails do
     |> sign(key("signed cookie", 64), :sha)
   end
 
-  def verify_cookie(name, raw, now \\ Campfire.Clock.now()),
-    do: verify(raw, key("signed cookie", 64), :sha, "cookie." <> name, now, true)
+  def verify_cookie(name, raw, now \\ Campfire.Clock.now()) do
+    case verified(raw, key("signed cookie", 64), :sha) do
+      nil -> nil
+      decoded -> cookie_metadata(decoded, "cookie." <> name, now)
+    end
+  rescue
+    _ -> nil
+  end
 
   def encrypt_cookie(name, value, expires \\ nil) do
     iv = :crypto.strong_rand_bytes(12)
@@ -51,10 +66,19 @@ defmodule Campfire.Rails do
   end
 
   def decrypt_cookie(name, raw, now \\ Campfire.Clock.now()) do
+    case decrypted(raw) do
+      nil -> nil
+      decoded -> cookie_metadata(decoded, "cookie." <> name, now)
+    end
+  rescue
+    _ -> nil
+  end
+
+  defp decrypted(raw) do
     with [data, iv, tag] <- String.split(raw, "--"),
-         {:ok, data} <- Base.decode64(data),
-         {:ok, iv} <- Base.decode64(iv),
-         {:ok, tag} <- Base.decode64(tag),
+         {:ok, data} <- base64(data),
+         {:ok, iv} <- base64(iv),
+         {:ok, tag} <- base64(tag),
          true <- byte_size(iv) == 12 and byte_size(tag) == 16,
          plain when is_binary(plain) <-
            :crypto.crypto_one_time_aead(
@@ -66,8 +90,8 @@ defmodule Campfire.Rails do
              tag,
              false
            ),
-         {:ok, decoded} <- Jason.decode(plain) do
-      cookie_metadata(decoded, "cookie." <> name, now)
+         {:ok, decoded} <- json_decode(plain) do
+      decoded
     else
       _ -> nil
     end
@@ -144,15 +168,25 @@ defmodule Campfire.Rails do
 
   defp sign(encoded, key, algorithm),
     do:
-      encoded <> "--" <> Base.encode16(:crypto.mac(:hmac, algorithm, key, encoded), case: :lower)
+      encoded <>
+        "--" <> :binary.encode_hex(:crypto.mac(:hmac, algorithm, key, encoded), :lowercase)
 
-  defp verify(raw, key, algorithm, purpose, now, cookie \\ false) do
+  defp verify(raw, key, algorithm, purpose, now) do
+    case verified(raw, key, algorithm) do
+      nil -> nil
+      decoded -> metadata(decoded, purpose, now)
+    end
+  rescue
+    _ -> nil
+  end
+
+  defp verified(raw, key, algorithm) do
     with [encoded, digest] <- String.split(raw, "--"),
-         expected = Base.encode16(:crypto.mac(:hmac, algorithm, key, encoded), case: :lower),
+         expected = :binary.encode_hex(:crypto.mac(:hmac, algorithm, key, encoded), :lowercase),
          true <- Plug.Crypto.secure_compare(digest, expected),
          {:ok, plain} <- decode64(encoded),
-         {:ok, decoded} <- Jason.decode(plain) do
-      if cookie, do: cookie_metadata(decoded, purpose, now), else: metadata(decoded, purpose, now)
+         {:ok, decoded} <- json_decode(plain) do
+      decoded
     else
       _ -> nil
     end
@@ -161,10 +195,26 @@ defmodule Campfire.Rails do
   end
 
   defp decode64(value) do
-    case Base.decode64(value) do
+    case base64(value) do
       {:ok, data} -> {:ok, data}
-      _ -> Base.url_decode64(value, padding: false)
+      _ -> base64(value, %{mode: :urlsafe, padding: false})
     end
+  end
+
+  # Erlang's native base64 and JSON, as cookies are decoded on every request.
+  defp base64(value, options \\ %{}) do
+    {:ok, :base64.decode(value, options)}
+  rescue
+    _ -> :error
+  end
+
+  defp json_decode(text) do
+    case :json.decode(text, :ok, %{null: nil}) do
+      {value, :ok, ""} -> {:ok, value}
+      _ -> :error
+    end
+  rescue
+    _ -> :error
   end
 
   defp cookie_metadata(%{"_rails" => %{"message" => _} = meta}, purpose, now) do
@@ -180,8 +230,8 @@ defmodule Campfire.Rails do
           data
 
         %{"message" => message} ->
-          with {:ok, text} <- Base.decode64(message),
-               {:ok, value} <- Jason.decode(text),
+          with {:ok, text} <- base64(message),
+               {:ok, value} <- json_decode(text),
                do: value,
                else: (_ -> nil)
 

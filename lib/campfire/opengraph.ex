@@ -77,10 +77,7 @@ defmodule Campfire.Opengraph do
     sanitized = Map.new(fields)
 
     if present?(sanitized["title"]) && present?(sanitized["description"]) && present?(canonical) do
-      {:ok,
-       %Jason.OrderedObject{
-         values: fields ++ [{"context_for_validation", %{"context" => nil}}, {"errors", %{}}]
-       }}
+      {:ok, fields ++ [{"context_for_validation", %{"context" => nil}}, {"errors", %{}}]}
     else
       :invalid
     end

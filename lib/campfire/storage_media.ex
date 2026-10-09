@@ -23,11 +23,9 @@ defmodule Campfire.StorageMedia do
     with value when is_map(value) <- Rails.verify_message("ActiveStorage", token, "variation"),
          [encoded, _signature] <- String.split(token, "--"),
          {:ok, json} <- Base.decode64(encoded),
-         {:ok, %Jason.OrderedObject{} = envelope} <- Jason.decode(json, objects: :ordered_objects) do
-      rails =
-        Enum.find_value(envelope.values, fn {key, value} -> if key == "_rails", do: value end)
-
-      data = Enum.find_value(rails.values, fn {key, value} -> if key == "data", do: value end)
+         {:ok, [{_, _} | _] = envelope} <- Campfire.JSON.decode(json) do
+      rails = Enum.find_value(envelope, fn {key, value} -> if key == "_rails", do: value end)
+      data = Enum.find_value(rails, fn {key, value} -> if key == "data", do: value end)
       {:ok, typed(data)}
     else
       _ -> {:error, :invalid_signature}
@@ -119,8 +117,7 @@ defmodule Campfire.StorageMedia do
       end
 
     with {:ok, extracted} <- result do
-      %Jason.OrderedObject{values: existing} =
-        Jason.decode!(blob["metadata"] || "{}", objects: :ordered_objects)
+      existing = Campfire.JSON.pairs(Campfire.JSON.decode!(blob["metadata"] || "{}"))
 
       additions =
         for key <-
@@ -135,7 +132,7 @@ defmodule Campfire.StorageMedia do
             else: pairs ++ [{key, value}]
         end)
 
-      metadata = %Jason.OrderedObject{values: values}
+      metadata = values
 
       updated =
         DB.transaction(fn query ->
@@ -252,17 +249,20 @@ defmodule Campfire.StorageMedia do
     end
   end
 
-  defp typed(%Jason.OrderedObject{values: values}),
-    do: %{"hash" => Enum.map(values, fn {key, value} -> [key, typed(value)] end)}
+  # Objects are pair lists, or %{} when empty.
+  defp typed([{_, _} | _] = pairs),
+    do: %{"hash" => Enum.map(pairs, fn {key, value} -> [key, typed(value)] end)}
+
+  defp typed(object) when object == %{}, do: %{"hash" => []}
 
   defp typed(value) when is_binary(value), do: %{"str" => value}
   defp typed(value) when is_list(value), do: Enum.map(value, &typed/1)
   defp typed(value), do: value
 
+  defp untyped(%{"hash" => []}), do: %{}
+
   defp untyped(%{"hash" => pairs}),
-    do: %Jason.OrderedObject{
-      values: Enum.map(pairs, fn [key, value] -> {key, untyped(value)} end)
-    }
+    do: Enum.map(pairs, fn [key, value] -> {key, untyped(value)} end)
 
   defp untyped(%{"str" => value}), do: value
   defp untyped(%{"sym" => value}), do: value
