@@ -55,12 +55,13 @@ defmodule Campfire.Messages do
             Rails.json(Enum.map(messages, &Chat.present_message(&1, Auth.base(conn))))
           )
         else
-          body = MessagesView.render_many(messages, Auth.base(conn))
+          parts = [{:raw, "\n"} | MessagesView.render_parts(messages, Auth.base(conn))]
 
           conn
           |> Auth.set_browser_session(data)
+          |> assign(:page_parts, parts)
           |> put_resp_content_type("text/html")
-          |> send_resp(200, "\n" <> body)
+          |> send_resp(200, Enum.map(parts, &Campfire.FragmentCache.part_data/1))
         end
     end
   end

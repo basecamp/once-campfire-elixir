@@ -35,11 +35,17 @@ defmodule Campfire.Media do
         if name in ["format", "convert"] || value in [nil, false, "", []] || value == %{} do
           []
         else
-          values = if is_list(value), do: value, else: [value]
+          # An object (a list of pairs) is a single value, like a map.
+          values =
+            case value do
+              [{_, _} | _] -> [value]
+              list when is_list(list) -> list
+              _ -> [value]
+            end
 
           {positional, keywords} =
             case List.last(values) do
-              %Jason.OrderedObject{values: pairs} -> {Enum.drop(values, -1), pairs}
+              [{_, _} | _] = pairs -> {Enum.drop(values, -1), pairs}
               map when is_map(map) -> {Enum.drop(values, -1), Map.to_list(map)}
               _ -> {values, []}
             end
@@ -94,16 +100,15 @@ defmodule Campfire.Media do
              "error",
              Path.expand(path)
            ]),
-         {:ok, %Jason.OrderedObject{values: values}} <-
-           Jason.decode(json, objects: :ordered_objects) do
+         {:ok, values} when is_list(values) <- Campfire.JSON.decode(json) do
       streams = List.keyfind(values, "streams", 0, {"streams", []}) |> elem(1)
 
       audio =
-        Enum.find(streams, fn %Jason.OrderedObject{values: pairs} ->
-          List.keyfind(pairs, "codec_type", 0) == {"codec_type", "audio"}
+        Enum.find(streams, fn stream ->
+          is_list(stream) and List.keyfind(stream, "codec_type", 0) == {"codec_type", "audio"}
         end)
 
-      pairs = if audio, do: audio.values, else: []
+      pairs = audio || []
 
       metadata =
         for key <- ~w(duration bit_rate sample_rate tags), {^key, value} <- pairs, into: %{} do

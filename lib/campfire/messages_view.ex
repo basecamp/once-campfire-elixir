@@ -19,6 +19,16 @@ defmodule Campfire.MessagesView do
 
   def render_many(messages, base), do: Enum.map_join(messages, &render(&1, base))
 
+  @doc "Messages as page parts (see `Campfire.HttpCompression.splice/3`)."
+  def render_parts(messages, base), do: Enum.map(messages, &render_part(&1, base))
+
+  defp render_part(message, base) do
+    [part] = Campfire.FragmentCache.parts(:message, [message], &render_fragment(&1, base))
+    part
+  rescue
+    _ -> {:raw, failed_fragment()}
+  end
+
   defp render_fragment(message, base) do
     creator = DB.one("SELECT * FROM users WHERE id=?", [message["creator_id"]])
     room = DB.one("SELECT * FROM rooms WHERE id=?", [message["room_id"]])

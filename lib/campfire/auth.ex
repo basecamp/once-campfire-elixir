@@ -9,7 +9,7 @@ defmodule Campfire.Auth do
          token when is_binary(token) <- Rails.verify_cookie("session_token", URI.decode(raw)),
          session when is_map(session) <- DB.one("SELECT * FROM sessions WHERE token=?", [token]),
          user when is_map(user) <- DB.one("SELECT * FROM users WHERE id=?", [session["user_id"]]) do
-      {conn, user, session}
+      {put_private(conn, :campfire_auth_token, token), user, session}
     else
       _ -> {conn, nil, nil}
     end
@@ -18,10 +18,25 @@ defmodule Campfire.Auth do
   def session_user(%{assigns: %{response_cache_auth: {user, session}}} = conn),
     do: {conn, user, session}
 
+  def session_user(%{private: %{campfire_auth: {user, session}}} = conn),
+    do: {conn, user, session}
+
+  # Looked up once per request. A session refreshed by the hourly activity
+  # update re-signs its cookie; otherwise the browser's cookie stays as is.
   def session_user(conn) do
     case session_lookup(conn) do
-      {conn, nil, nil} -> {conn, nil, nil}
-      {conn, user, session} -> {conn, user, resume_session(conn, session)}
+      {conn, nil, nil} ->
+        {conn, nil, nil}
+
+      {conn, user, session} ->
+        resumed = resume_session(conn, session)
+
+        conn =
+          conn
+          |> put_private(:campfire_auth, {user, resumed})
+          |> put_private(:campfire_auth_refreshed, resumed != session)
+
+        {conn, user, resumed}
     end
   end
 
@@ -45,6 +60,14 @@ defmodule Campfire.Auth do
 
     set_auth_cookie(conn, session)
   end
+
+  # Like the Rust port, an unchanged, unrefreshed session token is not re-sent.
+  def set_auth_cookie(
+        %{private: %{campfire_auth_token: token, campfire_auth_refreshed: false}} = conn,
+        %{"token" => token}
+      )
+      when not is_map_key(conn.resp_cookies, "session_token"),
+      do: conn
 
   def set_auth_cookie(conn, session) do
     expires = permanent_expiry() |> DateTime.to_iso8601()
@@ -75,29 +98,44 @@ defmodule Campfire.Auth do
   end
 
   def browser_session(%{assigns: %{response_cache_session: data}} = conn), do: {conn, data}
+  def browser_session(%{private: %{campfire_session: data}} = conn), do: {conn, data}
 
+  # Decrypted on first use and kept for the rest of the request. The decoded
+  # cookie is also kept, so writes can be skipped when nothing changed and the
+  # flash is only swept for requests that loaded the session.
   def browser_session(conn) do
     conn = fetch_cookies(conn)
 
-    data =
+    incoming =
       case conn.cookies["_campfire_session"] do
         raw when is_binary(raw) -> Rails.decrypt_cookie("_campfire_session", URI.decode(raw))
         _ -> nil
       end
 
-    if is_map(data),
-      do: {conn, data},
-      else:
-        {conn,
-         %{
-           "session_id" => Base.encode16(:crypto.strong_rand_bytes(16), case: :lower)
-         }}
+    incoming = if is_map(incoming), do: incoming
+
+    data =
+      incoming || %{"session_id" => Base.encode16(:crypto.strong_rand_bytes(16), case: :lower)}
+
+    conn =
+      conn
+      |> put_private(:campfire_session, data)
+      |> put_private(:campfire_session_incoming, incoming)
+
+    {conn, data}
   end
+
+  def session_loaded?(conn), do: Map.has_key?(conn.private, :campfire_session)
+
+  def set_browser_session(%{private: %{campfire_session_incoming: data}} = conn, data)
+      when is_map(data) and not is_map_key(conn.resp_cookies, "_campfire_session"),
+      do: conn
 
   def set_browser_session(conn, data),
     do:
-      put_resp_cookie(
-        conn,
+      conn
+      |> put_private(:campfire_session, data)
+      |> put_resp_cookie(
         "_campfire_session",
         URI.encode(Rails.encrypt_cookie("_campfire_session", data), &URI.char_unreserved?/1),
         http_only: true,

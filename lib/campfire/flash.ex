@@ -10,28 +10,20 @@ defmodule Campfire.Flash do
     |> Auth.set_browser_session(Map.put(data, "flash", flash))
   end
 
+  # As in Rails, only a request that loaded the session sweeps the flash it
+  # arrived with; others leave the cookie alone.
   def sweep(conn) do
-    if conn.assigns[:new_flash] || conn.assigns[:rails_exception] do
+    incoming = conn.private[:campfire_session_incoming]
+
+    if conn.assigns[:new_flash] || conn.assigns[:rails_exception] || !is_map(incoming) ||
+         !incoming["flash"] do
       conn
     else
-      {conn, incoming} = Auth.browser_session(conn)
+      {conn, data} = Auth.browser_session(conn)
 
-      if incoming["flash"] do
-        data =
-          case conn.resp_cookies["_campfire_session"] do
-            %{value: value} ->
-              Campfire.Rails.decrypt_cookie("_campfire_session", URI.decode(value))
-
-            _ ->
-              incoming
-          end
-
-        if is_map(data) && data["flash"],
-          do: Auth.set_browser_session(conn, Map.delete(data, "flash")),
-          else: conn
-      else
-        conn
-      end
+      if data["flash"],
+        do: Auth.set_browser_session(conn, Map.delete(data, "flash")),
+        else: conn
     end
   end
 

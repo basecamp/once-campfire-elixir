@@ -6,6 +6,7 @@ defmodule Campfire.HttpCompression do
 
   def apply(conn) do
     body = conn.resp_body
+
     cache = Enum.join(get_resp_header(conn, "cache-control"))
 
     if conn.status in [204, 304] || conn.status in 100..199 ||
@@ -15,9 +16,17 @@ defmodule Campfire.HttpCompression do
       conn
     else
       raw = List.first(get_req_header(conn, "accept-encoding")) || ""
+      # Like the Rust and Go front servers, bodies under 1 KiB are not worth gzipping.
+      # File responses (:set_file) are not checked: the only bundled one under
+      # 1 KiB is default-bot-avatar.svg, and the other files are PNG/JPEG
+      # images, which don't benefit from gzip anyway.
+      small = conn.state != :set_file and IO.iodata_length(body) < 1024
 
       case encoding(raw) do
         "identity" ->
+          conn
+
+        "gzip" when small ->
           conn
 
         "gzip" ->

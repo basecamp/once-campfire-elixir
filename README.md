@@ -160,6 +160,12 @@ for the workload, validation and reproduction commands.
 - Sidebar connection refresh waits for the current Turbo frame to finish loading,
   preventing an aborted response on startup or reconnect. Obsolete connections and removed frames do not reload.
 
+- Cookies are only sent when they change, as in the Rust port: the encrypted session when its
+  contents change, `session_token` when the hourly activity refresh re-signs it, and `last_room`
+  when the room changes. Only requests that load the session sweep its flash, and the
+  health check and other session-free requests never decrypt it. Responses under 1 KiB are
+  not gzipped by the app.
+
 - Search selects the newest 100 matching messages by insertion ID, then displays them in ID order. Backdated messages can appear in a different order from the original Rails app.
 
 The compatibility checks retain explicit rich-text comparison rules:

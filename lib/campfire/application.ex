@@ -2,6 +2,7 @@ defmodule Campfire.Application do
   use Application
 
   def start(_, _) do
+    Campfire.Clock.configure()
     database_path = System.get_env("DATABASE_PATH", "var/production.sqlite3")
 
     children = [

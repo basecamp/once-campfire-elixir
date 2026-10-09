@@ -26,6 +26,12 @@ defmodule Campfire.RoomPage do
         if room = Chat.room(user, room_id) do
           {conn, data} = Auth.browser_session(conn)
           messages = messages(room, message_id)
+
+          # Messages are spliced in after the layout so the ETag can use their
+          # cached digests (see FragmentCache.splice/3).
+          marker =
+            "<!--campfire-messages-" <> Base.encode16(:crypto.strong_rand_bytes(16)) <> "-->"
+
           account = DB.one("SELECT * FROM accounts LIMIT 1")
           gid = Base.url_encode64("gid://campfire/#{room["type"]}/#{room["id"]}", padding: false)
           name = display_name(room, user)
@@ -48,7 +54,7 @@ defmodule Campfire.RoomPage do
               account["updated_at"] |> String.replace(~r/[^0-9]/, "") |> String.slice(0, 14),
             stream: Rails.sign_stream(gid <> ":messages"),
             invitation: invitation_for(conn, user, data, account, room),
-            messages: MessagesView.render_many(messages, Auth.base(conn))
+            messages: marker
           ]
 
           {conn, html} =
@@ -64,11 +70,9 @@ defmodule Campfire.RoomPage do
 
           conn
           |> Auth.set_auth_cookie(session)
-          |> put_resp_cookie("last_room", to_string(room["id"]),
-            max_age: DateTime.diff(Auth.permanent_expiry(), Campfire.Clock.now())
-          )
+          |> remember_room(room)
           |> put_resp_content_type("text/html")
-          |> send_resp(200, html)
+          |> send_page(html, marker, MessagesView.render_parts(messages, Auth.base(conn)))
         else
           conn
           |> Campfire.Flash.put("alert", "Room not found or inaccessible")
@@ -78,6 +82,23 @@ defmodule Campfire.RoomPage do
   rescue
     Campfire.Pwa.MissingAsset ->
       Campfire.HttpResponse.exception(conn, 500, Campfire.Assets.read("public/500.html"))
+  end
+
+  defp send_page(conn, html, marker, parts) do
+    {body, parts} = Campfire.FragmentCache.splice(html, marker, parts)
+    conn |> assign(:page_parts, parts) |> send_resp(200, body)
+  end
+
+  # Like the Rust port, the cookie is only sent when the room changed.
+  defp remember_room(conn, room) do
+    id = to_string(room["id"])
+
+    if conn.cookies["last_room"] == id,
+      do: conn,
+      else:
+        put_resp_cookie(conn, "last_room", id,
+          max_age: DateTime.diff(Auth.permanent_expiry(), Campfire.Clock.now())
+        )
   end
 
   defp invitation_for(conn, user, _data, account, room) do

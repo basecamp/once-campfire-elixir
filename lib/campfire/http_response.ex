@@ -28,26 +28,18 @@ defmodule Campfire.HttpResponse do
       if conn.assigns[:rails_exception] do
         if conn.resp_body == "", do: conn, else: Campfire.HttpCompression.apply(conn)
       else
-        conn =
-          Enum.reduce(if(conn.state == :set_file, do: [], else: @security), conn, fn {key, value},
-                                                                                     c ->
-            if get_resp_header(c, key) == [], do: put_resp_header(c, key, value), else: c
-          end)
+        conn = if conn.state == :set_file, do: conn, else: defaults(conn, @security)
 
         conn =
           if conn.request_path in ["/up", "/cable"] ||
                String.starts_with?(conn.request_path, "/rails/active_storage/"),
              do: conn,
-             else:
-               conn
-               |> put_resp_header("x-version", System.get_env("APP_VERSION", "dev"))
-               |> put_resp_header("x-rev", System.get_env("GIT_REVISION", "dev"))
+             else: replace(conn, version_headers())
 
         conn =
-          if is_binary(conn.resp_body) &&
-               String.contains?(conn.resp_body, ~s(<link rel="stylesheet")),
-             do: put_resp_header(conn, "link", Campfire.Assets.preload_header()),
-             else: conn
+          if stylesheet?(conn),
+            do: put_resp_header(conn, "link", Campfire.Assets.preload_header()),
+            else: conn
 
         conn = etag(conn)
 
@@ -93,6 +85,41 @@ defmodule Campfire.HttpResponse do
         conn |> Campfire.HttpCompression.apply() |> Campfire.ResponseCache.complete()
       end
     end)
+  end
+
+  # Constant headers, validated once, are added in one step instead of a
+  # validated put_resp_header/3 call each, keeping put_resp_header's order.
+  defp defaults(conn, headers) do
+    missing =
+      for {key, _} = header <- headers, not List.keymember?(conn.resp_headers, key, 0), do: header
+
+    %{conn | resp_headers: conn.resp_headers ++ missing}
+  end
+
+  defp replace(conn, headers) do
+    %{
+      conn
+      | resp_headers:
+          Enum.reduce(headers, conn.resp_headers, &List.keystore(&2, elem(&1, 0), 0, &1))
+    }
+  end
+
+  defp version_headers do
+    case :persistent_term.get({__MODULE__, :version}, nil) do
+      nil ->
+        headers = [
+          {"x-version", System.get_env("APP_VERSION", "dev")},
+          {"x-rev", System.get_env("GIT_REVISION", "dev")}
+        ]
+
+        # The same check put_resp_header/3 applies to each value.
+        for {key, value} <- headers, do: put_resp_header(%Plug.Conn{}, key, value)
+        :persistent_term.put({__MODULE__, :version}, headers)
+        headers
+
+      headers ->
+        headers
+    end
   end
 
   def error(conn, status) do
@@ -150,13 +177,42 @@ defmodule Campfire.HttpResponse do
     if body != "", do: put_resp_header(conn, "vary", "Accept-Encoding"), else: conn
   end
 
+  # Spliced pages only look for the stylesheet in their layout text.
+  defp stylesheet?(%{assigns: %{page_parts: parts}}),
+    do:
+      Enum.any?(parts, fn
+        {:raw, data} -> String.contains?(data, ~s(<link rel="stylesheet"))
+        _fragment -> false
+      end)
+
+  defp stylesheet?(%{resp_body: body}) when is_binary(body),
+    do: String.contains?(body, ~s(<link rel="stylesheet"))
+
+  defp stylesheet?(_conn), do: false
+
+  # Like the Rust port, a page built from fragments hashes their cached
+  # digests and its own text instead of the whole body.
+  defp digest(%{assigns: %{page_parts: parts}}) do
+    :crypto.hash(
+      :sha256,
+      Enum.map(parts, fn
+        {:raw, data} ->
+          [<<0, IO.iodata_length(data)::64>>, data]
+
+        {:fragment, key, html} ->
+          [<<1>>, Campfire.FragmentCache.derived(key, :digest, html, &:crypto.hash(:sha256, &1))]
+      end)
+    )
+  end
+
+  defp digest(conn), do: :crypto.hash(:sha256, conn.resp_body)
+
   defp etag(conn) do
     if conn.status in [200, 201] && get_resp_header(conn, "etag") == [] &&
          get_resp_header(conn, "last-modified") == [] &&
          (is_binary(conn.resp_body) || is_list(conn.resp_body)) &&
          IO.iodata_length(conn.resp_body) > 0 do
-      digest =
-        :crypto.hash(:sha256, conn.resp_body) |> Base.encode16(case: :lower) |> binary_part(0, 32)
+      digest = digest(conn) |> Base.encode16(case: :lower) |> binary_part(0, 32)
 
       conn = put_resp_header(conn, "etag", ~s(W/"#{digest}"))
 

@@ -29,15 +29,14 @@ defmodule Campfire.Attachments do
             blob["content_type"]
           )
 
-        %Jason.OrderedObject{values: values} =
-          Jason.decode!(blob["metadata"] || "{}", objects: :ordered_objects)
+        values = Campfire.JSON.pairs(Campfire.JSON.decode!(blob["metadata"] || "{}"))
 
         {:ok,
          blob
          |> Map.put("content_type", type)
          |> Map.put(
            "metadata",
-           Rails.json(%Jason.OrderedObject{values: values ++ [{"identified", true}]})
+           Rails.json(values ++ [{"identified", true}])
          )}
       end
     else

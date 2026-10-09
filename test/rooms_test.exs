@@ -4,8 +4,8 @@ defmodule Campfire.RoomsTest do
   @fixture Jason.decode!(File.read!("test/fixtures/seed.json"))
   setup do
     DB.restore_fixture(@fixture)
-    System.put_env("CAMPFIRE_CLOCK", "2026-03-02T16:00:00Z")
-    on_exit(fn -> System.delete_env("CAMPFIRE_CLOCK") end)
+    Campfire.Clock.set("2026-03-02T16:00:00Z")
+    on_exit(fn -> Campfire.Clock.set(nil) end)
 
     %{
       user: DB.one("SELECT * FROM users WHERE id=127326141"),

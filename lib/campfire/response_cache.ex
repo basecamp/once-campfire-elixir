@@ -9,18 +9,22 @@ defmodule Campfire.ResponseCache do
   def start_link(opts), do: GenServer.start_link(__MODULE__, opts, name: __MODULE__)
 
   def init(opts) do
+    # Entries live in ETS, written only by this process, so lookups do not
+    # go through it. Each entry keeps the epoch it was rendered under.
+    :ets.new(__MODULE__, [:named_table, :set, :protected, read_concurrency: true])
     {:ok, db} = SQL.open(Keyword.fetch!(opts, :path), mode: :readonly)
     :ok = SQL.execute(db, "PRAGMA query_only=ON")
     Process.flag(:trap_exit, true)
 
-    {:ok,
-     %{db: db, version: nil, incarnation: make_ref(), entries: %{}, queue: :queue.new(), bytes: 0}}
+    {:ok, %{db: db, version: nil, incarnation: make_ref(), queue: :queue.new(), bytes: 0}}
   end
 
   def call(conn, _) do
     # Every render, including flash/conditional and cache-disabled paths, must
     # namespace timestamp-only fragments before its first authenticated read.
-    Process.put(@fragment_epoch, snapshot())
+    # Routes that never render message fragments skip the snapshot (a SQLite
+    # query); fragment_epoch/0 still captures one lazily if needed.
+    if fragments?(conn), do: Process.put(@fragment_epoch, snapshot())
     epoch = if eligible?(conn) && limit() > 0, do: fragment_epoch()
 
     if epoch do
@@ -150,6 +154,34 @@ defmodule Campfire.ResponseCache do
     end
   end
 
+  defp fragments?(%{path_info: path}) do
+    case path do
+      ["up"] ->
+        false
+
+      ["cable"] ->
+        false
+
+      ["rails", "active_storage" | _] ->
+        false
+
+      ["users", _, "avatar"] ->
+        false
+
+      ["account", "logo"] ->
+        false
+
+      ["qr_code", _] ->
+        false
+
+      [asset] when asset in ~w(webmanifest service-worker webmanifest.json service-worker.js) ->
+        false
+
+      _ ->
+        true
+    end
+  end
+
   defp eligible?(conn) do
     conn.method == "GET" && get_req_header(conn, "if-none-match") == [] &&
       get_req_header(conn, "if-modified-since") == [] &&
@@ -169,7 +201,15 @@ defmodule Campfire.ResponseCache do
 
   def snapshot, do: GenServer.call(__MODULE__, :snapshot)
   def epoch, do: GenServer.call(__MODULE__, :epoch)
-  def get(key, epoch), do: GenServer.call(__MODULE__, {:get, key, epoch})
+  # An entry matches only the epoch captured at the start of the request; the
+  # server clears the table whenever it observes a new database version.
+  def get(key, epoch) do
+    case :ets.lookup(__MODULE__, key) do
+      [{^key, ^epoch, entry}] when epoch != nil -> if limit() > 0, do: entry
+      _ -> nil
+    end
+  end
+
   def put(key, epoch, entry), do: GenServer.call(__MODULE__, {:put, key, epoch, entry})
   def clear, do: GenServer.call(__MODULE__, :clear)
 
@@ -187,16 +227,6 @@ defmodule Campfire.ResponseCache do
 
   def handle_call(:clear, _, state), do: {:reply, :ok, clear_state(state)}
 
-  def handle_call({:get, key, epoch}, _, state) do
-    state = observe(state)
-
-    value =
-      if state.version != nil && epoch == {state.incarnation, state.version} && limit() > 0,
-        do: Map.get(state.entries, key)
-
-    {:reply, value, state}
-  end
-
   def handle_call({:put, key, epoch, entry}, _, state) do
     state = observe(state)
     bytes = :erlang.external_size({key, entry})
@@ -204,15 +234,10 @@ defmodule Campfire.ResponseCache do
     state =
       if state.version != nil && epoch == {state.incarnation, state.version} && bytes <= limit() &&
            limit() > 0 &&
-           !Map.has_key?(state.entries, key) do
+           !:ets.member(__MODULE__, key) do
         state = evict(state, bytes)
-
-        %{
-          state
-          | entries: Map.put(state.entries, key, entry),
-            queue: :queue.in({key, bytes}, state.queue),
-            bytes: state.bytes + bytes
-        }
+        :ets.insert(__MODULE__, {key, epoch, entry})
+        %{state | queue: :queue.in({key, bytes}, state.queue), bytes: state.bytes + bytes}
       else
         state
       end
@@ -246,22 +271,18 @@ defmodule Campfire.ResponseCache do
     end
   end
 
-  defp clear_state(state), do: %{state | entries: %{}, queue: :queue.new(), bytes: 0}
-  defp evict(state, _bytes) when map_size(state.entries) == 0, do: state
+  defp clear_state(state) do
+    :ets.delete_all_objects(__MODULE__)
+    %{state | queue: :queue.new(), bytes: 0}
+  end
+
+  defp evict(state, _bytes) when state.bytes == 0, do: state
 
   defp evict(state, bytes) do
-    if state.bytes + bytes > limit() || map_size(state.entries) >= 4096 do
+    if state.bytes + bytes > limit() || :ets.info(__MODULE__, :size) >= 4096 do
       {{:value, {key, old_bytes}}, queue} = :queue.out(state.queue)
-
-      evict(
-        %{
-          state
-          | entries: Map.delete(state.entries, key),
-            queue: queue,
-            bytes: state.bytes - old_bytes
-        },
-        bytes
-      )
+      :ets.delete(__MODULE__, key)
+      evict(%{state | queue: queue, bytes: state.bytes - old_bytes}, bytes)
     else
       state
     end

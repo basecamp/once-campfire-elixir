@@ -48,7 +48,7 @@ defmodule Campfire.PublicFiles do
     data = File.read!(path)
 
     modified =
-      if System.get_env("CAMPFIRE_CLOCK"),
+      if Campfire.Clock.fixed?(),
         do: Campfire.Clock.now(),
         else: DateTime.from_unix!(File.stat!(path, time: :posix).mtime)
 
