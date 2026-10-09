@@ -163,7 +163,7 @@
         "parity/results/release.json",
         "parity/results/http-shutdown.json"
       ],
-      "notes": "Native production release with pinned Thruster TLS/HTTP2, fresh first-run and real worker, ONCE backup/restore, in-flight HTTP/job drain and Rails\u2192Elixir\u2192Rails rollback pass on isolated volumes. The container runs no Redis or separate worker; jobs drain in process on shutdown, as in the Rust port."
+      "notes": "Native production release with pinned Thruster TLS/HTTP2, fresh first-run and real worker, ONCE backup/restore, in-flight HTTP/job drain and Rails\u2192Elixir\u2192Rails rollback pass on isolated volumes. The container runs no Redis or separate worker; jobs drain in process on shutdown, as in the Rust port. The listed rollback and in-flight job drain receipts were recorded with Redis and Resque, when Rails and Elixir could share a live install."
     }
   ],
   "complete": false,

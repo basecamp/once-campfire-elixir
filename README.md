@@ -167,6 +167,10 @@ for the workload, validation and reproduction commands.
   shutdown, queued jobs run and running jobs get up to 25 seconds to finish.
 - **WebSockets:** broadcasts and disconnects are delivered in process; each broadcast is encoded
   once per subscription identifier for all subscribers.
+- **Switching runtimes:** Rails and Elixir cannot run against the same install at the same time,
+  since they share no job queue or Action Cable delivery; upgrading to Elixir or rolling back to
+  Rails is done with the app stopped. Jobs still queued or running when Elixir stops are not
+  handed to Rails. The database, storage and cookies are shared, so no data is migrated.
 
 The compatibility checks retain explicit rich-text comparison rules:
 

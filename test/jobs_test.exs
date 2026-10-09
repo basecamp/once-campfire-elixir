@@ -115,6 +115,20 @@ defmodule Campfire.JobsTest do
       send(webhook, :release)
     end
 
+    test "runs up to the configured concurrency of one class at once" do
+      start_worker(concurrency: 2)
+      for id <- 1..3, do: Worker.enqueue(job("Bot::WebhookJob", id))
+
+      assert_receive {:started, [1], first}
+      assert_receive {:started, [2], second}
+      refute_receive {:started, [3], _}, 100
+
+      send(first, :release)
+      assert_receive {:started, [3], third}
+      send(second, :release)
+      send(third, :release)
+    end
+
     test "drops and logs jobs enqueued onto a full queue" do
       start_worker(capacity: 1)
 

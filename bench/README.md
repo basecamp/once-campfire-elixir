@@ -38,7 +38,11 @@ external Resque queued/active/failed observations where applicable. Rails (and E
 images from before Redis was removed) require at least three consecutive quiet Redis observations spanning at least one second
 and fail if jobs do not drain within `JOB_DRAIN_SECS`. This is an observed quiet window,
 not an atomic job-completion guarantee: a worker can pop a job before registering it as
-active. A single queue-length read is never treated as completion. Current Elixir, Go and Rust
+active. A single queue-length read is never treated as completion. Each run's manifest declares
+the job backend every app owns (`redis_resque` for Rails and baseline images,
+`internal_unobserved` otherwise; override with `<APP>_JOBS_BACKEND`, for example for an
+older Elixir image), and results are validated against that declaration, never against the
+backend a run happens to observe. Current Elixir, Go and Rust
 own their queues internally, so the result records that their job state is unobserved.
 
 New runs use result schema 2. `manifest.json` declares the exact app/repetition/workload

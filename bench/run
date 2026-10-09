@@ -95,15 +95,26 @@ WORK=$BENCH/.work
 CONTAINER=bench-campfire-elixir-$PORT
 
 python3 - "$OUT/manifest.json" "$APPS" "$REPS" "$SUITES" "$HTTP_CONCS" "$CABLE_CLIENTS" "$UPLOAD_REPS" <<'PY'
-import json, sys
+import json, os, sys
 path, apps, reps, suites, concs, clients, uploads = sys.argv[1:]
+# The job backend each app owns is declared up front and validated, never
+# inferred from what a run happens to observe. Rails and baseline images
+# (built before Redis was removed) use Redis/Resque; current Elixir, Go and
+# Rust run jobs in process. <APP>_JOBS_BACKEND overrides it, e.g. for an
+# older Elixir image.
+defaults = {"reference": "redis_resque", "baseline": "redis_resque"}
+backends = {
+  app: os.environ.get(app.upper().replace("-", "_") + "_JOBS_BACKEND", defaults.get(app, "internal_unobserved"))
+  for app in apps.split(",")
+}
+assert set(backends.values()) <= {"redis_resque", "internal_unobserved"}, backends
 json.dump({
   "schema_version": 2, "status": "running", "complete": False,
   "expected": {
     "apps": apps.split(','), "reps": int(reps), "suites": suites.split(),
     "http_routes": ["room_show", "messages_page", "sidebar", "search", "avatar", "static_css", "up", "post_message"],
     "http_concs": [int(x) for x in concs.split()], "cable_clients": [int(x) for x in clients.split()],
-    "upload_reps": int(uploads)
+    "upload_reps": int(uploads), "job_backends": backends
   }
 }, open(path, "w"), indent=2)
 open(path, "a").write("\n")
@@ -353,16 +364,14 @@ run_rep() {
   local peak; peak=$(cat "$OUT/.$app-$rep.mem")
   local cg_peak; cg_peak=$(( $(cat "$cg/memory.peak" 2>/dev/null || echo 0) / 1048576 ))
   python3 "$BENCH/job-state.py" "$JOB_DRAIN_SECS" > "$OUT/$app-$rep-jobs.json"
-  python3 - "$app" "$OUT/$app-$rep-jobs.json" <<'PY'
+  python3 - "$app" "$OUT/$app-$rep-jobs.json" "$OUT/manifest.json" <<'PY'
 import json, sys
-app, path = sys.argv[1:]
+app, path, manifest = sys.argv[1:]
 jobs = json.load(open(path))
-# Current Elixir builds, like Go and Rust, run jobs in process; older Elixir images used Redis.
-redis = app == "reference" or (app in {"baseline", "elixir", "candidate"} and jobs.get("backend") == "redis_resque")
-if redis:
-    assert jobs.get("backend") == "redis_resque" and jobs.get("drained") is True, jobs
-else:
-    assert jobs.get("backend") == "internal_unobserved", jobs
+expected = json.load(open(manifest))["expected"]["job_backends"][app]
+assert jobs.get("backend") == expected, (expected, jobs)
+if expected == "redis_resque":
+    assert jobs.get("drained") is True, jobs
 PY
   kill "$SAMPLER" 2>/dev/null || true; SAMPLER=""
   python3 - "$f" "$app" "$rep" "$cold_ms" "$idle_cur" "$idle_anon" "$peak" "$cg_peak" "$http_json" "$cable_json" "$upload_json" "$load_start" "$(cat /proc/loadavg)" <<'PY'
