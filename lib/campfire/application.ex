@@ -11,7 +11,8 @@ defmodule Campfire.Application do
       Campfire.FragmentCache,
       Campfire.CableFrames,
       {Campfire.DB, path: database_path},
-      {Campfire.ResponseCache, path: database_path}
+      {Campfire.ResponseCache, path: database_path},
+      Campfire.StaticCache
     ]
 
     children =

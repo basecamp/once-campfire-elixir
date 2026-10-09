@@ -45,14 +45,21 @@ defmodule Campfire.PublicFiles do
 
   defp serve(conn, path, type) do
     method = conn.method
-    data = File.read!(path)
+
+    entry =
+      Campfire.StaticCache.fetch(path, fn ->
+        %{
+          body: File.read!(path),
+          modified: http_date(DateTime.from_unix!(File.stat!(path, time: :posix).mtime))
+        }
+      end)
+
+    data = entry.body
 
     modified =
       if System.get_env("CAMPFIRE_CLOCK"),
-        do: Campfire.Clock.now(),
-        else: DateTime.from_unix!(File.stat!(path, time: :posix).mtime)
-
-    modified = Calendar.strftime(modified, "%a, %d %b %Y %H:%M:%S GMT")
+        do: http_date(Campfire.Clock.now()),
+        else: entry.modified
 
     if List.first(get_req_header(conn, "if-modified-since")) == modified do
       conn
@@ -72,7 +79,14 @@ defmodule Campfire.PublicFiles do
       {conn, status, body} =
         case Campfire.Rack.ranges(List.first(get_req_header(conn, "range")), size) do
           nil ->
-            {assign(conn, :gzip_chunks, chunks(data)), 200, data}
+            # Compressed only if gzip is negotiated, then kept with the entry.
+            gzip = fn ->
+              Campfire.StaticCache.gzip(path, entry, fn ->
+                Campfire.HttpCompression.compress(data, chunks(data))
+              end)
+            end
+
+            {assign(conn, :precompressed_gzip, gzip), 200, data}
 
           [] ->
             {conn
@@ -115,6 +129,8 @@ defmodule Campfire.PublicFiles do
       conn |> send_resp(conn.status, if(method == "HEAD", do: "", else: conn.resp_body)) |> halt()
     end
   end
+
+  defp http_date(datetime), do: Calendar.strftime(datetime, "%a, %d %b %Y %H:%M:%S GMT")
 
   defp chunks(""), do: []
 
