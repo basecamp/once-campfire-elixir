@@ -37,10 +37,9 @@ defmodule Campfire.HttpResponse do
              else: replace(conn, version_headers())
 
         conn =
-          if is_binary(conn.resp_body) &&
-               String.contains?(conn.resp_body, ~s(<link rel="stylesheet")),
-             do: put_resp_header(conn, "link", Campfire.Assets.preload_header()),
-             else: conn
+          if stylesheet?(conn),
+            do: put_resp_header(conn, "link", Campfire.Assets.preload_header()),
+            else: conn
 
         conn = etag(conn)
 
@@ -178,13 +177,42 @@ defmodule Campfire.HttpResponse do
     if body != "", do: put_resp_header(conn, "vary", "Accept-Encoding"), else: conn
   end
 
+  # Spliced pages only look for the stylesheet in their layout text.
+  defp stylesheet?(%{assigns: %{page_parts: parts}}),
+    do:
+      Enum.any?(parts, fn
+        {:raw, data} -> String.contains?(data, ~s(<link rel="stylesheet"))
+        _fragment -> false
+      end)
+
+  defp stylesheet?(%{resp_body: body}) when is_binary(body),
+    do: String.contains?(body, ~s(<link rel="stylesheet"))
+
+  defp stylesheet?(_conn), do: false
+
+  # Like the Rust port, a page built from fragments hashes their cached
+  # digests and its own text instead of the whole body.
+  defp digest(%{assigns: %{page_parts: parts}}) do
+    :crypto.hash(
+      :sha256,
+      Enum.map(parts, fn
+        {:raw, data} ->
+          [<<0, IO.iodata_length(data)::64>>, data]
+
+        {:fragment, key, html} ->
+          [<<1>>, Campfire.FragmentCache.derived(key, :digest, html, &:crypto.hash(:sha256, &1))]
+      end)
+    )
+  end
+
+  defp digest(conn), do: :crypto.hash(:sha256, conn.resp_body)
+
   defp etag(conn) do
     if conn.status in [200, 201] && get_resp_header(conn, "etag") == [] &&
          get_resp_header(conn, "last-modified") == [] &&
          (is_binary(conn.resp_body) || is_list(conn.resp_body)) &&
          IO.iodata_length(conn.resp_body) > 0 do
-      digest =
-        :crypto.hash(:sha256, conn.resp_body) |> Base.encode16(case: :lower) |> binary_part(0, 32)
+      digest = digest(conn) |> Base.encode16(case: :lower) |> binary_part(0, 32)
 
       conn = put_resp_header(conn, "etag", ~s(W/"#{digest}"))
 

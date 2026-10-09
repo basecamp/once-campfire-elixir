@@ -52,12 +52,56 @@ defmodule Campfire.FragmentCache do
     {key, version}
   end
 
+  @doc """
+  Rendered records as page parts, `{:fragment, key, html}`. `key` identifies
+  the cached fragment, or is `nil` when this request does not cache fragments,
+  so values derived from its html can be cached next to it with `derived/4`.
+  """
+  def parts(kind, records, render) do
+    for record <- records do
+      case cache_key(identity(kind, record)) do
+        nil -> {:fragment, nil, render.(record)}
+        key -> {:fragment, key, cached(key, fn -> render.(record) end)}
+      end
+    end
+  end
+
+  @doc """
+  Splits a rendered page at `marker`, the placeholder standing in for `parts`,
+  returning the response iodata and the page's parts, which
+  `Campfire.HttpResponse` uses for the ETag. Returns `nil` when the marker is
+  absent.
+  """
+  def splice(html, marker, parts) do
+    case :binary.split(html, marker) do
+      [before, rest] ->
+        parts = [{:raw, before} | parts] ++ [{:raw, rest}]
+        {Enum.map(parts, &part_data/1), parts}
+
+      [_] ->
+        nil
+    end
+  end
+
+  def part_data({:raw, data}), do: data
+  def part_data({:fragment, _key, html}), do: html
+
+  @doc "A value computed from a fragment's html, cached with the fragment."
+  def derived(nil, _tag, html, fun), do: fun.(html)
+  def derived(key, tag, html, fun), do: cached({:derived, key, tag}, fn -> fun.(html) end)
+
   def fetch(key, render) do
+    case cache_key(key) do
+      nil -> render.()
+      key -> cached(key, render)
+    end
+  end
+
+  defp cache_key(key) do
     epoch = Campfire.ResponseCache.fragment_epoch()
 
-    if epoch == nil || !Campfire.ResponseCache.fragment_valid?(),
-      do: render.(),
-      else: cached({epoch, Process.get(:campfire_request_host), key}, render)
+    if epoch != nil and Campfire.ResponseCache.fragment_valid?(),
+      do: {epoch, Process.get(:campfire_request_host), key}
   end
 
   defp cached(key, render) do
