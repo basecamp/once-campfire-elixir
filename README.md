@@ -4,9 +4,9 @@ An Elixir implementation of [ONCE Campfire](https://github.com/basecamp/once-cam
 It keeps the existing SQLite database, storage layout, signed/encrypted cookies and
 Action Cable protocol, so existing installs can retain their data and sessions.
 
-The application runs on Elixir 1.20.4 / OTP 29 with Bandit and Plug. Redis and a
-native Resque-compatible worker handle jobs and broadcasts; the same Thruster
-binary as Rails handles TLS, HTTP/2 and proxy caching. libvips and FFmpeg process
+The application runs on Elixir 1.20.4 / OTP 29 with Bandit and Plug. Jobs and
+Action Cable broadcasts run in process, without Redis, as in the Rust port; the
+same Thruster binary as Rails handles TLS, HTTP/2 and proxy caching. libvips and FFmpeg process
 media. The Rails frontend is preserved, including Turbo and the composer.
 
 ## Running it
@@ -43,9 +43,8 @@ docker run -d --name campfire -p 80:80 -p 443:443 \
   installations must retain their storage and secrets.
 - Web Push requires a valid P-256 VAPID key pair in URL-safe Base64. Use your own
   production secrets; `parity/reference.env` contains public test keys.
-- Redis starts inside the container by default. `REDIS_URL` selects an external
-  Redis. The native job worker starts automatically; `bin/jobs` can also run it
-  against the same database, Redis and storage environment.
+- Background jobs run inside the app process, with `JOB_CONCURRENCY` (default 2)
+  workers per job class. The job queue is not durable, as in the Rust port (see Known differences).
 - The app listener binds loopback behind Thruster. Forwarded URL headers are
   trusted from the local proxy. The current Dockerfile packages the amd64
   Thruster binary.
@@ -95,7 +94,7 @@ bin/rails-to-elixir doctor
 bin/parity-services stop
 ```
 
-The native suite passes **1,961 tests**. The historical **65-gate** token-era parity run covered the
+The native suite has **1,963 tests**. The historical **65-gate** token-era parity run covered the
 reviewed backend; fresh shared browser checks cover the current frontend.
 Verification includes actual
 Chromium flows, all-table/FTS/storage mutation snapshots, injected transaction
@@ -105,7 +104,7 @@ TLS/HTTP2, fresh schema/setup and production rollback. See the
 [evidence ledger](plans/contracts.json), [verification record](parity/results/verification.json)
 and [conversion state](plans/elixir-conversion.md).
 
-The fixture services use isolated data, Redis and ports 47070/47071/47079. Frozen
+The fixture services use isolated data, Redis for the Rails reference and ports 47070/47071/47079. Frozen
 Rails comparisons additionally require the `campfire-reference:latest` image from
 the Rust parity harness, built from the same pinned reference. Live gates reset
 their fixture data and must run sequentially. Unit tests disable the HTTP server
@@ -162,6 +161,13 @@ for the workload, validation and reproduction commands.
 
 - Search selects the newest 100 matching messages by insertion ID, then displays them in ID order. Backdated messages can appear in a different order from the original Rails app.
 
+- **Jobs:** Redis and Resque are replaced by in-process queues with `JOB_CONCURRENCY` workers per
+  job class, as in the Rust port. The queue is not durable: queued and running jobs are lost on a
+  crash, as in Rust. Each class's queue holds up to 1,024 jobs; slow webhooks don't block pushes. On
+  shutdown, queued jobs run and running jobs get up to 25 seconds to finish.
+- **WebSockets:** broadcasts and disconnects are delivered in process; each broadcast is encoded
+  once per subscription identifier for all subscribers.
+
 The compatibility checks retain explicit rich-text comparison rules:
 
 - Attribute values escape `<` and `>` to prevent stored XSS, following the Rust
@@ -177,9 +183,8 @@ with allocation limits and isolated, supervised worker processes. Expected oracl
 raw differences and the comparison rules are documented in
 [`plans/richtext-comparison.md`](plans/richtext-comparison.md).
 
-Set `CAMPFIRE_CABLE_REDIS_BRIDGE=1` for live Action Cable delivery between Rails
-and Elixir. Elixir retains Redis and Resque-compatible jobs, while Rust uses integrated
-queues and a different frontend/server implementation. Their actual process
+Elixir, like Rust, uses integrated queues and in-process Action Cable delivery;
+Rust also uses a different frontend/server implementation. Their actual process
 models, response sizes and compression ratios are recorded with the benchmarks.
 No production cutover has been performed.
 

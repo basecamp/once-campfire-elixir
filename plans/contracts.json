@@ -60,7 +60,7 @@
     {
       "id": "mutations",
       "description": "Callbacks, transactions, cancellation, outbox and post-commit effects",
-      "status": "verified",
+      "status": "implemented",
       "evidence": [
         "parity/results/mutation.json",
         "parity/results/message-broadcasts.json",
@@ -72,7 +72,7 @@
         "parity/results/transaction-failures.json",
         "parity/results/room-deletion.json"
       ],
-      "notes": "Message/boost/room/user/account/attachment mutations, dirty tracking, injected rollback failures and post-commit queue/broadcast effects pass."
+      "notes": "Message/boost/room/user/account/attachment mutations, dirty tracking, injected rollback failures and post-commit queue/broadcast effects pass. Post-commit jobs go to the in-process queue (test/jobs_test.exs)."
     },
     {
       "id": "views",
@@ -122,7 +122,7 @@
     {
       "id": "jobs",
       "description": "Claims, retry, schedules, shutdown, mail and external integrations",
-      "status": "verified",
+      "status": "implemented",
       "evidence": [
         "parity/results/mutation.json",
         "parity/results/jobs.json",
@@ -133,12 +133,12 @@
         "parity/results/verification.json",
         "parity/results/network-protocol.json"
       ],
-      "notes": "Actual queue claims, failures/no retries, processed stats, worker drain, webhook replies/timeout/protocol boundaries and real isolated encrypted HTTPS push delivery pass."
+      "notes": "Actual queue claims, failures/no retries, processed stats, worker drain, webhook replies/timeout/protocol boundaries and real isolated encrypted HTTPS push delivery pass. Resque is replaced by the in-process, non-durable Campfire.Worker, as in the Rust port: bounded per-class queues, per-class concurrency and drain on graceful shutdown (test/jobs_test.exs). The listed receipts were recorded with Redis and Resque."
     },
     {
       "id": "realtime",
       "description": "Cable or polling, authorization, revocation and unique-user fanout",
-      "status": "verified",
+      "status": "implemented",
       "evidence": [
         "parity/results/cable.json",
         "parity/results/cable-interop.json",
@@ -149,12 +149,12 @@
         "parity/results/user-lifecycle.json",
         "parity/results/browser-flows.json"
       ],
-      "notes": "Cable protocol/authorization, cross-runtime pubsub, message/boost/room/involvement fanout, session/ban/deactivation revocation and browser lifecycle pass."
+      "notes": "Cable protocol/authorization, cross-runtime pubsub, message/boost/room/involvement fanout, session/ban/deactivation revocation and browser lifecycle pass. Broadcasts and disconnects are delivered in process (Campfire.CableFanout, test/cable_fanout_test.exs), as in the Rust port. cable-interop.json was recorded with the Redis bridge."
     },
     {
       "id": "operations",
       "description": "Environment, readiness, deployment, metrics and rollback rehearsal",
-      "status": "verified",
+      "status": "implemented",
       "evidence": [
         "parity/results/rollback.json",
         "parity/results/verification.json",
@@ -163,10 +163,10 @@
         "parity/results/release.json",
         "parity/results/http-shutdown.json"
       ],
-      "notes": "Native production release with pinned Thruster TLS/HTTP2, fresh first-run and real worker, ONCE backup/restore, in-flight HTTP/job drain and Rails\u2192Elixir\u2192Rails rollback pass on isolated volumes."
+      "notes": "Native production release with pinned Thruster TLS/HTTP2, fresh first-run and real worker, ONCE backup/restore, in-flight HTTP/job drain and Rails\u2192Elixir\u2192Rails rollback pass on isolated volumes. The container runs no Redis or separate worker; jobs drain in process on shutdown, as in the Rust port."
     }
   ],
-  "complete": true,
+  "complete": false,
   "benchmark_status": "complete: frozen candidate measured in four balanced rounds per build; clean native x86_64 run regressed, ARM64 shared-host observations failed the drained-job audit",
   "verified_at": "2026-10-05T07:38:42.478150+00:00",
   "source_digest": "41b6eca0b581d7de06e82019648c4f71d316bcc552eaeb1edd8461223e6849b4",

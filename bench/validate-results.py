@@ -86,7 +86,8 @@ def validate_upload(sample, count):
 
 def validate_jobs(root, app, rep):
     jobs = load(root / f"{app}-{rep}-jobs.json")
-    if app in REDIS_APPS:
+    # Current Elixir builds run jobs in process; only older Elixir images expose Redis.
+    if app == "reference" or (app in REDIS_APPS and jobs.get("backend") == "redis_resque"):
         require(jobs.get("backend") == "redis_resque", f"{app}-{rep}: Redis state unavailable")
         require(jobs.get("drained") is True, f"{app}-{rep}: jobs did not drain")
         observations = jobs.get("observations", [])

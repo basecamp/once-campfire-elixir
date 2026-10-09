@@ -9,7 +9,6 @@ defmodule Campfire.Application do
       {Registry, keys: :duplicate, name: Campfire.Connections},
       Campfire.RateLimiter,
       Campfire.FragmentCache,
-      Campfire.CableFrames,
       {Campfire.DB, path: database_path},
       {Campfire.ResponseCache, path: database_path}
     ]
@@ -29,29 +28,12 @@ defmodule Campfire.Application do
 
     children = children ++ Campfire.HtmlParser.children()
 
+    # Jobs run in process; the queue is not durable (see Campfire.Worker).
+    # JobTasks starts first so that it stops after the worker drains.
     children =
-      case {System.get_env("REDIS_URL"), System.get_env("CAMPFIRE_CABLE_REDIS_BRIDGE")} do
-        {url, "1"} when is_binary(url) ->
-          children ++
-            [
-              {Redix, {url, [name: Campfire.Redis]}},
-              {Campfire.CableRedisBridge, url}
-            ]
-
-        {url, _} when is_binary(url) ->
-          children ++
-            [
-              {Redix, {url, [name: Campfire.Redis]}}
-            ]
-
-        {nil, _} ->
-          children
-      end
-
-    children =
-      if System.get_env("CAMPFIRE_WORKER") == "1",
-        do: children ++ [Campfire.Worker],
-        else: children
+      if System.get_env("CAMPFIRE_JOBS_ADAPTER") == "disabled",
+        do: children,
+        else: children ++ [{Task.Supervisor, name: Campfire.JobTasks}, Campfire.Worker]
 
     children =
       if System.get_env("CAMPFIRE_NO_SERVER") == "1",
