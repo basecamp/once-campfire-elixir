@@ -14,7 +14,9 @@ defmodule Campfire.DB do
   `cached/3` keeps a read's rows until a table it reads is written. Every write bumps its
   table's generation after it commits, so a result is only ever stored under generations at
   least as old as any write it missed. Commits by other processes (another SQLite client) are
-  seen through the WAL index's change counter, and invalidate everything.
+  seen through the WAL index's change counter, and invalidate everything; the writer also asks
+  SQLite after each of its own commits whether another connection committed in the meantime,
+  so a foreign commit cannot hide behind a local one.
 
   A read first tries `Campfire.DB.Native`, which runs the whole statement in one call on the
   calling scheduler, with one connection per scheduler. Whatever it refuses, including every
@@ -47,6 +49,7 @@ defmodule Campfire.DB do
     :persistent_term.erase({__MODULE__, :native})
 
     children = [
+      __MODULE__.WalIndex,
       Supervisor.child_spec(
         {NimblePool,
          worker: {__MODULE__.Connection, {:writer, path}}, pool_size: 1, name: @writer},
@@ -80,7 +83,7 @@ defmodule Campfire.DB do
     else
       checkout(@writer, 5_000, fn conn ->
         result = run_safely.(conn)
-        written([written_table(sql)])
+        written(conn, [written_table(sql)])
         result
       end)
     end
@@ -155,13 +158,39 @@ defmodule Campfire.DB do
   defp generation(table), do: :ets.lookup_element(@generations, table, 2, 0)
 
   # Bumps the written tables after their commit; `:all` invalidates every cached read.
-  defp written(tables) do
+  #
+  # Replacing the saved WAL header here would hide a commit by another client that nothing
+  # looked at since, so the writer's connection is asked whether one happened. The header is
+  # read before that question: a foreign commit after the header is caught by the next
+  # `outside_commits/0`, one before it by the writer.
+  defp written(conn, tables) do
+    header = wal_state()
+    tables = if foreign_commit?(conn), do: [:all | tables], else: tables
     for table <- Enum.uniq(tables), do: :ets.update_counter(@generations, table, 1, {table, 0})
-    :ets.insert(@generations, {:wal, wal_state()})
+    :ets.insert(@generations, {:wal, header})
+  end
+
+  # `PRAGMA data_version` changes when another connection commits, never for the writer's own
+  # commits. The baseline is kept per connection, so a reopened writer counts as changed. It is
+  # asked on every write, `:all` included, so the next write starts from a fresh baseline.
+  defp foreign_commit?(nil), do: false
+
+  defp foreign_commit?({db, _} = conn) do
+    [%{"data_version" => version}] = run(conn, "PRAGMA data_version", [])
+    seen = {db, version}
+
+    case :ets.lookup(@generations, :data_version) do
+      [{:data_version, ^seen}] ->
+        false
+
+      _ ->
+        :ets.insert(@generations, {:data_version, seen})
+        true
+    end
   end
 
   @doc false
-  def invalidate_all, do: written([:all])
+  def invalidate_all, do: written(nil, [:all])
 
   # Every commit, by any client, changes the WAL index header (its transaction counter iChange
   # and mxFrame), which a raw read sees as SQLite maps the same pages. Checked once per request
@@ -175,7 +204,7 @@ defmodule Campfire.DB do
         [{:wal, ^state}] -> :ok
         # The first observation is the baseline: nothing was cached before it.
         [] -> :ets.insert_new(@generations, {:wal, state})
-        _ -> written([:all])
+        _ -> written(nil, [:all])
       end
     end
   end
@@ -186,23 +215,8 @@ defmodule Campfire.DB do
     case is_binary(path) and Campfire.DB.Native.wal_header(path) do
       header when is_binary(header) -> header
       nil -> :none
-      _ -> wal_state(path)
-    end
-  end
-
-  defp wal_state(path) do
-    with path when is_binary(path) <- path,
-         {:ok, file} <- :file.open(path, [:read, :raw, :binary]) do
-      try do
-        case :file.pread(file, 0, 48) do
-          {:ok, header} -> header
-          _ -> :none
-        end
-      after
-        :file.close(file)
-      end
-    else
-      _ -> :none
+      false -> :none
+      _ -> __MODULE__.WalIndex.header(path)
     end
   end
 
@@ -242,7 +256,7 @@ defmodule Campfire.DB do
           SQL.execute(db, "ROLLBACK")
           {:error, e}
       after
-        written(Process.delete(:campfire_db_written) || [:all])
+        written(conn, Process.delete(:campfire_db_written) || [:all])
       end
     end)
   end
@@ -278,7 +292,7 @@ defmodule Campfire.DB do
       end
 
       :ok = SQL.execute(db, "COMMIT; PRAGMA foreign_keys=ON")
-      written([:all])
+      written(conn, [:all])
       :ok
     end)
   end
@@ -329,6 +343,57 @@ defmodule Campfire.DB do
 
         :ets.insert(statements, {sql, stmt})
         stmt
+    end
+  end
+
+  defmodule WalIndex do
+    @moduledoc false
+    # The WAL index header without the native library. Closing any descriptor of the index
+    # file would release every POSIX lock this process holds on it, SQLite's own included, so
+    # a file is opened once and never closed, and old handles are kept (a collected raw file
+    # closes its descriptor). A raw file can only be read by the process that opened it, so
+    # this process reads it for everyone. A replaced file is told by its device and inode: the
+    # old inode cannot be reused while its descriptor stays open.
+    use GenServer
+
+    def start_link(_), do: GenServer.start_link(__MODULE__, nil, name: __MODULE__)
+
+    def header(path), do: GenServer.call(__MODULE__, {:header, path})
+
+    @impl GenServer
+    def init(_), do: {:ok, %{open: %{}, kept: []}}
+
+    @impl GenServer
+    def handle_call({:header, path}, _from, %{open: open, kept: kept} = state) do
+      case File.stat(path) do
+        {:ok, %File.Stat{major_device: major, minor_device: minor, inode: inode}} ->
+          identity = {major, minor, inode}
+
+          case Map.fetch(open, path) do
+            {:ok, {^identity, file}} ->
+              {:reply, read(file), state}
+
+            _ ->
+              case :file.open(path, [:read, :raw, :binary]) do
+                {:ok, file} ->
+                  open = Map.put(open, path, {identity, file})
+                  {:reply, read(file), %{open: open, kept: [file | kept]}}
+
+                _ ->
+                  {:reply, :none, state}
+              end
+          end
+
+        _ ->
+          {:reply, :none, state}
+      end
+    end
+
+    defp read(file) do
+      case :file.pread(file, 0, 48) do
+        {:ok, header} when byte_size(header) == 48 -> header
+        _ -> :none
+      end
     end
   end
 

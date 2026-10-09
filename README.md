@@ -219,13 +219,20 @@ The affected contracts are pending in `plans/contracts.json` until they are re-v
 - **Read cache:** reads are kept until a table they read is written. Writes through the app bump
   their tables after commit. Commits by any other SQLite client are seen through the WAL index
   (`-shm`) header and invalidate everything, so tools that edit the database while the app runs
-  remain safe.
+  remain safe. After each of its own commits the writer also asks SQLite (`PRAGMA
+  data_version`) whether another connection committed in the meantime, so a foreign commit
+  cannot hide behind a local write that replaces the saved header.
 - **Regexes and native reads:** literal regexes are compiled once and kept
   (`Campfire.Sigils`), since OTP 28+ re-imports an inline `~r` at every evaluation. Short reads
   run in one NIF call on the calling scheduler (`native/sqlite_read.c`, linked against the
   same system SQLite as Exqlite and only built with `EXQLITE_USE_SYSTEM`) and fall back to
-  the pooled readers; `CAMPFIRE_DB_NATIVE_READS=0` turns that off. The WAL index header is read through one kept
-  descriptor. None of these change responses.
+  the pooled readers; `CAMPFIRE_DB_NATIVE_READS=0` turns that off. A native statement is
+  interrupted after 1 ms (SQLite's progress handler) and then refused for a while, so the
+  pooled readers carry anything slow. The WAL index header is read through one descriptor
+  that is kept open and never closed, since closing any descriptor of that file would release
+  the process's POSIX locks on it, SQLite's own included; without the native library one
+  process (`Campfire.DB.WalIndex`) keeps it and reads it for everyone. None of these change
+  responses.
 - **Jobs and Cable:** in-process queues and fan-out replace Redis/Resque, so
   queued jobs are lost on a crash and there is no cross-runtime pub/sub.
 - **Front server:** Bandit replaces Thruster. Responses gzip at zlib level 1
