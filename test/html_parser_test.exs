@@ -16,6 +16,15 @@ defmodule Campfire.HtmlParserTest do
     assert HtmlParser.parse(html) == expected
   end
 
+  test "parses only the given bytes of a binary, without copying or NUL termination" do
+    for size <- [1_000, 20_000] do
+      source = "<p>" <> String.duplicate("x", size) <> "</p><b>beyond</b>"
+      html = binary_part(source, 0, size + 3)
+      text = String.duplicate("x", size)
+      assert HtmlParser.parse(html) == [{"p", [], [text]}]
+    end
+  end
+
   test "large fragments parse on a dirty scheduler without changing output" do
     text = String.duplicate("abcdefgh", 2_049)
     assert [{"p", [], [^text]}] = HtmlParser.parse("<p>#{text}</p>")

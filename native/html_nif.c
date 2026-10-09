@@ -72,16 +72,10 @@ static ERL_NIF_TERM parse(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
   ErlNifBinary html;
   if (argc != 1 || !enif_inspect_binary(env, argv[0], &html)) return enif_make_badarg(env);
 
-  char *input = enif_alloc(html.size + 1);
-  if (!input) return enif_make_tuple2(env, atom_error, text(env, "", "Cannot allocate memory"));
-  memcpy(input, html.data, html.size);
-  input[html.size] = 0;
-
   jmp_buf failure;
   if (setjmp(failure)) {
     allocation_failure = NULL;
     gumbo_free_all();
-    enif_free(input);
     return enif_make_tuple2(env, atom_error, text(env, "", "HTML parser allocation limit exceeded"));
   }
   allocation_failure = &failure;
@@ -92,7 +86,9 @@ static ERL_NIF_TERM parse(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
   options.max_tree_depth = 401;
   options.max_attributes = 400;
   options.max_errors = 0;
-  GumboOutput *output = gumbo_parse_with_options(&options, input, html.size);
+  /* Gumbo bounds every read of the input by its length, so it parses the
+     binary in place; argv[0] keeps it alive for the whole call. */
+  GumboOutput *output = gumbo_parse_with_options(&options, (const char *)html.data, html.size);
   allocation_failure = NULL;
 
   ERL_NIF_TERM result = output->status == GUMBO_STATUS_OK
@@ -100,7 +96,6 @@ static ERL_NIF_TERM parse(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
     : enif_make_tuple2(env, atom_error, text(env, "", gumbo_status_to_string(output->status)));
 
   gumbo_destroy_output(output);
-  enif_free(input);
   return result;
 }
 

@@ -2,6 +2,12 @@ defmodule Campfire.MessagesView do
   import Kernel, except: [sigil_r: 2]
   import Campfire.Sigils
   alias Campfire.{Assets, DB, Mentions, RichText}
+  # Parsed once at compile time instead of on every Floki.find/2.
+  @embeds Floki.Selector.Parser.parse(
+            "action-text-attachment[content-type='application/vnd.actiontext.opengraph-embed']"
+          )
+  @divs Floki.Selector.Parser.parse("div")
+  @attachments Floki.Selector.Parser.parse("action-text-attachment")
   require EEx
   EEx.function_from_file(:defp, :item, "priv/templates/message.html.eex", [:assigns])
   EEx.function_from_file(:defp, :boost_html, "priv/templates/boost.html.eex", [:assigns])
@@ -30,6 +36,8 @@ defmodule Campfire.MessagesView do
       )
 
     body = if text, do: text["body"], else: nil
+    blob = Campfire.Attachments.find("Message", message["id"], "attachment")
+    plain = RichText.plain_text(body || "")
 
     title =
       [creator["name"], creator["bio"]]
@@ -51,10 +59,9 @@ defmodule Campfire.MessagesView do
       created_epoch: epoch(message["created_at"]),
       updated_epoch: epoch(message["updated_at"]),
       created_iso: iso(message["created_at"]),
-      emoji_class:
-        if(all_emoji?(RichText.plain_text(body || "")), do: "message--emoji", else: ""),
-      presentation: presentation_fragment(message, body),
-      attachment_actions: attachment_actions(message),
+      emoji_class: if(all_emoji?(plain), do: "message--emoji", else: ""),
+      presentation: present(body, blob, plain, &presentation!/1),
+      attachment_actions: attachment_actions(blob),
       boosting: render_boosts(message)
     )
   end
@@ -63,8 +70,8 @@ defmodule Campfire.MessagesView do
     do:
       "<div class=\"message message--formatted message--failed center\">\n  <div class=\"message__body\">\n    <div class=\"message__body-content txt-align-center\">\n      Failed to load message content\n    </div>\n  </div>\n</div>\n"
 
-  defp attachment_actions(message) do
-    if blob = Campfire.Attachments.find("Message", message["id"], "attachment") do
+  defp attachment_actions(blob) do
+    if blob do
       path = Assets.html_escape(Campfire.Storage.blob_path(blob))
       filename = Assets.html_escape(Campfire.Filename.sanitized(blob["filename"]))
 
@@ -139,16 +146,14 @@ defmodule Campfire.MessagesView do
     do: Regex.match?(~r/\A(\p{Emoji_Presentation}|\p{Extended_Pictographic}|\x{FE0F})+\z/u, text)
 
   def presentation_message(message, body) do
-    present(message, body, &presentation/1)
-  end
-
-  defp presentation_fragment(message, body) do
-    present(message, body, &presentation!/1)
-  end
-
-  defp present(message, body, render) do
     blob = Campfire.Attachments.find("Message", message["id"], "attachment")
-    sound = Campfire.Sounds.find(Campfire.Chat.plain_text_body(message, body || ""))
+    present(body, blob, RichText.plain_text(body || ""), &presentation/1)
+  end
+
+  # Chat.plain_text_body/2 from an already loaded blob and plain text.
+  defp present(body, blob, plain, render) do
+    plain = if Campfire.Chat.present?(plain), do: plain, else: (blob || %{})["filename"] || ""
+    sound = Campfire.Sounds.find(plain)
 
     cond do
       blob -> Campfire.AttachmentView.render(blob)
@@ -179,11 +184,7 @@ defmodule Campfire.MessagesView do
   end
 
   defp remove_solo_link(nodes) do
-    embeds =
-      Floki.find(
-        nodes,
-        "action-text-attachment[content-type='application/vnd.actiontext.opengraph-embed']"
-      )
+    embeds = Floki.find(nodes, @embeds)
 
     plain = RichText.plain_text(Floki.raw_html(nodes))
 
@@ -192,7 +193,7 @@ defmodule Campfire.MessagesView do
       embed = Campfire.OpengraphEmbed.resolve(attrs)
 
       if embed && normalize_tweet(embed["href"]) == normalize_tweet(plain) do
-        if Floki.find(nodes, "div") != [] do
+        if Floki.find(nodes, @divs) != [] do
           replace_divs(nodes, attachment)
         else
           remove_paragraphs(nodes)
@@ -231,7 +232,7 @@ defmodule Campfire.MessagesView do
     do:
       Enum.flat_map(nodes, fn
         {"p", _, _} = node ->
-          if Floki.find([node], "action-text-attachment") == [], do: [], else: [node]
+          if Floki.find([node], @attachments) == [], do: [], else: [node]
 
         {tag, attrs, children} ->
           [{tag, attrs, remove_paragraphs(children)}]

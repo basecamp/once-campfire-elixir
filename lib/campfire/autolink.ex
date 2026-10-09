@@ -6,8 +6,25 @@ defmodule Campfire.Autolink do
   @urls ~r/(?:(?i:((?:ed2k|ftp|http|https|irc|mailto|news|gopher|nntp|telnet|webcal|xmpp|callto|feed|svn|urn|aim|rsync|tag|ssh|sftp|rtsp|afs|file):))\/\/|(?i:www)\.[a-zA-Z0-9_])[^\x09-\x0d <\x{A0}"]+/u
   @emails ~r/(?<![a-zA-Z0-9_.!#$%&'*\/=?^`{|}~+-])[a-zA-Z0-9_.!#$%+-]\.?[a-zA-Z0-9_.!#$%&'*\/=?^`{|}~+-]*@[a-zA-Z0-9_-]+(?:\.[a-zA-Z0-9_-]+)+/
 
+  # Every URL match contains "://" or "www." (any case) and every email "@";
+  # without them the scans cannot match.
+  @www for a <- ~w(w W), b <- ~w(w W), c <- ~w(w W), do: a <> b <> c <> "."
+
   def render(html) do
-    html |> replace(@urls, &url/1) |> replace(@emails, &email/1)
+    html = if :binary.match(html, url_marker()), do: replace(html, @urls, &url/1), else: html
+    if :binary.match(html, "@"), do: replace(html, @emails, &email/1), else: html
+  end
+
+  defp url_marker do
+    case :persistent_term.get({__MODULE__, :url_marker}, nil) do
+      nil ->
+        pattern = :binary.compile_pattern(["://" | @www])
+        :persistent_term.put({__MODULE__, :url_marker}, pattern)
+        pattern
+
+      pattern ->
+        pattern
+    end
   end
 
   defp replace(text, pattern, fun) do

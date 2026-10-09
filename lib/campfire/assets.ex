@@ -33,14 +33,7 @@ defmodule Campfire.Assets do
     "/assets/" <> Map.fetch!(@manifest, logical)["digested_path"]
   end
 
-  def html_escape(text),
-    do:
-      text
-      |> String.replace("&", "&amp;")
-      |> String.replace("<", "&lt;")
-      |> String.replace(">", "&gt;")
-      |> String.replace("\"", "&quot;")
-      |> String.replace("'", "&#39;")
+  def html_escape(text), do: Campfire.Escape.html(text)
 
   def manifest(base) do
     account = Campfire.DB.one("SELECT * FROM accounts LIMIT 1")
