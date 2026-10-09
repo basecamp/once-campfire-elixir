@@ -12,7 +12,7 @@ RUN arch="${TARGETARCH:-$(uname -m)}" && \
     cp "$gem/MIT-LICENSE" /tmp/THRUSTER-LICENSE
 
 FROM campfire-elixir:toolchain AS build
-ENV MIX_ENV=prod EXQLITE_USE_SYSTEM=1
+ENV MIX_ENV=prod
 COPY mix.exs mix.lock ./
 COPY deps ./deps
 COPY lib ./lib

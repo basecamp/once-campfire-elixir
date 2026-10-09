@@ -2,6 +2,7 @@ defmodule Campfire.BlobEmbeds do
   import Kernel, except: [sigil_r: 2]
   import Campfire.Sigils
   alias Campfire.{Attachments, DB, Rails, RichText}
+  @attachments Floki.Selector.Parser.parse("action-text-attachment")
 
   def resolve(attrs) do
     with token when is_binary(token) <- Map.new(attrs)["sgid"],
@@ -79,7 +80,7 @@ defmodule Campfire.BlobEmbeds do
   def blobs(body) do
     body
     |> RichText.parse()
-    |> Floki.find("action-text-attachment")
+    |> Floki.find(@attachments)
     |> Enum.map(fn {_, attrs, _} -> resolve(attrs) end)
     |> Enum.reject(&is_nil/1)
     |> Enum.uniq_by(& &1["id"])

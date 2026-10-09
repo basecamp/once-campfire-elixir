@@ -1,116 +1,86 @@
 defmodule Campfire.HtmlParserTest do
   use ExUnit.Case, async: false
+  alias Campfire.HtmlParser
 
-  test "parser produces native terms through an isolated worker" do
+  @pathological "<p>" <>
+                  Enum.map_join(1..390, &~s(<b a="#{&1}">)) <>
+                  String.duplicate("<p>x", 3_000)
+
+  test "parser produces native terms" do
     html = ~s(<p class="message">Hello<!-- pause --><strong>world</strong></p>)
 
     expected = [
       {"p", [{"class", "message"}], ["Hello", {:comment, " pause "}, {"strong", [], ["world"]}]}
     ]
 
-    assert Campfire.HtmlParser.parse(html) == expected
+    assert HtmlParser.parse(html) == expected
   end
 
-  test "large fragments use the public parser path without changing output" do
+  test "parses only the given bytes of a binary, without copying or NUL termination" do
+    for size <- [1_000, 20_000] do
+      source = "<p>" <> String.duplicate("x", size) <> "</p><b>beyond</b>"
+      html = binary_part(source, 0, size + 3)
+      text = String.duplicate("x", size)
+      assert HtmlParser.parse(html) == [{"p", [], [text]}]
+    end
+  end
+
+  test "large fragments parse on a dirty scheduler without changing output" do
     text = String.duplicate("abcdefgh", 2_049)
-    assert [{"p", [], [^text]}] = Campfire.HtmlParser.parse("<p>#{text}</p>")
+    assert [{"p", [], [^text]}] = HtmlParser.parse("<p>#{text}</p>")
+    assert HtmlParser.parse_nif("<p>#{text}</p>") == HtmlParser.parse_dirty("<p>#{text}</p>")
   end
 
-  test "valid documents beyond the NIF node budget retain Rails behavior" do
-    html = String.duplicate("<p>x</p>", 6_000)
-
-    assert nodes = Campfire.HtmlParser.parse(html)
-    assert length(nodes) == 6_000
-    assert Enum.all?(nodes, &(&1 == {"p", [], ["x"]}))
+  test "valid documents with many nodes retain Rails behavior" do
+    for count <- [6_000, 70_000] do
+      nodes = HtmlParser.parse(String.duplicate("<p>x</p>", count))
+      assert length(nodes) == count
+      assert Enum.all?(nodes, &(&1 == {"p", [], ["x"]}))
+    end
   end
 
-  test "pathological expansion is isolated from the BEAM" do
-    formatting = Enum.map_join(1..390, &~s(<b a="#{&1}">))
-    html = "<p>#{formatting}" <> String.duplicate("<p>x", 3_000)
-
-    assert_raise ArgumentError, ~r/isolated HTML parser exited with status/, fn ->
-      Campfire.HtmlParser.parse(html)
+  test "pathological expansion stops at the allocation limit without stopping the VM" do
+    assert_raise ArgumentError, "HTML parser allocation limit exceeded", fn ->
+      HtmlParser.parse(@pathological)
     end
 
-    assert Campfire.HtmlParser.parse("<p>alive</p>") == [{"p", [], ["alive"]}]
+    assert HtmlParser.parse("<p>alive</p>") == [{"p", [], ["alive"]}]
   end
 
-  test "an idle helper death is replaced without crashing its worker or caller" do
-    worker = String.to_existing_atom("Elixir.Campfire.HtmlParser.#{:erlang.phash2(self(), 4)}")
-    worker_pid = Process.whereis(worker)
-    port = :sys.get_state(worker)
-    {:os_pid, os_pid} = Port.info(port, :os_pid)
+  # A lower, test-only cap keeps the concurrent failures within CI memory
+  # (the production cap is checked above). If a failed parse left its
+  # accounting behind, even a small parse on that thread would fail.
+  test "failed parses release their memory on every scheduler thread" do
+    runs = 2 * System.schedulers_online()
+    limit = 16 * 1024 * 1024
+    html = String.duplicate("<p>x</p>", 1_000)
 
-    assert {_, 0} = System.cmd("kill", ["-KILL", Integer.to_string(os_pid)])
-    replacement = await_replacement(worker, port, System.monotonic_time(:millisecond) + 5_000)
-
-    assert is_port(replacement)
-    assert Port.info(replacement)
-    assert Process.whereis(worker) == worker_pid
-    assert Campfire.HtmlParser.parse("<p>alive</p>") == [{"p", [], ["alive"]}]
-  end
-
-  test "a helper is recycled after returning a large result" do
-    worker = String.to_existing_atom("Elixir.Campfire.HtmlParser.#{:erlang.phash2(self(), 4)}")
-    port = :sys.get_state(worker)
-    html = String.duplicate("<p>x</p>", 70_000)
-
-    assert nodes = Campfire.HtmlParser.parse(html)
-    assert length(nodes) == 70_000
-    refute :sys.get_state(worker) == port
-    assert Campfire.HtmlParser.parse("<p>alive</p>") == [{"p", [], ["alive"]}]
-  end
-
-  test "an abnormal linked port exit returns an error and replaces the helper" do
-    worker = String.to_existing_atom("Elixir.Campfire.HtmlParser.#{:erlang.phash2(self(), 4)}")
-    worker_pid = Process.whereis(worker)
-    broken_port = open_port_with_closed_input()
-
-    assert_receive {^broken_port, {:data, "ready"}}, 1_000
-    assert Port.connect(broken_port, worker_pid)
-    Process.unlink(broken_port)
-
-    :sys.replace_state(worker, fn port ->
-      Process.link(broken_port)
-      Port.close(port)
-      broken_port
+    1..runs
+    |> Task.async_stream(fn _ -> HtmlParser.parse_limited(@pathological, limit) end,
+      max_concurrency: runs,
+      timeout: 120_000
+    )
+    |> Enum.each(fn result ->
+      assert {:ok, {:error, "HTML parser allocation limit exceeded"}} = result
     end)
 
-    assert_raise ArgumentError, ~r/isolated HTML parser exited/, fn ->
-      Campfire.HtmlParser.parse("<p>broken pipe</p>")
-    end
-
-    replacement =
-      await_replacement(worker, broken_port, System.monotonic_time(:millisecond) + 5_000)
-
-    assert is_port(replacement)
-    assert Process.whereis(worker) == worker_pid
-    assert Campfire.HtmlParser.parse("<p>alive</p>") == [{"p", [], ["alive"]}]
+    1..runs
+    |> Task.async_stream(fn _ -> length(HtmlParser.parse_limited(html, limit)) end,
+      max_concurrency: runs,
+      timeout: 120_000
+    )
+    |> Enum.each(&assert(&1 == {:ok, 1_000}))
   end
 
-  defp open_port_with_closed_input do
-    executable = System.find_executable("sh")
-    script = ~S(exec 0<&-; printf '\000\000\000\005ready'; sleep 30)
-
-    Port.open({:spawn_executable, String.to_charlist(executable)}, [
-      :binary,
-      {:packet, 4},
-      :exit_status,
-      args: [~c"-c", String.to_charlist(script)]
-    ])
-  end
-
-  defp await_replacement(worker, old_port, deadline) do
-    case :sys.get_state(worker) do
-      ^old_port ->
-        if System.monotonic_time(:millisecond) < deadline do
-          await_replacement(worker, old_port, deadline)
-        else
-          flunk("parser helper was not replaced")
-        end
-
-      replacement ->
-        replacement
-    end
+  test "concurrent parses do not share allocation state" do
+    1..200
+    |> Task.async_stream(fn i ->
+      html = ~s(<p data-i="#{i}">#{String.duplicate("<i>x</i>", rem(i, 50) + 1)}</p>)
+      {i, HtmlParser.parse(html)}
+    end)
+    |> Enum.each(fn {:ok, {i, [{"p", [{"data-i", value}], children}]}} ->
+      assert value == Integer.to_string(i)
+      assert length(children) == rem(i, 50) + 1
+    end)
   end
 end

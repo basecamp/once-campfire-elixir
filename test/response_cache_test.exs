@@ -3,7 +3,7 @@ defmodule Campfire.ResponseCacheTest do
   import Plug.Conn
   import Plug.Test
   alias Campfire.{Auth, Chat, DB, Endpoint, Rails, ResponseCache}
-  alias Exqlite.Sqlite3, as: SQL
+  alias Campfire.SQLite, as: SQL
   @fixture Jason.decode!(File.read!("test/fixtures/seed.json"))
 
   setup do

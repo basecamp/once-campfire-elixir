@@ -1,60 +1,117 @@
 defmodule Campfire.DBTest do
   use ExUnit.Case, async: false
-  alias Campfire.DB
+  alias Campfire.{DB, SQLite}
   @fixture Jason.decode!(File.read!("test/fixtures/seed.json"))
 
   setup do
     :ok = DB.restore_fixture(@fixture)
   end
 
-  test "reads use the pool while the writer is busy" do
-    if Process.whereis(DB.ReadPool) do
-      parent = self()
-      %{"id" => id, "name" => original} = DB.one("SELECT id, name FROM accounts LIMIT 1")
-
-      writer =
-        Task.async(fn ->
-          DB.transaction(fn query ->
-            query.("UPDATE accounts SET name=? WHERE id=?", ["committed later", id])
-            send(parent, :writer_started)
-
-            receive do
-              :release_writer -> :ok
-            after
-              5_000 -> raise "writer was not released"
-            end
-          end)
-        end)
-
-      on_exit(fn ->
-        if Process.alive?(writer.pid) do
-          if pid = Process.whereis(DB), do: send(pid, :release_writer)
-        end
-      end)
-
-      assert_receive :writer_started
-
-      reader = Task.async(fn -> DB.one("SELECT name FROM accounts WHERE id=?", [id]) end)
-      assert {:ok, %{"name" => ^original}} = Task.yield(reader, 1_000)
-
-      send(Process.whereis(DB), :release_writer)
-      assert :ok = Task.await(writer)
-      assert %{"name" => "committed later"} = DB.one("SELECT name FROM accounts WHERE id=?", [id])
-    else
-      assert System.schedulers_online() == 1
-    end
+  defp readers do
+    {_writer, readers} = :persistent_term.get({DB, :connections})
+    Tuple.to_list(readers)
   end
 
-  @tag skip: System.schedulers_online() == 1
-  test "all readers reject writes and retain read-pool connection settings" do
-    readers = PartitionSupervisor.which_children(DB.ReadPool)
-    assert length(readers) == min(System.schedulers_online(), 8)
-    assert readers |> Enum.map(&elem(&1, 1)) |> Enum.uniq() |> length() == length(readers)
+  defp hold_transaction(id, name) do
+    parent = self()
+
+    task =
+      Task.async(fn ->
+        DB.transaction(fn query ->
+          query.("UPDATE accounts SET name=? WHERE id=?", [name, id])
+          send(parent, :writer_started)
+
+          receive do
+            :release_writer -> :ok
+          after
+            5_000 -> raise "writer was not released"
+          end
+        end)
+      end)
+
+    assert_receive :writer_started
+    task
+  end
+
+  test "reads use the readers while the writer is busy" do
+    %{"id" => id, "name" => original} = DB.one("SELECT id, name FROM accounts LIMIT 1")
+    writer = hold_transaction(id, "committed later")
+
+    reader = Task.async(fn -> DB.one("SELECT name FROM accounts WHERE id=?", [id]) end)
+    assert {:ok, %{"name" => ^original}} = Task.yield(reader, 1_000)
+
+    send(writer.pid, :release_writer)
+    assert :ok = Task.await(writer)
+    assert %{"name" => "committed later"} = DB.one("SELECT name FROM accounts WHERE id=?", [id])
+  end
+
+  test "writers wait for the lock in order" do
+    %{"id" => id} = DB.one("SELECT id FROM accounts LIMIT 1")
+    holder = hold_transaction(id, "first")
+    parent = self()
+
+    waiters =
+      for {name, queued} <- [{"second", 1}, {"third", 2}] do
+        task =
+          Task.async(fn ->
+            DB.transaction(fn query ->
+              send(parent, {:writing, name})
+              query.("UPDATE accounts SET name=? WHERE id=?", [name, id])
+            end)
+          end)
+
+        # Queue them in a known order.
+        wait_until(fn -> :queue.len(:sys.get_state(DB).waiting) == queued end)
+        task
+      end
+
+    refute_received {:writing, _}
+    send(holder.pid, :release_writer)
+    assert :ok = Task.await(holder)
+    Enum.each(waiters, &Task.await/1)
+    assert_received {:writing, "second"}
+    assert_received {:writing, "third"}
+    assert %{"name" => "third"} = DB.one("SELECT name FROM accounts WHERE id=?", [id])
+  end
+
+  test "an owner that exits mid-transaction is rolled back and the lock passes on" do
+    %{"id" => id, "name" => original} = DB.one("SELECT id, name FROM accounts LIMIT 1")
+    holder = hold_transaction(id, "never committed")
+
+    waiter =
+      Task.async(fn -> DB.query("UPDATE accounts SET updated_at=? WHERE id=?", ["after", id]) end)
+
+    wait_until(fn -> :queue.len(:sys.get_state(DB).waiting) == 1 end)
+
+    Process.unlink(holder.pid)
+    Process.exit(holder.pid, :kill)
+
+    assert [] = Task.await(waiter)
+    assert %{"name" => ^original} = DB.one("SELECT name FROM accounts WHERE id=?", [id])
+    assert %{owner: nil} = :sys.get_state(DB)
+  end
+
+  test "waiters that exit before their turn are skipped" do
+    %{"id" => id} = DB.one("SELECT id FROM accounts LIMIT 1")
+    holder = hold_transaction(id, "held")
+    gone = spawn(fn -> DB.query("UPDATE accounts SET updated_at='gone' WHERE id=?", [id]) end)
+    wait_until(fn -> :queue.len(:sys.get_state(DB).waiting) == 1 end)
+    Process.exit(gone, :kill)
+    wait_until(fn -> :queue.len(:sys.get_state(DB).waiting) == 0 end)
+
+    send(holder.pid, :release_writer)
+    assert :ok = Task.await(holder)
+    assert [] = DB.query("UPDATE accounts SET name='next' WHERE id=?", [id])
+    assert %{owner: nil} = :sys.get_state(DB)
+  end
+
+  test "all readers reject writes and retain their connection settings" do
+    assert length(readers()) == min(System.schedulers_online(), 8)
     original = DB.one("SELECT id, name FROM accounts LIMIT 1")
 
-    for {_, pid, :worker, _} <- readers do
-      assert {:error, %DB.Error{}} =
-               GenServer.call(pid, {:query, "UPDATE accounts SET name=?", ["must not persist"]})
+    for reader <- readers() do
+      assert {:error, _} =
+               SQLite.query(reader, "UPDATE accounts SET name=?", ["must not persist"])
 
       for {pragma, value} <- [
             {"foreign_keys", 1},
@@ -63,56 +120,54 @@ defmodule Campfire.DBTest do
             {"cache_size", -2000},
             {"mmap_size", 0}
           ] do
-        assert [%{^pragma => ^value}] = GenServer.call(pid, {:query, "PRAGMA #{pragma}", []})
+        assert {:ok, [%{^pragma => ^value}]} = SQLite.query(reader, "PRAGMA #{pragma}")
       end
 
-      assert [^original] =
-               GenServer.call(pid, {:query, "SELECT id, name FROM accounts LIMIT 1", []})
+      assert {:ok, [^original]} = SQLite.query(reader, "SELECT id, name FROM accounts LIMIT 1")
     end
   end
 
-  @tag skip: System.schedulers_online() == 1
   test "all readers observe commits and recreated fixture schemas without stale statements" do
     %{"id" => id} = DB.one("SELECT id FROM accounts LIMIT 1")
     assert [] = DB.query("UPDATE accounts SET name=? WHERE id=?", ["new committed name", id])
-    readers = PartitionSupervisor.which_children(DB.ReadPool)
 
-    for {_, pid, :worker, _} <- readers do
-      assert [%{"name" => "new committed name"}] =
-               GenServer.call(pid, {:query, "SELECT name FROM accounts WHERE id=?", [id]})
+    for reader <- readers() do
+      assert {:ok, [%{"name" => "new committed name"}]} =
+               SQLite.query(reader, "SELECT name FROM accounts WHERE id=?", [id])
     end
 
     assert :ok = DB.restore_fixture(@fixture)
     original = Enum.find(@fixture["tables"]["accounts"], &(&1["id"] == id))["name"]
 
-    for {_, pid, :worker, _} <- readers do
-      assert [%{"name" => ^original}] =
-               GenServer.call(pid, {:query, "SELECT name FROM accounts WHERE id=?", [id]})
+    for reader <- readers() do
+      assert {:ok, [%{"name" => ^original}]} =
+               SQLite.query(reader, "SELECT name FROM accounts WHERE id=?", [id])
     end
   end
 
-  @tag skip: System.schedulers_online() == 1
-  test "restarting a reader restores its route without restarting the writer or other readers" do
-    writer = Process.whereis(DB)
-    readers = PartitionSupervisor.which_children(DB.ReadPool)
-    route = {:via, PartitionSupervisor, {DB.ReadPool, self()}}
-    reader = GenServer.whereis(route)
-    {partition, ^reader, :worker, _} = Enum.find(readers, &(elem(&1, 1) == reader))
-    original = DB.one("SELECT id, name FROM accounts LIMIT 1")
+  defp wait_until(fun, attempts \\ 200) do
+    cond do
+      fun.() ->
+        :ok
 
-    assert :ok = Supervisor.terminate_child(DB.ReadPool, partition)
-    assert {:ok, replacement} = Supervisor.restart_child(DB.ReadPool, partition)
-    assert replacement != reader
-    assert GenServer.whereis(route) == replacement
-    assert Process.whereis(DB) == writer
+      attempts == 0 ->
+        flunk("condition not met")
 
-    assert List.keydelete(PartitionSupervisor.which_children(DB.ReadPool), partition, 0) ==
-             List.keydelete(readers, partition, 0)
+      true ->
+        Process.sleep(5)
+        wait_until(fun, attempts - 1)
+    end
+  end
 
-    assert ^original = DB.one("SELECT id, name FROM accounts LIMIT 1")
+  test "a failed fixture restore rolls back and restores foreign keys" do
+    broken = put_in(@fixture, ["tables", "accounts"], [%{"no_such_column" => 1}])
+    assert_raise DB.Error, fn -> DB.restore_fixture(broken) end
 
-    assert {:error, %DB.Error{}} =
-             GenServer.call(replacement, {:query, "UPDATE accounts SET name=?", ["read only"]})
+    {writer, _readers} = :persistent_term.get({DB, :connections})
+    refute SQLite.transaction?(writer)
+    assert [%{"foreign_keys" => 1}] = DB.query("PRAGMA foreign_keys")
+    assert %{owner: nil} = :sys.get_state(DB)
+    assert :ok = DB.restore_fixture(@fixture)
   end
 
   test "expected SQLite errors are returned without crashing the writer" do
@@ -124,17 +179,13 @@ defmodule Campfire.DBTest do
   test "invalid bindings raise in the caller without restarting connection owners" do
     writer = Process.whereis(DB)
 
-    reader =
-      if Process.whereis(DB.ReadPool),
-        do: GenServer.whereis({:via, PartitionSupervisor, {DB.ReadPool, self()}}),
-        else: writer
-
     for _ <- 1..4, sql <- ["SELECT ? AS value", "UPDATE accounts SET name=?"] do
       assert_raise ArgumentError, "unsupported type: %{}", fn -> DB.query(sql, [%{}]) end
-      assert Process.alive?(reader)
       assert Process.whereis(DB) == writer
       assert %{"value" => 19} = DB.one("SELECT ? AS value", [19])
     end
+
+    assert %{owner: nil} = :sys.get_state(DB)
   end
 
   test "transactions read their own writes through the public query API" do

@@ -1,128 +1,38 @@
 defmodule Campfire.DB do
+  @moduledoc """
+  SQLite access through `Campfire.SQLite` connections.
+
+  Reads (`SELECT`) outside a transaction run in the caller on one of the
+  read-only connections opened at startup, picked at random from a tuple in
+  `:persistent_term`. Everything else runs in the caller on the single write
+  connection, which this process hands out like a lock: callers check it out,
+  run their statements and check it back in. The lock monitors its owner and
+  waiters; if the owner exits it rolls back any open transaction before the
+  next caller gets the connection.
+  """
   use GenServer
-  alias Exqlite.Sqlite3, as: SQL
+  alias Campfire.SQLite
+
+  @connections {__MODULE__, :connections}
   @transaction_db {__MODULE__, :transaction_db}
 
   defmodule Error do
     defexception [:reason, message: "SQLite operation failed"]
   end
 
-  defmodule CallerException do
-    @moduledoc false
-    defstruct [:kind, :reason, :stacktrace]
-  end
+  def start_link(opts), do: GenServer.start_link(__MODULE__, opts, name: __MODULE__)
 
-  defmodule Reader do
-    @moduledoc false
-    # Readonly connection plus the prepared statements it owns. A cached statement is
-    # always idle: multi_step resets it at DONE/BUSY/error and any other failure
-    # releases it, so no cached statement holds a WAL read snapshot.
-    defstruct [:db, :limit, statements: %{}, uses: 0]
-  end
-
-  @statement_cache_size 64
-
-  def start_link(opts) do
-    server_opts =
-      case Keyword.get(opts, :name, __MODULE__) do
-        nil -> []
-        name -> [name: name]
-      end
-
-    GenServer.start_link(__MODULE__, opts, server_opts)
-  end
-
-  def init(opts) do
-    path = Keyword.fetch!(opts, :path)
-    if Keyword.get(opts, :read_only, false), do: init_reader(path, opts), else: init_writer(path)
-  end
-
-  defp init_reader(path, opts) do
-    limit = Keyword.get(opts, :statement_cache_size, @statement_cache_size)
-    true = is_integer(limit) and limit > 0
-
-    {:ok, db} = SQL.open(path, mode: :readonly)
-
-    :ok =
-      SQL.execute(
-        db,
-        "PRAGMA foreign_keys=ON; PRAGMA synchronous=NORMAL; PRAGMA cache_size=-2000;"
-      )
-
-    :ok = SQL.set_busy_timeout(db, 5000)
-    # Supervisor shutdown then runs terminate/2, which finalizes cached statements.
-    Process.flag(:trap_exit, true)
-    {:ok, %Reader{db: db, limit: limit}}
-  end
-
-  defp init_writer(path) do
-    File.mkdir_p!(Path.dirname(path))
-    {:ok, db} = SQL.open(path)
-
-    :ok =
-      SQL.execute(
-        db,
-        "PRAGMA foreign_keys=ON; PRAGMA journal_mode=WAL; PRAGMA synchronous=NORMAL; PRAGMA cache_size=2000; PRAGMA mmap_size=134217728;"
-      )
-
-    :ok = SQL.set_busy_timeout(db, 5000)
-    initialize(db)
-
-    ensure_refresh_index(db)
-    {:ok, db}
-  end
-
-  defp ensure_refresh_index(db) do
-    if run(db, "SELECT name FROM sqlite_master WHERE type='table' AND name='messages'", []) != [] do
-      :ok =
-        SQL.execute(
-          db,
-          "CREATE INDEX IF NOT EXISTS index_messages_on_room_id_and_updated_at ON messages(room_id,updated_at)"
-        )
-    end
-  end
-
-  defp initialize(db) do
-    if run(
-         db,
-         "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'",
-         []
-       ) == [] do
-      schema = Campfire.Assets.read("compat/database-schema.json") |> Jason.decode!()
-      :ok = SQL.execute(db, "BEGIN IMMEDIATE")
-
-      try do
-        for sql <- schema["schema"], do: :ok = SQL.execute(db, sql)
-
-        for version <- schema["versions"],
-            do: run(db, "INSERT INTO schema_migrations (version) VALUES (?)", [version])
-
-        now = Campfire.Chat.timestamp()
-
-        for {key, value} <- [
-              {"environment", System.get_env("RAILS_ENV", "production")},
-              {"schema_sha1", schema["schema_sha1"]}
-            ],
-            do:
-              run(
-                db,
-                "INSERT INTO ar_internal_metadata (key,value,created_at,updated_at) VALUES (?,?,?,?)",
-                [key, value, now, now]
-              )
-
-        :ok = SQL.execute(db, "COMMIT")
-      rescue
-        error ->
-          SQL.execute(db, "ROLLBACK")
-          reraise error, __STACKTRACE__
-      end
-    end
-  end
+  ## Public API
 
   def query(sql, params \\ []) do
     case Process.get(@transaction_db) do
-      nil -> query_outside_transaction(sql, params)
-      db -> run(db, sql, params)
+      nil ->
+        if select?(sql),
+          do: rescue_error(fn -> run(reader(), sql, params) end),
+          else: with_writer(fn conn -> rescue_error(fn -> run(conn, sql, params) end) end)
+
+      conn ->
+        run(conn, sql, params)
     end
   end
 
@@ -134,207 +44,255 @@ defmodule Campfire.DB do
   end
 
   def transaction(fun) do
-    case GenServer.call(__MODULE__, {:transaction, fun}, 30_000) do
-      {:raise, %CallerException{kind: kind, reason: reason, stacktrace: stacktrace}} ->
-        :erlang.raise(kind, reason, stacktrace)
-
-      {:ok, result} ->
-        result
+    case Process.get(@transaction_db) do
+      nil -> with_writer(&transaction(&1, fun))
+      conn -> fun.(fn sql, params -> run(conn, sql, params) end)
     end
   end
 
-  def restore_fixture(fixture),
-    do: GenServer.call(__MODULE__, {:restore_fixture, fixture}, 30_000)
+  def restore_fixture(fixture), do: with_writer(&restore_fixture(&1, fixture))
 
-  def handle_call({:restore_fixture, fixture}, _, db) do
-    :ok = SQL.execute(db, "PRAGMA foreign_keys=OFF")
+  ## Write lock
 
-    existing =
-      run(
-        db,
-        "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'",
-        []
-      )
-
-    for %{"name" => name} <- existing, not String.starts_with?(name, "message_search_index_") do
-      :ok = SQL.execute(db, "DROP TABLE IF EXISTS \"#{name}\"")
-    end
-
-    for sql <- fixture["schema"], do: :ok = SQL.execute(db, sql)
-    :ok = SQL.execute(db, "BEGIN IMMEDIATE")
-
-    for {table, rows} <- fixture["tables"], row <- rows do
-      fields = Map.keys(row)
-      names = Enum.map_join(fields, ",", &("\"" <> &1 <> "\""))
-      placeholders = Enum.map_join(fields, ",", fn _ -> "?" end)
-
-      run(
-        db,
-        "INSERT INTO \"#{table}\" (#{names}) VALUES (#{placeholders})",
-        Enum.map(fields, &row[&1])
-      )
-    end
-
-    :ok = SQL.execute(db, "COMMIT; PRAGMA foreign_keys=ON")
-    ensure_refresh_index(db)
-    {:reply, :ok, db}
-  end
-
-  def handle_call({:query, sql, params}, _, %Reader{} = reader) when is_list(params) do
-    {cached, statements} = Map.pop(reader.statements, sql)
-    reader = %{reader | statements: statements}
+  defp with_writer(fun) do
+    conn = GenServer.call(__MODULE__, :checkout, :infinity)
 
     try do
-      stmt =
-        case cached do
-          {stmt, _} -> stmt
-          nil -> SQL.prepare(reader.db, sql) |> value!()
-        end
-
-      rows = read(reader.db, stmt, params)
-      {:reply, rows, cache(reader, sql, stmt)}
-    rescue
-      error in Error ->
-        {:reply, {:error, error}, reader}
-
-      error ->
-        {:reply,
-         {:raise, %CallerException{kind: :error, reason: error, stacktrace: __STACKTRACE__}},
-         reader}
+      fun.(conn)
+    after
+      GenServer.cast(__MODULE__, {:checkin, self()})
     end
   end
 
-  def handle_call({:query, sql, params}, from, %Reader{db: db} = reader) do
-    {:reply, result, ^db} = handle_call({:query, sql, params}, from, db)
-    {:reply, result, reader}
+  @impl true
+  def init(opts) do
+    path = Keyword.fetch!(opts, :path)
+    Process.flag(:trap_exit, true)
+    writer = open_writer(path)
+    count = Keyword.get(opts, :readers, min(System.schedulers_online(), 8))
+    readers = for _ <- 1..count, do: open_reader(path)
+    :persistent_term.put(@connections, {writer, List.to_tuple(readers)})
+    {:ok, %{writer: writer, readers: readers, owner: nil, waiting: :queue.new()}}
   end
 
-  def handle_call({:query, sql, params}, _, db) do
-    result =
-      try do
-        run(db, sql, params)
-      rescue
-        error in Error ->
-          {:error, error}
+  @impl true
+  def handle_call(:checkout, {pid, _} = from, %{owner: nil} = state) do
+    {:noreply, grant(state, from, Process.monitor(pid))}
+  end
 
-        error ->
-          {:raise, %CallerException{kind: :error, reason: error, stacktrace: __STACKTRACE__}}
+  def handle_call(:checkout, {pid, _} = from, state) do
+    {:noreply, %{state | waiting: :queue.in({from, Process.monitor(pid)}, state.waiting)}}
+  end
+
+  @impl true
+  def handle_cast({:checkin, pid}, %{owner: {pid, ref}} = state) do
+    Process.demonitor(ref, [:flush])
+    {:noreply, next(state)}
+  end
+
+  @impl true
+  def handle_info({:DOWN, ref, :process, _, _}, %{owner: {_, ref}} = state) do
+    # The owner may have exited mid-transaction; any statement it was still
+    # running finishes first, as the connection serializes its callers.
+    if SQLite.transaction?(state.writer), do: SQLite.execute(state.writer, "ROLLBACK")
+    {:noreply, next(state)}
+  end
+
+  def handle_info({:DOWN, ref, :process, _, _}, state) do
+    {:noreply,
+     %{state | waiting: :queue.filter(fn {_, waiting} -> waiting != ref end, state.waiting)}}
+  end
+
+  def handle_info(_, state), do: {:noreply, state}
+
+  defp grant(state, {pid, _} = from, ref) do
+    GenServer.reply(from, state.writer)
+    %{state | owner: {pid, ref}}
+  end
+
+  defp next(state) do
+    case :queue.out(state.waiting) do
+      {{:value, {from, ref}}, waiting} -> grant(%{state | waiting: waiting}, from, ref)
+      {:empty, _} -> %{state | owner: nil}
+    end
+  end
+
+  @impl true
+  def terminate(_, state) do
+    :persistent_term.erase(@connections)
+    for conn <- [state.writer | state.readers], do: SQLite.close(conn)
+    :ok
+  end
+
+  ## Connections
+
+  defp reader do
+    {_, readers} = :persistent_term.get(@connections)
+    elem(readers, :rand.uniform(tuple_size(readers)) - 1)
+  end
+
+  defp open_reader(path) do
+    {:ok, conn} = SQLite.open(path, readonly: true)
+
+    :ok =
+      SQLite.execute(
+        conn,
+        "PRAGMA foreign_keys=ON; PRAGMA synchronous=NORMAL; PRAGMA cache_size=-2000;"
+      )
+
+    conn
+  end
+
+  defp open_writer(path) do
+    File.mkdir_p!(Path.dirname(path))
+    {:ok, conn} = SQLite.open(path)
+
+    :ok =
+      SQLite.execute(
+        conn,
+        "PRAGMA foreign_keys=ON; PRAGMA journal_mode=WAL; PRAGMA synchronous=NORMAL; PRAGMA cache_size=2000; PRAGMA mmap_size=134217728;"
+      )
+
+    initialize(conn)
+    ensure_refresh_index(conn)
+    conn
+  end
+
+  defp ensure_refresh_index(conn) do
+    if run(conn, "SELECT name FROM sqlite_master WHERE type='table' AND name='messages'", []) !=
+         [] do
+      execute!(
+        conn,
+        "CREATE INDEX IF NOT EXISTS index_messages_on_room_id_and_updated_at ON messages(room_id,updated_at)"
+      )
+    end
+  end
+
+  defp initialize(conn) do
+    if run(
+         conn,
+         "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'",
+         []
+       ) == [] do
+      schema = Campfire.Assets.read("compat/database-schema.json") |> Jason.decode!()
+
+      transaction(conn, fn _ ->
+        for sql <- schema["schema"], do: execute!(conn, sql)
+
+        for version <- schema["versions"],
+            do: run(conn, "INSERT INTO schema_migrations (version) VALUES (?)", [version])
+
+        now = Campfire.Chat.timestamp()
+
+        for {key, value} <- [
+              {"environment", System.get_env("RAILS_ENV", "production")},
+              {"schema_sha1", schema["schema_sha1"]}
+            ],
+            do:
+              run(
+                conn,
+                "INSERT INTO ar_internal_metadata (key,value,created_at,updated_at) VALUES (?,?,?,?)",
+                [key, value, now, now]
+              )
+      end)
+      |> case do
+        {:error, error} -> raise error
+        _ -> :ok
+      end
+    end
+  end
+
+  defp restore_fixture(conn, fixture) do
+    execute!(conn, "PRAGMA foreign_keys=OFF")
+
+    # Like transaction/2, a failure rolls back so the writer is never handed
+    # on inside a transaction, and foreign keys are restored on every exit.
+    try do
+      existing =
+        run(
+          conn,
+          "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'",
+          []
+        )
+
+      for %{"name" => name} <- existing, not String.starts_with?(name, "message_search_index_") do
+        execute!(conn, "DROP TABLE IF EXISTS \"#{name}\"")
       end
 
-    {:reply, result, db}
+      for sql <- fixture["schema"], do: execute!(conn, sql)
+      execute!(conn, "BEGIN IMMEDIATE")
+
+      for {table, rows} <- fixture["tables"], row <- rows do
+        fields = Map.keys(row)
+        names = Enum.map_join(fields, ",", &("\"" <> &1 <> "\""))
+        placeholders = Enum.map_join(fields, ",", fn _ -> "?" end)
+
+        run(
+          conn,
+          "INSERT INTO \"#{table}\" (#{names}) VALUES (#{placeholders})",
+          Enum.map(fields, &row[&1])
+        )
+      end
+
+      execute!(conn, "COMMIT")
+    rescue
+      error ->
+        if SQLite.transaction?(conn), do: SQLite.execute(conn, "ROLLBACK")
+        reraise error, __STACKTRACE__
+    after
+      SQLite.execute(conn, "PRAGMA foreign_keys=ON")
+    end
+
+    ensure_refresh_index(conn)
+    :ok
   end
 
-  def handle_call({:transaction, fun}, _, db) do
+  # A transaction on a checked-out writer. SQLite errors roll back and are
+  # returned; anything else rolls back and is re-raised in the caller.
+  defp transaction(conn, fun) do
+    execute!(conn, "BEGIN IMMEDIATE")
+    Process.put(@transaction_db, conn)
+
     try do
-      execute!(db, "BEGIN IMMEDIATE")
-      result = with_transaction_db(db, fn -> fun.(fn sql, params -> run(db, sql, params) end) end)
-      execute!(db, "COMMIT")
-      {:reply, {:ok, result}, db}
+      result = fun.(fn sql, params -> run(conn, sql, params) end)
+      execute!(conn, "COMMIT")
+      result
     rescue
       error in Error ->
-        SQL.execute(db, "ROLLBACK")
-        {:reply, {:ok, {:error, error}}, db}
+        SQLite.execute(conn, "ROLLBACK")
+        {:error, error}
 
       error ->
-        SQL.execute(db, "ROLLBACK")
-
-        {:reply,
-         {:raise, %CallerException{kind: :error, reason: error, stacktrace: __STACKTRACE__}}, db}
+        SQLite.execute(conn, "ROLLBACK")
+        reraise error, __STACKTRACE__
     catch
       kind, reason ->
-        SQL.execute(db, "ROLLBACK")
-
-        {:reply,
-         {:raise, %CallerException{kind: kind, reason: reason, stacktrace: __STACKTRACE__}}, db}
-    end
-  end
-
-  defp query_outside_transaction(sql, params) do
-    result =
-      if select?(sql) and Process.whereis(Campfire.DB.ReadPool) do
-        GenServer.call(
-          {:via, PartitionSupervisor, {Campfire.DB.ReadPool, self()}},
-          {:query, sql, params},
-          15_000
-        )
-      else
-        GenServer.call(__MODULE__, {:query, sql, params})
-      end
-
-    case result do
-      {:raise, %CallerException{kind: kind, reason: reason, stacktrace: stacktrace}} ->
-        :erlang.raise(kind, reason, stacktrace)
-
-      result ->
-        result
-    end
-  end
-
-  defp with_transaction_db(db, fun) do
-    Process.put(@transaction_db, db)
-
-    try do
-      fun.()
+        SQLite.execute(conn, "ROLLBACK")
+        :erlang.raise(kind, reason, __STACKTRACE__)
     after
       Process.delete(@transaction_db)
     end
   end
 
-  defp run(db, sql, params) do
-    stmt = SQL.prepare(db, sql) |> value!()
-
-    try do
-      SQL.bind(stmt, params) |> ok!()
-      columns = SQL.columns(db, stmt) |> value!()
-      rows = SQL.fetch_all(db, stmt) |> value!()
-      Enum.map(rows, &Map.new(Enum.zip(columns, &1)))
-    after
-      SQL.release(db, stmt)
+  defp run(conn, sql, params) do
+    case SQLite.query(conn, sql, params) do
+      {:ok, rows} -> rows
+      {:error, reason} -> raise %Error{reason: reason, message: inspect(reason)}
     end
   end
 
-  # Every parameter is rebound on each use (Sqlite3.bind/2 requires the full positional
-  # count), and columns are read after stepping, so an automatic re-prepare after a
-  # schema change cannot leave stale names. Any failure finalizes the statement, which
-  # also ends a read transaction left open by an incomplete step.
-  defp read(db, stmt, params) do
-    SQL.bind(stmt, params) |> ok!()
-    rows = SQL.fetch_all(db, stmt) |> value!()
-    columns = if rows == [], do: [], else: SQL.columns(db, stmt) |> value!()
-    Enum.map(rows, &Map.new(Enum.zip(columns, &1)))
+  defp rescue_error(fun) do
+    fun.()
   rescue
-    error ->
-      SQL.release(db, stmt)
-      reraise error, __STACKTRACE__
+    error in Error -> {:error, error}
   end
 
-  defp cache(%Reader{statements: statements, limit: limit} = reader, sql, stmt)
-       when map_size(statements) >= limit do
-    {lru, {evicted, _}} = Enum.min_by(statements, fn {_, {_, used}} -> used end)
-    SQL.release(reader.db, evicted)
-    cache(%{reader | statements: Map.delete(statements, lru)}, sql, stmt)
-  end
-
-  defp cache(%Reader{statements: statements, uses: uses} = reader, sql, stmt) do
-    %{reader | statements: Map.put(statements, sql, {stmt, uses + 1}), uses: uses + 1}
+  defp execute!(conn, sql) do
+    case SQLite.execute(conn, sql) do
+      :ok -> :ok
+      {:error, reason} -> raise %Error{reason: reason, message: inspect(reason)}
+    end
   end
 
   defp select?(sql), do: sql |> String.trim_leading() |> String.starts_with?("SELECT")
-
-  defp execute!(db, sql), do: SQL.execute(db, sql) |> ok!()
-  defp ok!(:ok), do: :ok
-  defp ok!({:error, reason}), do: sqlite_error!(reason)
-  defp value!({:ok, value}), do: value
-  defp value!({:error, reason}), do: sqlite_error!(reason)
-
-  defp sqlite_error(reason), do: %Error{reason: reason, message: inspect(reason)}
-
-  defp sqlite_error!(reason), do: raise(sqlite_error(reason))
-
-  def terminate(_, %Reader{db: db, statements: statements}) do
-    for {_, {stmt, _}} <- statements, do: SQL.release(db, stmt)
-    SQL.close(db)
-  end
-
-  def terminate(_, db), do: SQL.close(db)
 end

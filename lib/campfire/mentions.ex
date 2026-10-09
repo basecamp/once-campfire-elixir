@@ -2,6 +2,7 @@ defmodule Campfire.Mentions do
   import Kernel, except: [sigil_r: 2]
   import Campfire.Sigils
   alias Campfire.{Assets, DB, Rails, RichText}
+  @attachments Floki.Selector.Parser.parse("action-text-attachment")
 
   def resolve(attrs) do
     sgid = Map.new(attrs)["sgid"]
@@ -101,7 +102,7 @@ defmodule Campfire.Mentions do
   def users(html) do
     html
     |> RichText.parse()
-    |> Floki.find("action-text-attachment")
+    |> Floki.find(@attachments)
     |> Enum.map(fn {_, attrs, _} -> resolve_verified(attrs) end)
     |> Enum.reject(&is_nil/1)
     |> Enum.uniq_by(& &1["id"])

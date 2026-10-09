@@ -3,14 +3,13 @@ defmodule Campfire.ResponseCache do
   use GenServer
   import Plug.Conn
   alias Campfire.{Auth, Chat}
-  alias Exqlite.Sqlite3, as: SQL
   @fragment_epoch {__MODULE__, :fragment_epoch}
 
   def start_link(opts), do: GenServer.start_link(__MODULE__, opts, name: __MODULE__)
 
   def init(opts) do
-    {:ok, db} = SQL.open(Keyword.fetch!(opts, :path), mode: :readonly)
-    :ok = SQL.execute(db, "PRAGMA query_only=ON")
+    {:ok, db} = Campfire.SQLite.open(Keyword.fetch!(opts, :path), readonly: true)
+    :ok = Campfire.SQLite.execute(db, "PRAGMA query_only=ON")
     Process.flag(:trap_exit, true)
 
     {:ok,
@@ -230,19 +229,9 @@ defmodule Campfire.ResponseCache do
   end
 
   defp database_version(db) do
-    case SQL.prepare(db, "PRAGMA data_version") do
-      {:ok, stmt} ->
-        try do
-          case SQL.fetch_all(db, stmt) do
-            {:ok, [[version]]} -> version
-            _ -> nil
-          end
-        after
-          SQL.release(db, stmt)
-        end
-
-      _ ->
-        nil
+    case Campfire.SQLite.query(db, "PRAGMA data_version") do
+      {:ok, [%{"data_version" => version}]} -> version
+      _ -> nil
     end
   end
 
@@ -274,5 +263,5 @@ defmodule Campfire.ResponseCache do
     end
   end
 
-  def terminate(_, state), do: SQL.close(state.db)
+  def terminate(_, state), do: Campfire.SQLite.close(state.db)
 end

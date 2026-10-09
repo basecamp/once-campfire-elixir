@@ -10,9 +10,7 @@ defmodule Campfire.RichText do
   def raw_parse(html), do: Campfire.HtmlParser.parse(html)
 
   def parse(html) do
-    html = Regex.replace(~r/\A[\x00\x09-\x0d ]+|[\x00\x09-\x0d ]+\z/, html, "")
-
-    html |> raw_parse() |> Campfire.ContentCanonical.nodes()
+    html |> strip() |> raw_parse() |> Campfire.ContentCanonical.nodes()
   end
 
   def render(html),
@@ -303,15 +301,8 @@ defmodule Campfire.RichText do
     if tag in @void, do: "<#{tag}#{attrs}>", else: "<#{tag}#{attrs}>#{body}</#{tag}>"
   end
 
-  defp escape_text(text),
-    do:
-      text
-      |> String.replace("&", "&amp;")
-      |> String.replace("<", "&lt;")
-      |> String.replace(">", "&gt;")
-      |> String.replace("\u00a0", "&nbsp;")
-
-  defp escape_attr(text), do: escape_text(text) |> String.replace("\"", "&quot;")
+  defp escape_text(text), do: Campfire.Escape.text(text)
+  defp escape_attr(text), do: Campfire.Escape.attr(text)
 
   defp plain_nodes(nodes, ancestors) do
     {text, _} =
@@ -378,5 +369,36 @@ defmodule Campfire.RichText do
     end
   end
 
-  defp chomp(text), do: String.replace(text, ~r/(?:\r?\n)+$/, "")
+  # String.replace(text, ~r/(?:\r?\n)+$/, ""): every trailing \n or \r\n.
+  defp chomp(text) when is_binary(text),
+    do: binary_part(text, 0, chomp_size(text, byte_size(text)))
+
+  defp chomp_size(text, size) do
+    cond do
+      size >= 2 and binary_part(text, size - 2, 2) == "\r\n" -> chomp_size(text, size - 2)
+      size >= 1 and :binary.at(text, size - 1) == ?\n -> chomp_size(text, size - 1)
+      true -> size
+    end
+  end
+
+  # Regex.replace(~r/\A[\x00\x09-\x0d ]+|[\x00\x09-\x0d ]+\z/, html, "")
+  defguardp strip?(byte) when byte in [0, 9, 10, 11, 12, 13, 32]
+
+  defp strip(html) when is_binary(html) do
+    start = strip_start(html, 0, byte_size(html))
+    finish = strip_end(html, byte_size(html), start)
+    binary_part(html, start, finish - start)
+  end
+
+  defp strip_start(html, index, size) when index < size do
+    if strip?(:binary.at(html, index)), do: strip_start(html, index + 1, size), else: index
+  end
+
+  defp strip_start(_html, index, _size), do: index
+
+  defp strip_end(html, index, start) when index > start do
+    if strip?(:binary.at(html, index - 1)), do: strip_end(html, index - 1, start), else: index
+  end
+
+  defp strip_end(_html, index, _start), do: index
 end

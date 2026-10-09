@@ -95,7 +95,7 @@ bin/rails-to-elixir doctor
 bin/parity-services stop
 ```
 
-The native suite passes **1,961 tests**. The historical **65-gate** token-era parity run covered the
+The native suite passes **1,969 tests**. The historical **65-gate** token-era parity run covered the
 reviewed backend; fresh shared browser checks cover the current frontend.
 Verification includes actual
 Chromium flows, all-table/FTS/storage mutation snapshots, injected transaction
@@ -173,7 +173,7 @@ The compatibility checks retain explicit rich-text comparison rules:
   failed-message partial.
 
 The corpus covers 1,058 stored-content cases. The native parser uses Gumbo sources from Rails' Nokogiri 1.19.4,
-with allocation limits and isolated, supervised worker processes. Expected oracle output is retained;
+as a NIF with a 256 MiB per-parse allocation limit; exceeding it fails that parse without stopping the VM. Expected oracle output is retained;
 raw differences and the comparison rules are documented in
 [`plans/richtext-comparison.md`](plans/richtext-comparison.md).
 
