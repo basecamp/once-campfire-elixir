@@ -26,7 +26,7 @@ defmodule Campfire.HtmlParser do
     nodes = if byte_size(html) > @dirty_bytes, do: parse_dirty(html), else: parse_nif(html)
 
     case nodes do
-      {:error, message} -> raise ArgumentError, message
+      {:error, message} -> raise ArgumentError, to_string(message)
       nodes -> nodes
     end
   end
@@ -36,4 +36,8 @@ defmodule Campfire.HtmlParser do
 
   @doc false
   def parse_dirty(_html), do: :erlang.nif_error(:not_loaded)
+
+  # A parse with a lower allocation limit in bytes, for tests.
+  @doc false
+  def parse_limited(_html, _limit), do: :erlang.nif_error(:not_loaded)
 end

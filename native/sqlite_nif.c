@@ -67,16 +67,23 @@ static void connection_destructor(ErlNifEnv *env, void *object) {
   if (c->mutex) enif_mutex_destroy(c->mutex);
 }
 
-static ERL_NIF_TERM make_binary(ErlNifEnv *env, const void *data, size_t size) {
-  ERL_NIF_TERM term;
-  unsigned char *buffer = enif_make_new_binary(env, size, &term);
+/* A new binary holding data; 0 when it cannot be allocated. */
+static int make_binary(ErlNifEnv *env, const void *data, size_t size, ERL_NIF_TERM *term) {
+  unsigned char *buffer = enif_make_new_binary(env, size, term);
+  if (!buffer) return 0;
   if (size) memcpy(buffer, data, size);
-  return term;
+  return 1;
+}
+
+/* {error, Message}, or {error, enomem} if the message cannot be allocated. */
+static ERL_NIF_TERM error_text(ErlNifEnv *env, const char *message) {
+  ERL_NIF_TERM text;
+  if (!make_binary(env, message, strlen(message), &text)) text = enif_make_atom(env, "enomem");
+  return enif_make_tuple2(env, atom_error, text);
 }
 
 static ERL_NIF_TERM error_message(ErlNifEnv *env, connection_t *c) {
-  const char *message = c->db ? sqlite3_errmsg(c->db) : "connection closed";
-  return enif_make_tuple2(env, atom_error, make_binary(env, message, strlen(message)));
+  return error_text(env, c->db ? sqlite3_errmsg(c->db) : "connection closed");
 }
 
 static char *nul_terminated(ErlNifBinary *bin) {
@@ -106,15 +113,17 @@ static ERL_NIF_TERM open_nif(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]
   int rc = sqlite3_open_v2(filename, &db, flags, NULL);
   free(filename);
   if (rc != SQLITE_OK) {
-    const char *message = db ? sqlite3_errmsg(db) : sqlite3_errstr(rc);
-    ERL_NIF_TERM error =
-        enif_make_tuple2(env, atom_error, make_binary(env, message, strlen(message)));
+    ERL_NIF_TERM error = error_text(env, db ? sqlite3_errmsg(db) : sqlite3_errstr(rc));
     sqlite3_close_v2(db);
     return error;
   }
   sqlite3_busy_timeout(db, busy_timeout);
 
   connection_t *c = enif_alloc_resource(connection_type, sizeof(connection_t));
+  if (!c) {
+    sqlite3_close_v2(db);
+    return enif_raise_exception(env, enif_make_atom(env, "enomem"));
+  }
   memset(c, 0, sizeof(*c));
   c->db = db;
   c->mutex = enif_mutex_create("campfire_sqlite");
@@ -148,8 +157,7 @@ static ERL_NIF_TERM execute_nif(ErlNifEnv *env, int argc, const ERL_NIF_TERM arg
     if (sqlite3_exec(c->db, text, NULL, NULL, &message) == SQLITE_OK) {
       result = atom_ok;
     } else {
-      const char *m = message ? message : sqlite3_errmsg(c->db);
-      result = enif_make_tuple2(env, atom_error, make_binary(env, m, strlen(m)));
+      result = error_text(env, message ? message : sqlite3_errmsg(c->db));
     }
     sqlite3_free(message);
   }
@@ -228,19 +236,20 @@ static int refresh_columns(statement_t *s) {
   return 1;
 }
 
-static ERL_NIF_TERM column_value(ErlNifEnv *env, sqlite3_stmt *stmt, int i) {
+/* The column's value; 0 when a text or blob cannot be allocated. */
+static int column_value(ErlNifEnv *env, sqlite3_stmt *stmt, int i, ERL_NIF_TERM *value) {
   switch (sqlite3_column_type(stmt, i)) {
-    case SQLITE_INTEGER: return enif_make_int64(env, sqlite3_column_int64(stmt, i));
-    case SQLITE_FLOAT: return enif_make_double(env, sqlite3_column_double(stmt, i));
+    case SQLITE_INTEGER: *value = enif_make_int64(env, sqlite3_column_int64(stmt, i)); return 1;
+    case SQLITE_FLOAT: *value = enif_make_double(env, sqlite3_column_double(stmt, i)); return 1;
     case SQLITE_TEXT: {
       const unsigned char *text = sqlite3_column_text(stmt, i);
-      return make_binary(env, text, sqlite3_column_bytes(stmt, i));
+      return make_binary(env, text, sqlite3_column_bytes(stmt, i), value);
     }
     case SQLITE_BLOB: {
       const void *blob = sqlite3_column_blob(stmt, i);
-      return make_binary(env, blob, sqlite3_column_bytes(stmt, i));
+      return make_binary(env, blob, sqlite3_column_bytes(stmt, i), value);
     }
-    default: return atom_nil;
+    default: *value = atom_nil; return 1;
   }
 }
 
@@ -339,15 +348,17 @@ static int bind(ErlNifEnv *env, connection_t *c, sqlite3_stmt *stmt, ERL_NIF_TER
   return 0;
 }
 
-static ERL_NIF_TERM make_row(ErlNifEnv *env, statement_t *s, ERL_NIF_TERM *keys, ERL_NIF_TERM *values) {
-  ERL_NIF_TERM row;
+/* The current row as a map; 0 when a value cannot be allocated. */
+static int make_row(ErlNifEnv *env, statement_t *s, ERL_NIF_TERM *keys, ERL_NIF_TERM *values,
+                    ERL_NIF_TERM *row) {
   int count = s->column_count;
-  for (int i = 0; i < count; i++) values[i] = column_value(env, s->stmt, i);
-  if (!s->duplicate_columns && enif_make_map_from_arrays(env, keys, values, count, &row)) return row;
+  for (int i = 0; i < count; i++)
+    if (!column_value(env, s->stmt, i, &values[i])) return 0;
+  if (!s->duplicate_columns && enif_make_map_from_arrays(env, keys, values, count, row)) return 1;
   /* Like Map.new/1: the last column with a name wins. */
-  row = enif_make_new_map(env);
-  for (int i = 0; i < count; i++) enif_make_map_put(env, row, keys[i], values[i], &row);
-  return row;
+  *row = enif_make_new_map(env);
+  for (int i = 0; i < count; i++) enif_make_map_put(env, *row, keys[i], values[i], row);
+  return 1;
 }
 
 /* query(conn, sql, params) -> {ok, Rows} | {error, Message} | {arity, N} | ... */
@@ -400,7 +411,12 @@ static ERL_NIF_TERM query_nif(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[
       }
       for (int i = 0; i < s->column_count; i++) keys[i] = enif_make_copy(env, s->columns[i]);
     }
-    rows = enif_make_list_cell(env, make_row(env, s, keys, values), rows);
+    ERL_NIF_TERM row;
+    if (!make_row(env, s, keys, values, &row)) {
+      rc = SQLITE_NOMEM;
+      break;
+    }
+    rows = enif_make_list_cell(env, row, rows);
   }
   free(keys);
   free(values);
@@ -410,7 +426,7 @@ static ERL_NIF_TERM query_nif(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[
     enif_make_reverse_list(env, rows, &ordered);
     result = enif_make_tuple2(env, atom_ok, ordered);
   } else if (rc == SQLITE_NOMEM) {
-    result = enif_make_tuple2(env, atom_error, make_binary(env, "out of memory", 13));
+    result = error_text(env, "out of memory");
   } else {
     result = error_message(env, c);
   }
@@ -454,7 +470,12 @@ static ERL_NIF_TERM statements_nif(ErlNifEnv *env, int argc, const ERL_NIF_TERM 
       if (c->statements[i].used < seen && (!next || c->statements[i].used > next->used))
         next = &c->statements[i];
     if (!next) break;
-    list = enif_make_list_cell(env, make_binary(env, next->sql, next->sql_size), list);
+    ERL_NIF_TERM sql;
+    if (!make_binary(env, next->sql, next->sql_size, &sql)) {
+      enif_mutex_unlock(c->mutex);
+      return enif_raise_exception(env, enif_make_atom(env, "enomem"));
+    }
+    list = enif_make_list_cell(env, sql, list);
     seen = next->used;
   }
   enif_mutex_unlock(c->mutex);

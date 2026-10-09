@@ -47,11 +47,16 @@ defmodule Campfire.HtmlParserTest do
     assert HtmlParser.parse("<p>alive</p>") == [{"p", [], ["alive"]}]
   end
 
+  # A lower, test-only cap keeps the concurrent failures within CI memory
+  # (the production cap is checked above). If a failed parse left its
+  # accounting behind, even a small parse on that thread would fail.
   test "failed parses release their memory on every scheduler thread" do
     runs = 2 * System.schedulers_online()
+    limit = 16 * 1024 * 1024
+    html = String.duplicate("<p>x</p>", 1_000)
 
     1..runs
-    |> Task.async_stream(fn _ -> HtmlParser.parse_dirty(@pathological) end,
+    |> Task.async_stream(fn _ -> HtmlParser.parse_limited(@pathological, limit) end,
       max_concurrency: runs,
       timeout: 120_000
     )
@@ -59,14 +64,12 @@ defmodule Campfire.HtmlParserTest do
       assert {:ok, {:error, "HTML parser allocation limit exceeded"}} = result
     end)
 
-    html = String.duplicate("<p>x</p>", 70_000)
-
     1..runs
-    |> Task.async_stream(fn _ -> length(HtmlParser.parse_dirty(html)) end,
+    |> Task.async_stream(fn _ -> length(HtmlParser.parse_limited(html, limit)) end,
       max_concurrency: runs,
       timeout: 120_000
     )
-    |> Enum.each(&assert(&1 == {:ok, 70_000}))
+    |> Enum.each(&assert(&1 == {:ok, 1_000}))
   end
 
   test "concurrent parses do not share allocation state" do

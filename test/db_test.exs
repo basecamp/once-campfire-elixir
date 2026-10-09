@@ -159,6 +159,17 @@ defmodule Campfire.DBTest do
     end
   end
 
+  test "a failed fixture restore rolls back and restores foreign keys" do
+    broken = put_in(@fixture, ["tables", "accounts"], [%{"no_such_column" => 1}])
+    assert_raise DB.Error, fn -> DB.restore_fixture(broken) end
+
+    {writer, _readers} = :persistent_term.get({DB, :connections})
+    refute SQLite.transaction?(writer)
+    assert [%{"foreign_keys" => 1}] = DB.query("PRAGMA foreign_keys")
+    assert %{owner: nil} = :sys.get_state(DB)
+    assert :ok = DB.restore_fixture(@fixture)
+  end
+
   test "expected SQLite errors are returned without crashing the writer" do
     assert {:error, %DB.Error{}} = DB.query("SELECT * FROM missing_table")
     assert {:error, %DB.Error{}} = DB.one("SELECT * FROM missing_table")

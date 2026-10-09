@@ -205,33 +205,44 @@ defmodule Campfire.DB do
   defp restore_fixture(conn, fixture) do
     execute!(conn, "PRAGMA foreign_keys=OFF")
 
-    existing =
-      run(
-        conn,
-        "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'",
-        []
-      )
+    # Like transaction/2, a failure rolls back so the writer is never handed
+    # on inside a transaction, and foreign keys are restored on every exit.
+    try do
+      existing =
+        run(
+          conn,
+          "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'",
+          []
+        )
 
-    for %{"name" => name} <- existing, not String.starts_with?(name, "message_search_index_") do
-      execute!(conn, "DROP TABLE IF EXISTS \"#{name}\"")
+      for %{"name" => name} <- existing, not String.starts_with?(name, "message_search_index_") do
+        execute!(conn, "DROP TABLE IF EXISTS \"#{name}\"")
+      end
+
+      for sql <- fixture["schema"], do: execute!(conn, sql)
+      execute!(conn, "BEGIN IMMEDIATE")
+
+      for {table, rows} <- fixture["tables"], row <- rows do
+        fields = Map.keys(row)
+        names = Enum.map_join(fields, ",", &("\"" <> &1 <> "\""))
+        placeholders = Enum.map_join(fields, ",", fn _ -> "?" end)
+
+        run(
+          conn,
+          "INSERT INTO \"#{table}\" (#{names}) VALUES (#{placeholders})",
+          Enum.map(fields, &row[&1])
+        )
+      end
+
+      execute!(conn, "COMMIT")
+    rescue
+      error ->
+        if SQLite.transaction?(conn), do: SQLite.execute(conn, "ROLLBACK")
+        reraise error, __STACKTRACE__
+    after
+      SQLite.execute(conn, "PRAGMA foreign_keys=ON")
     end
 
-    for sql <- fixture["schema"], do: execute!(conn, sql)
-    execute!(conn, "BEGIN IMMEDIATE")
-
-    for {table, rows} <- fixture["tables"], row <- rows do
-      fields = Map.keys(row)
-      names = Enum.map_join(fields, ",", &("\"" <> &1 <> "\""))
-      placeholders = Enum.map_join(fields, ",", fn _ -> "?" end)
-
-      run(
-        conn,
-        "INSERT INTO \"#{table}\" (#{names}) VALUES (#{placeholders})",
-        Enum.map(fields, &row[&1])
-      )
-    end
-
-    execute!(conn, "COMMIT; PRAGMA foreign_keys=ON")
     ensure_refresh_index(conn)
     :ok
   end

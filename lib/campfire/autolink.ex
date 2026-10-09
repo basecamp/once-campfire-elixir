@@ -11,8 +11,12 @@ defmodule Campfire.Autolink do
   @www for a <- ~w(w W), b <- ~w(w W), c <- ~w(w W), do: a <> b <> c <> "."
 
   def render(html) do
-    html = if :binary.match(html, url_marker()), do: replace(html, @urls, &url/1), else: html
-    if :binary.match(html, "@"), do: replace(html, @emails, &email/1), else: html
+    html =
+      if :binary.match(html, url_marker()) != :nomatch,
+        do: replace(html, @urls, &url/1),
+        else: html
+
+    if :binary.match(html, "@") != :nomatch, do: replace(html, @emails, &email/1), else: html
   end
 
   defp url_marker do
