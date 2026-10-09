@@ -17,6 +17,9 @@ defmodule Campfire.HttpCompression do
     else
       raw = List.first(get_req_header(conn, "accept-encoding")) || ""
       # Like the Rust and Go front servers, bodies under 1 KiB are not worth gzipping.
+      # File responses (:set_file) are not checked: the only bundled one under
+      # 1 KiB is default-bot-avatar.svg, and the other files are PNG/JPEG
+      # images, which don't benefit from gzip anyway.
       small = conn.state != :set_file and IO.iodata_length(body) < 1024
 
       case encoding(raw) do
