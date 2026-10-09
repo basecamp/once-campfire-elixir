@@ -27,8 +27,6 @@ defmodule Campfire.Application do
         children
       end
 
-    children = children ++ Campfire.HtmlParser.children()
-
     children =
       case {System.get_env("REDIS_URL"), System.get_env("CAMPFIRE_CABLE_REDIS_BRIDGE")} do
         {url, "1"} when is_binary(url) ->

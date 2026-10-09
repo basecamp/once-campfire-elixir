@@ -20,6 +20,11 @@ void* gumbo_alloc(size_t size) XMALLOC;
 void* gumbo_realloc(void* ptr, size_t size) RETURNS_NONNULL;
 void gumbo_free(void* ptr);
 void gumbo_set_allocation_limit(size_t size);
+#ifdef GUMBO_NIF
+// Provided by the embedding NIF; must not return.
+void gumbo_allocation_failed(void);
+void gumbo_free_all(void);
+#endif
 
 // Debug wrapper for printf
 #ifdef GUMBO_DEBUG
