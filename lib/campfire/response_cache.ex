@@ -1,35 +1,105 @@
 defmodule Campfire.ResponseCache do
-  @moduledoc "Bounded complete response representations with fresh authorization and cookies."
+  @moduledoc """
+  Bounded complete response representations with fresh authorization and cookies.
+
+  The owning process holds the dedicated SQLite connection that observes commits
+  (`PRAGMA data_version`), admits and evicts entries, and keeps the byte accounting. The
+  entries themselves live in a public ETS table tagged with the epoch they were admitted
+  under: a request captures its epoch with one owner call before authentication, reads the
+  entry itself, and confirms with a second, equally small call that the epoch is still
+  current before acting on anything it read. Authentication and room authorization rows
+  read on that path are remembered under the same epoch, so a warm request does no SQLite
+  query at all; any commit by any writer advances the epoch and retires both tables.
+  """
   use GenServer
   import Plug.Conn
-  alias Campfire.{Auth, Chat}
+  alias Campfire.{Auth, Chat, Rails}
   alias Exqlite.Sqlite3, as: SQL
   @fragment_epoch {__MODULE__, :fragment_epoch}
+  @entries __MODULE__.Entries
+  @authorization __MODULE__.Authorization
+  @authorization_capacity 4096
 
   def start_link(opts), do: GenServer.start_link(__MODULE__, opts, name: __MODULE__)
 
   def init(opts) do
     {:ok, db} = SQL.open(Keyword.fetch!(opts, :path), mode: :readonly)
     :ok = SQL.execute(db, "PRAGMA query_only=ON")
+    {:ok, statement} = SQL.prepare(db, "PRAGMA data_version")
     Process.flag(:trap_exit, true)
 
+    for table <- [@entries, @authorization] do
+      :ets.new(table, [
+        :named_table,
+        :set,
+        :public,
+        read_concurrency: true,
+        write_concurrency: true
+      ])
+    end
+
     {:ok,
-     %{db: db, version: nil, incarnation: make_ref(), entries: %{}, queue: :queue.new(), bytes: 0}}
+     %{
+       db: db,
+       statement: statement,
+       version: nil,
+       incarnation: make_ref(),
+       queue: :queue.new(),
+       bytes: 0
+     }}
   end
 
   def call(conn, _) do
     # Every render, including flash/conditional and cache-disabled paths, must
-    # namespace timestamp-only fragments before its first authenticated read.
-    Process.put(@fragment_epoch, snapshot())
+    # namespace timestamp-only fragments before its first authenticated read, which for
+    # eligible requests already happened in `authenticate/1`. Routes that never render
+    # fragments skip the owner entirely.
+    if fragments?(conn) and not captured?(), do: Process.put(@fragment_epoch, snapshot())
+    serve(conn, true)
+  end
+
+  @doc """
+  The request's session for plugs that run before the cache. An eligible request captures
+  its epoch here, resolves the rows under it and keeps them for `call/2` and the handler,
+  so a page is authenticated once; any other request is authenticated as before.
+  """
+  def authenticate(conn) do
+    if eligible?(conn) && limit() > 0 do
+      if not captured?(), do: Process.put(@fragment_epoch, snapshot())
+      {conn, user, session} = session_user(conn, fragment_epoch(), true)
+      conn = if user, do: assign(conn, :response_cache_auth, {user, session}), else: conn
+      {conn, user, session}
+    else
+      Auth.session_user(conn)
+    end
+  end
+
+  @doc "The rows from `authenticate/1` read again from the database, for a response sent before `call/2`."
+  def reauthenticate(%{assigns: %{response_cache_auth: _}} = conn, _user, _session),
+    do: Auth.session_user(%{conn | assigns: Map.delete(conn.assigns, :response_cache_auth)})
+
+  def reauthenticate(conn, user, session), do: {conn, user, session}
+
+  defp captured?, do: Process.get(@fragment_epoch, :uncaptured) != :uncaptured
+
+  # Rows and entries are acted on only once the owner confirms, after they were read, that
+  # the request's epoch is still current. If a commit landed in between, the request
+  # captures the new epoch and authenticates from the database once more.
+  defp serve(conn, remembered?) do
     epoch = if eligible?(conn) && limit() > 0, do: fragment_epoch()
 
     if epoch do
       # Capture before authentication; a commit during auth must prevent reuse/admission.
-      {conn, user, session} = Auth.session_user(conn)
+      {conn, user, session} =
+        case conn.assigns do
+          %{response_cache_auth: {user, session}} when remembered? -> {conn, user, session}
+          _ -> session_user(conn, epoch, remembered?)
+        end
+
       {conn, data} = Auth.browser_session(conn)
 
-      if user && !data["flash"] && accessible?(conn, user) do
-        conn =
+      if user && !data["flash"] && accessible?(conn, user, epoch, remembered?) do
+        authorized =
           conn
           |> assign(:response_cache_auth, {user, session})
           |> assign(:response_cache_session, data)
@@ -53,38 +123,20 @@ defmodule Campfire.ResponseCache do
             )
           )
 
-        case get(key, epoch) do
-          nil ->
-            assign(conn, :response_cache_capture, {key, epoch})
+        entry = get(key, epoch)
 
-          entry ->
-            conn =
-              Enum.reduce(entry.headers, conn, fn {name, value}, acc ->
-                put_resp_header(acc, name, value)
-              end)
+        cond do
+          current?(epoch) ->
+            if entry,
+              do: serve_hit(authorized, entry, session, data),
+              else: assign(authorized, :response_cache_capture, {key, epoch})
 
-            conn =
-              if "session_token" in entry.cookies,
-                do: Auth.set_auth_cookie(conn, session),
-                else: conn
+          remembered? ->
+            Process.put(@fragment_epoch, snapshot())
+            serve(%{conn | assigns: Map.delete(conn.assigns, :response_cache_auth)}, false)
 
-            conn =
-              if "_campfire_session" in entry.cookies,
-                do: Auth.set_browser_session(conn, data),
-                else: conn
-
-            conn =
-              if "last_room" in entry.cookies do
-                [_, id] = Regex.run(~r{^/rooms/(\d+)}, conn.request_path)
-
-                put_resp_cookie(conn, "last_room", id,
-                  max_age: DateTime.diff(Auth.permanent_expiry(), Campfire.Clock.now())
-                )
-              else
-                conn
-              end
-
-            conn |> assign(:response_cache_hit, true) |> send_resp(200, entry.body) |> halt()
+          true ->
+            assign(authorized, :response_cache_capture, {key, epoch})
         end
       else
         conn
@@ -92,6 +144,36 @@ defmodule Campfire.ResponseCache do
     else
       conn
     end
+  end
+
+  defp serve_hit(conn, entry, session, data) do
+    conn =
+      Enum.reduce(entry.headers, conn, fn {name, value}, acc ->
+        put_resp_header(acc, name, value)
+      end)
+
+    conn =
+      if "session_token" in entry.cookies,
+        do: Auth.set_auth_cookie(conn, session),
+        else: conn
+
+    conn =
+      if "_campfire_session" in entry.cookies,
+        do: Auth.set_browser_session(conn, data),
+        else: conn
+
+    conn =
+      if "last_room" in entry.cookies do
+        [_, id] = Regex.run(~r{^/rooms/(\d+)}, conn.request_path)
+
+        put_resp_cookie(conn, "last_room", id,
+          max_age: DateTime.diff(Auth.permanent_expiry(), Campfire.Clock.now())
+        )
+      else
+        conn
+      end
+
+    conn |> assign(:response_cache_hit, true) |> send_resp(200, entry.body) |> halt()
   end
 
   # HttpResponse calls this after validators/compression have selected the final
@@ -160,16 +242,91 @@ defmodule Campfire.ResponseCache do
       )
   end
 
-  defp accessible?(conn, user) do
-    case Regex.run(~r{^/rooms/(\d+)}, conn.request_path) do
-      [_, id] -> Chat.room(user, id) != nil
-      nil -> true
+  # Health, Cable, avatar, logo and QR reads render no fragments and need no epoch.
+  defp fragments?(%{method: "GET", request_path: path}) do
+    path not in ["/up", "/cable"] and
+      not String.starts_with?(path, "/account/logo") and
+      not String.starts_with?(path, "/qr_code/") and
+      not Regex.match?(~r{^/users/[^/]+/avatar$}, path)
+  end
+
+  defp fragments?(_conn), do: true
+
+  # The session and user rows for a verified cookie, remembered under the request's epoch.
+  # Resuming still runs so an idle session is touched exactly as before.
+  defp session_user(conn, epoch, remembered?) do
+    conn = fetch_cookies(conn)
+
+    with raw when is_binary(raw) <- conn.cookies["session_token"],
+         token when is_binary(token) <- Rails.verify_cookie("session_token", URI.decode(raw)) do
+      case remembered? && lookup(@authorization, {epoch, :session, token}) do
+        [{_, {user, session}}] ->
+          {conn, user, Auth.resume_session(conn, session)}
+
+        _ ->
+          case Auth.session_user(conn) do
+            {conn, user, session} when is_map(user) ->
+              remember({epoch, :session, token}, {user, session})
+              {conn, user, session}
+
+            {conn, _, _} ->
+              {conn, nil, nil}
+          end
+      end
+    else
+      _ -> {conn, nil, nil}
     end
+  end
+
+  defp accessible?(conn, user, epoch, remembered?) do
+    case user && Regex.run(~r{^/rooms/(\d+)}, conn.request_path) do
+      [_, id] ->
+        key = {epoch, :room, user["id"], id}
+
+        case remembered? && lookup(@authorization, key) do
+          [{^key, room}] ->
+            room != nil
+
+          _ ->
+            room = Chat.room(user, id)
+            remember(key, room)
+            room != nil
+        end
+
+      _ ->
+        true
+    end
+  end
+
+  # A full table stops remembering until the next commit retires it; every commit does.
+  defp remember(key, value) do
+    if :ets.info(@authorization, :size) < @authorization_capacity,
+      do: :ets.insert(@authorization, {key, value})
+  rescue
+    ArgumentError -> false
+  end
+
+  # While the owner is restarting its tables are gone; that is a miss, not an error.
+  defp lookup(table, key) do
+    :ets.lookup(table, key)
+  rescue
+    ArgumentError -> []
   end
 
   def snapshot, do: GenServer.call(__MODULE__, :snapshot)
   def epoch, do: GenServer.call(__MODULE__, :epoch)
-  def get(key, epoch), do: GenServer.call(__MODULE__, {:get, key, epoch})
+
+  @doc "Whether `epoch` is still the database's current epoch, observed now."
+  def current?(epoch), do: GenServer.call(__MODULE__, {:current?, epoch})
+
+  @doc "The entry admitted under `epoch`, read from the table without the owner."
+  def get(key, epoch) do
+    case lookup(@entries, key) do
+      [{^key, ^epoch, entry}] when epoch != nil -> if limit() > 0, do: entry
+      _ -> nil
+    end
+  end
+
   def put(key, epoch, entry), do: GenServer.call(__MODULE__, {:put, key, epoch, entry})
   def clear, do: GenServer.call(__MODULE__, :clear)
 
@@ -185,17 +342,16 @@ defmodule Campfire.ResponseCache do
      state}
   end
 
-  def handle_call(:clear, _, state), do: {:reply, :ok, clear_state(state)}
-
-  def handle_call({:get, key, epoch}, _, state) do
+  def handle_call({:current?, epoch}, _, state) do
     state = observe(state)
 
-    value =
-      if state.version != nil && epoch == {state.incarnation, state.version} && limit() > 0,
-        do: Map.get(state.entries, key)
-
-    {:reply, value, state}
+    {:reply, limit() > 0 && state.version != nil && epoch == {state.incarnation, state.version},
+     state}
   end
+
+  # Clearing also retires every epoch captured so far, so nothing read before it is acted on.
+  def handle_call(:clear, _, state),
+    do: {:reply, :ok, %{clear_state(state) | incarnation: make_ref()}}
 
   def handle_call({:put, key, epoch, entry}, _, state) do
     state = observe(state)
@@ -204,15 +360,10 @@ defmodule Campfire.ResponseCache do
     state =
       if state.version != nil && epoch == {state.incarnation, state.version} && bytes <= limit() &&
            limit() > 0 &&
-           !Map.has_key?(state.entries, key) do
+           !:ets.member(@entries, key) do
         state = evict(state, bytes)
-
-        %{
-          state
-          | entries: Map.put(state.entries, key, entry),
-            queue: :queue.in({key, bytes}, state.queue),
-            bytes: state.bytes + bytes
-        }
+        :ets.insert(@entries, {key, epoch, entry})
+        %{state | queue: :queue.in({key, bytes}, state.queue), bytes: state.bytes + bytes}
       else
         state
       end
@@ -221,7 +372,7 @@ defmodule Campfire.ResponseCache do
   end
 
   defp observe(state) do
-    version = database_version(state.db)
+    {version, state} = database_version(state)
     state = if limit() == 0, do: clear_state(state), else: state
 
     if version == state.version && version != nil,
@@ -229,39 +380,32 @@ defmodule Campfire.ResponseCache do
       else: %{clear_state(state) | version: version}
   end
 
-  defp database_version(db) do
-    case SQL.prepare(db, "PRAGMA data_version") do
-      {:ok, stmt} ->
-        try do
-          case SQL.fetch_all(db, stmt) do
-            {:ok, [[version]]} -> version
-            _ -> nil
-          end
-        after
-          SQL.release(db, stmt)
-        end
+  # The statement stays prepared across calls; one that fails to step is replaced.
+  defp database_version(%{db: db, statement: statement} = state) do
+    case SQL.step(db, statement) do
+      {:row, [version]} ->
+        SQL.reset(statement)
+        {version, state}
 
       _ ->
-        nil
+        SQL.release(db, statement)
+        {:ok, statement} = SQL.prepare(db, "PRAGMA data_version")
+        {nil, %{state | statement: statement}}
     end
   end
 
-  defp clear_state(state), do: %{state | entries: %{}, queue: :queue.new(), bytes: 0}
-  defp evict(state, _bytes) when map_size(state.entries) == 0, do: state
+  defp clear_state(state) do
+    :ets.delete_all_objects(@entries)
+    :ets.delete_all_objects(@authorization)
+    %{state | queue: :queue.new(), bytes: 0}
+  end
 
   defp evict(state, bytes) do
-    if state.bytes + bytes > limit() || map_size(state.entries) >= 4096 do
+    if (state.bytes + bytes > limit() || :ets.info(@entries, :size) >= 4096) &&
+         not :queue.is_empty(state.queue) do
       {{:value, {key, old_bytes}}, queue} = :queue.out(state.queue)
-
-      evict(
-        %{
-          state
-          | entries: Map.delete(state.entries, key),
-            queue: queue,
-            bytes: state.bytes - old_bytes
-        },
-        bytes
-      )
+      :ets.delete(@entries, key)
+      evict(%{state | queue: queue, bytes: state.bytes - old_bytes}, bytes)
     else
       state
     end
@@ -274,5 +418,8 @@ defmodule Campfire.ResponseCache do
     end
   end
 
-  def terminate(_, state), do: SQL.close(state.db)
+  def terminate(_, %{db: db, statement: statement}) do
+    SQL.release(db, statement)
+    SQL.close(db)
+  end
 end

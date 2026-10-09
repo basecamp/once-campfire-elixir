@@ -49,7 +49,9 @@ defmodule Campfire.BrowserGuard do
   end
 
   defp show_if_authorized(conn) do
-    {conn, user, session} = if public?(conn), do: {conn, nil, nil}, else: Auth.session_user(conn)
+    {conn, user, session} =
+      if public?(conn), do: {conn, nil, nil}, else: Campfire.ResponseCache.authenticate(conn)
+
     bot_key = conn.path_params["bot_key"]
 
     query_bot =
@@ -80,6 +82,8 @@ defmodule Campfire.BrowserGuard do
         conn
 
       true ->
+        # This page is sent from here, so its rows come from the database, as they did.
+        {conn, user, session} = Campfire.ResponseCache.reauthenticate(conn, user, session)
         conn = if session, do: Auth.set_auth_cookie(conn, session), else: conn
         {conn, data} = Auth.browser_session(conn)
         raw = List.first(get_req_header(conn, "user-agent")) || ""
