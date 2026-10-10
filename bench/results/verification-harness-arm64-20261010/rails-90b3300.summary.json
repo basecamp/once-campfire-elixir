@@ -1,0 +1,93 @@
+{
+  "metadata": {
+    "verification_revision": "ec02debb3e44f40b8778a6a42db3c4515b2f9eaf",
+    "response_validation": "route-contract-v1",
+    "started_at": "2026-10-10T07:48:50Z",
+    "seed_sha256": "1295f8a392308a760475e66c4783983b8fd45fa49d47f7d85eeacf13afc34a38",
+    "server_cpus": "8-11",
+    "client_cpus": "12-15",
+    "network": "host",
+    "gzip": true,
+    "duration": 8,
+    "concurrencies": "16",
+    "rounds": 3,
+    "loadgen_sha256": "d6c0c9565195b06df0084e30e209817bd532dd7b9c18dd34684cda09ad27652e",
+    "routes": "room_show,messages_page,sidebar,search,avatar,static_css,up,post_message",
+    "profile": "read-and-post-v1",
+    "mixed_writer": null,
+    "images": {
+      "rails": "sha256:acd36eedae55dffc22e127c4dc526295defc3d7ed1374efa916e6c86a27a73b0"
+    },
+    "image_labels": {
+      "rails": {
+        "org.opencontainers.image.description": "",
+        "org.opencontainers.image.licenses": "MIT",
+        "org.opencontainers.image.source": ""
+      }
+    },
+    "source_revisions": {
+      "rails": {
+        "head": "90b330024dec3e757c79b6a7e6568f93da8e3148",
+        "dirty": false
+      }
+    },
+    "preflight_only": false,
+    "topology": {
+      "rails": {
+        "http_workers": "3",
+        "threads": "5",
+        "jobs": "Redis/Resque",
+        "cable": "Action Cable",
+        "response_cache_mb": "64"
+      }
+    },
+    "runtimes": {
+      "rails": "rails"
+    },
+    "complete": true
+  },
+  "results": {
+    "rails": {
+      "room_show": {
+        "median_rps": 178.4,
+        "runs": [
+          178.4,
+          170.5,
+          185.4
+        ]
+      },
+      "messages_page": {
+        "median_rps": 286.2,
+        "runs": [
+          331.3,
+          273.9,
+          286.2
+        ]
+      },
+      "sidebar": {
+        "median_rps": 469.3,
+        "runs": [
+          467.4,
+          507.5,
+          469.3
+        ]
+      },
+      "search": {
+        "median_rps": 310.2,
+        "runs": [
+          296.0,
+          337.4,
+          310.2
+        ]
+      },
+      "post_message": {
+        "median_rps": 223.3,
+        "runs": [
+          205.4,
+          236.5,
+          223.3
+        ]
+      }
+    }
+  }
+}

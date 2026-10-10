@@ -1,0 +1,13 @@
+diff --git a/bench/contracts.rb b/bench/contracts.rb
+index 84ca829..518754e 100644
+--- a/bench/contracts.rb
++++ b/bench/contracts.rb
+@@ -37,7 +37,7 @@ module BenchmarkContracts
+     expected_db_ids = {
+       "room_show" => sql.call(database, "SELECT id FROM messages WHERE room_id=#{room} ORDER BY created_at DESC LIMIT 40").map { |v| v.fetch("id") }.reverse,
+       "messages_page" => sql.call(database, "SELECT id FROM messages WHERE room_id=#{room} AND created_at < (SELECT created_at FROM messages WHERE id=#{anchor}) ORDER BY created_at DESC LIMIT 40").map { |v| v.fetch("id") }.reverse,
+-      "search" => sql.call(database, "SELECT m.id FROM messages m JOIN message_search_index idx ON idx.rowid=m.id JOIN memberships mm ON mm.room_id=m.room_id JOIN users u ON u.id=mm.user_id WHERE u.email_address='#{labels.fetch('emails.david').gsub("'", "''")}' AND idx.body MATCH 'coffee' ORDER BY m.id DESC LIMIT 100").map { |v| v.fetch("id") }.reverse
++      "search" => sql.call(database, "SELECT m.id FROM messages m JOIN message_search_index idx ON idx.rowid=m.id JOIN memberships mm ON mm.room_id=m.room_id JOIN users u ON u.id=mm.user_id WHERE u.email_address='#{labels.fetch('emails.david').gsub("'", "''")}' AND idx.body MATCH 'coffee' ORDER BY m.created_at DESC, m.id DESC LIMIT 100").map { |v| v.fetch("id") }.reverse
+     }
+     contract_dir = destination
+     FileUtils.mkdir_p(contract_dir)

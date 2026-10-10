@@ -1,0 +1,91 @@
+{
+  "metadata": {
+    "verification_revision": "ec02debb3e44f40b8778a6a42db3c4515b2f9eaf",
+    "response_validation": "route-contract-v1",
+    "started_at": "2026-10-10T07:40:24Z",
+    "seed_sha256": "1295f8a392308a760475e66c4783983b8fd45fa49d47f7d85eeacf13afc34a38",
+    "server_cpus": "8-11",
+    "client_cpus": "12-15",
+    "network": "host",
+    "gzip": true,
+    "duration": 8,
+    "concurrencies": "16",
+    "rounds": 3,
+    "loadgen_sha256": "d6c0c9565195b06df0084e30e209817bd532dd7b9c18dd34684cda09ad27652e",
+    "routes": "room_show,messages_page,sidebar,search,avatar,static_css,up,post_message",
+    "profile": "read-and-post-v1",
+    "mixed_writer": null,
+    "images": {
+      "elixir": "sha256:9a8e2275d6cca47e7939212152d71b67fc540fd68d4c488373dc909b2096d713"
+    },
+    "image_labels": {
+      "elixir": {
+        "org.opencontainers.image.version": "29.1.1"
+      }
+    },
+    "source_revisions": {
+      "elixir": {
+        "head": "cf6547844a1c410be31e26d4e12aae28128ef03a",
+        "dirty": false
+      }
+    },
+    "preflight_only": false,
+    "topology": {
+      "elixir": {
+        "processes": 1,
+        "runtime": "BEAM",
+        "jobs": "Redis/Resque",
+        "cable": "native",
+        "response_cache_mb": "64"
+      }
+    },
+    "runtimes": {
+      "elixir": "elixir"
+    },
+    "complete": true
+  },
+  "results": {
+    "elixir": {
+      "room_show": {
+        "median_rps": 10895.9,
+        "runs": [
+          11279.6,
+          10895.9,
+          9901.6
+        ]
+      },
+      "messages_page": {
+        "median_rps": 12498.2,
+        "runs": [
+          13540.9,
+          12498.2,
+          12386.2
+        ]
+      },
+      "sidebar": {
+        "median_rps": 15171.0,
+        "runs": [
+          15171.0,
+          14107.6,
+          15302.4
+        ]
+      },
+      "search": {
+        "median_rps": 14294.4,
+        "runs": [
+          14447.6,
+          14294.4,
+          13326.8
+        ]
+      },
+      "post_message": {
+        "median_rps": 417.8,
+        "runs": [
+          417.8,
+          413.6,
+          467.6
+        ]
+      }
+    }
+  }
+}

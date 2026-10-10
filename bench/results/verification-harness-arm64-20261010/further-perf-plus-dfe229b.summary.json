@@ -1,0 +1,91 @@
+{
+  "metadata": {
+    "verification_revision": "ec02debb3e44f40b8778a6a42db3c4515b2f9eaf",
+    "response_validation": "route-contract-v1",
+    "started_at": "2026-10-10T07:44:37Z",
+    "seed_sha256": "1295f8a392308a760475e66c4783983b8fd45fa49d47f7d85eeacf13afc34a38",
+    "server_cpus": "8-11",
+    "client_cpus": "12-15",
+    "network": "host",
+    "gzip": true,
+    "duration": 8,
+    "concurrencies": "16",
+    "rounds": 3,
+    "loadgen_sha256": "d6c0c9565195b06df0084e30e209817bd532dd7b9c18dd34684cda09ad27652e",
+    "routes": "room_show,messages_page,sidebar,search,avatar,static_css,up,post_message",
+    "profile": "read-and-post-v1",
+    "mixed_writer": null,
+    "images": {
+      "elixir": "sha256:1674f2c0a95032a3be21bc768eabbf84ed8b6bcd7cd377850cf68e486bf9f4a7"
+    },
+    "image_labels": {
+      "elixir": {
+        "org.opencontainers.image.version": "29.1.1"
+      }
+    },
+    "source_revisions": {
+      "elixir": {
+        "head": "dfe229b6c5f67a6cebf41106aace2dd0e741afb1",
+        "dirty": false
+      }
+    },
+    "preflight_only": false,
+    "topology": {
+      "elixir": {
+        "processes": 1,
+        "runtime": "BEAM",
+        "jobs": "Redis/Resque",
+        "cable": "native",
+        "response_cache_mb": "64"
+      }
+    },
+    "runtimes": {
+      "elixir": "elixir"
+    },
+    "complete": true
+  },
+  "results": {
+    "elixir": {
+      "room_show": {
+        "median_rps": 19831.0,
+        "runs": [
+          18614.8,
+          21155.0,
+          19831.0
+        ]
+      },
+      "messages_page": {
+        "median_rps": 27513.2,
+        "runs": [
+          27078.3,
+          27513.2,
+          28325.7
+        ]
+      },
+      "sidebar": {
+        "median_rps": 35628.0,
+        "runs": [
+          34210.4,
+          36910.6,
+          35628.0
+        ]
+      },
+      "search": {
+        "median_rps": 29671.2,
+        "runs": [
+          29671.2,
+          30646.1,
+          29129.1
+        ]
+      },
+      "post_message": {
+        "median_rps": 566.7,
+        "runs": [
+          507.8,
+          643.7,
+          566.7
+        ]
+      }
+    }
+  }
+}

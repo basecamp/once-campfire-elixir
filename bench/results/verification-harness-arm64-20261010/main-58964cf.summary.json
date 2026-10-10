@@ -1,0 +1,91 @@
+{
+  "metadata": {
+    "verification_revision": "ec02debb3e44f40b8778a6a42db3c4515b2f9eaf",
+    "response_validation": "route-contract-v1",
+    "started_at": "2026-10-10T07:33:22Z",
+    "seed_sha256": "1295f8a392308a760475e66c4783983b8fd45fa49d47f7d85eeacf13afc34a38",
+    "server_cpus": "8-11",
+    "client_cpus": "12-15",
+    "network": "host",
+    "gzip": true,
+    "duration": 8,
+    "concurrencies": "16",
+    "rounds": 3,
+    "loadgen_sha256": "d6c0c9565195b06df0084e30e209817bd532dd7b9c18dd34684cda09ad27652e",
+    "routes": "room_show,messages_page,sidebar,search,avatar,static_css,up,post_message",
+    "profile": "read-and-post-v1",
+    "mixed_writer": null,
+    "images": {
+      "elixir": "sha256:8553eb96368d751f11230e22c46f816cca0a8c3030c734f56cb3585a1cf45c0a"
+    },
+    "image_labels": {
+      "elixir": {
+        "org.opencontainers.image.version": "29.1.1"
+      }
+    },
+    "source_revisions": {
+      "elixir": {
+        "head": "58964cf8a8788b2a20c7bde16dae65b025812593",
+        "dirty": false
+      }
+    },
+    "preflight_only": false,
+    "topology": {
+      "elixir": {
+        "processes": 1,
+        "runtime": "BEAM",
+        "jobs": "Redis/Resque",
+        "cable": "native",
+        "response_cache_mb": "64"
+      }
+    },
+    "runtimes": {
+      "elixir": "elixir"
+    },
+    "complete": true
+  },
+  "results": {
+    "elixir": {
+      "room_show": {
+        "median_rps": 4342.0,
+        "runs": [
+          4433.4,
+          4342.0,
+          4334.6
+        ]
+      },
+      "messages_page": {
+        "median_rps": 4621.8,
+        "runs": [
+          4435.7,
+          4621.8,
+          4738.7
+        ]
+      },
+      "sidebar": {
+        "median_rps": 5101.8,
+        "runs": [
+          4921.9,
+          5458.9,
+          5101.8
+        ]
+      },
+      "search": {
+        "median_rps": 4730.0,
+        "runs": [
+          4648.5,
+          5083.1,
+          4730.0
+        ]
+      },
+      "post_message": {
+        "median_rps": 486.9,
+        "runs": [
+          488.6,
+          486.9,
+          452.0
+        ]
+      }
+    }
+  }
+}
