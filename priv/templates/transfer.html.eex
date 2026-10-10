@@ -1,3 +1,1 @@
-      <form data-controller="auto-submit" action="<%= @path %>" accept-charset="UTF-8" method="post"><input type="hidden" name="_method" value="put" />
-
-
+      <form data-controller="auto-submit" action="<%= @path %>" accept-charset="UTF-8" method="post"><input type="hidden" name="_method" value="put" /></form>
