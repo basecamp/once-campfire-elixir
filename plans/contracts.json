@@ -72,7 +72,7 @@
         "parity/results/transaction-failures.json",
         "parity/results/room-deletion.json"
       ],
-      "notes": "Message/boost/room/user/account/attachment mutations, dirty tracking, injected rollback failures and post-commit queue/broadcast effects pass."
+      "notes": "Message/boost/room/user/account/attachment mutations, dirty tracking, injected rollback failures and post-commit queue/broadcast effects pass. Post-commit jobs go to the in-process queue (test/jobs_test.exs)."
     },
     {
       "id": "views",
@@ -133,7 +133,7 @@
         "parity/results/verification.json",
         "parity/results/network-protocol.json"
       ],
-      "notes": "Actual queue claims, failures/no retries, processed stats, worker drain, webhook replies/timeout/protocol boundaries and real isolated encrypted HTTPS push delivery pass."
+      "notes": "Actual queue claims, failures/no retries, processed stats, worker drain, webhook replies/timeout/protocol boundaries and real isolated encrypted HTTPS push delivery pass. Resque is replaced by the in-process, non-durable Campfire.Worker, as in the Rust port: bounded per-class queues, per-class concurrency and drain on graceful shutdown (test/jobs_test.exs). The listed receipts were recorded with Redis and Resque."
     },
     {
       "id": "realtime",
@@ -149,7 +149,7 @@
         "parity/results/user-lifecycle.json",
         "parity/results/browser-flows.json"
       ],
-      "notes": "Cable protocol/authorization, cross-runtime pubsub, message/boost/room/involvement fanout, session/ban/deactivation revocation and browser lifecycle pass."
+      "notes": "Cable protocol/authorization, cross-runtime pubsub, message/boost/room/involvement fanout, session/ban/deactivation revocation and browser lifecycle pass. Broadcasts and disconnects are delivered in process (Campfire.CableFanout, test/cable_fanout_test.exs), as in the Rust port. cable-interop.json was recorded with the Redis bridge."
     },
     {
       "id": "operations",
@@ -163,7 +163,7 @@
         "parity/results/release.json",
         "parity/results/http-shutdown.json"
       ],
-      "notes": "Native production release with pinned Thruster TLS/HTTP2, fresh first-run and real worker, ONCE backup/restore, in-flight HTTP/job drain and Rails\u2192Elixir\u2192Rails rollback pass on isolated volumes."
+      "notes": "Native production release with pinned Thruster TLS/HTTP2, fresh first-run and real worker, ONCE backup/restore, in-flight HTTP/job drain and Rails\u2192Elixir\u2192Rails rollback pass on isolated volumes. The container runs no Redis or separate worker; jobs drain in process on shutdown, as in the Rust port. The listed rollback and in-flight job drain receipts were recorded with Redis and Resque, when Rails and Elixir could share a live install."
     }
   ],
   "complete": true,

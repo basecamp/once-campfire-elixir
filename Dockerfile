@@ -24,7 +24,6 @@ RUN mix deps.compile && mix compile --warnings-as-errors && mix release
 FROM campfire-elixir:toolchain
 # Build-only emulation flags must not change the production VM configuration.
 ENV ERL_FLAGS=""
-RUN apt-get update && apt-get install -y --no-install-recommends redis-server && rm -rf /var/lib/apt/lists/*
 WORKDIR /campfire
 COPY --from=build /app/_build/prod/rel/campfire ./
 COPY --from=frontend /tmp/thrust /usr/local/bin/thrust

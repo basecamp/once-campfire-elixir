@@ -1,3 +1,4 @@
+import importlib.util
 import json
 from pathlib import Path
 import subprocess
@@ -22,7 +23,8 @@ class BenchmarkValidationTest(unittest.TestCase):
             "schema_version": 2, "status": "running", "complete": False,
             "expected": {"apps": ["baseline", "candidate"], "reps": 1,
                          "suites": ["http", "cable", "upload"], "http_routes": ["room_show"],
-                         "http_concs": [1], "cable_clients": [3], "upload_reps": 2},
+                         "http_concs": [1], "cable_clients": [3], "upload_reps": 2,
+                         "job_backends": {"baseline": "redis_resque", "candidate": "redis_resque"}},
         })
         for app, successes in (("baseline", 11), ("candidate", 7)):
             sample = self.sample(app, successes)
@@ -125,6 +127,36 @@ class BenchmarkValidationTest(unittest.TestCase):
         sample["upload"]["runs"].pop()
         self.write("candidate-1.json", sample)
         self.assertIn("expected 2 uploads", self.run_validator().stderr)
+
+    def test_job_backends_must_be_declared(self):
+        manifest = json.loads((self.root / "manifest.json").read_text())
+        del manifest["expected"]["job_backends"]
+        self.write("manifest.json", manifest)
+        self.assertIn("every app must declare its job backend", self.run_validator().stderr)
+
+    def test_observed_job_backend_must_match_declaration(self):
+        spec = importlib.util.spec_from_file_location("validate_results", VALIDATOR)
+        validator = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(validator)
+        quiet = [{"at": at, "queued": 0, "active": 0, "failed": 0} for at in (1, 1.5, 2)]
+        redis = {"schema_version": 2, "backend": "redis_resque", "drained": True,
+                 "observations": quiet, "final": quiet[-1]}
+        unobserved = {"schema_version": 2, "backend": "internal_unobserved", "drained": None}
+
+        cases = [
+            # A Redis-backed app whose Redis is unreachable reports an unobserved backend.
+            ("redis_resque", unobserved, "expected redis_resque jobs, observed internal_unobserved"),
+            # An in-process app that unexpectedly exposes Redis.
+            ("internal_unobserved", redis, "expected internal_unobserved jobs, observed redis_resque"),
+        ]
+        for expected, jobs, message in cases:
+            self.write("candidate-1-jobs.json", jobs)
+            with self.assertRaisesRegex(AssertionError, message):
+                validator.validate_jobs(self.root, "candidate", 1, expected)
+
+        for expected, jobs in (("redis_resque", redis), ("internal_unobserved", unobserved)):
+            self.write("candidate-1-jobs.json", jobs)
+            validator.validate_jobs(self.root, "candidate", 1, expected)
 
     def test_active_or_failed_jobs_are_rejected(self):
         jobs = json.loads((self.root / "candidate-1-jobs.json").read_text())

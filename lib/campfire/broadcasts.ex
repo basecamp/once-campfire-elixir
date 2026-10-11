@@ -7,13 +7,11 @@ defmodule Campfire.Broadcasts do
     append =
       ~s(<turbo-stream action="append" target="messages_#{room_key(room)}"><template>#{html}</template></turbo-stream>)
 
-    Cable.broadcast(Cable.messages_stream(room), append)
+    unreads =
+      for membership <- DB.query("SELECT user_id FROM memberships WHERE room_id=?", [room["id"]]),
+          do: {"user_#{membership["user_id"]}_unreads", %{"roomId" => room["id"]}}
 
-    for membership <- DB.query("SELECT user_id FROM memberships WHERE room_id=?", [room["id"]]) do
-      Cable.broadcast("user_#{membership["user_id"]}_unreads", %{"roomId" => room["id"]})
-    end
-
-    :ok
+    Cable.broadcast_all([{Cable.messages_stream(room), append} | unreads])
   end
 
   def remove(room, message),

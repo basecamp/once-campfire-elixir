@@ -76,53 +76,147 @@ defmodule Campfire.JobsTest do
     end
   end
 
-  test "enqueue reports unavailable Redis without exiting the caller" do
-    adapter = System.get_env("CAMPFIRE_JOBS_ADAPTER")
-    System.delete_env("CAMPFIRE_JOBS_ADAPTER")
+  describe "in-process queue" do
+    setup do
+      start_supervised!({Task.Supervisor, name: Campfire.JobTasks})
+      :ok
+    end
 
-    on_exit(fn ->
-      if adapter,
-        do: System.put_env("CAMPFIRE_JOBS_ADAPTER", adapter),
-        else: System.delete_env("CAMPFIRE_JOBS_ADAPTER")
-    end)
+    defp start_worker(options) do
+      test = self()
 
-    assert Process.whereis(Campfire.Redis) == nil
+      perform = fn job ->
+        send(test, {:started, job["arguments"], self()})
 
-    log =
-      capture_log(fn ->
-        assert Jobs.enqueue("ExampleJob", []) == {:error, :redis_unavailable}
-      end)
-
-    assert log =~ "Campfire job enqueue failed: :redis_unavailable"
-  end
-
-  test "enqueue reports a Redis disconnect race without exiting the caller" do
-    adapter = System.get_env("CAMPFIRE_JOBS_ADAPTER")
-    System.delete_env("CAMPFIRE_JOBS_ADAPTER")
-
-    redis =
-      spawn(fn ->
         receive do
-          {:"$gen_cast", _request} -> exit(:simulated_disconnect)
+          :release -> :ok
         end
+      end
+
+      options = Keyword.merge([concurrency: 1, perform: perform], options)
+      start_supervised!(Supervisor.child_spec({Worker, options}, restart: :temporary))
+    end
+
+    defp job(class, id), do: %{"job_class" => class, "arguments" => [id]}
+
+    test "runs jobs in order with per-class concurrency, so slow classes do not block others" do
+      start_worker([])
+      Worker.enqueue(job("Bot::WebhookJob", 1))
+      Worker.enqueue(job("Bot::WebhookJob", 2))
+      Worker.enqueue(job("Room::PushMessageJob", 3))
+
+      assert_receive {:started, [1], webhook}
+      assert_receive {:started, [3], push}
+      refute_receive {:started, [2], _}
+
+      send(push, :release)
+      send(webhook, :release)
+      assert_receive {:started, [2], webhook}
+      send(webhook, :release)
+    end
+
+    test "runs up to the configured concurrency of one class at once" do
+      start_worker(concurrency: 2)
+      for id <- 1..3, do: Worker.enqueue(job("Bot::WebhookJob", id))
+
+      assert_receive {:started, [1], first}
+      assert_receive {:started, [2], second}
+      refute_receive {:started, [3], _}, 100
+
+      send(first, :release)
+      assert_receive {:started, [3], third}
+      send(second, :release)
+      send(third, :release)
+    end
+
+    test "drops and logs jobs enqueued onto a full queue" do
+      start_worker(capacity: 1)
+
+      log =
+        capture_log(fn ->
+          Worker.enqueue(job("Bot::WebhookJob", 1))
+          assert_receive {:started, [1], running}
+          Worker.enqueue(job("Bot::WebhookJob", 2))
+          Worker.enqueue(job("Bot::WebhookJob", 3))
+          :sys.get_state(Worker)
+          send(running, :release)
+          assert_receive {:started, [2], queued}
+          send(queued, :release)
+          refute_receive {:started, [3], _}
+        end)
+
+      assert log =~ "Campfire job queue is full, dropping job: Bot::WebhookJob"
+    end
+
+    test "logs failures and crashes without retrying or stopping the runner" do
+      test = self()
+
+      perform = fn
+        %{"arguments" => [:raise]} -> raise "boom"
+        %{"arguments" => [:error]} -> {:error, :refused}
+        %{"arguments" => [:exit]} -> exit(:crashed)
+        %{"arguments" => [id]} -> send(test, {:performed, id})
+      end
+
+      start_supervised!({Worker, concurrency: 1, perform: perform})
+
+      log =
+        capture_log(fn ->
+          for id <- [:raise, :error, :exit, :ok], do: Worker.enqueue(job("Bot::WebhookJob", id))
+          assert_receive {:performed, :ok}
+          :sys.get_state(Worker)
+        end)
+
+      assert log =~ "Campfire job failed: Bot::WebhookJob boom"
+      assert log =~ "Campfire job failed: Bot::WebhookJob :refused"
+      assert log =~ "Campfire job crashed: Bot::WebhookJob :crashed"
+    end
+
+    test "shutdown runs queued jobs and waits for running ones before stopping" do
+      start_worker([])
+      Worker.enqueue(job("Bot::WebhookJob", 1))
+      Worker.enqueue(job("Bot::WebhookJob", 2))
+      assert_receive {:started, [1], first}
+
+      stopping = Task.async(fn -> GenServer.stop(Worker, :shutdown) end)
+      refute_receive {:started, [2], _}, 100
+      send(first, :release)
+      assert_receive {:started, [2], second}
+      refute Task.yield(stopping, 100)
+      send(second, :release)
+      assert Task.await(stopping) == :ok
+    end
+
+    test "shutdown abandons jobs still unfinished at the deadline" do
+      start_worker(drain_ms: 100)
+      Worker.enqueue(job("Bot::WebhookJob", 1))
+      Worker.enqueue(job("Bot::WebhookJob", 2))
+      assert_receive {:started, [1], _}
+
+      log = capture_log(fn -> assert GenServer.stop(Worker, :shutdown) == :ok end)
+
+      assert log =~
+               ~s(Campfire jobs abandoned at shutdown: ["Bot::WebhookJob", "Bot::WebhookJob"])
+    end
+
+    test "enqueue goes to the in-process worker unless jobs are disabled" do
+      adapter = System.get_env("CAMPFIRE_JOBS_ADAPTER")
+
+      on_exit(fn ->
+        if adapter,
+          do: System.put_env("CAMPFIRE_JOBS_ADAPTER", adapter),
+          else: System.delete_env("CAMPFIRE_JOBS_ADAPTER")
       end)
 
-    Process.register(redis, Campfire.Redis)
+      start_worker([])
+      System.put_env("CAMPFIRE_JOBS_ADAPTER", "disabled")
+      assert Jobs.enqueue("Bot::WebhookJob", [1]) == :ok
+      refute_receive {:started, _, _}, 50
 
-    on_exit(fn ->
-      if Process.alive?(redis), do: Process.exit(redis, :kill)
-
-      if adapter,
-        do: System.put_env("CAMPFIRE_JOBS_ADAPTER", adapter),
-        else: System.delete_env("CAMPFIRE_JOBS_ADAPTER")
-    end)
-
-    log =
-      capture_log(fn ->
-        assert Jobs.enqueue("ExampleJob", []) ==
-                 {:error, {:redis_unavailable, :simulated_disconnect}}
-      end)
-
-    assert log =~ "Campfire job enqueue failed: {:redis_unavailable, :simulated_disconnect}"
+      System.delete_env("CAMPFIRE_JOBS_ADAPTER")
+      assert Jobs.enqueue("Bot::WebhookJob", [2]) == :ok
+      assert_receive {:started, [2], running}
+      send(running, :release)
+    end
   end
 end

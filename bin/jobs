@@ -1,6 +1,0 @@
-#!/bin/sh
-set -eu
-# Run the native queue consumer against the same database, Redis and storage as the app.
-export CAMPFIRE_NO_SERVER=1
-export CAMPFIRE_WORKER=1
-exec mix run --no-halt

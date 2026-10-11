@@ -1,8 +1,9 @@
 # Conversion state
 
-All nine compatibility contracts are verified against Rails
-`90b330024dec3e757c79b6a7e6568f93da8e3148`. The complete tuned run passes
-65 gates and 1,929 tests. Raw scopes, logs, runtime results and the source digest are
+Jobs run on an in-process, non-durable queue and Action Cable delivery is in
+process, as in the Rust port (see README, Known differences). The compatibility
+contracts are recorded against Rails `90b330024dec3e757c79b6a7e6568f93da8e3148`.
+The complete tuned run passed 65 gates and 1,929 tests. Raw scopes, logs, runtime results and the source digest are
 in `parity/results/verification.json` and `contracts.json`.
 
 The project follows rails-to-rust: immutable reference, source inventory, live
@@ -51,3 +52,4 @@ retained under `bench/results/`; no universal performance improvement is claimed
 
 All authorized conversion, verification, benchmark and tuning evidence is recorded.
 The port does not match Rust's measured capacity. No production deployment was requested.
+

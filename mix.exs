@@ -17,7 +17,6 @@ defmodule Campfire.MixProject do
         {:exqlite, "~> 0.33"},
         {:bcrypt_elixir, "~> 3.3"},
         {:floki, "~> 0.38"},
-        {:redix, "~> 1.5"},
         {:qqr, "0.2.0"},
         {:elixir_make, "~> 0.9", runtime: false},
         {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
