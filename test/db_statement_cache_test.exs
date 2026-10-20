@@ -137,7 +137,7 @@ defmodule Campfire.DBStatementCacheTest do
     :ok = SQL.close(conn)
 
     many = "SELECT a.id FROM items a, items b, items c, items d, items e"
-    assert length(q(reader, many)) == 243
+    assert Enum.count(q(reader, many)) == 243
     write.("after multi-chunk success")
     assert {log, log} = checkpoint(writer)
 
@@ -167,6 +167,67 @@ defmodule Campfire.DBStatementCacheTest do
     assert [%{"name" => "one"}] = q(reader, @by_id, [1])
     assert [%{"name" => "one"}] = q(writer, @by_id, [1])
     assert Process.alive?(reader) and Process.alive?(writer)
+  end
+
+  test "the writer keeps one prepared statement per distinct write", %{writer: writer} do
+    %DB.Writer{statements: statements} = :sys.get_state(writer)
+    before = :ets.info(statements, :size)
+
+    assert [] = q(writer, "INSERT INTO items (id, name) VALUES (99, 'ninety-nine')")
+    assert :ets.info(statements, :size) == before + 1
+
+    assert [] = q(writer, "UPDATE items SET name='again' WHERE id=99")
+    assert :ets.info(statements, :size) == before + 2
+
+    assert [%{"name" => "again"}] = q(writer, @by_id, [99])
+    assert :ets.info(statements, :size) == before + 3
+
+    # A repeated statement is reused, not re-prepared.
+    for _ <- 1..5, do: assert([_ | _] = q(writer, "SELECT name FROM items WHERE id=?", [99]))
+    assert :ets.info(statements, :size) == before + 3
+  end
+
+  test "a failed write is dropped from the writer's cache", %{writer: writer} do
+    %DB.Writer{statements: statements} = :sys.get_state(writer)
+    before = :ets.info(statements, :size)
+
+    assert {:error, %DB.Error{}} = q(writer, "SELECT * FROM missing_table")
+    assert :ets.info(statements, :size) == before
+
+    assert [%{"name" => "one"}] = q(writer, @by_id, [1])
+    assert :ets.info(statements, :size) == before + 1
+  end
+
+  test "writer statements inside a transaction are cached and survive commit" do
+    %DB.Writer{statements: statements} = :sys.get_state(Campfire.DB)
+    before = :ets.info(statements, :size)
+
+    # Harmless distinct writes against the application's own schema.
+    DB.transaction(fn q ->
+      q.("UPDATE searches SET query=query WHERE id=-1", [])
+      q.("UPDATE searches SET query=query WHERE id=-2", [])
+    end)
+
+    assert :ets.info(statements, :size) == before + 2
+
+    # A second transaction reuses both.
+    DB.transaction(fn q ->
+      q.("UPDATE searches SET query=query WHERE id=-1", [])
+      q.("UPDATE searches SET query=query WHERE id=-2", [])
+    end)
+
+    assert :ets.info(statements, :size) == before + 2
+  end
+
+  test "the writer's cache is bounded", %{writer: writer} do
+    %DB.Writer{statements: statements} = :sys.get_state(writer)
+
+    for i <- 1..200 do
+      q(writer, "SELECT id + #{i} AS n FROM items WHERE id=?", [1])
+    end
+
+    assert :ets.info(statements, :size) <= 128
+    assert [%{"n" => 2}] = q(writer, "SELECT id + 1 AS n FROM items WHERE id=?", [1])
   end
 
   test "stopping a reader finalizes its cached statements", %{reader: reader} do

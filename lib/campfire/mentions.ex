@@ -28,7 +28,7 @@ defmodule Campfire.Mentions do
     if message = List.first(parts) do
       decoded = decode_base64(message)
 
-      envelope = decoded |> repair_utf8() |> Jason.decode!()
+      envelope = Campfire.JSON.decode!(repair_utf8(decoded))
       rails = envelope["_rails"] || %{}
 
       cond do

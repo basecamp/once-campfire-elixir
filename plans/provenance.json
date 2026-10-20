@@ -61,7 +61,8 @@
     "image_processing": "1.14.0",
     "libvips": "8.16.1",
     "ffmpeg": "7.1.5",
-    "native_pipeline": "native/vips.c"
+    "native_pipeline": "vix",
+    "elixir_binding": "vix 0.42.0"
   },
   "database_bootstrap": {
     "source": "test/fixtures/seed.json: schema, schema_migrations, ar_internal_metadata.schema_sha1",

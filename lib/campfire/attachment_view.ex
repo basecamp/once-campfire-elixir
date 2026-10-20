@@ -7,7 +7,7 @@ defmodule Campfire.AttachmentView do
     video? = String.starts_with?(blob["content_type"] || "", "video/")
 
     if Storage.variable?(blob) || video? do
-      metadata = Jason.decode!(blob["metadata"] || "{}")
+      metadata = Campfire.JSON.decode!(blob["metadata"] || "{}")
       {width, height} = dimensions(metadata)
 
       content =

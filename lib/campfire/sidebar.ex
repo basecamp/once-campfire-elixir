@@ -40,7 +40,7 @@ defmodule Campfire.Sidebar do
         |> Enum.take(max(20 - length(excludes), 0))
 
       account = DB.one("SELECT settings FROM accounts LIMIT 1")
-      settings = Jason.decode!(account["settings"] || "{}")
+      settings = Campfire.JSON.decode!(account["settings"] || "{}")
 
       content =
         frame(
@@ -114,7 +114,7 @@ defmodule Campfire.Sidebar do
     members = if members == [], do: [user], else: members
 
     {avatars, name} =
-      if length(members) > 1 do
+      if match?([_, _ | _], members) do
         images =
           members
           |> Enum.take(4)

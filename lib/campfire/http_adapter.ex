@@ -3,7 +3,12 @@ defmodule Campfire.HttpAdapter do
   @behaviour Plug.Conn.Adapter
 
   def send_resp(adapter, status, headers, body) do
-    if List.keyfind(headers, "content-encoding", 0) == {"content-encoding", "gzip"} do
+    # A known length means the body is complete: send it as one response. Chunked framing is only
+    # needed for the streaming gzip path, where no length is known up front.
+    gzip? = List.keyfind(headers, "content-encoding", 0) == {"content-encoding", "gzip"}
+    sized? = List.keyfind(headers, "content-length", 0) != nil
+
+    if gzip? and not sized? do
       {:ok, _, adapter} = Bandit.Adapter.send_chunked(adapter, status, headers)
       {:ok, _, adapter} = Bandit.Adapter.chunk(adapter, body)
       {:ok, _, adapter} = Bandit.Adapter.chunk(adapter, "")

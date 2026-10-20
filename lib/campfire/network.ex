@@ -143,7 +143,7 @@ defmodule Campfire.Network do
     ]
 
     options =
-      case System.get_env("SSL_CERT_FILE") do
+      case Campfire.Env.get("SSL_CERT_FILE") do
         path when is_binary(path) and path != "" ->
           [{:cacertfile, String.to_charlist(path)} | options]
 
@@ -254,8 +254,6 @@ defmodule Campfire.Network do
         with {:ok, buffer} <- at_least(socket, transport, timeout, buffer, length + 2),
              <<chunk::binary-size(^length), "\r\n", rest::binary>> <- buffer do
           receive_chunks(socket, transport, timeout, rest, [parts, chunk], size + length, limit)
-        else
-          error -> error
         end
       end
     else

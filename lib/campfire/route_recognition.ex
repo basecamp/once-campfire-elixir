@@ -2,12 +2,16 @@ defmodule Campfire.RouteRecognition do
   @moduledoc "Pinned Rails route order, verbs and optional format recognition."
   import Plug.Conn
   @external_resource "vectors/route-actions.json"
-  @routes Jason.decode!(File.read!(@external_resource))
+  @routes Campfire.JSON.decode!(File.read!(@external_resource))
 
   def init(options), do: options
   def call(%{request_path: "/cable"} = conn, _), do: conn
 
-  def call(conn, _) do
+  def call(conn, opts) do
+    do_call(conn, opts)
+  end
+
+  defp do_call(conn, _) do
     method = if conn.method == "HEAD", do: "GET", else: conn.method
     raw = segments(conn.request_path)
     tokens = raw |> drop_trailing_slash() |> Enum.map(&token/1)

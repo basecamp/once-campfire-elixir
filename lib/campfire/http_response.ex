@@ -12,7 +12,11 @@ defmodule Campfire.HttpResponse do
   ]
   def init(opts), do: opts
 
-  def call(conn, _) do
+  def call(conn, opts) do
+    do_call(conn, opts)
+  end
+
+  defp do_call(conn, _) do
     conn = delete_resp_header(conn, "cache-control")
 
     conn =
@@ -21,78 +25,88 @@ defmodule Campfire.HttpResponse do
         _ -> conn
       end
 
-    register_before_send(conn, fn conn ->
-      conn = Campfire.ResponseFormats.prepare(conn)
-      conn = Campfire.Flash.sweep(conn)
+    register_before_send(conn, &finalize/1)
+  end
 
-      if conn.assigns[:rails_exception] do
-        if conn.resp_body == "", do: conn, else: Campfire.HttpCompression.apply(conn)
-      else
-        conn =
-          Enum.reduce(if(conn.state == :set_file, do: [], else: @security), conn, fn {key, value},
-                                                                                     c ->
-            if get_resp_header(c, key) == [], do: put_resp_header(c, key, value), else: c
-          end)
+  @doc """
+  Produces the final representation: security and version headers, validators, compression and the
+  response-cache capture.
 
-        conn =
-          if conn.request_path in ["/up", "/cable"] ||
-               String.starts_with?(conn.request_path, "/rails/active_storage/"),
-             do: conn,
-             else:
-               conn
-               |> put_resp_header("x-version", System.get_env("APP_VERSION", "dev"))
-               |> put_resp_header("x-rev", System.get_env("GIT_REVISION", "dev"))
+  The cached-hit path skips this, because the entry it replays already holds the result.
+  """
+  def finalize(conn) do
+    conn = Campfire.ResponseFormats.prepare(conn)
+    conn = Campfire.Flash.sweep(conn)
 
-        conn =
-          if is_binary(conn.resp_body) &&
-               String.contains?(conn.resp_body, ~s(<link rel="stylesheet")),
-             do: put_resp_header(conn, "link", Campfire.Assets.preload_header()),
-             else: conn
+    if conn.assigns[:rails_exception] do
+      if conn.resp_body == "", do: conn, else: Campfire.HttpCompression.apply(conn)
+    else
+      # @security is a compile-time constant list; Plug's per-write CRLF scan is not needed here.
+      conn =
+        if conn.state == :set_file do
+          conn
+        else
+          missing = Enum.reject(@security, fn {key, _} -> get_resp_header(conn, key) != [] end)
+          %{conn | resp_headers: missing ++ conn.resp_headers}
+        end
 
-        conn = etag(conn)
+      conn =
+        if conn.request_path in ["/up", "/cable"] ||
+             String.starts_with?(conn.request_path, "/rails/active_storage/"),
+           do: conn,
+           else:
+             conn
+             |> put_header("x-version", version_header(:version, "APP_VERSION"))
+             |> put_header("x-rev", version_header(:rev, "GIT_REVISION"))
 
-        conn =
-          if get_resp_header(conn, "cache-control") == [],
-            do: put_resp_header(conn, "cache-control", "no-cache"),
-            else: conn
+      conn =
+        if is_binary(conn.resp_body) &&
+             String.contains?(conn.resp_body, ~s(<link rel="stylesheet")),
+           do: put_header(conn, "link", Campfire.Assets.preload_header()),
+           else: conn
 
-        conn =
-          if conn.status == 200 && conn.method in ["GET", "HEAD"] && fresh?(conn),
-            do:
-              %{conn | status: 304, resp_body: ""}
-              |> delete_resp_header("content-type")
-              |> delete_resp_header("content-length"),
-            else: conn
+      conn = etag(conn)
 
-        conn =
-          if conn.status not in [204, 304] && conn.status not in 100..199 do
-            vary = Enum.join(get_resp_header(conn, "vary"), ",")
+      conn =
+        if get_resp_header(conn, "cache-control") == [],
+          do: put_header(conn, "cache-control", "no-cache"),
+          else: conn
 
-            put_resp_header(
-              conn,
-              "vary",
-              if(
-                "accept-encoding" in (vary
-                                      |> String.downcase()
-                                      |> String.split(",")
-                                      |> Enum.map(&String.trim/1)),
-                do: vary,
-                else: if(vary == "", do: "Accept-Encoding", else: vary <> ",Accept-Encoding")
-              )
+      conn =
+        if conn.status == 200 && conn.method in ["GET", "HEAD"] && fresh?(conn),
+          do:
+            %{conn | status: 304, resp_body: ""}
+            |> delete_resp_header("content-type")
+            |> delete_resp_header("content-length"),
+          else: conn
+
+      conn =
+        if conn.status not in [204, 304] && conn.status not in 100..199 do
+          vary = Enum.join(get_resp_header(conn, "vary"), ",")
+
+          put_header(
+            conn,
+            "vary",
+            if(
+              "accept-encoding" in (vary
+                                    |> String.downcase()
+                                    |> String.split(",")
+                                    |> Enum.map(&String.trim/1)),
+              do: vary,
+              else: if(vary == "", do: "Accept-Encoding", else: vary <> ",Accept-Encoding")
             )
-          else
-            conn
-          end
+          )
+        else
+          conn
+        end
 
-        conn =
-          if conn.status in [204, 304],
-            do:
-              conn |> delete_resp_header("content-type") |> delete_resp_header("content-length"),
-            else: conn
+      conn =
+        if conn.status in [204, 304],
+          do: conn |> delete_resp_header("content-type") |> delete_resp_header("content-length"),
+          else: conn
 
-        conn |> Campfire.HttpCompression.apply() |> Campfire.ResponseCache.complete()
-      end
-    end)
+      conn |> Campfire.HttpCompression.apply() |> Campfire.ResponseCache.complete()
+    end
   end
 
   def error(conn, status) do
@@ -144,10 +158,31 @@ defmodule Campfire.HttpResponse do
     conn =
       %{conn | status: status, resp_body: body, resp_headers: [], resp_cookies: %{}}
       |> assign(:rails_exception, true)
-      |> put_resp_header("content-type", type <> "; charset=UTF-8")
+      |> put_header("content-type", type <> "; charset=UTF-8")
 
-    conn = if head?, do: put_resp_header(conn, "content-length", "0"), else: conn
-    if body != "", do: put_resp_header(conn, "vary", "Accept-Encoding"), else: conn
+    conn = if head?, do: put_header(conn, "content-length", "0"), else: conn
+    if body != "", do: put_header(conn, "vary", "Accept-Encoding"), else: conn
+  end
+
+  defp version_header(key, name) do
+    cache = {__MODULE__, key}
+
+    case :persistent_term.get(cache, nil) do
+      nil ->
+        value = Campfire.Env.get(name, "dev")
+        :persistent_term.put(cache, value)
+        value
+
+      value ->
+        value
+    end
+  end
+
+  # Keys and values here are ours (constants or computed digests), so writing them directly skips
+  # Plug's CRLF scan without weakening anything: nothing user-controlled reaches this function.
+  defp put_header(conn, key, value) do
+    headers = :lists.keydelete(key, 1, conn.resp_headers)
+    %{conn | resp_headers: [{key, value} | headers]}
   end
 
   defp etag(conn) do
@@ -158,10 +193,10 @@ defmodule Campfire.HttpResponse do
       digest =
         :crypto.hash(:sha256, conn.resp_body) |> Base.encode16(case: :lower) |> binary_part(0, 32)
 
-      conn = put_resp_header(conn, "etag", ~s(W/"#{digest}"))
+      conn = put_header(conn, "etag", ~s(W/"#{digest}"))
 
       if get_resp_header(conn, "cache-control") == [],
-        do: put_resp_header(conn, "cache-control", "max-age=0, private, must-revalidate"),
+        do: put_header(conn, "cache-control", "max-age=0, private, must-revalidate"),
         else: conn
     else
       conn

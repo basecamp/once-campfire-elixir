@@ -1,6 +1,6 @@
 defmodule Campfire.IPPolicy do
   import Bitwise
-  @ranges Jason.decode!(File.read!("priv/ip-policy.json"))
+  @ranges Campfire.JSON.decode!(File.read!("priv/ip-policy.json"))
   def public?({a, b, c, d} = ip) do
     if Enum.all?(Tuple.to_list(ip), &(is_integer(&1) && &1 in 0..255)) do
       value = (a <<< 24) + (b <<< 16) + (c <<< 8) + d

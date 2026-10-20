@@ -128,7 +128,7 @@ defmodule Campfire.UserAgent do
 
       [matched, name, version | captures] ->
         comment =
-          if length(captures) > 1,
+          if match?([_, _ | _], captures),
             do:
               captures
               |> Enum.at(1)
@@ -172,47 +172,30 @@ defmodule Campfire.UserAgent do
     end
   end
 
+  @browser_names %{
+    edge: "Edge",
+    ie: "Internet Explorer",
+    opera: "Opera",
+    wechat: "Wechat Browser",
+    vivaldi: "Vivaldi",
+    itunes: "iTunes",
+    podcast: "Podcast Addict",
+    wmp: "Windows Media Player",
+    apple: "AppleCoreMedia",
+    lavf: "libavformat"
+  }
+  @gecko_products ["PaleMoon", "Firefox", "Camino", "Iceweasel", "Seamonkey"]
+
   def browser(a) do
     case a.kind do
       :base ->
         a.app && a.app.name
 
-      :edge ->
-        "Edge"
-
-      :ie ->
-        "Internet Explorer"
-
-      :opera ->
-        "Opera"
-
-      :wechat ->
-        "Wechat Browser"
-
-      :vivaldi ->
-        "Vivaldi"
-
       :chrome ->
         if(product(a, "Iron"), do: "Iron", else: "Chrome")
 
-      :itunes ->
-        "iTunes"
-
-      :podcast ->
-        "Podcast Addict"
-
-      :wmp ->
-        "Windows Media Player"
-
-      :apple ->
-        "AppleCoreMedia"
-
-      :lavf ->
-        "libavformat"
-
       :gecko ->
-        Enum.find(["PaleMoon", "Firefox", "Camino", "Iceweasel", "Seamonkey"], &product(a, &1)) ||
-          (a.app && a.app.name)
+        Enum.find(@gecko_products, &product(a, &1)) || (a.app && a.app.name)
 
       :webkit ->
         cond do
@@ -228,6 +211,9 @@ defmodule Campfire.UserAgent do
           contains(at(a, 0), "PlayStation 4") -> "PS4 Internet Browser"
           true -> nil
         end
+
+      kind ->
+        Map.fetch!(@browser_names, kind)
     end
   end
 
@@ -449,8 +435,8 @@ defmodule Campfire.UserAgent do
           %{name: n, comment: c} when n in ["Dalvik", "Mozilla"] ->
             cond do
               is_nil(c) -> raise KeyError
-              length(c) > 3 -> Enum.at(c, 2)
-              length(c) == 3 -> "Android"
+              match?([_, _, _, _ | _], c) -> Enum.at(c, 2)
+              match?([_, _, _], c) -> "Android"
               true -> nil
             end
 

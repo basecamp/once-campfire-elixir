@@ -17,7 +17,7 @@ defmodule Campfire.Rack do
 
   def ranges(header, size) do
     with [_, spec] <- Regex.run(~r/bytes=([^;]+)/, header),
-         true <- length(String.split(spec, ",")) <= 100 do
+         true <- Enum.count_until(String.split(spec, ","), 101) <= 100 do
       result =
         Regex.split(~r/,[ \t]*/, spec)
         |> drop_trailing()

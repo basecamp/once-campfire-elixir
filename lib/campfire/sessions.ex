@@ -29,7 +29,7 @@ defmodule Campfire.Sessions do
         base: Auth.base(conn),
         account_version: version(account["updated_at"]),
         account_name: Assets.html_escape(account["name"] || "Campfire"),
-        vapid: Assets.html_escape(System.get_env("VAPID_PUBLIC_KEY", "")),
+        vapid: Assets.html_escape(Campfire.Env.get("VAPID_PUBLIC_KEY", "")),
         rejected: status != 200,
         email: if(params["email_address"], do: Assets.html_escape(params["email_address"])),
         account_has_logo: !!Campfire.Attachments.find("Account", account["id"], "logo"),
@@ -60,7 +60,7 @@ defmodule Campfire.Sessions do
       assigns = [
         base: Auth.base(conn),
         account_version: "",
-        vapid: Assets.html_escape(System.get_env("VAPID_PUBLIC_KEY", "")),
+        vapid: Assets.html_escape(Campfire.Env.get("VAPID_PUBLIC_KEY", "")),
         account_has_logo: false,
         custom_styles: "",
         title: "Set up Campfire",
@@ -174,7 +174,7 @@ defmodule Campfire.Sessions do
       name = Assets.html_escape(owner["name"])
       email = Assets.html_escape(owner["email_address"] || "")
 
-      "  <div class=\"txt-align-center margin-block-double full-width\">\n    <a class=\"btn center\" title=\"Email #{name}\" href=\"mailto:&quot;#{name}&quot; &lt;#{email}&gt;\">\n      <img aria-hidden=\"true\" src=\"#{Assets.path("lifebuoy.svg")}\" />\n      <span>#{email}</span>\n</a>\n    <div class=\"txt-align-center center margin-block txt-subtle\">Campfire&trade; version <span class=\"version-badge\">#{Assets.html_escape(System.get_env("APP_VERSION", "dev"))}</span></div>\n  </div>\n\n"
+      "  <div class=\"txt-align-center margin-block-double full-width\">\n    <a class=\"btn center\" title=\"Email #{name}\" href=\"mailto:&quot;#{name}&quot; &lt;#{email}&gt;\">\n      <img aria-hidden=\"true\" src=\"#{Assets.path("lifebuoy.svg")}\" />\n      <span>#{email}</span>\n</a>\n    <div class=\"txt-align-center center margin-block txt-subtle\">Campfire&trade; version <span class=\"version-badge\">#{Assets.html_escape(Campfire.Env.get("APP_VERSION", "dev"))}</span></div>\n  </div>\n\n"
     else
       ""
     end

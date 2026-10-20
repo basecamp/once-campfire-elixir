@@ -1,6 +1,7 @@
 defmodule Campfire.RubyJSON do
   @moduledoc "The comments accepted by Ruby JSON, without touching comment markers inside strings."
-  def decode(json), do: json |> strip(false, false, []) |> IO.iodata_to_binary() |> Jason.decode()
+  def decode(json),
+    do: json |> strip(false, false, []) |> IO.iodata_to_binary() |> Campfire.JSON.decode()
 
   defp strip(<<>>, _, _, acc), do: Enum.reverse(acc)
 

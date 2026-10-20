@@ -147,9 +147,15 @@ for the workload, validation and reproduction commands.
 - Authenticated room, message-list, sidebar and search complete HTML/gzip bodies use a bounded
   cache: 64 MiB per app, disabled with `CAMPFIRE_RESPONSE_CACHE_MB=0`.
   Authorization and cookies stay fresh; SQLite commits from any writer
-  invalidate cached bodies. Fragment keys also retain the pre-render SQLite epoch and
-  request host, including conditional requests and when response caching is disabled.
-  JSON and conditional requests retain their native paths.
+  invalidate cached bodies, and an entry is retired 15 seconds after admission.
+  A body over 1 MiB, or a request whose key material exceeds 8 KiB, is served without
+  being kept. Fragment keys also retain the pre-render SQLite epoch and the
+  request origin, including conditional requests and when response caching is disabled;
+  renders outside a request share one detached scope. Fragments are bounded by bytes
+  (`CAMPFIRE_FRAGMENT_CACHE_MB`, default 32): reads count as uses, a write past the limit
+  drops least recently used fragments until three quarters remain, and a fragment larger
+  than a quarter of the limit is served but not kept. JSON and conditional requests retain
+  their native paths.
 
 - Session-transfer auto-submit forms explicitly close their form tag; the pinned Rails
   reference omitted it.

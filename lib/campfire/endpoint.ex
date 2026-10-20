@@ -3,12 +3,18 @@ defmodule Campfire.Endpoint do
   def init(options), do: Campfire.Router.init(options)
 
   def call(conn, options) do
+    dispatch(conn, options)
+  end
+
+  defp dispatch(conn, options) do
     Campfire.Router.call(conn, options)
   rescue
     error in Plug.Conn.WrapperError ->
       respond(error.conn, error.reason)
 
     error ->
+      require Logger
+      Logger.error("endpoint rescue: " <> Exception.format(:error, error, __STACKTRACE__))
       respond(conn, error)
   after
     Campfire.ResponseCache.cleanup()

@@ -1,6 +1,25 @@
 defmodule Campfire.HtmlParserTest do
   use ExUnit.Case, async: false
 
+  # The reference adapter is the Rails side's parser: a pool of helper processes running
+  # Nokogiri's own gumbo sources, which the parity tests measure against. It is not in the
+  # request path — the parser above it is the NIF — so the pool's fault isolation is pinned
+  # here, where the tests that used to exercise the pool the port itself ran now live.
+  setup do
+    for index <- 0..3 do
+      case Campfire.HtmlParserReference.start_link(index) do
+        {:ok, pid} -> on_exit(fn -> if Process.alive?(pid), do: Process.exit(pid, :kill) end)
+        {:error, {:already_started, _}} -> :ok
+      end
+    end
+
+    :ok
+  end
+
+  defp reference_worker do
+    Module.concat(Campfire.HtmlParserReference, "#{:erlang.phash2(self(), 4)}")
+  end
+
   test "parser produces native terms through an isolated worker" do
     html = ~s(<p class="message">Hello<!-- pause --><strong>world</strong></p>)
 
@@ -20,23 +39,53 @@ defmodule Campfire.HtmlParserTest do
     html = String.duplicate("<p>x</p>", 6_000)
 
     assert nodes = Campfire.HtmlParser.parse(html)
-    assert length(nodes) == 6_000
+    assert Enum.count(nodes) == 6_000
     assert Enum.all?(nodes, &(&1 == {"p", [], ["x"]}))
   end
 
-  test "pathological expansion is isolated from the BEAM" do
-    formatting = Enum.map_join(1..390, &~s(<b a="#{&1}">))
-    html = "<p>#{formatting}" <> String.duplicate("<p>x", 3_000)
+  test "both backends refuse a document past the reference's limits with the same message" do
+    deep = String.duplicate("<div>", 405) <> "x"
+    wide = "<p " <> Enum.map_join(1..405, fn i -> ~s(a#{i}="x" ) end) <> ">y</p>"
 
-    assert_raise ArgumentError, ~r/isolated HTML parser exited with status/, fn ->
-      Campfire.HtmlParser.parse(html)
+    for {html, message} <- [
+          {deep, ~r/Document tree depth limit exceeded/},
+          {wide, ~r/Attributes per element limit exceeded/}
+        ] do
+      assert_raise ArgumentError, message, fn -> Campfire.HtmlParser.parse(html) end
+      assert_raise ArgumentError, message, fn -> Campfire.HtmlParserReference.parse(html) end
     end
 
     assert Campfire.HtmlParser.parse("<p>alive</p>") == [{"p", [], ["alive"]}]
   end
 
+  test "a document that exhausts the reference helper leaves the caller and the VM alive" do
+    formatting = Enum.map_join(1..390, &~s(<b a="#{&1}">))
+    html = "<p>#{formatting}" <> String.duplicate("<p>x", 3_000)
+
+    # On this machine the reference helper aborts on this document (its own allocation fails and
+    # it exits 134) and the caller gets an error; on a larger one it may return a tree. Either
+    # way the caller survives and the VM stays up, which is the property being pinned here.
+    reference =
+      try do
+        {:tree, Campfire.HtmlParserReference.parse(html)}
+      rescue
+        e in ArgumentError -> {:error, Exception.message(e)}
+      end
+
+    case reference do
+      {:error, message} -> assert message =~ "isolated HTML parser exited with status"
+      {:tree, nodes} -> assert is_list(nodes)
+    end
+
+    # The port's own path holds the reference's limits as budgets rather than as a process that
+    # can be lost, so it returns a tree where the reference cannot finish: the recorded known
+    # difference for documents the reference's C cannot allocate.
+    assert is_list(Campfire.HtmlParser.parse(html))
+    assert Campfire.HtmlParser.parse("<p>alive</p>") == [{"p", [], ["alive"]}]
+  end
+
   test "an idle helper death is replaced without crashing its worker or caller" do
-    worker = String.to_existing_atom("Elixir.Campfire.HtmlParser.#{:erlang.phash2(self(), 4)}")
+    worker = reference_worker()
     worker_pid = Process.whereis(worker)
     port = :sys.get_state(worker)
     {:os_pid, os_pid} = Port.info(port, :os_pid)
@@ -47,22 +96,22 @@ defmodule Campfire.HtmlParserTest do
     assert is_port(replacement)
     assert Port.info(replacement)
     assert Process.whereis(worker) == worker_pid
-    assert Campfire.HtmlParser.parse("<p>alive</p>") == [{"p", [], ["alive"]}]
+    assert Campfire.HtmlParserReference.parse("<p>alive</p>") == [{"p", [], ["alive"]}]
   end
 
   test "a helper is recycled after returning a large result" do
-    worker = String.to_existing_atom("Elixir.Campfire.HtmlParser.#{:erlang.phash2(self(), 4)}")
+    worker = reference_worker()
     port = :sys.get_state(worker)
     html = String.duplicate("<p>x</p>", 70_000)
 
-    assert nodes = Campfire.HtmlParser.parse(html)
-    assert length(nodes) == 70_000
+    assert nodes = Campfire.HtmlParserReference.parse(html)
+    assert Enum.count(nodes) == 70_000
     refute :sys.get_state(worker) == port
-    assert Campfire.HtmlParser.parse("<p>alive</p>") == [{"p", [], ["alive"]}]
+    assert Campfire.HtmlParserReference.parse("<p>alive</p>") == [{"p", [], ["alive"]}]
   end
 
   test "an abnormal linked port exit returns an error and replaces the helper" do
-    worker = String.to_existing_atom("Elixir.Campfire.HtmlParser.#{:erlang.phash2(self(), 4)}")
+    worker = reference_worker()
     worker_pid = Process.whereis(worker)
     broken_port = open_port_with_closed_input()
 
@@ -77,7 +126,7 @@ defmodule Campfire.HtmlParserTest do
     end)
 
     assert_raise ArgumentError, ~r/isolated HTML parser exited/, fn ->
-      Campfire.HtmlParser.parse("<p>broken pipe</p>")
+      Campfire.HtmlParserReference.parse("<p>broken pipe</p>")
     end
 
     replacement =
@@ -85,7 +134,7 @@ defmodule Campfire.HtmlParserTest do
 
     assert is_port(replacement)
     assert Process.whereis(worker) == worker_pid
-    assert Campfire.HtmlParser.parse("<p>alive</p>") == [{"p", [], ["alive"]}]
+    assert Campfire.HtmlParserReference.parse("<p>alive</p>") == [{"p", [], ["alive"]}]
   end
 
   defp open_port_with_closed_input do

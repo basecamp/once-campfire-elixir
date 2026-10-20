@@ -29,7 +29,7 @@ defmodule Campfire.Refresh do
           updated =
             DB.query(
               "SELECT * FROM messages WHERE room_id=? AND updated_at>? AND id NOT IN (SELECT value FROM json_each(?)) ORDER BY +created_at DESC LIMIT 40",
-              [room["id"], since, Jason.encode!(excluded)]
+              [room["id"], since, Torque.encode!(excluded)]
             )
             |> Enum.reverse()
 

@@ -3,7 +3,7 @@ defmodule Campfire.Sounds do
   import Campfire.Sigils
   alias Campfire.Assets
   @external_resource "vectors/sounds.json"
-  @sounds Jason.decode!(File.read!(@external_resource))
+  @sounds Campfire.JSON.decode!(File.read!(@external_resource))
           |> Map.new(&{&1["name"], Map.drop(&1, ["presentation"])})
 
   def find(plain) do

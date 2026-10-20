@@ -26,3 +26,10 @@ __pycache__/
 !/parity/checkpoints/20261005-statement-cache/README.md
 
 /tmp/
+.worktrees/
+
+# native build outputs (elixir_make writes these next to the sources) and local tool caches
+/native/[0-9]*/
+/native/campfire-html
+/.cache/
+/.pi/

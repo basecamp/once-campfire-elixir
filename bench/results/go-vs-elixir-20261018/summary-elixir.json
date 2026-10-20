@@ -1,0 +1,217 @@
+{
+  "app": "elixir",
+  "base": "http://127.0.0.1:4101",
+  "seed": "/Users/gilbertwong/WorkSpace/opensource/elixir/once-campfire-verification/fixtures/default",
+  "routes": [
+    "room_show"
+  ],
+  "concurrencies": [
+    1,
+    16,
+    64
+  ],
+  "rounds": 2,
+  "duration": 6,
+  "loadgen": "/Users/gilbertwong/WorkSpace/opensource/elixir/once-campfire-verification/loadgen/target/release/loadgen",
+  "host": "Darwin 27.0.0 arm64",
+  "cpus": "10",
+  "samples": [
+    {
+      "avg_bytes": 20615,
+      "conc": 1,
+      "errors": 0,
+      "gzip": true,
+      "invalid_reasons": {},
+      "invalid_responses": 0,
+      "latency": {
+        "max_ms": 10.335,
+        "mean_ms": 0.34,
+        "n": 17505,
+        "p50_ms": 0.327,
+        "p90_ms": 0.399,
+        "p99_ms": 0.518
+      },
+      "ok": 17505,
+      "path": "/rooms/486777696",
+      "rps": 2917.4,
+      "secs": 6.0,
+      "statuses": {
+        "200": 17505
+      },
+      "validation": "route-contract-v1",
+      "route": "room_show",
+      "concurrency": 1,
+      "round": 1,
+      "requests_per_second": 2917.5
+    },
+    {
+      "avg_bytes": 20615,
+      "conc": 16,
+      "errors": 0,
+      "gzip": true,
+      "invalid_reasons": {},
+      "invalid_responses": 0,
+      "latency": {
+        "max_ms": 17.583,
+        "mean_ms": 2.19,
+        "n": 43641,
+        "p50_ms": 1.944,
+        "p90_ms": 3.381,
+        "p99_ms": 6.195
+      },
+      "ok": 43641,
+      "path": "/rooms/486777696",
+      "rps": 7271.1,
+      "secs": 6.0,
+      "statuses": {
+        "200": 43641
+      },
+      "validation": "route-contract-v1",
+      "route": "room_show",
+      "concurrency": 16,
+      "round": 1,
+      "requests_per_second": 7273.5
+    },
+    {
+      "avg_bytes": 20615,
+      "conc": 64,
+      "errors": 0,
+      "gzip": true,
+      "invalid_reasons": {},
+      "invalid_responses": 0,
+      "latency": {
+        "max_ms": 63.967,
+        "mean_ms": 6.95,
+        "n": 55103,
+        "p50_ms": 5.523,
+        "p90_ms": 10.751,
+        "p99_ms": 23.807
+      },
+      "ok": 55103,
+      "path": "/rooms/486777696",
+      "rps": 9177.3,
+      "secs": 6.0,
+      "statuses": {
+        "200": 55103
+      },
+      "validation": "route-contract-v1",
+      "route": "room_show",
+      "concurrency": 64,
+      "round": 1,
+      "requests_per_second": 9183.833333333334
+    },
+    {
+      "avg_bytes": 20615,
+      "conc": 1,
+      "errors": 0,
+      "gzip": true,
+      "invalid_reasons": {},
+      "invalid_responses": 0,
+      "latency": {
+        "max_ms": 13.487,
+        "mean_ms": 0.73,
+        "n": 8171,
+        "p50_ms": 0.364,
+        "p90_ms": 1.525,
+        "p99_ms": 4.167
+      },
+      "ok": 8171,
+      "path": "/rooms/486777696",
+      "rps": 1361.8,
+      "secs": 6.0,
+      "statuses": {
+        "200": 8171
+      },
+      "validation": "route-contract-v1",
+      "route": "room_show",
+      "concurrency": 1,
+      "round": 2,
+      "requests_per_second": 1361.8333333333333
+    },
+    {
+      "avg_bytes": 20615,
+      "conc": 16,
+      "errors": 0,
+      "gzip": true,
+      "invalid_reasons": {},
+      "invalid_responses": 0,
+      "latency": {
+        "max_ms": 16.959,
+        "mean_ms": 2.4,
+        "n": 39967,
+        "p50_ms": 1.584,
+        "p90_ms": 4.431,
+        "p99_ms": 7.895
+      },
+      "ok": 39967,
+      "path": "/rooms/486777696",
+      "rps": 6659.9,
+      "secs": 6.0,
+      "statuses": {
+        "200": 39967
+      },
+      "validation": "route-contract-v1",
+      "route": "room_show",
+      "concurrency": 16,
+      "round": 2,
+      "requests_per_second": 6661.166666666667
+    },
+    {
+      "avg_bytes": 20615,
+      "conc": 64,
+      "errors": 0,
+      "gzip": true,
+      "invalid_reasons": {},
+      "invalid_responses": 0,
+      "latency": {
+        "max_ms": 64.927,
+        "mean_ms": 5.37,
+        "n": 71258,
+        "p50_ms": 5.067,
+        "p90_ms": 6.211,
+        "p99_ms": 8.655
+      },
+      "ok": 71258,
+      "path": "/rooms/486777696",
+      "rps": 11866.9,
+      "secs": 6.0,
+      "statuses": {
+        "200": 71258
+      },
+      "validation": "route-contract-v1",
+      "route": "room_show",
+      "concurrency": 64,
+      "round": 2,
+      "requests_per_second": 11876.333333333334
+    }
+  ],
+  "results": {
+    "room_show@1": {
+      "route": "room_show",
+      "concurrency": 1,
+      "requests_per_second": 2139.6666666666665,
+      "samples": [
+        2917.5,
+        1361.8333333333333
+      ]
+    },
+    "room_show@16": {
+      "route": "room_show",
+      "concurrency": 16,
+      "requests_per_second": 6967.333333333334,
+      "samples": [
+        7273.5,
+        6661.166666666667
+      ]
+    },
+    "room_show@64": {
+      "route": "room_show",
+      "concurrency": 64,
+      "requests_per_second": 10530.083333333334,
+      "samples": [
+        9183.833333333334,
+        11876.333333333334
+      ]
+    }
+  }
+}

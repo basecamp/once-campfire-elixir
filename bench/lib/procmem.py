@@ -17,7 +17,7 @@ import json, os, re, sys, time
 def role(cmdline):
     if "beam.smp" in cmdline:
         return "beam"
-    if "campfire-html" in cmdline or "campfire-vips" in cmdline:
+    if "campfire-html" in cmdline:
         return "helpers"
     if "thrust" in cmdline:
         return "thrust"

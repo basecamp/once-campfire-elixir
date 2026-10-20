@@ -50,7 +50,7 @@ defmodule Campfire.Worker do
 
       {:ok, payload} ->
         decoded =
-          case Jason.decode(payload) do
+          case Campfire.JSON.decode(payload) do
             {:ok, decoded} -> decoded
             _ -> %{"raw" => payload}
           end
@@ -64,12 +64,12 @@ defmodule Campfire.Worker do
         Redix.command(Campfire.Redis, [
           "SET",
           "resque:worker:#{state.worker}",
-          Jason.encode!(current)
+          Torque.encode!(current)
         ])
 
         try do
           %{"class" => "ActiveJob::QueueAdapters::ResqueAdapter::JobWrapper", "args" => [job]} =
-            Jason.decode!(payload)
+            Campfire.JSON.decode!(payload)
 
           case perform(job) do
             {:error, error} -> raise "job failed: #{inspect(error)}"
@@ -92,7 +92,7 @@ defmodule Campfire.Worker do
             Redix.transaction_pipeline(Campfire.Redis, [
               ["INCR", "resque:stat:failed"],
               ["INCR", "resque:stat:failed:#{state.worker}"],
-              ["RPUSH", "resque:failed", Jason.encode!(failure)]
+              ["RPUSH", "resque:failed", Torque.encode!(failure)]
             ])
         after
           Redix.transaction_pipeline(Campfire.Redis, [

@@ -26,9 +26,11 @@ defmodule Campfire.HttpCompression do
               do: nil,
               else: gzip(IO.iodata_to_binary(body), conn.assigns[:gzip_chunks])
 
-          %{conn | resp_body: compressed}
-          |> put_resp_header("content-encoding", "gzip")
-          |> delete_resp_header("content-length")
+          conn = %{conn | resp_body: compressed} |> put_resp_header("content-encoding", "gzip")
+
+          if is_binary(compressed),
+            do: put_resp_header(conn, "content-length", Integer.to_string(byte_size(compressed))),
+            else: delete_resp_header(conn, "content-length")
 
         nil ->
           path =
@@ -116,6 +118,10 @@ defmodule Campfire.HttpCompression do
         rest::binary>>
 
   defp gzip(body, chunks) do
+    do_gzip(body, chunks)
+  end
+
+  defp do_gzip(body, chunks) do
     z = :zlib.open()
 
     try do

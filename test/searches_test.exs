@@ -43,6 +43,6 @@ defmodule Campfire.SearchesTest do
       [user_id, private]
     )
 
-    assert length(Searches.messages(user_id, "searchsparseonly")) == 100
+    assert Enum.count(Searches.messages(user_id, "searchsparseonly")) == 100
   end
 end

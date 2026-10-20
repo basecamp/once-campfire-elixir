@@ -2,7 +2,7 @@ defmodule Campfire.PublicFiles do
   @moduledoc "The pinned public documents served before controller recognition."
   import Plug.Conn
   @external_resource "priv/compat/rack-mime.json"
-  @mime Jason.decode!(File.read!(@external_resource))
+  @mime Campfire.JSON.decode!(File.read!(@external_resource))
   @files ~w(robots.txt 404.html 422.html 500.html 502.html)
   def init(opts), do: opts
 
@@ -48,7 +48,7 @@ defmodule Campfire.PublicFiles do
     data = File.read!(path)
 
     modified =
-      if System.get_env("CAMPFIRE_CLOCK"),
+      if Campfire.Env.get("CAMPFIRE_CLOCK"),
         do: Campfire.Clock.now(),
         else: DateTime.from_unix!(File.stat!(path, time: :posix).mtime)
 

@@ -1,0 +1,3 @@
+          <button class="btn message__action-btn center full-width" data-action="reply#reply" title="Reply" aria-label="Reply">
+            <img class="colorize--black" aria-hidden="true" src="<%= @reply_icon %>" width="20" height="20" />
+</button>

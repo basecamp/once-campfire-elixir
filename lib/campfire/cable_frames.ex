@@ -24,7 +24,7 @@ defmodule Campfire.CableFrames do
         {:reply, {:ok, frame}, queue}
 
       _ ->
-        case Jason.decode(payload) do
+        case Campfire.JSON.decode(payload) do
           {:ok, data} ->
             frame = Campfire.Rails.json(%{"identifier" => identifier, "message" => data})
 

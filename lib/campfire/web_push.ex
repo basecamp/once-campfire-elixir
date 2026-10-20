@@ -43,8 +43,8 @@ defmodule Campfire.WebPush do
   end
 
   def authorization(audience, now \\ DateTime.to_unix(Clock.now())) do
-    private = decode(System.fetch_env!("VAPID_PRIVATE_KEY"))
-    public = decode(System.fetch_env!("VAPID_PUBLIC_KEY"))
+    private = decode(Campfire.Env.fetch!("VAPID_PRIVATE_KEY"))
+    public = decode(Campfire.Env.fetch!("VAPID_PUBLIC_KEY"))
     header = Base.url_encode64(~s({"typ":"JWT","alg":"ES256"}), padding: false)
 
     claims =
@@ -63,9 +63,12 @@ defmodule Campfire.WebPush do
   end
 
   def encoded_message(payload, badge) do
-    data = ~s({"path":#{Jason.encode!(payload["path"])},"badge":#{Jason.encode!(badge)}})
-    options = ~s({"body":#{Jason.encode!(payload["body"])},"icon":"/account/logo","data":#{data}})
-    ~s({"title":#{Jason.encode!(payload["title"])},"options":#{options}})
+    data = ~s({"path":#{Torque.encode!(payload["path"])},"badge":#{Torque.encode!(badge)}})
+
+    options =
+      ~s({"body":#{Torque.encode!(payload["body"])},"icon":"/account/logo","data":#{data}})
+
+    ~s({"title":#{Torque.encode!(payload["title"])},"options":#{options}})
   end
 
   def decode(raw) do

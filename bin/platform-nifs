@@ -1,0 +1,45 @@
+#!/bin/sh
+# elixir_make dependencies compile their object files inside deps/<dep>/priv/obj, which a host
+# checkout and the toolchain container share: whichever side built last leaves objects the other
+# one cannot link. This rebuilds them for the platform it runs on.
+#
+# bin/mix runs it inside the container. Run it directly on the host for the host.
+set -eu
+ROOT=$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)
+cd "$ROOT"
+
+case "$(uname -s)" in
+  Darwin) DEFAULT_MAGIC="cf fa ed fe" ;;
+  *) DEFAULT_MAGIC="7f 45 4c 46" ;;
+esac
+
+EXPECTED=${EXPECTED_MAGIC:-$DEFAULT_MAGIC}
+DEPS="gumbo exqlite bcrypt_elixir vix torque"
+STALE=""
+
+for dep in $DEPS; do
+  # elixir_make leaves .o files; precompiled NIF deps (torque) ship a .so instead.
+  objects=$(find "deps/$dep/priv/obj" -name '*.o' 2>/dev/null || true)
+  objects="$objects $(find "deps/$dep/priv" -name '*.so' 2>/dev/null || true)"
+
+  for artifact in $objects; do
+    magic=$(head -c 4 "$artifact" | od -An -tx1 | tr -s ' ' | sed 's/^ //;s/ $//')
+
+    if [ "$magic" != "$EXPECTED" ]; then
+      STALE="$STALE $dep"
+      break
+    fi
+  done
+done
+
+[ -n "$STALE" ] || exit 0
+
+# `deps.compile --force` keeps existing objects, so the foreign ones have to go first.
+for dep in $STALE; do
+  rm -rf "deps/$dep/priv/obj"
+  find "deps/$dep/priv" -name '*.so' -delete 2>/dev/null || true
+done
+
+echo "platform-nifs: object files do not match $(uname -s); rebuilding$STALE" >&2
+# shellcheck disable=SC2086
+exec mix deps.compile --force $STALE

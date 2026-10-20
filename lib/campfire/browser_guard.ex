@@ -9,7 +9,11 @@ defmodule Campfire.BrowserGuard do
 
   def init(options), do: options
 
-  def call(conn, _) do
+  def call(conn, opts) do
+    do_call(conn, opts)
+  end
+
+  defp do_call(conn, _) do
     cond do
       exempt?(conn) ->
         conn
@@ -50,6 +54,7 @@ defmodule Campfire.BrowserGuard do
 
   defp show_if_authorized(conn) do
     {conn, user, session} = if public?(conn), do: {conn, nil, nil}, else: Auth.session_user(conn)
+    conn = if user, do: assign(conn, :auth_session, {user, session}), else: conn
     bot_key = conn.path_params["bot_key"]
 
     query_bot =

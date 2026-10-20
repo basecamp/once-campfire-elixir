@@ -1,0 +1,6 @@
+          <a class="btn message__action-btn center full-width hide-in-ios-pwa" title="Download" aria-label="Download" href="<%= @path %>?disposition=attachment">
+            <img class="colorize--black" aria-hidden="true" src="<%= @download_icon %>" width="20" height="20" />
+</a>
+          <button class="btn message__action-btn center full-width" data-controller="web-share" data-action="web-share#share" data-web-share-files-value="<%= @path %>" data-web-share-title-value="<%= @filename %>" title="Share" aria-label="Share">
+            <img class="colorize--black" aria-hidden="true" src="<%= @share_icon %>" width="20" height="20" />
+</button>

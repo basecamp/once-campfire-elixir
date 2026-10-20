@@ -77,7 +77,12 @@ defmodule Campfire.Platform do
       end
   end
 
+  # Pure in the user-agent string, and parsed on every request; memoise per distinct agent.
   def blocked?(raw) do
+    Campfire.Memo.fetch({:blocked, raw}, fn -> blocked_now?(raw) end)
+  end
+
+  defp blocked_now?(raw) do
     if String.trim(raw || "") == "" do
       false
     else

@@ -13,6 +13,10 @@ defmodule Campfire.RoomPage do
   EEx.function_from_file(:defp, :invitation, "priv/templates/invitation.html.eex", [:assigns])
 
   def show(conn, room_id, message_id \\ nil) do
+    do_show(conn, room_id, message_id)
+  end
+
+  defp do_show(conn, room_id, message_id) do
     {conn, user, session} = Auth.session_user(conn)
 
     cond do
@@ -43,7 +47,7 @@ defmodule Campfire.RoomPage do
             namespace: namespace(room),
             room_updated: MessagesView.epoch(room["updated_at"]),
             base: Assets.html_escape(Auth.base(conn)),
-            vapid: Assets.html_escape(System.get_env("VAPID_PUBLIC_KEY", "")),
+            vapid: Assets.html_escape(Campfire.Env.get("VAPID_PUBLIC_KEY", "")),
             account_version:
               account["updated_at"] |> String.replace(~r/[^0-9]/, "") |> String.slice(0, 14),
             stream: Rails.sign_stream(gid <> ":messages"),

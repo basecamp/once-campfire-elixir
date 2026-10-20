@@ -1,0 +1,282 @@
+{
+  "app": "elixir",
+  "base": "http://127.0.0.1:4104",
+  "seed": "/Users/gilbertwong/WorkSpace/opensource/elixir/once-campfire-verification/fixtures/default",
+  "routes": [
+    "room_show",
+    "search"
+  ],
+  "concurrencies": [
+    16,
+    64
+  ],
+  "rounds": 2,
+  "duration": 6,
+  "loadgen": "/Users/gilbertwong/WorkSpace/opensource/elixir/once-campfire-verification/loadgen/target/release/loadgen",
+  "host": "Darwin 27.0.0 arm64",
+  "cpus": "10",
+  "samples": [
+    {
+      "avg_bytes": 20615,
+      "conc": 16,
+      "errors": 0,
+      "gzip": true,
+      "invalid_reasons": {},
+      "invalid_responses": 0,
+      "latency": {
+        "max_ms": 11.055,
+        "mean_ms": 1.74,
+        "n": 54888,
+        "p50_ms": 1.74,
+        "p90_ms": 2.403,
+        "p99_ms": 2.979
+      },
+      "ok": 54888,
+      "path": "/rooms/486777696",
+      "rps": 9144.8,
+      "secs": 6.0,
+      "statuses": {
+        "200": 54888
+      },
+      "validation": "route-contract-v1",
+      "route": "room_show",
+      "concurrency": 16,
+      "round": 1,
+      "requests_per_second": 9148.0
+    },
+    {
+      "avg_bytes": 20615,
+      "conc": 64,
+      "errors": 0,
+      "gzip": true,
+      "invalid_reasons": {},
+      "invalid_responses": 0,
+      "latency": {
+        "max_ms": 37.855,
+        "mean_ms": 7.41,
+        "n": 51720,
+        "p50_ms": 7.443,
+        "p90_ms": 9.599,
+        "p99_ms": 13.343
+      },
+      "ok": 51720,
+      "path": "/rooms/486777696",
+      "rps": 8610.7,
+      "secs": 6.01,
+      "statuses": {
+        "200": 51720
+      },
+      "validation": "route-contract-v1",
+      "route": "room_show",
+      "concurrency": 64,
+      "round": 1,
+      "requests_per_second": 8620.0
+    },
+    {
+      "avg_bytes": 9450,
+      "conc": 16,
+      "errors": 0,
+      "gzip": true,
+      "invalid_reasons": {},
+      "invalid_responses": 0,
+      "latency": {
+        "max_ms": 7.183,
+        "mean_ms": 1.35,
+        "n": 70725,
+        "p50_ms": 1.415,
+        "p90_ms": 2.01,
+        "p99_ms": 2.597
+      },
+      "ok": 70725,
+      "path": "/searches?q=coffee",
+      "rps": 11784.4,
+      "secs": 6.0,
+      "statuses": {
+        "200": 70725
+      },
+      "validation": "route-contract-v1",
+      "route": "search",
+      "concurrency": 16,
+      "round": 1,
+      "requests_per_second": 11787.5
+    },
+    {
+      "avg_bytes": 9450,
+      "conc": 64,
+      "errors": 0,
+      "gzip": true,
+      "invalid_reasons": {},
+      "invalid_responses": 0,
+      "latency": {
+        "max_ms": 14.039,
+        "mean_ms": 5.3,
+        "n": 72236,
+        "p50_ms": 5.263,
+        "p90_ms": 6.559,
+        "p99_ms": 8.535
+      },
+      "ok": 72236,
+      "path": "/searches?q=coffee",
+      "rps": 12029.0,
+      "secs": 6.01,
+      "statuses": {
+        "200": 72236
+      },
+      "validation": "route-contract-v1",
+      "route": "search",
+      "concurrency": 64,
+      "round": 1,
+      "requests_per_second": 12039.333333333334
+    },
+    {
+      "avg_bytes": 20615,
+      "conc": 16,
+      "errors": 0,
+      "gzip": true,
+      "invalid_reasons": {},
+      "invalid_responses": 0,
+      "latency": {
+        "max_ms": 11.167,
+        "mean_ms": 1.83,
+        "n": 52225,
+        "p50_ms": 1.777,
+        "p90_ms": 2.239,
+        "p99_ms": 3.081
+      },
+      "ok": 52225,
+      "path": "/rooms/486777696",
+      "rps": 8702.0,
+      "secs": 6.0,
+      "statuses": {
+        "200": 52225
+      },
+      "validation": "route-contract-v1",
+      "route": "room_show",
+      "concurrency": 16,
+      "round": 2,
+      "requests_per_second": 8704.166666666666
+    },
+    {
+      "avg_bytes": 20615,
+      "conc": 64,
+      "errors": 0,
+      "gzip": true,
+      "invalid_reasons": {},
+      "invalid_responses": 0,
+      "latency": {
+        "max_ms": 21.679,
+        "mean_ms": 6.92,
+        "n": 55353,
+        "p50_ms": 7.987,
+        "p90_ms": 10.359,
+        "p99_ms": 13.519
+      },
+      "ok": 55353,
+      "path": "/rooms/486777696",
+      "rps": 9213.4,
+      "secs": 6.01,
+      "statuses": {
+        "200": 55353
+      },
+      "validation": "route-contract-v1",
+      "route": "room_show",
+      "concurrency": 64,
+      "round": 2,
+      "requests_per_second": 9225.5
+    },
+    {
+      "avg_bytes": 9450,
+      "conc": 16,
+      "errors": 0,
+      "gzip": true,
+      "invalid_reasons": {},
+      "invalid_responses": 0,
+      "latency": {
+        "max_ms": 10.327,
+        "mean_ms": 1.31,
+        "n": 73195,
+        "p50_ms": 1.287,
+        "p90_ms": 1.643,
+        "p99_ms": 2.051
+      },
+      "ok": 73195,
+      "path": "/searches?q=coffee",
+      "rps": 12196.3,
+      "secs": 6.0,
+      "statuses": {
+        "200": 73195
+      },
+      "validation": "route-contract-v1",
+      "route": "search",
+      "concurrency": 16,
+      "round": 2,
+      "requests_per_second": 12199.166666666666
+    },
+    {
+      "avg_bytes": 9450,
+      "conc": 64,
+      "errors": 0,
+      "gzip": true,
+      "invalid_reasons": {},
+      "invalid_responses": 0,
+      "latency": {
+        "max_ms": 12.071,
+        "mean_ms": 5.29,
+        "n": 72399,
+        "p50_ms": 5.311,
+        "p90_ms": 6.619,
+        "p99_ms": 8.391
+      },
+      "ok": 72399,
+      "path": "/searches?q=coffee",
+      "rps": 12054.7,
+      "secs": 6.01,
+      "statuses": {
+        "200": 72399
+      },
+      "validation": "route-contract-v1",
+      "route": "search",
+      "concurrency": 64,
+      "round": 2,
+      "requests_per_second": 12066.5
+    }
+  ],
+  "results": {
+    "room_show@16": {
+      "route": "room_show",
+      "concurrency": 16,
+      "requests_per_second": 8926.083333333332,
+      "samples": [
+        9148.0,
+        8704.166666666666
+      ]
+    },
+    "room_show@64": {
+      "route": "room_show",
+      "concurrency": 64,
+      "requests_per_second": 8922.75,
+      "samples": [
+        8620.0,
+        9225.5
+      ]
+    },
+    "search@16": {
+      "route": "search",
+      "concurrency": 16,
+      "requests_per_second": 11993.333333333332,
+      "samples": [
+        11787.5,
+        12199.166666666666
+      ]
+    },
+    "search@64": {
+      "route": "search",
+      "concurrency": 64,
+      "requests_per_second": 12052.916666666668,
+      "samples": [
+        12039.333333333334,
+        12066.5
+      ]
+    }
+  }
+}

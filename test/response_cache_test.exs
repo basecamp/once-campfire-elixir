@@ -8,13 +8,15 @@ defmodule Campfire.ResponseCacheTest do
 
   setup do
     DB.restore_fixture(@fixture)
-    System.put_env("CAMPFIRE_CLOCK", "2026-03-02T16:00:00Z")
-    System.put_env("CAMPFIRE_RESPONSE_CACHE_MB", "64")
+    Campfire.Env.put("CAMPFIRE_CLOCK", "2026-03-02T16:00:00Z")
+    Campfire.Env.put("CAMPFIRE_RESPONSE_CACHE_MB", "64")
+    Campfire.ResponseCache.refresh_limit()
 
     on_exit(fn ->
       ResponseCache.cleanup()
-      System.delete_env("CAMPFIRE_CLOCK")
-      System.delete_env("CAMPFIRE_RESPONSE_CACHE_MB")
+      Campfire.Env.delete("CAMPFIRE_CLOCK")
+      Campfire.Env.delete("CAMPFIRE_RESPONSE_CACHE_MB")
+      Campfire.ResponseCache.refresh_limit()
     end)
 
     user = DB.one("SELECT * FROM users WHERE id=127326141")
@@ -95,6 +97,51 @@ defmodule Campfire.ResponseCacheTest do
     assert get(context, path).resp_body =~ "local response-cache text"
   end
 
+  test "a render is only admitted while the epoch it was captured at still holds", context do
+    path = "/rooms/#{context.room["id"]}"
+    key = {:http, "www.example.com", 80, path, "", [], 1, 2, nil, nil, nil}
+
+    admitted = fn epoch, key ->
+      Plug.Test.conn(:get, path)
+      |> assign(:response_cache_capture, {key, epoch})
+      |> assign(:resp_body, "<html>render</html>")
+      |> put_resp_header("content-type", "text/html")
+      |> Map.put(:status, 200)
+      |> ResponseCache.complete()
+
+      ResponseCache.get(key, epoch) != nil
+    end
+
+    epoch = ResponseCache.epoch()
+    assert admitted.(epoch, key)
+
+    :ok = SQL.execute(context.foreign, "UPDATE accounts SET name='moved on'")
+
+    # The captured epoch is now older than the database: the admission check must refuse it.
+    refute admitted.(epoch, {:late, key})
+  end
+
+  # The sequence a reviewer asked for upstream: warm the cache, let a foreign writer commit, land an
+  # unrelated local write before anything reads, then read. A cache that records a shared WAL header
+  # on local write absorbs the foreign commit here and serves stale bytes forever.
+  test "an unrelated local write cannot absorb a foreign commit", context do
+    message = Chat.create_message(context.user, context.room, "before absorb text")
+    path = "/rooms/#{context.room["id"]}"
+
+    assert get(context, path).resp_body =~ "before absorb text"
+    assert get(context, path).assigns[:response_cache_hit]
+
+    :ok =
+      SQL.execute(
+        context.foreign,
+        "UPDATE action_text_rich_texts SET body='foreign absorb text' WHERE record_id=#{message["id"]}"
+      )
+
+    DB.query("UPDATE rooms SET name=name WHERE id=?", [context.room["id"]])
+
+    assert get(context, path).resp_body =~ "foreign absorb text"
+  end
+
   test "wildcard HTML requests invalidate timestamp-only fragments after foreign writes",
        context do
     message = Chat.create_message(context.user, context.room, "before wildcard cache text")
@@ -118,7 +165,8 @@ defmodule Campfire.ResponseCacheTest do
        context do
     message = Chat.create_message(context.user, context.room, "before native fragment text")
     path = "/rooms/#{context.room["id"]}"
-    System.put_env("CAMPFIRE_RESPONSE_CACHE_MB", "0")
+    Campfire.Env.put("CAMPFIRE_RESPONSE_CACHE_MB", "0")
+    Campfire.ResponseCache.refresh_limit()
     assert get(context, path).resp_body =~ "before native fragment text"
 
     :ok =
@@ -129,7 +177,8 @@ defmodule Campfire.ResponseCacheTest do
 
     assert get(context, path).resp_body =~ "foreign disabled fragment text"
 
-    System.put_env("CAMPFIRE_RESPONSE_CACHE_MB", "64")
+    Campfire.Env.put("CAMPFIRE_RESPONSE_CACHE_MB", "64")
+    Campfire.ResponseCache.refresh_limit()
     conditional = [{"if-none-match", "unmatched"}]
     assert get(context, path, conditional).resp_body =~ "foreign disabled fragment text"
 
@@ -204,6 +253,80 @@ defmodule Campfire.ResponseCacheTest do
     assert dated.status == 200
     assert dated.resp_body =~ "foreign conditional leaf text"
     assert get(context, path, html ++ [{"if-none-match", "*"}]).status == 304
+  end
+
+  test "a warm body is retired by the freshness window", context do
+    path = "/rooms/#{context.room["id"]}"
+    assert get(context, path).status == 200
+    assert get(context, path).assigns[:response_cache_hit]
+
+    Campfire.Env.put("CAMPFIRE_CLOCK", "2026-03-02T16:00:16Z")
+    refute get(context, path).assigns[:response_cache_hit]
+
+    Campfire.Env.put("CAMPFIRE_CLOCK", "2026-03-02T16:00:32Z")
+    refute get(context, path).assigns[:response_cache_hit]
+  end
+
+  test "a body too large to retain is served without being kept", context do
+    epoch = ResponseCache.epoch()
+    body = String.duplicate("x", 1024 * 1024 + 1)
+
+    conn =
+      conn(:get, "/rooms/#{context.room["id"]}")
+      |> assign(:response_cache_capture, {"oversized", epoch})
+      |> put_resp_header("content-type", "text/html; charset=utf-8")
+      |> Map.put(:status, 200)
+      |> Map.put(:resp_body, body)
+
+    assert ResponseCache.complete(conn).resp_body == body
+    assert ResponseCache.get("oversized", epoch) == nil
+  end
+
+  test "a request whose key material is too large is served without being kept", context do
+    path = "/rooms/#{context.room["id"]}"
+    headers = [{"accept", "text/html," <> String.duplicate("a", 9000)}]
+
+    assert get(context, path).status == 200
+    assert get(context, path).assigns[:response_cache_hit]
+    assert get(context, path, headers).status == 200
+    refute get(context, path, headers).assigns[:response_cache_hit]
+  end
+
+  test "a read keeps an entry ahead of an older one when the budget fills" do
+    Campfire.Env.put("CAMPFIRE_RESPONSE_CACHE_MB", "1")
+    Campfire.ResponseCache.refresh_limit()
+    epoch = ResponseCache.epoch()
+    entry = %{body: String.duplicate("x", 400_000), slots: [], headers: [], cookies: []}
+    for key <- ["one", "two"], do: ResponseCache.put(key, epoch, entry)
+    assert ResponseCache.get("one", epoch) != nil
+
+    ResponseCache.put("three", epoch, entry)
+
+    assert ResponseCache.get("one", epoch) != nil
+    assert ResponseCache.get("two", epoch) == nil
+  end
+
+  test "an entry larger than the per-item limit is not retained" do
+    epoch = ResponseCache.epoch()
+    large = %{body: String.duplicate("x", 2_200_000), slots: [], headers: [], cookies: []}
+    small = %{body: String.duplicate("x", 1_000), slots: [], headers: [], cookies: []}
+
+    ResponseCache.put("large", epoch, large)
+    ResponseCache.put("small", epoch, small)
+
+    assert ResponseCache.get("large", epoch) == nil
+    assert ResponseCache.get("small", epoch) != nil
+  end
+
+  test "an expired entry is retired so the next render can be kept again", context do
+    path = "/rooms/#{context.room["id"]}"
+
+    assert get(context, path).status == 200
+    assert get(context, path).assigns[:response_cache_hit]
+
+    Campfire.Env.put("CAMPFIRE_CLOCK", "2026-03-02T16:00:16Z")
+    refute get(context, path).assigns[:response_cache_hit]
+    assert get(context, path).assigns[:response_cache_hit]
   end
 
   test "warm bodies never replace current membership or authentication", context do
@@ -291,7 +414,8 @@ defmodule Campfire.ResponseCacheTest do
   end
 
   test "body budget disable and rollback preserve bounded valid entries", context do
-    System.put_env("CAMPFIRE_RESPONSE_CACHE_MB", "1")
+    Campfire.Env.put("CAMPFIRE_RESPONSE_CACHE_MB", "1")
+    Campfire.ResponseCache.refresh_limit()
     epoch = ResponseCache.epoch()
     entry = %{body: String.duplicate("x", 400_000), slots: [], headers: [], cookies: []}
     for key <- ["one", "two", "three"], do: ResponseCache.put(key, epoch, entry)
@@ -300,7 +424,8 @@ defmodule Campfire.ResponseCacheTest do
     :ok = SQL.execute(context.foreign, "BEGIN; UPDATE accounts SET name='rolled back'; ROLLBACK")
     assert ResponseCache.epoch() == epoch
     assert ResponseCache.get("three", epoch) != nil
-    System.put_env("CAMPFIRE_RESPONSE_CACHE_MB", "0")
+    Campfire.Env.put("CAMPFIRE_RESPONSE_CACHE_MB", "0")
+    Campfire.ResponseCache.refresh_limit()
     assert ResponseCache.epoch() == nil
     assert get(context, "/rooms/#{context.room["id"]}").status == 200
     assert :sys.get_state(ResponseCache).bytes == 0

@@ -1,0 +1,22 @@
+#!/bin/sh
+# Builds the two images the parity harness runs: the toolchain (candidate side) and the reference.
+#
+# The reference image is the pinned Rails app plus one layer — libfaketime and a writable
+# /rails/tmp — that the harness depends on and that reference/ (a submodule) does not provide.
+# Same two tags README documents, same GIT_REVISION bin/parity-services verifies.
+set -eu
+ROOT=$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)
+REVISION=$(git -C "$ROOT/reference" rev-parse HEAD)
+
+docker build --build-arg GIT_REVISION="$REVISION" -t campfire-reference:app -t campfire-reference:latest "$ROOT/reference"
+docker build -f "$ROOT/Dockerfile.parity-reference" -t campfire-reference:app -t campfire-reference:latest "$ROOT"
+docker build -f "$ROOT/Dockerfile.dev" -t campfire-elixir:toolchain "$ROOT"
+
+for image in campfire-reference:app campfire-reference:latest; do
+  actual=$(docker image inspect "$image" --format '{{range .Config.Env}}{{println .}}{{end}}' | sed -n 's/^GIT_REVISION=//p')
+  [ "$actual" = "$REVISION" ] || { echo "$image carries $actual, expected $REVISION" >&2; exit 1; }
+done
+
+# The reference image's entrypoint would run db:prepare for a non-Rails command, so bypass it.
+docker run --rm --entrypoint sh campfire-reference:app -c 'test -e /usr/local/lib/libfaketime.so.1 && test -w /rails/tmp'
+echo "parity images ready (reference revision $REVISION)"

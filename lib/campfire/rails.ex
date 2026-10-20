@@ -2,26 +2,25 @@ defmodule Campfire.Rails do
   import Kernel, except: [sigil_r: 2]
   import Campfire.Sigils
   @moduledoc "Rails signing and encryption, validated against reference-produced vectors."
-  def json(value),
-    do:
-      Jason.encode!(value)
-      |> String.replace("<", "\\u003c")
-      |> String.replace(">", "\\u003e")
-      |> String.replace("&", "\\u0026")
+  def json(%Jason.OrderedObject{} = value),
+    do: value |> Campfire.JSON.encode_ordered() |> escape_json()
+
+  def json(value), do: value |> Torque.encode!() |> escape_json()
+
+  defp escape_json(json) do
+    json
+    |> String.replace("<", "\\u003c")
+    |> String.replace(">", "\\u003e")
+    |> String.replace("&", "\\u0026")
+  end
 
   def key(salt, length) do
-    secret = System.fetch_env!("SECRET_KEY_BASE")
-    cache = {__MODULE__, secret, salt, length}
+    secret =
+      Campfire.Memo.fetch(:secret_key_base, fn -> Campfire.Env.fetch!("SECRET_KEY_BASE") end)
 
-    case :persistent_term.get(cache, nil) do
-      nil ->
-        key = :crypto.pbkdf2_hmac(:sha256, secret, salt, 1000, length)
-        :persistent_term.put(cache, key)
-        key
-
-      key ->
-        key
-    end
+    Campfire.Memo.fetch({:key, secret, salt, length}, fn ->
+      :crypto.pbkdf2_hmac(:sha256, secret, salt, 1000, length)
+    end)
   end
 
   def sign_cookie(name, value, expires \\ nil) do
@@ -66,7 +65,7 @@ defmodule Campfire.Rails do
              tag,
              false
            ),
-         {:ok, decoded} <- Jason.decode(plain) do
+         {:ok, decoded} <- Campfire.JSON.decode(plain) do
       cookie_metadata(decoded, "cookie." <> name, now)
     else
       _ -> nil
@@ -101,7 +100,7 @@ defmodule Campfire.Rails do
 
   def sign_stream(stream),
     do:
-      Jason.encode!(stream)
+      Torque.encode!(stream)
       |> Base.encode64()
       |> sign(key("turbo/signed_stream_verifier_key", 64), :sha256)
 
@@ -151,7 +150,7 @@ defmodule Campfire.Rails do
          expected = Base.encode16(:crypto.mac(:hmac, algorithm, key, encoded), case: :lower),
          true <- Plug.Crypto.secure_compare(digest, expected),
          {:ok, plain} <- decode64(encoded),
-         {:ok, decoded} <- Jason.decode(plain) do
+         {:ok, decoded} <- Campfire.JSON.decode(plain) do
       if cookie, do: cookie_metadata(decoded, purpose, now), else: metadata(decoded, purpose, now)
     else
       _ -> nil
@@ -181,7 +180,7 @@ defmodule Campfire.Rails do
 
         %{"message" => message} ->
           with {:ok, text} <- Base.decode64(message),
-               {:ok, value} <- Jason.decode(text),
+               {:ok, value} <- Campfire.JSON.decode(text),
                do: value,
                else: (_ -> nil)
 

@@ -34,7 +34,7 @@ defmodule Campfire.RoomForms do
     conn = if user, do: Auth.set_auth_cookie(conn, session), else: conn
     room = if id, do: Chat.room(user, id), else: %{"name" => "New room", "id" => nil}
     account = DB.one("SELECT * FROM accounts LIMIT 1") || %{}
-    settings = Jason.decode!(account["settings"] || "{}")
+    settings = Campfire.JSON.decode!(account["settings"] || "{}")
 
     cond do
       !user ->
@@ -78,7 +78,9 @@ defmodule Campfire.RoomForms do
         {selected, unselected} = Enum.split_with(users, &(&1["id"] in selected_ids))
 
         direct_users =
-          if length(users) > 1, do: Enum.reject(users, &(&1["id"] == user["id"])), else: users
+          if match?([_, _ | _], users),
+            do: Enum.reject(users, &(&1["id"] == user["id"])),
+            else: users
 
         render_user = fn target, selected ->
           render_user(target, user, kind, edit, admin, selected)
@@ -103,7 +105,7 @@ defmodule Campfire.RoomForms do
           selected_users: Enum.map_join(selected, &render_user.(&1, true)),
           unselected_users: Enum.map_join(unselected, &render_user.(&1, false)),
           separator: selected != [] && unselected != [],
-          filter: if(length(users) > 20, do: filter(), else: "")
+          filter: if(Enum.count_until(users, 21) > 20, do: filter(), else: "")
         ]
 
         title =

@@ -4,7 +4,7 @@ defmodule Campfire.RichTextComparison do
   def comparable(%{"error" => error, "message" => message}) do
     kind =
       cond do
-        error in ["JSON::ParserError", "Jason.DecodeError"] ->
+        error in ["JSON::ParserError", "Campfire.JSON.Error"] ->
           :invalid_json
 
         String.contains?(message, "invalid base64") ->

@@ -8,28 +8,157 @@ defmodule Campfire.MessagesView do
 
   EEx.function_from_file(:defp, :boosts_html, "priv/templates/boosts.html.eex", [:assigns])
 
+  EEx.function_from_file(
+    :defp,
+    :attachment_actions_html,
+    "priv/templates/message_attachment_actions.html.eex",
+    [:assigns]
+  )
+
+  EEx.function_from_file(
+    :defp,
+    :reply_action_html,
+    "priv/templates/message_reply_action.html.eex",
+    [:assigns]
+  )
+
   def render(message, base) do
     :message
     |> Campfire.FragmentCache.record(message, fn ->
-      render_fragment(message, base)
+      render_fragment(message, base, nil)
     end)
   rescue
     _ -> failed_fragment()
   end
 
-  def render_many(messages, base), do: Enum.map_join(messages, &render(&1, base))
+  def render_many(messages, base) do
+    entries = Enum.map(messages, &{:message, &1})
 
-  defp render_fragment(message, base) do
-    creator = DB.one("SELECT * FROM users WHERE id=?", [message["creator_id"]])
-    room = DB.one("SELECT * FROM rooms WHERE id=?", [message["room_id"]])
+    Campfire.FragmentCache.fetch_many(entries, fn missed ->
+      loaded = preload(missed)
+      Enum.map(missed, fn {:message, message} -> render_safely(message, base, loaded) end)
+    end)
+    |> Enum.join()
+  end
 
-    text =
-      DB.one(
-        "SELECT body FROM action_text_rich_texts WHERE record_type='Message' AND record_id=? AND name='body'",
-        [message["id"]]
-      )
+  # A page's misses are rendered from one batched read set rather than a query per message, and a
+  # fully warm page runs no read at all.
+  defp preload(entries) do
+    messages = Enum.map(entries, fn {:message, message} -> message end)
+    ids = Enum.map(messages, & &1["id"])
 
-    body = if text, do: text["body"], else: nil
+    # A page's reads run as a handful of batched statements inside one read transaction per chunk,
+    # rather than five statements per message.
+    messages_by_id = Map.new(messages, &{&1["id"], &1})
+
+    boosts =
+      in_chunks(ids, fn placeholders, chunk ->
+        [rows] =
+          DB.read_batch([
+            {
+              "SELECT * FROM boosts WHERE message_id IN (#{placeholders}) ORDER BY message_id, created_at, id",
+              chunk
+            }
+          ])
+
+        rows
+      end)
+
+    boosts_by_message = Enum.group_by(boosts, & &1["message_id"])
+
+    {users, rooms, bodies} =
+      ids
+      |> Enum.chunk_every(400)
+      |> Enum.reduce({[], [], []}, fn chunk, {users, rooms, bodies} ->
+        chunk_messages = Enum.map(chunk, &Map.fetch!(messages_by_id, &1))
+        creator_ids = Enum.map(chunk_messages, & &1["creator_id"])
+        room_ids = Enum.map(chunk_messages, & &1["room_id"])
+
+        booster_ids =
+          chunk
+          |> Enum.flat_map(&Map.get(boosts_by_message, &1, []))
+          |> Enum.map(& &1["booster_id"])
+
+        user_ids = Enum.uniq(creator_ids ++ booster_ids)
+        chunk_room_ids = Enum.uniq(room_ids)
+
+        [chunk_users, chunk_rooms, chunk_bodies] =
+          DB.read_batch([
+            {"SELECT * FROM users WHERE id IN (#{placeholders(user_ids)})", user_ids},
+            {"SELECT * FROM rooms WHERE id IN (#{placeholders(chunk_room_ids)})", chunk_room_ids},
+            {
+              "SELECT record_id, body FROM action_text_rich_texts WHERE record_type='Message' AND record_id IN (#{placeholders(chunk)}) AND name='body'",
+              chunk
+            }
+          ])
+
+        {users ++ chunk_users, rooms ++ chunk_rooms, bodies ++ chunk_bodies}
+      end)
+
+    attachments =
+      in_chunks(ids, fn _placeholders, chunk ->
+        Campfire.Attachments.find_many("Message", chunk, "attachment")
+      end)
+
+    %{
+      users: Map.new(users, &{&1["id"], &1}),
+      rooms: Map.new(rooms, &{&1["id"], &1}),
+      bodies: Map.new(bodies, &{&1["record_id"], &1["body"]}),
+      boosts: Enum.group_by(boosts, & &1["message_id"]),
+      attachments: Map.new(attachments, &{&1["record_id"], &1})
+    }
+  end
+
+  defp placeholders(list), do: Enum.map_join(list, ",", fn _ -> "?" end)
+
+  defp in_chunks([], _query), do: []
+
+  defp in_chunks(ids, query) do
+    ids
+    |> Enum.chunk_every(400)
+    |> Enum.flat_map(fn chunk ->
+      placeholders = Enum.map_join(chunk, ",", fn _ -> "?" end)
+      query.(placeholders, chunk)
+    end)
+  end
+
+  defp user(id, nil), do: DB.one("SELECT * FROM users WHERE id=?", [id])
+  defp user(id, %{users: users}), do: Map.get(users, id)
+
+  defp room(id, nil), do: DB.one("SELECT * FROM rooms WHERE id=?", [id])
+  defp room(id, %{rooms: rooms}), do: Map.get(rooms, id)
+
+  defp body(id, nil) do
+    case DB.one(
+           "SELECT body FROM action_text_rich_texts WHERE record_type='Message' AND record_id=? AND name='body'",
+           [id]
+         ) do
+      nil -> nil
+      text -> text["body"]
+    end
+  end
+
+  defp body(id, %{bodies: bodies}), do: Map.get(bodies, id)
+
+  defp attachment(id, nil), do: Campfire.Attachments.find("Message", id, "attachment")
+  defp attachment(id, %{attachments: attachments}), do: Map.get(attachments, id)
+
+  defp boosts(message, nil) do
+    DB.query("SELECT * FROM boosts WHERE message_id=? ORDER BY created_at", [message["id"]])
+  end
+
+  defp boosts(message, %{boosts: boosts}), do: Map.get(boosts, message["id"], [])
+
+  defp render_safely(message, base, loaded) do
+    render_fragment(message, base, loaded)
+  rescue
+    _ -> failed_fragment()
+  end
+
+  defp render_fragment(message, base, loaded) do
+    creator = user(message["creator_id"], loaded)
+    room = room(message["room_id"], loaded)
+    body = body(message["id"], loaded)
 
     title =
       [creator["name"], creator["bio"]]
@@ -54,8 +183,8 @@ defmodule Campfire.MessagesView do
       emoji_class:
         if(all_emoji?(RichText.plain_text(body || "")), do: "message--emoji", else: ""),
       presentation: presentation_fragment(message, body),
-      attachment_actions: attachment_actions(message),
-      boosting: render_boosts(message)
+      attachment_actions: attachment_actions(message, loaded),
+      boosting: render_boosts(message, loaded)
     )
   end
 
@@ -63,35 +192,34 @@ defmodule Campfire.MessagesView do
     do:
       "<div class=\"message message--formatted message--failed center\">\n  <div class=\"message__body\">\n    <div class=\"message__body-content txt-align-center\">\n      Failed to load message content\n    </div>\n  </div>\n</div>\n"
 
-  defp attachment_actions(message) do
-    if blob = Campfire.Attachments.find("Message", message["id"], "attachment") do
+  defp attachment_actions(message, loaded) do
+    if blob = attachment(message["id"], loaded) do
       path = Assets.html_escape(Campfire.Storage.blob_path(blob))
       filename = Assets.html_escape(Campfire.Filename.sanitized(blob["filename"]))
 
-      """
-                <a class="btn message__action-btn center full-width hide-in-ios-pwa" title="Download" aria-label="Download" href="#{path}?disposition=attachment">
-                  <img class="colorize--black" aria-hidden="true" src="#{Assets.path("download.svg")}" width="20" height="20" />
-      </a>
-                <button class="btn message__action-btn center full-width" data-controller="web-share" data-action="web-share#share" data-web-share-files-value="#{path}" data-web-share-title-value="#{filename}" title="Share" aria-label="Share">
-                  <img class="colorize--black" aria-hidden="true" src="#{Assets.path("share.svg")}" width="20" height="20" />
-      </button>
-      """
+      attachment_actions_html(%{
+        path: path,
+        filename: filename,
+        download_icon: Assets.path("download.svg"),
+        share_icon: Assets.path("share.svg")
+      })
     else
-      """
-                <button class="btn message__action-btn center full-width" data-action="reply#reply" title="Reply" aria-label="Reply">
-                  <img class="colorize--black" aria-hidden="true" src="#{Assets.path("reply.svg")}" width="20" height="20" />
-      </button>
-      """
+      reply_action_html(%{reply_icon: Assets.path("reply.svg")})
     end
   end
 
-  def render_boosts(message) do
+  def render_boosts(message, loaded \\ nil) do
     boosts_html(
       client_id: Assets.html_escape(message["client_message_id"]),
       id: message["id"],
       boosts:
-        DB.query("SELECT * FROM boosts WHERE message_id=? ORDER BY created_at", [message["id"]])
-        |> Enum.map_join(&render_boost/1)
+        message
+        |> boosts(loaded)
+        |> Enum.map(&{:boost, &1})
+        |> Campfire.FragmentCache.fetch_many(fn missed ->
+          Enum.map(missed, fn {:boost, boost} -> render_boost_fragment(boost, loaded) end)
+        end)
+        |> Enum.join()
     )
     |> String.trim_trailing("\n")
   end
@@ -99,12 +227,12 @@ defmodule Campfire.MessagesView do
   def render_boost(boost) do
     :boost
     |> Campfire.FragmentCache.record(boost, fn ->
-      render_boost_fragment(boost)
+      render_boost_fragment(boost, nil)
     end)
   end
 
-  defp render_boost_fragment(boost) do
-    booster = DB.one("SELECT * FROM users WHERE id=?", [boost["booster_id"]])
+  defp render_boost_fragment(boost, loaded) do
+    booster = user(boost["booster_id"], loaded)
 
     avatar =
       Mentions.avatar(booster, :page)
@@ -187,7 +315,7 @@ defmodule Campfire.MessagesView do
 
     plain = RichText.plain_text(Floki.raw_html(nodes))
 
-    if length(embeds) == 1 do
+    if match?([_], embeds) do
       [{_, attrs, _} = attachment] = embeds
       embed = Campfire.OpengraphEmbed.resolve(attrs)
 

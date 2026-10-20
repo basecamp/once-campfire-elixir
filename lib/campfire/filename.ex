@@ -1,7 +1,7 @@
 defmodule Campfire.Filename do
   import Kernel, except: [sigil_r: 2]
   import Campfire.Sigils
-  @approximations Jason.decode!(File.read!("priv/transliterations.json"))
+  @approximations Campfire.JSON.decode!(File.read!("priv/transliterations.json"))
   def sanitized(raw) do
     raw
     |> utf8()

@@ -1,101 +1,51 @@
 defmodule Campfire.HtmlParser do
-  @moduledoc "Bounded, fault-isolated Gumbo parsers pinned to the Rails reference's Nokogiri version."
-  use GenServer
-  @workers 4
-  @recycle_output_bytes 1_048_576
+  @moduledoc """
+  HTML parsing on the pinned Gumbo binding, at the reference's parser-time limits.
 
-  def children do
-    for index <- 0..(@workers - 1) do
-      %{id: {__MODULE__, index}, start: {__MODULE__, :start_link, [index]}}
-    end
-  end
+  A fragment parses in a `body` context, as Nokogiri's `HTML5.fragment` does for the
+  reference, and one past the reference's tree-depth or per-element attribute limit
+  raises `ArgumentError` instead of returning a tree.
 
-  def start_link(index), do: GenServer.start_link(__MODULE__, index, name: name(index))
+  Processing instructions are dropped: the binding keeps them (the spec gained them in
+  2026) while the reference records a bogus comment, and the render pipeline discards
+  comments either way, so dropping them here keeps the rendered output the same.
+  """
+  @options [max_tree_depth: 401, max_attributes: 400, max_errors: 0]
 
   def parse(html) do
-    index = :erlang.phash2(self(), @workers)
+    case Gumbo.parse_fragment(html, :body, @options) do
+      {:ok, output} ->
+        output
+        |> Gumbo.Output.fragment_nodes()
+        |> Gumbo.materialize(detail: :tree)
+        |> Enum.flat_map(&List.wrap(to_term(&1)))
 
-    case GenServer.call(name(index), {:parse, html}, 30_000) do
-      {:error, message} -> raise ArgumentError, message
-      %{"error" => message} -> raise ArgumentError, message
-      nodes -> Enum.map(nodes, &decode_node/1)
+      {:error, :tree_too_deep} ->
+        raise ArgumentError, "Document tree depth limit exceeded"
+
+      {:error, :too_many_attributes} ->
+        raise ArgumentError, "Attributes per element limit exceeded"
+
+      {:error, reason} ->
+        raise ArgumentError, "cannot parse HTML: #{inspect(reason)}"
     end
   end
 
-  @impl true
-  def init(_index) do
-    Process.flag(:trap_exit, true)
-    {:ok, open_port()}
+  defp to_term(%{type: type, tag_name: tag_name, attributes: attributes, children: children})
+       when type in [:element, :template] do
+    {tag_name, attributes, Enum.flat_map(children, &List.wrap(to_term(&1)))}
   end
 
-  @impl true
-  def handle_call({:parse, html}, _from, port) do
-    if port_command(port, html) do
-      receive do
-        {^port, {:data, data}} ->
-          {:reply, Jason.decode!(data), recycle_after_large_output(port, data)}
+  defp to_term(%{type: :comment} = comment), do: {:comment, comment.text}
 
-        {^port, {:exit_status, status}} ->
-          message = "isolated HTML parser exited with status #{status}"
-          {:reply, {:error, message}, open_port()}
+  # A `<?…>` is a processing instruction here and a bogus comment to the reference, whose
+  # generation predates the token type: it keeps `?pi?` where this binding keeps `target`/`data`
+  # and loses the delimiters, so the two cannot be made to agree node for node by mapping one
+  # onto the other. The render pipeline discards comments and instructions alike, so dropping
+  # the node is what keeps this tree the shape the reader works on; the tree comparison against
+  # the reference parser labels the two bodies it moves rather than counting them as divergences
+  # (var/classify_diffs.exs, `:processing_instruction`).
+  defp to_term(%{type: :processing_instruction}), do: nil
 
-        {:EXIT, ^port, reason} ->
-          message = "isolated HTML parser exited: #{inspect(reason)}"
-          {:reply, {:error, message}, open_port()}
-      after
-        27_000 ->
-          Port.close(port)
-          {:reply, {:error, "isolated HTML parser timed out"}, open_port()}
-      end
-    else
-      {:reply, {:error, "isolated HTML parser exited before parsing"}, open_port()}
-    end
-  end
-
-  @impl true
-  def handle_info({port, {:exit_status, _status}}, port), do: {:noreply, open_port()}
-
-  def handle_info({port, {:exit_status, _status}}, current) when is_port(port),
-    do: {:noreply, current}
-
-  def handle_info({:EXIT, port, _reason}, port), do: {:noreply, open_port()}
-
-  def handle_info({:EXIT, port, _reason}, current) when is_port(port),
-    do: {:noreply, current}
-
-  @impl true
-  def terminate(_, port) do
-    if Port.info(port), do: Port.close(port)
-  end
-
-  defp open_port do
-    executable = Path.join(:code.priv_dir(:campfire), "native/campfire-html")
-
-    Port.open({:spawn_executable, String.to_charlist(executable)}, [
-      :binary,
-      {:packet, 4},
-      :exit_status
-    ])
-  end
-
-  defp port_command(port, html) do
-    Port.command(port, html)
-  rescue
-    ArgumentError -> false
-  end
-
-  defp recycle_after_large_output(port, data) when byte_size(data) >= @recycle_output_bytes do
-    Port.close(port)
-    open_port()
-  end
-
-  defp recycle_after_large_output(port, _data), do: port
-
-  defp name(index), do: String.to_atom("Elixir.Campfire.HtmlParser.#{index}")
-
-  defp decode_node([tag, attrs, children]),
-    do: {tag, Enum.map(attrs, &List.to_tuple/1), Enum.map(children, &decode_node/1)}
-
-  defp decode_node(%{"comment" => text}), do: {:comment, text}
-  defp decode_node(text) when is_binary(text), do: text
+  defp to_term(%{text: text}), do: text
 end

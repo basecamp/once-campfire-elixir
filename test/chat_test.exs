@@ -4,8 +4,8 @@ defmodule Campfire.ChatTest do
   @fixture Jason.decode!(File.read!("test/fixtures/seed.json"))
   setup do
     :ok = DB.restore_fixture(@fixture)
-    System.put_env("CAMPFIRE_CLOCK", "2026-03-02T16:00:00Z")
-    on_exit(fn -> System.delete_env("CAMPFIRE_CLOCK") end)
+    Campfire.Env.put("CAMPFIRE_CLOCK", "2026-03-02T16:00:00Z")
+    on_exit(fn -> Campfire.Env.delete("CAMPFIRE_CLOCK") end)
     user = Chat.bot("394959859-BenderBot123")
     room = Chat.room(user, 486_777_696)
     %{user: user, room: room}
@@ -94,9 +94,9 @@ defmodule Campfire.ChatTest do
 
   test "pagination uses timestamps, bounds page size, and scopes the cursor", %{room: room} do
     latest = Chat.messages(room, %{})
-    assert length(latest) == 40
+    assert Enum.count(latest) == 40
     earlier = Chat.messages(room, %{"before" => to_string(hd(latest)["id"])})
-    assert length(earlier) == 40
+    assert Enum.count(earlier) == 40
     assert List.last(earlier)["created_at"] < hd(latest)["created_at"]
     assert {:error, :not_found} = Chat.messages(room, %{"after" => "0"})
   end

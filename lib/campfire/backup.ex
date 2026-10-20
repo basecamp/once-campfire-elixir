@@ -3,10 +3,10 @@ defmodule Campfire.Backup do
   alias Exqlite.Sqlite3, as: SQL
 
   def create do
-    source = System.get_env("DATABASE_PATH", "/rails/storage/db/production.sqlite3")
+    source = Campfire.Env.get("DATABASE_PATH", "/rails/storage/db/production.sqlite3")
 
     folder =
-      System.get_env("BACKUP_PATH", Path.join(Path.dirname(Path.dirname(source)), "backups"))
+      Campfire.Env.get("BACKUP_PATH", Path.join(Path.dirname(Path.dirname(source)), "backups"))
 
     File.mkdir_p!(folder)
     destination = Path.join(folder, Path.basename(source))

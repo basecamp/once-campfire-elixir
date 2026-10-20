@@ -1,5 +1,7 @@
 defmodule Campfire.MediaTest do
   use ExUnit.Case, async: true
+
+  @moduletag :pinned_libvips
   alias Campfire.Media
 
   @vectors Jason.decode!(File.read!("vectors/storage.json"))

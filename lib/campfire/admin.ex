@@ -50,7 +50,7 @@ defmodule Campfire.Admin do
     settings =
       if attrs["settings"] do
         values =
-          Jason.decode!(account["settings"] || "{}")
+          Campfire.JSON.decode!(account["settings"] || "{}")
           |> Map.put_new("restrict_room_creation_to_administrators", false)
 
         values =
@@ -62,7 +62,7 @@ defmodule Campfire.Admin do
               raise ArgumentError, "unknown account setting: #{key}"
           end)
 
-        Jason.encode!(values)
+        Torque.encode!(values)
       else
         account["settings"] || ~s({"restrict_room_creation_to_administrators":false})
       end

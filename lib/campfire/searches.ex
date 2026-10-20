@@ -51,7 +51,7 @@ defmodule Campfire.Searches do
         probe |> Enum.filter(&(&1["reachable"] == 1)) |> Enum.take(100) |> Enum.map(& &1["id"])
 
       ids =
-        if length(ids) < 100 && length(probe) == 1000 do
+        if Enum.count_until(ids, 100) < 100 && Enum.count_until(probe, 1001) == 1000 do
           DB.query(
             "SELECT m.id FROM messages m JOIN message_search_index idx ON idx.rowid=m.id " <>
               "JOIN memberships mm ON mm.room_id=m.room_id WHERE mm.user_id=? AND idx.body MATCH ? " <>
@@ -66,7 +66,7 @@ defmodule Campfire.Searches do
       DB.query(
         "SELECT m.* FROM messages m JOIN memberships mm ON mm.room_id=m.room_id " <>
           "WHERE mm.user_id=? AND m.id IN (SELECT value FROM json_each(?)) ORDER BY m.id",
-        [user_id, Jason.encode!(ids)]
+        [user_id, Torque.encode!(ids)]
       )
     end
   end

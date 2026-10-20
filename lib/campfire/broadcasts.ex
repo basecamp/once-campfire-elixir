@@ -1,17 +1,26 @@
 defmodule Campfire.Broadcasts do
   alias Campfire.{Cable, DB, MessagesView}
 
-  def create(room, message, base \\ System.get_env("APP_URL", "http://example.org"), _user \\ nil) do
-    html = "\n" <> String.trim_trailing(MessagesView.render(message, base), "\n")
+  def create(
+        room,
+        message,
+        base \\ Campfire.Env.get("APP_URL", "http://example.org"),
+        _user \\ nil,
+        rendered \\ nil
+      ) do
+    # The POST handler renders the same message for its own response; passing that through halves
+    # the render cost of a posted message.
+    html = "\n" <> String.trim_trailing(rendered || MessagesView.render(message, base), "\n")
 
     append =
       ~s(<turbo-stream action="append" target="messages_#{room_key(room)}"><template>#{html}</template></turbo-stream>)
 
     Cable.broadcast(Cable.messages_stream(room), append)
 
-    for membership <- DB.query("SELECT user_id FROM memberships WHERE room_id=?", [room["id"]]) do
-      Cable.broadcast("user_#{membership["user_id"]}_unreads", %{"roomId" => room["id"]})
-    end
+    unreads = Campfire.Rails.json(%{"roomId" => room["id"]})
+
+    for membership <- DB.query("SELECT user_id FROM memberships WHERE room_id=?", [room["id"]]),
+        do: Cable.broadcast_payload("user_#{membership["user_id"]}_unreads", unreads)
 
     :ok
   end

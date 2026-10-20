@@ -13,7 +13,6 @@ git submodule update --init reference
 bin/export-assets --local
 
 mkdir -p var/bin
-cc -O2 -Wall -Wextra -Werror native/vips.c $(pkg-config --cflags --libs vips) -o var/bin/campfire-vips
 
 mix local.hex --force
 mix local.rebar --force
@@ -21,7 +20,6 @@ mix deps.get
 
 cat <<'EOF'
 Local setup complete. In each shell, from the repository root, run:
-  export PATH="$PWD/var/bin:$PATH"
   export CAMPFIRE_NO_SERVER=1 CAMPFIRE_JOBS_ADAPTER=disabled
   export DATABASE_PATH="$PWD/var/test.sqlite3"
 Then use ordinary mix compile/test/credo/dialyzer commands (see README).

@@ -77,13 +77,13 @@ defmodule Campfire.JobsTest do
   end
 
   test "enqueue reports unavailable Redis without exiting the caller" do
-    adapter = System.get_env("CAMPFIRE_JOBS_ADAPTER")
-    System.delete_env("CAMPFIRE_JOBS_ADAPTER")
+    adapter = Campfire.Env.get("CAMPFIRE_JOBS_ADAPTER")
+    Campfire.Env.delete("CAMPFIRE_JOBS_ADAPTER")
 
     on_exit(fn ->
       if adapter,
-        do: System.put_env("CAMPFIRE_JOBS_ADAPTER", adapter),
-        else: System.delete_env("CAMPFIRE_JOBS_ADAPTER")
+        do: Campfire.Env.put("CAMPFIRE_JOBS_ADAPTER", adapter),
+        else: Campfire.Env.delete("CAMPFIRE_JOBS_ADAPTER")
     end)
 
     assert Process.whereis(Campfire.Redis) == nil
@@ -97,8 +97,8 @@ defmodule Campfire.JobsTest do
   end
 
   test "enqueue reports a Redis disconnect race without exiting the caller" do
-    adapter = System.get_env("CAMPFIRE_JOBS_ADAPTER")
-    System.delete_env("CAMPFIRE_JOBS_ADAPTER")
+    adapter = Campfire.Env.get("CAMPFIRE_JOBS_ADAPTER")
+    Campfire.Env.delete("CAMPFIRE_JOBS_ADAPTER")
 
     redis =
       spawn(fn ->
@@ -113,8 +113,8 @@ defmodule Campfire.JobsTest do
       if Process.alive?(redis), do: Process.exit(redis, :kill)
 
       if adapter,
-        do: System.put_env("CAMPFIRE_JOBS_ADAPTER", adapter),
-        else: System.delete_env("CAMPFIRE_JOBS_ADAPTER")
+        do: Campfire.Env.put("CAMPFIRE_JOBS_ADAPTER", adapter),
+        else: Campfire.Env.delete("CAMPFIRE_JOBS_ADAPTER")
     end)
 
     log =

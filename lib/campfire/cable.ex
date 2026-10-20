@@ -47,7 +47,7 @@ defmodule Campfire.Cable do
 
   @impl true
   def handle_in({raw, [opcode: :text]}, state) do
-    case Jason.decode(raw) do
+    case Campfire.JSON.decode(raw) do
       {:ok, %{"command" => "subscribe", "identifier" => id}} when is_binary(id) ->
         subscribe(id, state)
 
@@ -68,7 +68,7 @@ defmodule Campfire.Cable do
     if Map.has_key?(state.subscriptions, id) do
       {:push, {:text, Rails.json(%{"identifier" => id, "type" => "confirm_subscription"})}, state}
     else
-      with {:ok, params} <- Jason.decode(id),
+      with {:ok, params} <- Campfire.JSON.decode(id),
            {:ok, sub} <- authorize(params, state.user) do
         if sub.stream, do: register(sub.stream, id)
 
@@ -163,7 +163,7 @@ defmodule Campfire.Cable do
 
   defp perform(id, data, state) do
     with sub when is_map(sub) <- state.subscriptions[id],
-         {:ok, params} <- Jason.decode(data),
+         {:ok, params} <- Campfire.JSON.decode(data),
          %{"action" => action} <- params do
       cond do
         sub.channel == "PresenceChannel" && action == "refresh" ->
@@ -183,9 +183,15 @@ defmodule Campfire.Cable do
     {:ok, state}
   end
 
-  def broadcast(stream, data) do
-    payload = Rails.json(data)
+  def broadcast(stream, data), do: broadcast_payload(stream, Rails.json(data))
 
+  @doc """
+  Broadcasts an already encoded payload.
+
+  Fan-out that sends the same body to many streams - one per room member, for example - encodes it
+  once here instead of once per recipient.
+  """
+  def broadcast_payload(stream, payload) do
     if Process.whereis(Campfire.CableRedisBridge) do
       Campfire.CableRedisBridge.publish(stream, payload)
     else
@@ -196,8 +202,18 @@ defmodule Campfire.Cable do
   end
 
   def deliver(stream, payload) do
+    # One frame per subscription identifier, built here rather than in each socket: the payload then
+    # crosses to the sockets as the finished frame instead of being copied per recipient and hashed
+    # again for the memo lookup on arrival.
     Registry.dispatch(Campfire.Streams, stream, fn entries ->
-      for {pid, id} <- entries, do: send(pid, {:delivery, stream, id, payload})
+      entries
+      |> Enum.group_by(fn {_pid, identifier} -> identifier end, fn {pid, _identifier} -> pid end)
+      |> Enum.each(fn {identifier, pids} ->
+        case Campfire.CableFrames.frame(stream, identifier, payload) do
+          {:ok, frame} -> Enum.each(pids, &send(&1, {:frame, frame}))
+          {:error, _} -> :ok
+        end
+      end)
     end)
 
     :ok
@@ -239,6 +255,9 @@ defmodule Campfire.Cable do
       {:error, _} -> {:ok, state}
     end
   end
+
+  # Delivered by Cable.deliver/2, which builds the frame once per identifier.
+  def handle_info({:frame, frame}, state), do: {:push, {:text, frame}, state}
 
   def handle_info({:disconnect, reconnect}, state),
     do:

@@ -42,7 +42,7 @@ defmodule Campfire.AccountPage do
       {administrators, members} = Enum.split_with(users, &(&1["role"] == 1))
       invitation = Auth.base(conn) <> "/join/" <> account["join_code"]
       version = String.replace(account["updated_at"], ~r/[^0-9]/, "") |> String.slice(0, 14)
-      settings = Jason.decode!(account["settings"] || "{}")
+      settings = Campfire.JSON.decode!(account["settings"] || "{}")
       restriction = settings["restrict_room_creation_to_administrators"]
 
       back =
@@ -64,13 +64,13 @@ defmodule Campfire.AccountPage do
         administrators: Enum.map_join(administrators, &render_user(&1, user, data)),
         members: Enum.map_join(members, &render_user(&1, user, data)),
         separator: administrators != [] && members != [],
-        next_page: if(length(users) > 500, do: next_page(2), else: ""),
+        next_page: if(Enum.count_until(users, 501) > 500, do: next_page(2), else: ""),
         delete_logo:
           if(Attachments.find("Account", account["id"], "logo"),
             do: logo_delete(account_version: version),
             else: ""
           ),
-        version: Assets.html_escape(System.get_env("APP_VERSION", "dev"))
+        version: Assets.html_escape(Campfire.Env.get("APP_VERSION", "dev"))
       ]
 
       content = if admin, do: account(assigns), else: readonly(assigns)

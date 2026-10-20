@@ -10,7 +10,7 @@ defmodule Campfire.Assets do
             "or bin/export-assets with the pinned Docker reference image (see README)."
   end
 
-  @manifest Jason.decode!(File.read!(@manifest_file))
+  @manifest Campfire.JSON.decode!(File.read!(@manifest_file))
   @preloads Regex.scan(
               ~r/Assets.path\("([^"]+\.css)"\)/,
               File.read!(@layout_file)
@@ -27,7 +27,10 @@ defmodule Campfire.Assets do
             end)
   def preload_header, do: @preloads
   def file(relative), do: Application.app_dir(:campfire, "priv/" <> relative)
-  def read(relative), do: relative |> file() |> File.read!()
+
+  def read(relative) do
+    Campfire.Memo.fetch({:asset, relative}, fn -> relative |> file() |> File.read!() end)
+  end
 
   def path(logical) do
     "/assets/" <> Map.fetch!(@manifest, logical)["digested_path"]
@@ -44,6 +47,16 @@ defmodule Campfire.Assets do
 
   def manifest(base) do
     account = Campfire.DB.one("SELECT * FROM accounts LIMIT 1")
+
+    Campfire.Memo.fetch(
+      {:manifest, base, if(account, do: {account["name"], account["updated_at"]})},
+      fn ->
+        build_manifest(base, account)
+      end
+    )
+  end
+
+  defp build_manifest(base, account) do
     name = if account, do: account["name"], else: "Campfire"
 
     version =

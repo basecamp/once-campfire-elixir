@@ -42,7 +42,7 @@ defmodule Campfire.BlobEmbeds do
           end)
 
         base =
-          Process.get(:campfire_request_base, System.get_env("APP_URL", "http://example.org"))
+          Process.get(:campfire_request_base, Campfire.Env.get("APP_URL", "http://example.org"))
 
         ~s(    <img src="#{Campfire.Assets.html_escape(base <> Campfire.AttachmentView.representation(blob, typed))}">\n)
       else
@@ -106,6 +106,20 @@ defmodule Campfire.BlobEmbeds do
         do: Attachments.save(query, blob, "ActionText::RichText", text_id, "embeds")
 
     {added, removed}
+  end
+
+  @doc """
+  Syncs embeds for a rich text row that was just inserted.
+
+  A new row cannot have existing embeds, so the query `sync/3` runs to find them would always come
+  back empty; this saves the inserts only.
+  """
+  def sync_new(query, text_id, blobs) do
+    added =
+      for blob <- blobs,
+          do: Attachments.save(query, blob, "ActionText::RichText", text_id, "embeds")
+
+    {added, []}
   end
 
   def committed({added, removed}) do

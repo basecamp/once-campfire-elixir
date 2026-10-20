@@ -4,7 +4,7 @@ defmodule Campfire.ModelCache do
   @moduledoc "Active Record cache keys and controller model validators."
   import Plug.Conn
   @external_resource "vectors/image-etags.json"
-  @avatar_digest Jason.decode!(File.read!(@external_resource))["Users::AvatarsController"][
+  @avatar_digest Campfire.JSON.decode!(File.read!(@external_resource))["Users::AvatarsController"][
                    "digest"
                  ]
 

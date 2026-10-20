@@ -27,12 +27,20 @@ defmodule Campfire.Chat do
     end
   end
 
-  def room(user, id),
-    do:
-      DB.one(
-        "SELECT r.* FROM rooms r JOIN memberships m ON m.room_id=r.id WHERE r.id=? AND m.user_id=?",
-        [integer(id), user["id"]]
-      )
+  def room(user, id) do
+    id = integer(id)
+
+    Campfire.SessionStore.fetch(
+      Campfire.ResponseCache.current_version(),
+      {:room, user["id"], id},
+      fn ->
+        DB.one(
+          "SELECT r.* FROM rooms r JOIN memberships m ON m.room_id=r.id WHERE r.id=? AND m.user_id=?",
+          [id, user["id"]]
+        )
+      end
+    )
+  end
 
   def can_administer?(user, message), do: user["role"] == 1 or user["id"] == message["creator_id"]
 
@@ -99,7 +107,7 @@ defmodule Campfire.Chat do
               [message["id"], body, now, now]
             )
 
-          Campfire.BlobEmbeds.sync(q, text["id"], embeds)
+          Campfire.BlobEmbeds.sync_new(q, text["id"], embeds)
         end
 
         if attachment do
@@ -127,8 +135,10 @@ defmodule Campfire.Chat do
       Campfire.Jobs.enqueue_push(room, result)
       Campfire.BlobEmbeds.committed({embeds, []})
 
-      if blob = Campfire.Attachments.find("Message", result["id"], "attachment"),
-        do: Campfire.Attachments.analyze_later(blob)
+      if attachment do
+        if blob = Campfire.Attachments.find("Message", result["id"], "attachment"),
+          do: Campfire.Attachments.analyze_later(blob)
+      end
     end
 
     result

@@ -23,7 +23,7 @@ defmodule Campfire.StorageMedia do
     with value when is_map(value) <- Rails.verify_message("ActiveStorage", token, "variation"),
          [encoded, _signature] <- String.split(token, "--"),
          {:ok, json} <- Base.decode64(encoded),
-         {:ok, %Jason.OrderedObject{} = envelope} <- Jason.decode(json, objects: :ordered_objects) do
+         {:ok, %Jason.OrderedObject{} = envelope} <- Campfire.JSON.decode_ordered(json) do
       rails =
         Enum.find_value(envelope.values, fn {key, value} -> if key == "_rails", do: value end)
 
@@ -120,7 +120,7 @@ defmodule Campfire.StorageMedia do
 
     with {:ok, extracted} <- result do
       %Jason.OrderedObject{values: existing} =
-        Jason.decode!(blob["metadata"] || "{}", objects: :ordered_objects)
+        Campfire.JSON.decode_ordered!(blob["metadata"] || "{}")
 
       additions =
         for key <-

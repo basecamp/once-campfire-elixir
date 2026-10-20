@@ -11,7 +11,7 @@ defmodule Campfire.Jobs do
 
   def enqueue(class, args) do
     cond do
-      System.get_env("CAMPFIRE_JOBS_ADAPTER") == "disabled" -> :ok
+      Campfire.Env.get("CAMPFIRE_JOBS_ADAPTER") == "disabled" -> :ok
       is_nil(Process.whereis(Campfire.Redis)) -> enqueue_error(:redis_unavailable)
       true -> enqueue_redis(class, args)
     end

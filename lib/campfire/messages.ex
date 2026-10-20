@@ -1,6 +1,6 @@
 defmodule Campfire.Messages do
   import Plug.Conn
-  alias Campfire.{Auth, Broadcasts, Chat, DB, MessagesView, Rails, Webhooks}
+  alias Campfire.{Auth, Broadcasts, Chat, DB, MessagesView, Rails}
 
   require EEx
   EEx.function_from_file(:defp, :editor, "priv/templates/message_edit.html.eex", [:assigns])
@@ -67,20 +67,27 @@ defmodule Campfire.Messages do
 
   defp action(%{method: "POST"} = conn, user, room, nil) do
     attrs =
-      Campfire.Params.required(conn.params, "message")
-      |> Campfire.Params.permit(~w(body attachment client_message_id))
+      Campfire.Params.permit(
+        Campfire.Params.required(conn.params, "message"),
+        ~w"body attachment client_message_id"
+      )
 
-    case Chat.create_message(user, room, attrs["body"], attrs) do
+    case Campfire.Chat.create_message(user, room, attrs["body"], attrs) do
       message when is_map(message) ->
         Campfire.Attachments.process_message(message)
-        Broadcasts.create(room, message, Auth.base(conn), user)
-        Webhooks.enqueue(room, message)
+
+        rendered =
+          Campfire.MessagesView.render(message, Campfire.Auth.base(conn))
+
+        Campfire.Broadcasts.create(room, message, Campfire.Auth.base(conn), user, rendered)
+
+        Campfire.Webhooks.enqueue(room, message)
 
         stream =
           ~s(<turbo-stream action="append" target="messages_#{Broadcasts.room_key(room)}"><template>
-#{MessagesView.render(message, Auth.base(conn)) |> String.trim_trailing("\n")}</template></turbo-stream>\n)
+#{rendered |> String.trim_trailing("\n")}</template></turbo-stream>\n)
 
-        conn |> put_resp_content_type("text/vnd.turbo-stream.html") |> send_resp(200, stream)
+        send_resp(put_resp_content_type(conn, "text/vnd.turbo-stream.html"), 200, stream)
 
       {:error, error} ->
         raise error

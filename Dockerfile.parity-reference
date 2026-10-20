@@ -1,0 +1,22 @@
+# The parity harness needs two things the pinned Rails image does not give it: a clock it can
+# freeze (the harness starts the reference with FAKETIME= and execs Rails runners with
+# LD_PRELOAD=/usr/local/lib/libfaketime.so.1) and a /rails/tmp the non-root user can write.
+#
+# reference/ is a pinned submodule and stays untouched, so this adds them as a layer on top of the
+# image the README builds. GIT_REVISION is inherited, which is what bin/parity-services checks.
+#
+# Build it with bin/parity-image.
+FROM campfire-reference:app
+
+USER root
+
+RUN apt-get update -qq && \
+    apt-get install --no-install-recommends -y libfaketime && \
+    ln -sf /usr/lib/$(uname -m)-linux-gnu/faketime/libfaketime.so.1 /usr/local/lib/libfaketime.so.1 && \
+    mkdir -p /rails/tmp /rails/log && \
+    chmod -R 777 /rails/tmp /rails/log && \
+    rm -rf /var/lib/apt/lists /var/cache/apt/archives
+
+# FAKETIME comes from the harness per container. Monotonic time stays real so timeouts behave.
+ENV LD_PRELOAD="/usr/local/lib/libfaketime.so.1:/usr/local/lib/libjemalloc.so" \
+    FAKETIME_DONT_FAKE_MONOTONIC="1"

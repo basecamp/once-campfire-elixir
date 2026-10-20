@@ -1,6 +1,8 @@
 defmodule Campfire.TransformationsTest do
   use ExUnit.Case, async: true
 
+  @moduletag :pinned_libvips
+
   @vectors for item <-
                  Jason.decode!(File.read!("vectors/transformations.json"),
                    objects: :ordered_objects

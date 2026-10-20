@@ -48,10 +48,10 @@ defmodule Campfire.CableFramesTest do
 
     assert :ok = Cable.broadcast("room-stream", %{"body" => "hello"})
 
-    assert_receive {:delivery, "room-stream", "subscription-id", payload}
+    # The frame is built once by the broadcaster and handed to the socket already encoded.
+    assert_receive {:frame, frame}
 
-    assert {:push, {:text, frame}, %{}} =
-             Cable.handle_info({:delivery, "room-stream", "subscription-id", payload}, %{})
+    assert {:push, {:text, ^frame}, %{}} = Cable.handle_info({:frame, frame}, %{})
 
     assert Jason.decode!(frame) == %{
              "identifier" => "subscription-id",
@@ -64,7 +64,12 @@ defmodule Campfire.CableFramesTest do
     Registry.register(Campfire.Connections, 42, nil)
 
     assert :ok = CableRedisBridge.deliver("room-stream", ~s({"body":"hello"}))
-    assert_receive {:delivery, "room-stream", "subscription-id", ~s({"body":"hello"})}
+    assert_receive {:frame, frame}
+
+    assert Jason.decode!(frame) == %{
+             "identifier" => "subscription-id",
+             "message" => %{"body" => "hello"}
+           }
 
     internal =
       "action_cable/" <> Base.url_encode64("gid://campfire/User/42", padding: false)

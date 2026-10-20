@@ -6,7 +6,7 @@ defmodule Campfire.Rooms do
     account = DB.one("SELECT settings FROM accounts LIMIT 1")
 
     settings =
-      if account && account["settings"], do: Jason.decode!(account["settings"]), else: %{}
+      if account && account["settings"], do: Campfire.JSON.decode!(account["settings"]), else: %{}
 
     user["role"] == 1 || !settings["restrict_room_creation_to_administrators"]
   end
@@ -181,7 +181,7 @@ defmodule Campfire.Rooms do
         "WHERE r.type='Rooms::Direct' GROUP BY r.id " <>
         "HAVING COUNT(*)=? AND SUM(m.user_id IN (SELECT value FROM json_each(?)))=? " <>
         "ORDER BY r.id LIMIT 1",
-      [length(ids), Jason.encode!(ids), length(ids)]
+      [length(ids), Torque.encode!(ids), length(ids)]
     )
   end
 

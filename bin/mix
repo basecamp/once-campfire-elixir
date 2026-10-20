@@ -1,5 +1,21 @@
 #!/bin/sh
+# Runs mix in the project's toolchain container.
+#
+# Two things differ from a plain `docker run`: the build path is /app/_build/container, so host and
+# container builds never overwrite each other, and dependency NIFs — which elixir_make compiles
+# inside the shared source tree — are rebuilt first when the last builder was the other platform.
 set -eu
 ROOT=$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)
 mkdir -p "$ROOT/var/tmp"
-exec docker run --rm --network host --user "$(id -u):$(id -g)" -e HOME=/app -e TMPDIR=/app/var/tmp -e HEX_HOME=/app/.hex -e MIX_HOME=/app/.mix -e EXQLITE_USE_SYSTEM=1 -e CAMPFIRE_NO_SERVER=1 -e CAMPFIRE_JOBS_ADAPTER=disabled -e DATABASE_PATH=/app/var/test.sqlite3 -v "$ROOT:/app" -w /app campfire-elixir:toolchain mix "$@"
+
+run() {
+  docker run --rm --network host --user "$(id -u):$(id -g)" \
+    -e HOME=/app -e TMPDIR=/app/var/tmp -e HEX_HOME=/app/.hex -e MIX_HOME=/app/.mix \
+    -e MIX_BUILD_PATH=/app/_build/container -e EXQLITE_USE_SYSTEM=1 \
+    -e CAMPFIRE_NO_SERVER=1 -e CAMPFIRE_JOBS_ADAPTER=disabled \
+    -e DATABASE_PATH=/app/var/test.sqlite3 \
+    -v "$ROOT:/app" -w /app campfire-elixir:toolchain "$@"
+}
+
+run sh -c 'bin/platform-nifs >/dev/null 2>&1 || true'
+run mix "$@"

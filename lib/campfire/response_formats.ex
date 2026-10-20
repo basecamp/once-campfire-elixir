@@ -5,7 +5,7 @@ defmodule Campfire.ResponseFormats do
   import Plug.Conn
 
   @external_resource "vectors/mime-types.json"
-  @types Jason.decode!(File.read!(@external_resource))
+  @types Campfire.JSON.decode!(File.read!(@external_resource))
   @mime @types["lookup"]
   @wildcards @types["wildcards"]
 

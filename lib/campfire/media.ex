@@ -1,87 +1,16 @@
 defmodule Campfire.Media do
-  @moduledoc "Image and video processing through the same libvips and FFmpeg pipelines as Active Storage."
+  @moduledoc "Image processing through libvips (Vix) and audio/video through FFprobe and FFmpeg."
 
-  def image_metadata(path) do
-    case run("campfire-vips", ["analyze", Path.expand(path)]) do
-      {:ok, json} -> Jason.decode(json)
-      error -> error
-    end
-  end
+  def image_metadata(path), do: Campfire.Media.Vips.image_metadata(path)
 
   def resize(input, output, width, height)
       when is_integer(width) and width > 0 and is_integer(height) and height > 0 do
-    case run("campfire-vips", [
-           "resize",
-           Path.expand(input),
-           Path.expand(output),
-           to_string(width),
-           to_string(height)
-         ]) do
-      {:ok, _} -> :ok
-      error -> error
-    end
+    Campfire.Media.Vips.resize(input, output, width, height)
   end
 
-  def convert(input, output) do
-    case run("campfire-vips", ["convert", Path.expand(input), Path.expand(output)]) do
-      {:ok, _} -> :ok
-      error -> error
-    end
-  end
+  def convert(input, output), do: Campfire.Media.Vips.convert(input, output)
 
-  def transform(input, output, entries) do
-    arguments =
-      Enum.flat_map(entries, fn {name, value} ->
-        if name in ["format", "convert"] || value in [nil, false, "", []] || value == %{} do
-          []
-        else
-          values = if is_list(value), do: value, else: [value]
-
-          {positional, keywords} =
-            case List.last(values) do
-              %Jason.OrderedObject{values: pairs} -> {Enum.drop(values, -1), pairs}
-              map when is_map(map) -> {Enum.drop(values, -1), Map.to_list(map)}
-              _ -> {values, []}
-            end
-
-          positional =
-            if name in ["resize_to_limit", "resize_to_fit"],
-              do: Enum.map(positional, &(&1 || 10_000_000)),
-              else: positional
-
-          [name, to_string(length(positional))] ++
-            Enum.map(positional, &argument/1) ++
-            [to_string(length(keywords))] ++
-            Enum.flat_map(keywords, fn {key, value} -> [key, argument(value)] end)
-        end
-      end)
-
-    format =
-      Enum.find_value(entries, fn {key, value} ->
-        if key == "convert" && value not in [nil, false, "", []], do: value
-      end)
-
-    destination = if is_binary(format), do: output <> "." <> format, else: output
-
-    try do
-      case run(
-             "campfire-vips",
-             ["transform", Path.expand(input), Path.expand(destination)] ++ arguments
-           ) do
-        {:ok, _} -> if destination == output, do: :ok, else: File.rename(destination, output)
-        error -> error
-      end
-    after
-      if destination != output, do: File.rm(destination)
-    end
-  rescue
-    _ -> {:error, :invalid_transformation}
-  end
-
-  defp argument(value) when is_list(value), do: Enum.map_join(value, " ", &argument/1)
-
-  defp argument(value) when is_binary(value) or is_number(value) or is_boolean(value),
-    do: to_string(value)
+  def transform(input, output, entries), do: Campfire.Media.Vips.transform(input, output, entries)
 
   def audio_metadata(path) do
     with {:ok, json} <-
@@ -95,7 +24,7 @@ defmodule Campfire.Media do
              Path.expand(path)
            ]),
          {:ok, %Jason.OrderedObject{values: values}} <-
-           Jason.decode(json, objects: :ordered_objects) do
+           Campfire.JSON.decode_ordered(json) do
       streams = List.keyfind(values, "streams", 0, {"streams", []}) |> elem(1)
 
       audio =
@@ -130,7 +59,7 @@ defmodule Campfire.Media do
              "json",
              Path.expand(path)
            ]),
-         {:ok, data} <- Jason.decode(json) do
+         {:ok, data} <- Campfire.JSON.decode(json) do
       streams = data["streams"] || []
       video = Enum.find(streams, &(&1["codec_type"] == "video"))
       audio = Enum.find(streams, &(&1["codec_type"] == "audio"))

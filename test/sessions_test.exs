@@ -6,8 +6,8 @@ defmodule Campfire.SessionsTest do
   setup do
     Campfire.RateLimiter.clear()
     DB.restore_fixture(@fixture)
-    System.put_env("CAMPFIRE_CLOCK", "2026-03-02T16:00:00Z")
-    on_exit(fn -> System.delete_env("CAMPFIRE_CLOCK") end)
+    Campfire.Env.put("CAMPFIRE_CLOCK", "2026-03-02T16:00:00Z")
+    on_exit(fn -> Campfire.Env.delete("CAMPFIRE_CLOCK") end)
     :ok
   end
 
@@ -40,7 +40,7 @@ defmodule Campfire.SessionsTest do
     assert page.resp_body =~ "<title>Sign in</title>"
     assert page.resp_body =~ "application-a54c74a7.js"
     assert page.resp_cookies["_campfire_session"][:http_only]
-    assert length(Regex.scan(~r/lifebuoy-/, page.resp_body)) == 1
+    assert Enum.count(Regex.scan(~r/lifebuoy-/, page.resp_body)) == 1
 
     assert browser_write(:post, "/session", %{
              "email_address" => "david@37signals.com",
@@ -193,7 +193,7 @@ defmodule Campfire.SessionsTest do
     assert length(Regex.scan(~r/<form\b/, page.resp_body)) ==
              length(Regex.scan(~r/<\/form>/, page.resp_body))
 
-    assert length(
+    assert Enum.count(
              Regex.scan(
                ~r/<form\b[^>]*data-controller="auto-submit"[^>]*>(?:\s*<input\b[^>]*>)*\s*<\/form>/,
                page.resp_body

@@ -1,7 +1,7 @@
 defmodule Campfire.Webhooks do
   alias Campfire.{Attachments, Chat, DB, Jobs, Mentions, Network, Storage}
   @external_resource "priv/compat/rails-mime.json"
-  @mime Jason.decode!(File.read!(@external_resource))
+  @mime Campfire.JSON.decode!(File.read!(@external_resource))
 
   def enqueue(room, message) do
     bots =

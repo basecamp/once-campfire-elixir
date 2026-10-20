@@ -43,7 +43,7 @@ defmodule Campfire.CableRedisBridge do
     with {:ok, "gid://campfire/User/" <> id} <-
            Base.url_decode64(encoded_user, padding: false),
          {user_id, ""} <- Integer.parse(id),
-         {:ok, %{"type" => "disconnect"} = message} <- Jason.decode(payload) do
+         {:ok, %{"type" => "disconnect"} = message} <- Campfire.JSON.decode(payload) do
       reconnect = Map.get(message, "reconnect", true)
 
       Registry.dispatch(Campfire.Connections, user_id, fn entries ->

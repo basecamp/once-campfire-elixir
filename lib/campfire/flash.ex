@@ -20,7 +20,10 @@ defmodule Campfire.Flash do
         data =
           case conn.resp_cookies["_campfire_session"] do
             %{value: value} ->
-              Campfire.Rails.decrypt_cookie("_campfire_session", URI.decode(value))
+              Campfire.Rails.decrypt_cookie(
+                "_campfire_session",
+                Campfire.CookieCodec.decode(value)
+              )
 
             _ ->
               incoming

@@ -22,7 +22,7 @@ defmodule Campfire.Storage do
   end
 
   def path(key) do
-    root = System.get_env("STORAGE_PATH", "var/files") |> Path.expand()
+    root = Campfire.Env.get("STORAGE_PATH", "var/files") |> Path.expand()
 
     if is_binary(key) && Regex.match?(~r/\A[a-zA-Z0-9_-]{4,}\z/, key) do
       Path.join([root, String.slice(key, 0, 2), String.slice(key, 2, 2), key])
@@ -347,7 +347,7 @@ defmodule Campfire.Storage do
 
           owner =
             if blob do
-              case Jason.decode(blob["metadata"] || "{}") do
+              case Campfire.JSON.decode(blob["metadata"] || "{}") do
                 {:ok, metadata} when is_map(metadata) -> metadata["campfire_upload_user_id"]
                 _ -> nil
               end

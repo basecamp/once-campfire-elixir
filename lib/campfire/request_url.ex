@@ -8,7 +8,11 @@ defmodule Campfire.RequestURL do
   def call(%{remote_ip: peer} = conn, _) when peer in [{127, 0, 0, 1}, {0, 0, 0, 0, 0, 0, 0, 1}],
     do: local_proxy(conn)
 
-  def call(conn, _), do: conn
+  def call(conn, opts) do
+    do_call(conn, opts)
+  end
+
+  defp do_call(conn, _), do: conn
 
   defp local_proxy(conn) do
     proto = forwarded(header(conn, "forwarded") || "") |> Map.get("proto", []) |> List.last()

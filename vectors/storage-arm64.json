@@ -13,20 +13,24 @@
   "fixture": "alpha-centuri.mov",
   "preview": {
     "byte_size": 11790,
-    "checksum": "Ckn6FYF3wfdTi3GYIHXgbg=="
+    "checksum": "Ckn6FYF3wfdTi3GYIHXgbg==",
+    "pixels": "f5GXVCF5mtNOJ8mvKYE4mA=="
   },
   "variants": {
     "alpha-centuri-preview-webp": {
       "byte_size": 3346,
-      "checksum": "BLqQqutSvW4uMlH52CJJCw=="
+      "checksum": "BLqQqutSvW4uMlH52CJJCw==",
+      "pixels": "q+NuXpSLGnmVTZAfdGQvwA=="
     },
     "alpha-centuri-poster": {
       "byte_size": 5134,
-      "checksum": "SCvxTijcri7iO5qMei25DA=="
+      "checksum": "SCvxTijcri7iO5qMei25DA==",
+      "pixels": "tbiJvk/XmT4RR8Sb6X7tjA=="
     },
     "alpha-centuri-poster-from-key": {
       "byte_size": 5134,
-      "checksum": "SCvxTijcri7iO5qMei25DA=="
+      "checksum": "SCvxTijcri7iO5qMei25DA==",
+      "pixels": "tbiJvk/XmT4RR8Sb6X7tjA=="
     }
   }
 }

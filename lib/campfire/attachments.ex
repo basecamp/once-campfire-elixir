@@ -8,6 +8,24 @@ defmodule Campfire.Attachments do
     )
   end
 
+  # The same join for a page's worth of records; `record_id` comes back alongside the blob so
+  # callers can key the results. Ordered by record for a stable first row per record, the way
+  # find/3 takes the first row of its own query.
+  def find_many(type, ids, name) when is_list(ids) do
+    case ids do
+      [] ->
+        []
+
+      ids ->
+        placeholders = Enum.map_join(ids, ",", fn _ -> "?" end)
+
+        DB.query(
+          "SELECT a.record_id AS record_id, b.* FROM active_storage_attachments a JOIN active_storage_blobs b ON b.id=a.blob_id WHERE a.record_type=? AND a.record_id IN (#{placeholders}) AND a.name=? ORDER BY a.record_id, a.id",
+          [type | ids] ++ [name]
+        )
+    end
+  end
+
   def prepare(nil), do: {:ok, nil}
   def prepare(""), do: {:ok, nil}
 
@@ -17,7 +35,7 @@ defmodule Campfire.Attachments do
   def prepare(token) when is_binary(token) do
     with id when is_integer(id) <- Rails.verify_message("ActiveStorage", token, "blob_id"),
          blob when is_map(blob) <- DB.one("SELECT * FROM active_storage_blobs WHERE id=?", [id]) do
-      metadata = Jason.decode!(blob["metadata"] || "{}")
+      metadata = Campfire.JSON.decode!(blob["metadata"] || "{}")
 
       if metadata["identified"] do
         {:ok, blob}
@@ -30,7 +48,7 @@ defmodule Campfire.Attachments do
           )
 
         %Jason.OrderedObject{values: values} =
-          Jason.decode!(blob["metadata"] || "{}", objects: :ordered_objects)
+          Campfire.JSON.decode_ordered!(blob["metadata"] || "{}")
 
         {:ok,
          blob
@@ -152,7 +170,7 @@ defmodule Campfire.Attachments do
   end
 
   def analyze_later(blob) do
-    metadata = Jason.decode!(blob["metadata"] || "{}")
+    metadata = Campfire.JSON.decode!(blob["metadata"] || "{}")
 
     cond do
       metadata["analyzed"] ->

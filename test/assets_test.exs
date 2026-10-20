@@ -177,7 +177,7 @@ defmodule Campfire.AssetsTest do
 
   defp export_with_path(path) do
     System.cmd("sh", [Path.join(path, "project/bin/export-assets")],
-      env: [{"PATH", path <> ":" <> System.get_env("PATH", "")}],
+      env: [{"PATH", path <> ":" <> Campfire.Env.get("PATH", "")}],
       stderr_to_stdout: true
     )
   end

@@ -18,7 +18,7 @@ defmodule Campfire.MessagesViewTest do
 
   test "batch rendering shares complete fragments with broadcasts" do
     messages = DB.query("SELECT * FROM messages ORDER BY id DESC LIMIT 2")
-    assert length(messages) == 2
+    assert Enum.count(messages) == 2
     base = "https://campfire.test"
     html = MessagesView.render_many(messages, base)
     assert html == Enum.map_join(messages, &MessagesView.render(&1, base))
@@ -115,6 +115,59 @@ defmodule Campfire.MessagesViewTest do
     assert recovered =~ message["client_message_id"]
   end
 
+  test "the fragment store stays within its byte budget and drops least recently used entries" do
+    Campfire.Env.put("CAMPFIRE_FRAGMENT_CACHE_MB", "1")
+    on_exit(fn -> Campfire.Env.delete("CAMPFIRE_FRAGMENT_CACHE_MB") end)
+    counter = :counters.new(1, [])
+    html = String.duplicate("x", 32 * 1024)
+
+    render = fn label ->
+      fn ->
+        :counters.add(counter, 1, 1)
+        label
+      end
+    end
+
+    limit = 1024 * 1024
+    assert FragmentCache.fetch(:kept, render.("kept")) == "kept"
+    assert FragmentCache.fetch(:dropped, render.("dropped")) == "dropped"
+
+    Enum.reduce_while(1..1000, 1, fn i, _ ->
+      FragmentCache.fetch({:filler, i}, fn -> html end)
+
+      if FragmentCache.bytes() + byte_size(html) + 1024 > limit,
+        do: {:halt, i},
+        else: {:cont, i + 1}
+    end)
+
+    assert FragmentCache.bytes() <= limit
+    assert :counters.get(counter, 1) == 2
+
+    # A read counts as a use, so the crossing write drops the older entry instead.
+    assert FragmentCache.fetch(:kept, render.("kept")) == "kept"
+    assert :counters.get(counter, 1) == 2
+    FragmentCache.fetch(:crossing, fn -> html end)
+    assert FragmentCache.bytes() <= limit
+    assert FragmentCache.fetch(:kept, render.("kept")) == "kept"
+    assert :counters.get(counter, 1) == 2
+    assert FragmentCache.fetch(:dropped, render.("dropped")) == "dropped"
+    assert :counters.get(counter, 1) == 3
+  end
+
+  test "an entry larger than a quarter of the budget is served but not kept" do
+    Campfire.Env.put("CAMPFIRE_FRAGMENT_CACHE_MB", "1")
+    on_exit(fn -> Campfire.Env.delete("CAMPFIRE_FRAGMENT_CACHE_MB") end)
+
+    assert FragmentCache.fetch(:huge, fn -> String.duplicate("x", 300 * 1024) end)
+           |> byte_size() == 300 * 1024
+
+    assert FragmentCache.size() == 0
+    assert FragmentCache.bytes() == 0
+
+    assert FragmentCache.fetch(:small, fn -> "kept" end) == "kept"
+    assert FragmentCache.size() == 1
+  end
+
   test "concurrent cache rollover remains bounded and returns every rendered value" do
     for i <- 1..4096, do: FragmentCache.fetch({:seed, i}, fn -> Integer.to_string(i) end)
 
@@ -127,6 +180,6 @@ defmodule Campfire.MessagesViewTest do
       |> Enum.map(fn {:ok, html} -> html end)
 
     assert Enum.sort(results) == Enum.sort(Enum.map(1..100, &"rollover-#{&1}"))
-    assert :ets.info(FragmentCache, :size) <= 4096
+    assert FragmentCache.bytes() <= 32 * 1024 * 1024
   end
 end

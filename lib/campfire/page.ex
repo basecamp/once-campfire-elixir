@@ -26,7 +26,7 @@ defmodule Campfire.Page do
       content: "",
       footer: "        \n",
       sidebar: "      \n",
-      vapid: Assets.html_escape(System.get_env("VAPID_PUBLIC_KEY", "")),
+      vapid: Assets.html_escape(Campfire.Env.get("VAPID_PUBLIC_KEY", "")),
       account_version:
         (account["updated_at"] || "") |> String.replace(~r/[^0-9]/, "") |> String.slice(0, 14)
     ]

@@ -5,10 +5,12 @@ defmodule Campfire.FetchMetadataTest do
   alias Campfire.{Auth, RequestURL}
 
   test "method, origin, metadata and TLS policy matrix" do
-    original = System.get_env("FORCE_SSL")
+    original = Campfire.Env.get("FORCE_SSL")
 
     on_exit(fn ->
-      if original, do: System.put_env("FORCE_SSL", original), else: System.delete_env("FORCE_SSL")
+      if original,
+        do: Campfire.Env.put("FORCE_SSL", original),
+        else: Campfire.Env.delete("FORCE_SSL")
     end)
 
     for method <- ~w(GET HEAD POST PUT PATCH DELETE OPTIONS TRACE),
@@ -26,7 +28,7 @@ defmodule Campfire.FetchMetadataTest do
           "garbage"
         ],
         origin <- [nil, :matching, "null", "https://attacker.test"] do
-      if forced, do: System.put_env("FORCE_SSL", forced), else: System.delete_env("FORCE_SSL")
+      if forced, do: Campfire.Env.put("FORCE_SSL", forced), else: Campfire.Env.delete("FORCE_SSL")
       request = %{conn(method, "/session") | scheme: scheme, host: "campfire.test", port: 8443}
       actual_origin = if origin == :matching, do: Auth.base(request), else: origin
       request = if site, do: put_req_header(request, "sec-fetch-site", site), else: request

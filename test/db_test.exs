@@ -48,7 +48,7 @@ defmodule Campfire.DBTest do
   @tag skip: System.schedulers_online() == 1
   test "all readers reject writes and retain read-pool connection settings" do
     readers = PartitionSupervisor.which_children(DB.ReadPool)
-    assert length(readers) == min(System.schedulers_online(), 8)
+    assert length(readers) == min(System.schedulers_online(), 2)
     assert readers |> Enum.map(&elem(&1, 1)) |> Enum.uniq() |> length() == length(readers)
     original = DB.one("SELECT id, name FROM accounts LIMIT 1")
 
@@ -60,7 +60,7 @@ defmodule Campfire.DBTest do
             {"foreign_keys", 1},
             {"journal_mode", "wal"},
             {"synchronous", 1},
-            {"cache_size", -2000},
+            {"cache_size", 2000},
             {"mmap_size", 0}
           ] do
         assert [%{^pragma => ^value}] = GenServer.call(pid, {:query, "PRAGMA #{pragma}", []})
@@ -69,6 +69,46 @@ defmodule Campfire.DBTest do
       assert [^original] =
                GenServer.call(pid, {:query, "SELECT id, name FROM accounts LIMIT 1", []})
     end
+  end
+
+  test "a read batch returns one result per statement in order" do
+    [account, rooms, count] =
+      DB.read_batch([
+        {"SELECT * FROM accounts LIMIT 1", []},
+        {"SELECT id FROM rooms ORDER BY id LIMIT 3", []},
+        {"SELECT count(*) AS count FROM messages", []}
+      ])
+
+    assert [%{"id" => _}] = account
+    assert [_, _, _] = rooms
+    assert [%{"count" => count_value}] = count
+    assert count_value > 0
+  end
+
+  test "a read batch inside a transaction reads that transaction's own writes" do
+    {batched, single} =
+      DB.transaction(fn q ->
+        q.("UPDATE accounts SET name=? WHERE id=(SELECT id FROM accounts LIMIT 1)", ["batch name"])
+
+        [batched] = DB.read_batch([{"SELECT name FROM accounts LIMIT 1", []}])
+        single = DB.query("SELECT name FROM accounts LIMIT 1")
+
+        {batched, single}
+      end)
+
+    assert [%{"name" => "batch name"}] = batched
+    assert [%{"name" => "batch name"}] = single
+  end
+
+  test "a failing read batch raises and leaves the readers usable" do
+    assert_raise DB.Error, fn ->
+      DB.read_batch([
+        {"SELECT 1 AS n", []},
+        {"SELECT * FROM missing_table", []}
+      ])
+    end
+
+    assert [%{"n" => 1}] = DB.query("SELECT 1 AS n")
   end
 
   @tag skip: System.schedulers_online() == 1
