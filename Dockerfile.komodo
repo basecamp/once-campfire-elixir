@@ -1,0 +1,49 @@
+# syntax=docker/dockerfile:1.7
+# Self-contained build for Komodo (Conciergerie): no step on the host and no Ruby. Unlike Dockerfile,
+# the compiled frontend is committed in priv/static/assets (refresh with bin/export-assets when the
+# reference changes) and Thruster comes from its pinned rubygems.org package.
+
+FROM alpine:3.20 AS thruster
+ADD --checksum=sha256:9cd7265bf54e954575c8442e42d050ed8eb55df4f9d7da8fd6f94fcc0339baa5 \
+    https://rubygems.org/downloads/thruster-0.1.23-x86_64-linux.gem /tmp/thruster.gem
+RUN cd /tmp && tar -xf thruster.gem data.tar.gz && tar -xzf data.tar.gz exe/x86_64-linux/thrust MIT-LICENSE
+
+# Same as Dockerfile.dev: keep both in step.
+FROM elixir:1.20.4-otp-29-slim@sha256:3898ffe18d695e770239e4b342dc6b83136f52da0a37df2298083c03068cfd4e AS toolchain
+ARG ERL_FLAGS=""
+ENV ERL_FLAGS=${ERL_FLAGS}
+RUN apt-get update && apt-get install -y --no-install-recommends build-essential cmake git ca-certificates libsqlite3-dev pkg-config libvips-dev=8.16.1-1+deb13u1 ffmpeg=7:7.1.5-0+deb13u1 && rm -rf /var/lib/apt/lists/*
+COPY native/vips.c /build/vips.c
+RUN cc -O2 -Wall -Wextra -Werror /build/vips.c $(pkg-config --cflags --libs vips) -o /usr/local/bin/campfire-vips && rm -rf /build
+WORKDIR /app
+ENV HEX_HOME=/app/.hex MIX_HOME=/app/.mix
+RUN mix local.hex --force && mix local.rebar --force
+
+FROM toolchain AS build
+ENV MIX_ENV=prod
+COPY mix.exs mix.lock ./
+RUN mix deps.get --only prod
+COPY lib ./lib
+COPY native ./native
+COPY priv ./priv
+COPY vectors/message-etags.json vectors/mime-types.json vectors/route-actions.json vectors/image-etags.json vectors/sounds.json vectors/fragment-digests.json ./vectors/
+RUN test -f priv/static/assets/.manifest.json && mix deps.compile && mix compile --warnings-as-errors && mix release
+
+FROM toolchain
+ENV ERL_FLAGS=""
+WORKDIR /campfire
+COPY --from=build /app/_build/prod/rel/campfire ./
+COPY --from=thruster /tmp/exe/x86_64-linux/thrust /usr/local/bin/thrust
+COPY --from=thruster /tmp/MIT-LICENSE /campfire/THRUSTER-LICENSE
+COPY priv/public/502.html /campfire/public/502.html
+COPY --chmod=755 hooks /hooks
+COPY --chmod=755 bin/container-start /campfire/bin/container-start
+RUN mkdir -p /rails/storage/db /rails/storage/files /rails/storage/backups /rails/storage/thruster && chown -R 1000:1000 /rails/storage
+USER 1000:1000
+ARG APP_VERSION=dev
+ARG GIT_REVISION=dev
+ENV APP_VERSION=$APP_VERSION GIT_REVISION=$GIT_REVISION RAILS_ENV=production
+ENV DATABASE_PATH=/rails/storage/db/production.sqlite3 STORAGE_PATH=/rails/storage/files
+ENV HTTP_IDLE_TIMEOUT=60 HTTP_READ_TIMEOUT=300 HTTP_WRITE_TIMEOUT=300
+EXPOSE 80
+CMD ["/campfire/bin/container-start"]

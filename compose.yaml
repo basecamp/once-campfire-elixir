@@ -1,0 +1,40 @@
+# Production deployment by Komodo (Conciergerie). APP_HOST, APP_ROUTER and the secrets come from the
+# Komodo stack environment; without Traefik the labels have no effect.
+services:
+  campfire:
+    build:
+      context: .
+      dockerfile: Dockerfile.komodo
+    restart: unless-stopped
+    environment:
+      SECRET_KEY_BASE: ${SECRET_KEY_BASE:?}
+      VAPID_PUBLIC_KEY: ${VAPID_PUBLIC_KEY:?}
+      VAPID_PRIVATE_KEY: ${VAPID_PRIVATE_KEY:?}
+      APP_URL: https://${APP_HOST:?}
+    volumes:
+      - storage:/rails/storage
+    networks:
+      - proxy
+    # List form: Compose interpolates variables in list items, not in mapping keys.
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+      - traefik.http.routers.${APP_ROUTER:?}.rule=Host(`${APP_HOST}`)
+      - traefik.http.routers.${APP_ROUTER}.entrypoints=https
+      - traefik.http.routers.${APP_ROUTER}.tls.certresolver=letsencrypt
+      - traefik.http.routers.${APP_ROUTER}-http.rule=Host(`${APP_HOST}`)
+      - traefik.http.routers.${APP_ROUTER}-http.entrypoints=http
+      - traefik.http.routers.${APP_ROUTER}-http.middlewares=redirect-to-https@docker
+      - traefik.http.services.${APP_ROUTER}.loadbalancer.server.port=80
+      # Consistent SQLite snapshot in /rails/storage/backups before each archive (offen/docker-volume-backup).
+      - docker-volume-backup.archive-pre=/hooks/pre-backup
+
+networks:
+  proxy:
+    external: true
+
+# Created by hand before the first Deploy, filled with the data copied from the previous install.
+volumes:
+  storage:
+    name: ${APP_VOLUME:-campfire-storage}
+    external: true
