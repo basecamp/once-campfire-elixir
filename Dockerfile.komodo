@@ -30,8 +30,12 @@ COPY priv ./priv
 COPY vectors/message-etags.json vectors/mime-types.json vectors/route-actions.json vectors/image-etags.json vectors/sounds.json vectors/fragment-digests.json ./vectors/
 RUN test -f priv/static/assets/.manifest.json && mix deps.compile && mix compile --warnings-as-errors && mix release
 
-FROM toolchain
-ENV ERL_FLAGS=""
+# Runtime: the release embeds ERTS, so no Elixir, Erlang or compiler; only the libraries its NIFs, ERTS,
+# campfire-vips and FFmpeg load. Same Debian release as the toolchain image (trixie).
+FROM debian:trixie-slim
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates libsctp1 libsqlite3-0 libssl3t64 libtinfo6 libstdc++6 "libvips42t64=8.16.1-1+deb13u*" "ffmpeg=7:7.1.5-0+deb13u*" && rm -rf /var/lib/apt/lists/*
+ENV LANG=C.UTF-8 ERL_FLAGS=""
+COPY --from=toolchain /usr/local/bin/campfire-vips /usr/local/bin/campfire-vips
 WORKDIR /campfire
 COPY --from=build /app/_build/prod/rel/campfire ./
 COPY --from=thruster /tmp/exe/x86_64-linux/thrust /usr/local/bin/thrust
