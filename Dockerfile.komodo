@@ -8,11 +8,12 @@ ADD --checksum=sha256:9cd7265bf54e954575c8442e42d050ed8eb55df4f9d7da8fd6f94fcc03
     https://rubygems.org/downloads/thruster-0.1.23-x86_64-linux.gem /tmp/thruster.gem
 RUN cd /tmp && tar -xf thruster.gem data.tar.gz && tar -xzf data.tar.gz exe/x86_64-linux/thrust MIT-LICENSE
 
-# Same as Dockerfile.dev: keep both in step.
+# Same as Dockerfile.dev (keep both in step), except the Debian revision: an exact pin breaks at the
+# next Debian security update, so only the libvips and FFmpeg versions are pinned.
 FROM elixir:1.20.4-otp-29-slim@sha256:3898ffe18d695e770239e4b342dc6b83136f52da0a37df2298083c03068cfd4e AS toolchain
 ARG ERL_FLAGS=""
 ENV ERL_FLAGS=${ERL_FLAGS}
-RUN apt-get update && apt-get install -y --no-install-recommends build-essential cmake git ca-certificates libsqlite3-dev pkg-config libvips-dev=8.16.1-1+deb13u1 ffmpeg=7:7.1.5-0+deb13u1 && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends build-essential cmake git ca-certificates libsqlite3-dev pkg-config "libvips-dev=8.16.1-1+deb13u*" "ffmpeg=7:7.1.5-0+deb13u*" && rm -rf /var/lib/apt/lists/*
 COPY native/vips.c /build/vips.c
 RUN cc -O2 -Wall -Wextra -Werror /build/vips.c $(pkg-config --cflags --libs vips) -o /usr/local/bin/campfire-vips && rm -rf /build
 WORKDIR /app
